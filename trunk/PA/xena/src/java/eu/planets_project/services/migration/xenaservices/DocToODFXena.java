@@ -16,7 +16,7 @@
  * @author Justin Waddell
  */
 
-package eu.planets_project.ifr.core.services.migration.xenaservices;
+package eu.planets_project.services.migration.xenaservices;
 
 import java.io.File;
 import java.io.FileInputStream;
