@@ -63,13 +63,13 @@ import eu.planets_project.ifr.core.common.services.migrate.BasicMigrateOneBinary
  *
  */
 @Stateless
-@Local(DocToODFXena.class)
+@Local(BasicMigrateOneBinary.class)
 @LocalBinding(jndiBinding = "planets-project.eu/XenaService/BasicMigrateOneBinary")
-@Remote(DocToODFXena.class)
+@Remote(BasicMigrateOneBinary.class)
 @RemoteBinding(jndiBinding = "planets-project.eu/XenaService/BasicMigrateOneBinary")
 
 // Web Service Annotations, copied from the inherited interface.
-@WebService(name = BasicMigrateOneBinary.NAME, serviceName= BasicMigrateOneBinary.NAME, targetNamespace = PlanetsServices.NS )
+@WebService(name = "DocToODFXena", serviceName= BasicMigrateOneBinary.NAME, targetNamespace = PlanetsServices.NS )
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 public class DocToODFXena implements BasicMigrateOneBinary {
 
@@ -90,7 +90,7 @@ public class DocToODFXena implements BasicMigrateOneBinary {
                     partName = "binary")
             byte[] binary ) {
         // TODO Auto-generated method stub
-        return null;
+        return binary;
     }
     
     /*
