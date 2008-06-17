@@ -32,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
+import java.util.Properties;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -185,11 +186,11 @@ public class DocToODFXena implements BasicMigrateOneBinary {
      * Code from the Xena project.
      */
 
-    public static String OPENOFFICE_INSTALL_DIR = "C:/Program Files/OpenOffice.org 2.3";
+    public String ooffice_install_dir;
     // Values like PDF might work, writer_pdf_Export should work.
     //  - http://www.oooforum.org/forum/viewtopic.phtml?p=167815
     //  - List of filters: http://www.oooforum.org/forum/viewtopic.phtml?t=3549
-    public final static String ODF_WRITER_EXPORT_FILTER = "";
+    public String ooffice_export_filter = "";
     public final static String OPEN_DOCUMENT_PREFIX = "opendocument";
 	private final static String OPEN_DOCUMENT_URI = "http://preservation.naa.gov.au/odf/1.0";
 	public final static String DOCUMENT_TYPE_TAG_NAME = "type";
@@ -204,10 +205,18 @@ public class DocToODFXena implements BasicMigrateOneBinary {
 	            + "(ISO 26300, Version 1.0) document, produced by Open Office version 2.0.";
 
 	public DocToODFXena() {
-		// Nothing to do
+        Properties props = new Properties();
+        try {
+            props.load( this.getClass().getResourceAsStream("/eu/planets_project/services/migration/xenaservices/xena.properties"));
+            this.ooffice_install_dir = props.getProperty("openoffice.install.dir");
+        } catch( IOException e ) {
+            // Use a default for now.
+            this.ooffice_install_dir  = "C:/Program Files/OpenOffice.org 2.3";
+        }
+        log.info("Pointed to OOffice in: "+this.ooffice_install_dir);
 	}
 
-	private XComponent loadDocument(InputStream is, String extension, boolean visible ) throws Exception {
+	private XComponent loadDocument(String fname, InputStream is, String extension, boolean visible ) throws Exception {
 		File input = File.createTempFile("input", "." + extension);
 		try {
 			input.deleteOnExit();
@@ -218,14 +227,14 @@ public class DocToODFXena implements BasicMigrateOneBinary {
 				fos.write(buf, 0, n);
 			}
 			fos.close();
-			XComponent rtn = loadDocument(input, visible );
+			XComponent rtn = loadDocument(fname, input, visible );
 			return rtn;
 		} finally {
 			input.delete();
 		}
 	}
 
-	static XComponent loadDocument(File input, boolean visible) throws Exception {
+	static XComponent loadDocument(String fname, File input, boolean visible) throws Exception {
 		/*
 		 * Bootstraps a servicemanager with the jurt base components registered
 		 */
@@ -248,7 +257,7 @@ public class DocToODFXena implements BasicMigrateOneBinary {
 		} catch (com.sun.star.connection.NoConnectException ncex) {
 			// Could not connect to OpenOffice, so start it up and try again
 			try {
-				startOpenOffice();
+				startOpenOffice(fname);
 				objectInitial = xurlresolver.resolve(address);
 			} catch (Exception ex) {
 				// If it fails again for any reason, just bail
@@ -257,7 +266,7 @@ public class DocToODFXena implements BasicMigrateOneBinary {
 		} catch (com.sun.star.uno.RuntimeException rtex) {
 			// Could not connect to OpenOffice, so start it up and try again
 			try {
-				startOpenOffice();
+				startOpenOffice(fname);
 				objectInitial = xurlresolver.resolve(address);
 			} catch (Exception ex) {
 				// If it fails again for any reason, just bail
@@ -287,11 +296,8 @@ public class DocToODFXena implements BasicMigrateOneBinary {
 		return xcomponentloader.loadComponentFromURL("file:///" + input.getAbsolutePath().replace('\\', '/'), "_blank", 0, loadProperties);
 	}
 
-	private static void startOpenOffice() throws Exception, InterruptedException {
-//		PropertiesManager propManager = pluginManager.getPropertiesManager();
-//		String fname = propManager.getPropertyValue(OfficeProperties.OFFICE_PLUGIN_NAME, OfficeProperties.OOO_DIR_PROP_NAME);
-		String fname = OPENOFFICE_INSTALL_DIR;
-		
+	private static void startOpenOffice(String fname ) throws Exception, InterruptedException {
+	    
 		if (fname == null || fname.equals("")) {
 			throw new Exception("OpenOffice.org location not configured.");
 		}
@@ -335,7 +341,7 @@ public class DocToODFXena implements BasicMigrateOneBinary {
 
 			// Open our office document...
 			XComponent objectDocumentToStore =
-			    loadDocument(inputStream, "doc", visible );
+			    loadDocument( this.ooffice_install_dir, inputStream, "doc", visible );
 
 			// Getting an object that will offer a simple way to store a document to a URL.
 			XStorable xstorable = (XStorable) UnoRuntime.queryInterface(XStorable.class, objectDocumentToStore);
@@ -351,13 +357,14 @@ public class DocToODFXena implements BasicMigrateOneBinary {
 			propertyvalue[0].Name = "Overwrite";
 			propertyvalue[0].Value = new Boolean(true);
 
-			// Setting the filter name
-			/*
-			propertyvalue[1] = new PropertyValue();
-			propertyvalue[1].Name = "FilterName";
+			// Setting the optional filter name
+			if (ooffice_export_filter != null
+                    && !"".equals(ooffice_export_filter)) {
+                propertyvalue[1] = new PropertyValue();
+                propertyvalue[1].Name = "FilterName";
 
-			propertyvalue[1].Value = ODF_WRITER_EXPORT_FILTER;
-*/
+                propertyvalue[1].Value = ooffice_export_filter;
+            }
 			
 			// Storing and converting the document
 			try {
@@ -365,7 +372,7 @@ public class DocToODFXena implements BasicMigrateOneBinary {
 			} catch (Exception e) {
 				throw new Exception(
 				                        "Cannot convert to open document format. Maybe your OpenOffice.org installation does not have installed: "
-				                                + ODF_WRITER_EXPORT_FILTER
+				                                + ooffice_export_filter
 				                                + " or maybe the document is password protected or has some other problem. Try opening in OpenOffice.org manually.",
 				                        e);
 			}
