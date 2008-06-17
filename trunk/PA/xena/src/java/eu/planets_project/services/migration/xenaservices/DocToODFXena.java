@@ -18,11 +18,14 @@
 
 package eu.planets_project.services.migration.xenaservices;
 
+import java.net.URI;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -38,6 +41,7 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
+import javax.xml.ws.BindingType;
 
 import org.jboss.annotation.ejb.LocalBinding;
 import org.jboss.annotation.ejb.RemoteBinding;
@@ -54,6 +58,7 @@ import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.uno.UnoRuntime;
 
+import eu.planets_project.ifr.core.common.logging.PlanetsLogger;
 import eu.planets_project.ifr.core.common.services.PlanetsServices;
 import eu.planets_project.ifr.core.common.services.migrate.BasicMigrateOneBinary;
 
@@ -69,9 +74,17 @@ import eu.planets_project.ifr.core.common.services.migrate.BasicMigrateOneBinary
 @RemoteBinding(jndiBinding = "planets-project.eu/XenaService/BasicMigrateOneBinary")
 
 // Web Service Annotations, copied from the inherited interface.
-@WebService(name = "DocToODFXena", serviceName= BasicMigrateOneBinary.NAME, targetNamespace = PlanetsServices.NS )
-@SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
+@WebService(
+        name = "DocToODFXena", 
+        serviceName= BasicMigrateOneBinary.NAME, 
+        targetNamespace = PlanetsServices.NS )
+@SOAPBinding(
+        parameterStyle = SOAPBinding.ParameterStyle.BARE,
+        style = SOAPBinding.Style.RPC)
+@BindingType(value = "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")
 public class DocToODFXena implements BasicMigrateOneBinary {
+    
+    PlanetsLogger log = PlanetsLogger.getLogger(DocToODFXena.class);
 
 	/* (non-Javadoc)
      * @see eu.planets_project.ifr.core.common.services.migrate.BasicMigrateOneBinary#basicMigrateOneBinary(byte[])
@@ -89,14 +102,94 @@ public class DocToODFXena implements BasicMigrateOneBinary {
                     targetNamespace = PlanetsServices.NS + "/" + BasicMigrateOneBinary.NAME, 
                     partName = "binary")
             byte[] binary ) {
-        // TODO Auto-generated method stub
-        return binary;
+
+        File input = new File( "C:/tmp.doc" );
+        try {
+            FileOutputStream fos = new FileOutputStream(input);
+            fos.write(binary);
+            fos.flush();
+            fos.close();
+        } catch( FileNotFoundException e ) {
+            log.error("Creating "+input.getAbsolutePath()+" :: " +e);
+            return null;
+        } catch( IOException e ) {
+            log.error("Creating "+input.getAbsolutePath()+" :: " +e);
+            return null;
+        }
+        
+        File output = new File( "C:/tmp.odt" );
+
+        try {
+            this.transform(input.toURI(), output.toURI());
+        } catch( SAXException e ) {
+            log.error("Transforming "+input.getAbsolutePath()+" :: " +e);
+            return null;
+        } catch( IOException e ) {
+            log.error("Transforming "+input.getAbsolutePath()+" :: " +e);
+            return null;
+        }
+        
+        
+        byte[] result = null;
+        try {
+            result = this.getByteArrayFromFile(output);
+        } catch( IOException e ) {
+            log.error("Returning "+input.getAbsolutePath()+" :: " +e);
+            return null;
+        } 
+        
+        return result;
+    }
+    
+    // FIXME Refactor this into common.
+    private static byte[] getByteArrayFromFile(File file) throws IOException {
+        InputStream is = new FileInputStream(file);
+
+        // Get the size of the file
+        long length = file.length();
+
+        // You cannot create an array using a long type.
+        // It needs to be an int type.
+        // Before converting to an int type, check
+        // to ensure that file is not larger than Integer.MAX_VALUE.
+        if (length > Integer.MAX_VALUE) {
+            // throw new
+            // IllegalArgumentException("getBytesFromFile@JpgToTiffConverter::
+            // The file is too large (i.e. larger than 2 GB!");
+            System.out.println("Datei ist zu gross (e.g. groesser als 2GB)!");
+        }
+
+        // Create the byte array to hold the data
+        byte[] bytes = new byte[(int) length];
+
+        // Read in the bytes
+        int offset = 0;
+        int numRead = 0;
+        while (offset < bytes.length
+                && (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
+            offset += numRead;
+        }
+
+        // Ensure all the bytes have been read in
+        if (offset < bytes.length) {
+            throw new IOException("Could not completely read file "
+                    + file.getName());
+        }
+
+        // Close the input stream and return bytes
+        is.close();
+        return bytes;
     }
     
     /*
      * Code from the Xena project.
      */
 
+    public static String OPENOFFICE_INSTALL_DIR = "C:/Program Files/OpenOffice.org 2.3";
+    // Values like PDF might work, writer_pdf_Export should work.
+    //  - http://www.oooforum.org/forum/viewtopic.phtml?p=167815
+    //  - List of filters: http://www.oooforum.org/forum/viewtopic.phtml?t=3549
+    public final static String ODF_WRITER_EXPORT_FILTER = "";
     public final static String OPEN_DOCUMENT_PREFIX = "opendocument";
 	private final static String OPEN_DOCUMENT_URI = "http://preservation.naa.gov.au/odf/1.0";
 	public final static String DOCUMENT_TYPE_TAG_NAME = "type";
@@ -197,7 +290,8 @@ public class DocToODFXena implements BasicMigrateOneBinary {
 	private static void startOpenOffice() throws Exception, InterruptedException {
 //		PropertiesManager propManager = pluginManager.getPropertiesManager();
 //		String fname = propManager.getPropertyValue(OfficeProperties.OFFICE_PLUGIN_NAME, OfficeProperties.OOO_DIR_PROP_NAME);
-		String fname = "C:/Program Files/OpenOffice 2.3";
+		String fname = OPENOFFICE_INSTALL_DIR;
+		
 		if (fname == null || fname.equals("")) {
 			throw new Exception("OpenOffice.org location not configured.");
 		}
@@ -232,21 +326,16 @@ public class DocToODFXena implements BasicMigrateOneBinary {
 		}
 	}
 
-	public void parse(InputSource input) throws SAXException, IOException {
-		File output = File.createTempFile("output", "xantmp");
-
-		String converter = "none";
-		// Values like PDF might work, writer_pdf_Export should work.
-		//  - http://www.oooforum.org/forum/viewtopic.phtml?p=167815
-		//  - List of filters: http://www.oooforum.org/forum/viewtopic.phtml?t=3549
+	public void transform(URI input, URI output) throws SAXException, IOException {
+		
+		FileInputStream inputStream = new FileInputStream( new File( input ));
 
 		try {
-			output.deleteOnExit();
 			boolean visible = false;
 
 			// Open our office document...
 			XComponent objectDocumentToStore =
-			    loadDocument(input.getByteStream(), "doc", visible );
+			    loadDocument(inputStream, "doc", visible );
 
 			// Getting an object that will offer a simple way to store a document to a URL.
 			XStorable xstorable = (XStorable) UnoRuntime.queryInterface(XStorable.class, objectDocumentToStore);
@@ -263,20 +352,20 @@ public class DocToODFXena implements BasicMigrateOneBinary {
 			propertyvalue[0].Value = new Boolean(true);
 
 			// Setting the filter name
+			/*
 			propertyvalue[1] = new PropertyValue();
 			propertyvalue[1].Name = "FilterName";
 
-			propertyvalue[1].Value = converter;
-
+			propertyvalue[1].Value = ODF_WRITER_EXPORT_FILTER;
+*/
+			
 			// Storing and converting the document
 			try {
-				String url = "file:///" + output.getAbsolutePath().replace('\\', '/');
-
-				xstorable.storeToURL(url, propertyvalue);
+				xstorable.storeToURL(output.toURL().toString(), propertyvalue);
 			} catch (Exception e) {
 				throw new Exception(
 				                        "Cannot convert to open document format. Maybe your OpenOffice.org installation does not have installed: "
-				                                + converter
+				                                + ODF_WRITER_EXPORT_FILTER
 				                                + " or maybe the document is password protected or has some other problem. Try opening in OpenOffice.org manually.",
 				                        e);
 			}
@@ -284,9 +373,9 @@ public class DocToODFXena implements BasicMigrateOneBinary {
 			XComponent xcomponent = (XComponent) UnoRuntime.queryInterface(XComponent.class, xstorable);
 			// Closing the converted document
 			xcomponent.dispose();
-			if (output.length() == 0) {
+/*			if (output.length() == 0) {
 				throw new Exception("OpenOffice open document file is empty. Do you have OpenOffice Java integration installed?");
-			}
+			}*/
 		} catch (Exception e) {
 			logger.log(Level.FINEST, "Problem normalisting office document", e);
 			throw new SAXException(e);
@@ -316,7 +405,7 @@ public class DocToODFXena implements BasicMigrateOneBinary {
 			throw new IOException("OpenOffice could not create the open document file");
             */
 		} finally {
-			output.delete();
+//			output.delete();
 		}
 	}
 }
