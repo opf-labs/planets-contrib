@@ -1,4 +1,5 @@
 /**
+ * This file is based on Xena, but heavily modified.
  * 
  */
 package eu.planets_project.services.migration.xenaservices;
@@ -16,8 +17,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jws.WebParam;
-
 import org.xml.sax.SAXException;
 
 import com.sun.star.beans.PropertyValue;
@@ -29,8 +28,6 @@ import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.uno.UnoRuntime;
 
 import eu.planets_project.ifr.core.common.logging.PlanetsLogger;
-import eu.planets_project.ifr.core.common.services.PlanetsServices;
-import eu.planets_project.ifr.core.common.services.migrate.BasicMigrateOneBinary;
 
 /**
  * @author <a href="mailto:Andrew.Jackson@bl.uk">Andy Jackson</a>
@@ -56,7 +53,7 @@ public class XenaMigrations {
     
     
     public final static String OPEN_DOCUMENT_PREFIX = "opendocument";
-    private final static String OPEN_DOCUMENT_URI = "http://preservation.naa.gov.au/odf/1.0";
+//    private final static String OPEN_DOCUMENT_URI = "http://preservation.naa.gov.au/odf/1.0";
     public final static String DOCUMENT_TYPE_TAG_NAME = "type";
     public final static String DOCUMENT_EXTENSION_TAG_NAME = "extension";
     public final static String PROCESS_DESCRIPTION_TAG_NAME = "description";
@@ -64,10 +61,12 @@ public class XenaMigrations {
 
     private static Logger logger = Logger.getLogger(DocToODFXena.class.getName());
 
+    /*
     private final static String DESCRIPTION =
         "The following data is a MIME-compliant (RFC 1421) PEM base64 (RFC 1421) representation of an Open Document Format "
                 + "(ISO 26300, Version 1.0) document, produced by Open Office version 2.0.";
-
+*/
+    
     public XenaMigrations() {
         Properties props = new Properties();
         try {
@@ -347,7 +346,7 @@ public class XenaMigrations {
         
         byte[] result = null;
         try {
-            result = this.getByteArrayFromFile(output);
+            result = XenaMigrations.getByteArrayFromFile(output);
         } catch( IOException e ) {
             log.error("Returning "+input.getAbsolutePath()+" :: " +e);
             return null;
