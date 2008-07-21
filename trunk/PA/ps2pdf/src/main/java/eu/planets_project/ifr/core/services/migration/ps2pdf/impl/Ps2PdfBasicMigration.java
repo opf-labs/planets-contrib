@@ -1,0 +1,83 @@
+package eu.planets_project.ifr.core.services.migration.ps2pdf.impl;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.Remote;
+import javax.ejb.Stateless;
+import javax.jws.WebMethod;
+import javax.jws.WebParam;
+import javax.jws.WebResult;
+import javax.jws.WebService;
+import javax.jws.soap.SOAPBinding;
+import javax.xml.ws.BindingType;
+
+import org.jboss.annotation.ejb.RemoteBinding;
+
+import eu.planets_project.ifr.core.common.cli.ProcessRunner;
+import eu.planets_project.ifr.core.common.services.PlanetsServices;
+import eu.planets_project.ifr.core.common.services.migrate.BasicMigrateOneBinary;
+
+
+
+@SuppressWarnings("serial")
+@WebService(name = Ps2PdfBasicMigration.NAME, serviceName = BasicMigrateOneBinary.NAME, targetNamespace = PlanetsServices.NS)
+@SOAPBinding(
+        parameterStyle = SOAPBinding.ParameterStyle.BARE,
+        style = SOAPBinding.Style.RPC)
+@Stateless
+@Remote(BasicMigrateOneBinary.class)
+@RemoteBinding(jndiBinding="planets-project.eu/Ps2PdfBasicMigrationServiceRemote")
+@BindingType(value="http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")
+public class Ps2PdfBasicMigration implements BasicMigrateOneBinary, Serializable
+{
+    
+	private static final long serialVersionUID = 1878137433497934155L;
+	public static final String NAME = "Ps2PdfBasicMigration";
+
+	@WebMethod(operationName = BasicMigrateOneBinary.NAME,
+	           action = PlanetsServices.NS + "/" + BasicMigrateOneBinary.NAME)
+	@WebResult(name = BasicMigrateOneBinary.NAME + "Result",
+	           targetNamespace = PlanetsServices.NS + "/" + BasicMigrateOneBinary.NAME,
+	           partName = BasicMigrateOneBinary.NAME + "Result")
+	public byte[] basicMigrateOneBinary(
+	        @WebParam(name = "binary", targetNamespace = PlanetsServices.NS  + "/" + BasicMigrateOneBinary.NAME, partName = "binary")
+	        byte[] binary)
+	{
+		InputStream psfile = new ByteArrayInputStream(binary);
+		
+		ProcessRunner runner = new ProcessRunner();
+		List<String> command = new ArrayList<String>();
+		command.add("ps2pdf");
+		command.add("-");
+		command.add("-");
+		
+		runner.setCommand(command);
+		runner.setInputStream(psfile);
+		runner.setCollection(true);
+		runner.setOutputCollectionByteSize(-1);
+		
+		runner.run();
+		int return_code = runner.getReturnCode();
+		
+		if (return_code != 0){
+			throw new RuntimeException("Execution failed:" + runner.getProcessErrorAsString());
+		}
+		InputStream pdfFileStream = runner.getProcessOutput();
+		
+		byte[] pdffile;
+		try {
+			pdffile = new byte[pdfFileStream.available()];
+			pdfFileStream.read(pdffile);
+		} catch (IOException e) {
+			throw new RuntimeException("Execution failed:" + runner.getProcessErrorAsString());
+		}
+		
+		return pdffile;
+		
+	}
+}
