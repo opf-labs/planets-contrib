@@ -67,6 +67,9 @@ public class XenaMigrations {
                 + "(ISO 26300, Version 1.0) document, produced by Open Office version 2.0.";
 */
     
+    /**
+     * 
+     */
     public XenaMigrations() {
         Properties props = new Properties();
         try {
@@ -79,6 +82,15 @@ public class XenaMigrations {
         log.info("Pointed to OOffice in: "+this.ooffice_install_dir);
     }
 
+    /**
+     * 
+     * @param fname
+     * @param is
+     * @param extension
+     * @param visible
+     * @return
+     * @throws Exception
+     */
     private XComponent loadDocument(String fname, InputStream is, String extension, boolean visible ) throws Exception {
         File input = File.createTempFile("input", "." + extension);
         try {
@@ -97,6 +109,14 @@ public class XenaMigrations {
         }
     }
 
+    /**
+     * 
+     * @param fname
+     * @param input
+     * @param visible
+     * @return
+     * @throws Exception
+     */
     static XComponent loadDocument(String fname, File input, boolean visible) throws Exception {
         /*
          * Bootstraps a servicemanager with the jurt base components registered
@@ -159,6 +179,12 @@ public class XenaMigrations {
         return xcomponentloader.loadComponentFromURL("file:///" + input.getAbsolutePath().replace('\\', '/'), "_blank", 0, loadProperties);
     }
 
+    /**
+     * 
+     * @param fname
+     * @throws Exception
+     * @throws InterruptedException
+     */
     private static void startOpenOffice(String fname ) throws Exception, InterruptedException {
         
         if (fname == null || fname.equals("")) {
@@ -195,6 +221,13 @@ public class XenaMigrations {
         }
     }
 
+    /**
+     * 
+     * @param input
+     * @param output
+     * @throws SAXException
+     * @throws IOException
+     */
     public void transform(URI input, URI output) throws SAXException, IOException {
         
         FileInputStream inputStream = new FileInputStream( new File( input ));
@@ -279,6 +312,7 @@ public class XenaMigrations {
         }
     }
     
+    
     /**
      * @return the ooffice_export_filter
      */
@@ -307,7 +341,12 @@ public class XenaMigrations {
         this.ooffice_import_filter = ooffice_import_filter;
     }
 
-    // This is the actual class that does the work.
+    /**
+     * This is the actual class that does the work.
+     * 
+     * @param binary
+     * @return
+     */
     public byte[] basicMigrateOneBinary ( byte[] binary ) {
 
         File input, output;
@@ -360,7 +399,12 @@ public class XenaMigrations {
         return result; 
     }
     
-    // FIXME Refactor this into common.
+    /**
+     *     // FIXME Refactor this into common.
+     * @param file
+     * @return
+     * @throws IOException
+     */
     private static byte[] getByteArrayFromFile(File file) throws IOException {
         InputStream is = new FileInputStream(file);
 
