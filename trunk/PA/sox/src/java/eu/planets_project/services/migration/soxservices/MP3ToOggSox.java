@@ -29,21 +29,21 @@ import eu.planets_project.ifr.core.common.services.PlanetsServices;
 import eu.planets_project.ifr.core.common.services.migrate.BasicMigrateOneBinary;
 
 /**
- * Convert a file from  mp3 to .wav.
+ * Convert a file from  mp3 to .ogg.
  * 
  */
 @Stateless
 @Local(BasicMigrateOneBinary.class)
 @Remote(BasicMigrateOneBinary.class)
-@LocalBinding(jndiBinding = "planets/MP3ToWavSox")
-@RemoteBinding(jndiBinding = "planets-project.eu/MP3ToWavSox")
-@WebService(name = "MP3ToWavSox", serviceName = BasicMigrateOneBinary.NAME, targetNamespace = PlanetsServices.NS)
+@LocalBinding(jndiBinding = "planets/MP3ToOggSox")
+@RemoteBinding(jndiBinding = "planets-project.eu/MP3ToOggSox")
+@WebService(name = "MP3ToOggSox", serviceName = BasicMigrateOneBinary.NAME, targetNamespace = PlanetsServices.NS)
 @SOAPBinding( style = SOAPBinding.Style.RPC)
 @BindingType(value = "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")
 @MTOM(enabled = true, threshold = 0)
-public class MP3ToWavSox implements BasicMigrateOneBinary {
+public class MP3ToOggSox implements BasicMigrateOneBinary {
 
-	PlanetsLogger log = PlanetsLogger.getLogger(MP3ToWavSox.class);
+	PlanetsLogger log = PlanetsLogger.getLogger(MP3ToOggSox.class);
 
 
 	@WebMethod(operationName = BasicMigrateOneBinary.NAME, action = PlanetsServices.NS
@@ -56,12 +56,10 @@ public class MP3ToWavSox implements BasicMigrateOneBinary {
 					+ "/" + BasicMigrateOneBinary.NAME, partName = "binary")
 			 @XmlMimeType(value="application/octet-stream")
 					byte[] inFile) throws PlanetsException {
-		log.info("basicMigrateOneBinary start");
 		SoxMigrations soxm = null;
+		File sourceAudioFile = null;
 		soxm = new SoxMigrations();
-
-		log.info("basicMigrateOneBinary end");
-		return soxm.transformMp3ToWav(inFile);
+		return soxm.transformMp3ToOgg(inFile);
 	}
 
 	
@@ -76,10 +74,11 @@ public class MP3ToWavSox implements BasicMigrateOneBinary {
 					DataHandler inSrc) throws PlanetsException {
 		log.info("basicMigrateOneBinaryDH start");
 		SoxMigrations soxm = null;
+		File sourceAudioFile = null;
 		soxm = new SoxMigrations();
 
 		log.info("basicMigrateOneBinary end");
-		return soxm.transformMp3ToWavDH(inSrc);
+		return soxm.transformMp3ToOggDH(inSrc);
 	}
 	
 	
