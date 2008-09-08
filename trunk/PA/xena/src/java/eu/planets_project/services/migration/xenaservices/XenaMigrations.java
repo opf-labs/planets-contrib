@@ -206,7 +206,7 @@ public class XenaMigrations {
         commandList.add("-accept=socket,port=8100;urp;");
         String[] commandArr = commandList.toArray(new String[0]);
         try {
-            logger.finest("Starting OpenOffice process");
+            logger.info("Starting OpenOffice process: "+commandArr);
             Runtime.getRuntime().exec(commandArr);
         } catch (IOException x) {
             throw new Exception("Cannot start OpenOffice.org. Try Checking Office Properties. " + sofficeProgram.getAbsolutePath(), x);
