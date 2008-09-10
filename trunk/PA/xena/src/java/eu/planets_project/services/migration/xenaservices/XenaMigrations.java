@@ -203,6 +203,7 @@ public class XenaMigrations {
         commandList.add(sofficeProgram.getAbsolutePath());
         commandList.add("-nologo");
         commandList.add("-nodefault");
+        commandList.add("-headless");
         commandList.add("-accept=socket,port=8100;urp;");
         String[] commandArr = commandList.toArray(new String[0]);
         try {
