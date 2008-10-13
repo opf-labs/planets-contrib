@@ -23,10 +23,10 @@ import javax.xml.ws.soap.MTOM;
 import org.jboss.annotation.ejb.LocalBinding;
 import org.jboss.annotation.ejb.RemoteBinding;
 
-import eu.planets_project.ifr.core.common.api.PlanetsException;
-import eu.planets_project.ifr.core.common.logging.PlanetsLogger;
-import eu.planets_project.ifr.core.common.services.PlanetsServices;
-import eu.planets_project.ifr.core.common.services.migrate.BasicMigrateOneBinary;
+import eu.planets_project.services.PlanetsException;
+import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.migrate.BasicMigrateOneBinary;
+import eu.planets_project.services.utils.PlanetsLogger;
 
 /**
  * Convert a file from  mp3 to .flac.

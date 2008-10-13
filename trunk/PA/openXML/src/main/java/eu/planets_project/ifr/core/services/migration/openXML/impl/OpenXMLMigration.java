@@ -9,13 +9,13 @@
 
 package eu.planets_project.ifr.core.services.migration.openXML.impl;
 
-import eu.planets_project.ifr.core.common.logging.PlanetsLogger;
 import eu.planets_project.ifr.core.services.migration.openXML.api.OpenXMLMigrationServiceRemoteInterface;
 import eu.planets_project.ifr.core.services.migration.openXML.common.ConversionReport;
 import eu.planets_project.ifr.core.services.migration.openXML.common.ConversionResult;
 import eu.planets_project.ifr.core.services.migration.openXML.common.ConvertedFile;
 import eu.planets_project.ifr.core.services.migration.openXML.common.ConvertedFileNames;
 import eu.planets_project.ifr.core.services.migration.openXML.api.PlanetsServiceException;
+import eu.planets_project.services.utils.PlanetsLogger;
 
 import java.io.File;
 import java.io.FileFilter;

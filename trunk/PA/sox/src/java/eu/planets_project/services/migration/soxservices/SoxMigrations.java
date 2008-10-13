@@ -11,9 +11,9 @@ import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
 
-import eu.planets_project.ifr.core.common.cli.ProcessRunner;
-import eu.planets_project.ifr.core.common.logging.PlanetsLogger;
-import eu.planets_project.ifr.core.common.services.ByteArrayHelper;
+import eu.planets_project.services.utils.ByteArrayHelper;
+import eu.planets_project.services.utils.PlanetsLogger;
+import eu.planets_project.services.utils.ProcessRunner;
 
 /**
  * Common sox invocation class

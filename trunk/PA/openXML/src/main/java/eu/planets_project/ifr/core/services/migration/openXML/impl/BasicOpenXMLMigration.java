@@ -9,11 +9,11 @@
 
 package eu.planets_project.ifr.core.services.migration.openXML.impl;
 
-import eu.planets_project.ifr.core.common.api.PlanetsException;
-import eu.planets_project.ifr.core.common.logging.PlanetsLogger;
-import eu.planets_project.ifr.core.common.services.PlanetsServices;
-import eu.planets_project.ifr.core.common.services.migrate.BasicMigrateOneBinary;
 import eu.planets_project.ifr.core.services.migration.openXML.api.PlanetsServiceException;
+import eu.planets_project.services.PlanetsException;
+import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.migrate.BasicMigrateOneBinary;
+import eu.planets_project.services.utils.PlanetsLogger;
 
 import java.io.File;
 import java.io.FileInputStream;

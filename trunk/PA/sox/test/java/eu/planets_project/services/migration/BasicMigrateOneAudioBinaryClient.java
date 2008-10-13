@@ -21,9 +21,9 @@ import org.hibernate.validator.AssertFalse;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
-import eu.planets_project.ifr.core.common.api.PlanetsException;
-import eu.planets_project.ifr.core.common.services.PlanetsServices;
-import eu.planets_project.ifr.core.common.services.migrate.BasicMigrateOneBinary;
+import eu.planets_project.services.PlanetsException;
+import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.migrate.BasicMigrateOneBinary;
 import eu.planets_project.services.migration.soxservices.MP3ToFlacSox;
 import eu.planets_project.services.migration.soxservices.MP3ToOggSox;
 import eu.planets_project.services.migration.soxservices.MP3ToWavSox;

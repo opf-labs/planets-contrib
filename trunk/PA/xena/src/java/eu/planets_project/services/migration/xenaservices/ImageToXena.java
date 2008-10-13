@@ -6,8 +6,9 @@ package eu.planets_project.services.migration.xenaservices;
 import au.gov.naa.digipres.xena.core.Xena;
 import au.gov.naa.digipres.xena.kernel.XenaInputSource;
 import au.gov.naa.digipres.xena.kernel.normalise.NormaliserResults;
-import eu.planets_project.ifr.core.common.api.PlanetsException;
-import eu.planets_project.ifr.core.common.services.migrate.BasicMigrateOneBinary;
+import eu.planets_project.services.PlanetsException;
+import eu.planets_project.services.migrate.BasicMigrateOneBinary;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
