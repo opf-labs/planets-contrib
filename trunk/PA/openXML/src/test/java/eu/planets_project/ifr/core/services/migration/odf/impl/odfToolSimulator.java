@@ -33,9 +33,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import eu.planets_project.ifr.core.services.migration.odf.common.ConversionReport;
-import eu.planets_project.ifr.core.services.migration.odf.common.ConversionSummary;
-import eu.planets_project.ifr.core.services.migration.odf.common.ConvertedFile;
+import eu.planets_project.ifr.core.services.migration.openXML.common.ConversionReport;
+import eu.planets_project.ifr.core.services.migration.openXML.common.ConversionSummary;
+import eu.planets_project.ifr.core.services.migration.openXML.common.ConvertedFile;
 
 /**
  *
