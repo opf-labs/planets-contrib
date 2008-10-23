@@ -1,4 +1,4 @@
-package eu.planets_project.services.migration;
+package eu.planets_project.services.migration.soxservices;
 
 import static org.junit.Assert.fail;
 
@@ -30,7 +30,7 @@ import eu.planets_project.services.migration.soxservices.MP3ToWavSox;
 import eu.planets_project.services.migration.soxservices.WavToFlacSox;
 import eu.planets_project.services.migration.soxservices.WavToOggSox;
 
-public class BasicMigrateOneAudioBinaryClient {
+public class BasicMigrateOneAudioBinaryTests {
 
 	public void test(BasicMigrateOneBinary converter, String srcFormat,
 			String destformat) {
