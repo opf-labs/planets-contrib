@@ -51,10 +51,10 @@ public class MP3ToWavSox implements BasicMigrateOneBinary {
 	@WebResult(name = BasicMigrateOneBinary.NAME + "Result", targetNamespace = PlanetsServices.NS
 			+ "/" + BasicMigrateOneBinary.NAME, partName = BasicMigrateOneBinary.NAME
 			+ "Result") 
-	public @XmlMimeType(value="application/octet-stream") byte[] basicMigrateOneBinary(
+	public  byte[] basicMigrateOneBinary(
 			@WebParam(name = "binary", targetNamespace = PlanetsServices.NS
 					+ "/" + BasicMigrateOneBinary.NAME, partName = "binary")
-			 @XmlMimeType(value="application/octet-stream")
+			 
 					byte[] inFile) throws PlanetsException {
 		log.info("basicMigrateOneBinary start");
 		SoxMigrations soxm = null;
@@ -65,22 +65,22 @@ public class MP3ToWavSox implements BasicMigrateOneBinary {
 	}
 
 	
-	@WebMethod(operationName = BasicMigrateOneBinary.NAME+"DH", action = PlanetsServices.NS
-			+ "/" + BasicMigrateOneBinary.NAME+"DH")
-	@WebResult(name = BasicMigrateOneBinary.NAME+"DH" + "Result", targetNamespace = PlanetsServices.NS
-			+ "/" + BasicMigrateOneBinary.NAME, partName = BasicMigrateOneBinary.NAME+"DH"
-			+ "Result") 
-	public DataHandler basicMigrateOneBinaryDH(
-			@WebParam(name = "dataHandler", targetNamespace = PlanetsServices.NS
-					+ "/" + BasicMigrateOneBinary.NAME, partName = "dataHandler")
-					DataHandler inSrc) throws PlanetsException {
-		log.info("basicMigrateOneBinaryDH start");
-		SoxMigrations soxm = null;
-		soxm = new SoxMigrations();
-
-		log.info("basicMigrateOneBinary end");
-		return soxm.transformMp3ToWavDH(inSrc);
-	}
+//	@WebMethod(operationName = BasicMigrateOneBinary.NAME+"DH", action = PlanetsServices.NS
+//			+ "/" + BasicMigrateOneBinary.NAME+"DH")
+//	@WebResult(name = BasicMigrateOneBinary.NAME+"DH" + "Result", targetNamespace = PlanetsServices.NS
+//			+ "/" + BasicMigrateOneBinary.NAME, partName = BasicMigrateOneBinary.NAME+"DH"
+//			+ "Result") 
+//	public DataHandler basicMigrateOneBinaryDH(
+//			@WebParam(name = "dataHandler", targetNamespace = PlanetsServices.NS
+//					+ "/" + BasicMigrateOneBinary.NAME, partName = "dataHandler")
+//					DataHandler inSrc) throws PlanetsException {
+//		log.info("basicMigrateOneBinaryDH start");
+//		SoxMigrations soxm = null;
+//		soxm = new SoxMigrations();
+//
+//		log.info("basicMigrateOneBinary end");
+//		return soxm.transformMp3ToWavDH(inSrc);
+//	}
 	
 	
 	

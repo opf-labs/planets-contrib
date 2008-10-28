@@ -1,15 +1,9 @@
 package eu.planets_project.services.migration.soxservices;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
-
-import javax.activation.DataHandler;
-import javax.mail.util.ByteArrayDataSource;
 
 import eu.planets_project.services.utils.ByteArrayHelper;
 import eu.planets_project.services.utils.PlanetsLogger;
@@ -26,29 +20,48 @@ public class SoxMigrations {
     public final String SOX = "sox";
     PlanetsLogger log = PlanetsLogger.getLogger(SoxMigrations.class);
 
-    public static String SOX_HOME;
-
+    public static final String SYSTEM_TEMP = System.getProperty("java.io.tmpdir") + File.separator;
+    public static  String SoX_WORK_DIR = null;
+    public static  String SoX_IN = null;
+    public static  String SoX_OUTPUT_DIR = null;
+    public static String SOX_HOME = null;
+    
     public SoxMigrations() {
-        Properties props = new Properties();
-        try {
-            props
-                    .load(this
-                            .getClass()
-                            .getResourceAsStream(
-                                    "/eu/planets_project/services/migration/soxservices/sox.properties"));
-            SOX_HOME = props.getProperty("sox.bin.dir");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            // Use a default for now.
-            SOX_HOME = "/usr/bin/";
-        }
+    	
+    	SOX_HOME = System.getenv("SOX_HOME") + File.separator;
+		
+		if(SYSTEM_TEMP.endsWith(File.separator)) {
+		    if (SYSTEM_TEMP.endsWith(File.separator + File.separator)) {
+		        SoX_WORK_DIR = SYSTEM_TEMP.replace(File.separatorChar + File.separator, File.separator) + "SoX" + File.separator;
+		        SoX_IN = SoX_WORK_DIR + "IN" + File.separator;
+		        SoX_OUTPUT_DIR = SoX_WORK_DIR + "OUT" + File.separator;
+		    }
+		    else {
+		    	SoX_WORK_DIR = SYSTEM_TEMP + File.separator + "SoX" + File.separator;
+		    	SoX_IN = SoX_WORK_DIR + "IN" + File.separator;
+		        SoX_OUTPUT_DIR = SoX_WORK_DIR + "OUT" + File.separator;
+		    }
+		}
+		else {
+			SoX_WORK_DIR = SYSTEM_TEMP + File.separator + "SoX" + File.separator;
+			SoX_IN = SoX_WORK_DIR + "IN" + File.separator;
+		    SoX_OUTPUT_DIR = SoX_WORK_DIR + "OUT" + File.separator;
+		}
         log.info("Pointed to sox in: " + SOX_HOME);
+        System.out.println("Pointed SoX_HOME to: " + SOX_HOME);
     }
 
-    public byte[] transformMp3ToOgg(byte[] input) {
+	public byte[] transformMp3ToOgg(byte[] input) {
         log.info("transformMp3ToOgg begin ");
-        return genericTransformAudioSrcToAudioDest(input, ".mp3", ".ogg", null);
+        SoxMigrationResults migrationResults = new SoxMigrationResults();
+        
+        genericTransformAudioSrcToAudioDest(input, ".mp3", ".ogg", null);
+        return migrationResults.getByteArray();
+    }
+    
+    public byte[] transformWavToAiff(byte[] input) {
+    	log.info("transformWavToAiff begin ");
+    	return genericTransformAudioSrcToAudioDest(input, ".wav", ".aiff", null);
     }
 
     public byte[] transformMp3ToWav(byte[] input) {
@@ -71,123 +84,190 @@ public class SoxMigrations {
         return genericTransformAudioSrcToAudioDest(input, ".mp3", ".flac", null);
     }
 
-    public DataHandler transformMp3ToOggDH(DataHandler input) {
-        log.info("transformMp3ToOggDH begin ");
-        return genericTransformAudioSrcToAudioDestDH(input, ".mp3", ".ogg",
-                null);
-    }
-
-    public DataHandler transformMp3ToWavDH(DataHandler input) {
-        log.info("transformMp3ToWavDH begin ");
-        return genericTransformAudioSrcToAudioDestDH(input, ".mp3", ".wav",
-                null);
-    }
-
-    public DataHandler transformWavToOggDH(DataHandler input) {
-        log.info("transformWavToOggDH begin ");
-        return genericTransformAudioSrcToAudioDestDH(input, ".wav", ".ogg",
-                null);
-    }
-
-    public DataHandler transformWavToFlacDH(DataHandler input) {
-        log.info("transformWavToFlacDH begin ");
-        return genericTransformAudioSrcToAudioDestDH(input, ".wav", ".flac",
-                null);
-    }
-
-    public DataHandler transformMp3ToFlacDH(DataHandler input) {
-        log.info("transformMp3ToFlacDH begin ");
-        return genericTransformAudioSrcToAudioDestDH(input, ".mp3", ".flac",
-                null);
-    }
+//    public DataHandler transformMp3ToOggDH(DataHandler input) {
+//        log.info("transformMp3ToOggDH begin ");
+//        return genericTransformAudioSrcToAudioDestDH(input, ".mp3", ".ogg",
+//                null);
+//    }
+//    
+//    public DataHandler transformWavToAiffDH(DataHandler input) {
+//    	log.info("transformWavToRAW begin ");
+//    	return genericTransformAudioSrcToAudioDestDH(input, ".wav", ".aiff", null);
+//    }
+//
+//    public DataHandler transformMp3ToWavDH(DataHandler input) {
+//        log.info("transformMp3ToWavDH begin ");
+//        return genericTransformAudioSrcToAudioDestDH(input, ".mp3", ".wav",
+//                null);
+//    }
+//
+//    public DataHandler transformWavToOggDH(DataHandler input) {
+//        log.info("transformWavToOggDH begin ");
+//        return genericTransformAudioSrcToAudioDestDH(input, ".wav", ".ogg",
+//                null);
+//    }
+//
+//    public DataHandler transformWavToFlacDH(DataHandler input) {
+//        log.info("transformWavToFlacDH begin ");
+//        return genericTransformAudioSrcToAudioDestDH(input, ".wav", ".flac",
+//                null);
+//    }
+//
+//    public DataHandler transformMp3ToFlacDH(DataHandler input) {
+//        log.info("transformMp3ToFlacDH begin ");
+//        return genericTransformAudioSrcToAudioDestDH(input, ".mp3", ".flac",
+//                null);
+//    }
 
     public byte[] genericTransformAudioSrcToAudioDest(byte[] input,
             String srcSuffix, String destSuffix, ArrayList<String> soxCliParams) {
-
+    	
         if (!srcSuffix.startsWith("."))
             srcSuffix = "." + srcSuffix;
+        
         if (!destSuffix.startsWith("."))
             destSuffix = "." + destSuffix;
+        
         log.info("genericTransformAudioSrcToAudioDest begin: Converting from "
                 + srcSuffix + " to " + destSuffix);
-        File f = FileUtils.tempFile("tempout", destSuffix);
-
-        File inputFile = FileUtils.tempFile(input, "tempin.audio", srcSuffix);
-        if (!f.canRead() || !inputFile.exists() || !f.exists() || !f.canWrite()
-                || !inputFile.canRead() || !inputFile.canWrite()) {
-            throw new IllegalStateException("Can't read from or write to: "
-                    + f.getAbsolutePath());
+        File workFolder = new File(SoX_WORK_DIR);
+        if(!workFolder.exists()) {
+        	workFolder.mkdir();
         }
-
+        
+        File outputFolder = new File(SoX_OUTPUT_DIR);
+        
+        if(!outputFolder.exists()) {
+        	boolean madeOutputFolder = outputFolder.mkdir();
+        }
+        
+        String outputFilePath = outputFolder.getAbsolutePath() + File.separator + "SoX_OUTPUT_FILE" + destSuffix; 
+        
+        File inputFolder = new File(SoX_IN);
+        
+        if(!inputFolder.exists()) {
+        	boolean madeInputFolder = inputFolder.mkdir();
+        }
+        
+        String inputFilePath = inputFolder.getAbsolutePath() + File.separator + "SoX_INPUT_FILE" + srcSuffix;
+        File inputFile = ByteArrayHelper.writeToDestFile(input, inputFilePath);
+        
+        
         try {
-            List<String> commands = Arrays.asList(SOX, inputFile
-                    .getAbsolutePath(), f.getAbsolutePath());
-            commands.addAll(soxCliParams);
-            File home = new File(SOX_HOME);
-
+            List<String> commands = Arrays.asList(SOX_HOME + SOX, inputFile
+                    .getAbsolutePath(), outputFilePath);
+            if(soxCliParams!=null) {
+            	commands.addAll(soxCliParams);
+            }
+            
             ProcessRunner pr = new ProcessRunner(commands);
-            pr.setStartingDir(home);
+            
+            pr.setStartingDir(new File(SOX_HOME));
+            
             log.info("Executing: " + commands);
+            
             pr.run();
 
             log.info("SOX call output: " + pr.getProcessOutputAsString());
             log.error("SOX call error: " + pr.getProcessErrorAsString());
+            
             log.debug("Executing: " + commands + " finished.");
 
         } catch (Exception ex) {
-            log.error("SoX could not create the open document file");
+            log.error("SoX could not create the output file");
         }
         log.info("genericTransformAudioSrcToAudioDest end");
-        log.info(f.length());
-
-        return ByteArrayHelper.read(f);
+        File processOutputFile = new File(outputFilePath);
+        byte[] outputFileData = null;
+        
+        if(processOutputFile.canRead()) {
+        	outputFileData = ByteArrayHelper.read(new File(outputFilePath));
+            log.info(outputFileData.length);
+        }
+        else {
+        	outputFileData = null;
+        	log.error("SoX didn't create an output file!");
+        }
+        
+        boolean deletedFolders = deleteTempFiles(workFolder);
+        
+        return outputFileData;
     }
 
-    public DataHandler genericTransformAudioSrcToAudioDestDH(DataHandler input,
-            String srcSuffix, String destSuffix, ArrayList<String> soxCliParams) {
-        log
-                .info("genericTransformAudioSrcToAudioDestDH begin : Converting from "
-                        + srcSuffix + " to " + destSuffix);
-        File f = FileUtils.tempFile("tempout.audio", destSuffix);
-        byte[] raw = null;
-        try {
-            FileOutputStream fos = new FileOutputStream(f);
-            log.info(input.getContentType());
-            log.info(raw);
-            log.info(input.getContent().toString());
-            log.info(raw);
-            fos.write(raw);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        File inputFile = FileUtils.tempFile(raw, "tempin.audio", srcSuffix);
-        if (!f.canRead() || !inputFile.exists() || !f.exists() || !f.canWrite()
-                || !inputFile.canRead() || !inputFile.canWrite()) {
-            throw new IllegalStateException("Can't read from or write to: "
-                    + f.getAbsolutePath());
-        }
-        try {
-            List<String> commands = Arrays.asList(SOX, inputFile
-                    .getAbsolutePath(), f.getAbsolutePath());
-            File home = new File(SOX_HOME);
-            if (soxCliParams != null) {
-                commands.addAll(soxCliParams);
-            }
-            ProcessRunner pr = new ProcessRunner(commands);
-            pr.setStartingDir(home);
-            log.info("Executing: " + commands);
-            pr.run();
-            log.info("SOX call output: " + pr.getProcessOutputAsString());
-            log.error("SOX call error: " + pr.getProcessErrorAsString());
-            log.debug("Executing: " + commands + " finished.");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            log.error("SoX could not create the open document file");
-        }
-        log.info("genericTransformAudioSrcToAudioDestDH end");
-        log.info(f.length());
-        return new DataHandler(new ByteArrayDataSource(ByteArrayHelper.read(f),
-                "application/octet-stream"));
-    }
+    
+    
+//    public DataHandler genericTransformAudioSrcToAudioDestDH(DataHandler input,
+//            String srcSuffix, String destSuffix, ArrayList<String> soxCliParams) {
+//        log
+//                .info("genericTransformAudioSrcToAudioDestDH begin : Converting from "
+//                        + srcSuffix + " to " + destSuffix);
+//        File f = FileUtils.tempFile("tempout.audio", destSuffix);
+//        byte[] raw = null;
+//        try {
+//            FileOutputStream fos = new FileOutputStream(f);
+//            log.info(input.getContentType());
+//            log.info(raw);
+//            log.info(input.getContent().toString());
+//            log.info(raw);
+//            fos.write(raw);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        File inputFile = FileUtils.tempFile(raw, "tempin.audio", srcSuffix);
+////        if (!f.canRead() || !inputFile.exists() || !f.exists() || !f.canWrite()
+////                || !inputFile.canRead() || !inputFile.canWrite()) {
+////            throw new IllegalStateException("Can't read from or write to: "
+////                    + f.getAbsolutePath());
+////        }
+//        try {
+//            List<String> commands = Arrays.asList(SOX_HOME + File.separator + SOX, inputFile
+//                    .getAbsolutePath(), f.getAbsolutePath());
+//            File home = new File(SOX_HOME);
+//            if (soxCliParams != null) {
+//                commands.addAll(soxCliParams);
+//            }
+//            ProcessRunner pr = new ProcessRunner(commands);
+//            pr.setStartingDir(home);
+//            log.info("Executing: " + commands);
+//            pr.run();
+//            log.info("SOX call output: " + pr.getProcessOutputAsString());
+//            log.error("SOX call error: " + pr.getProcessErrorAsString());
+//            log.debug("Executing: " + commands + " finished.");
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//            log.error("SoX could not create the open document file");
+//        }
+//        log.info("genericTransformAudioSrcToAudioDestDH end");
+//        log.info(f.length());
+//        return new DataHandler(new ByteArrayDataSource(ByteArrayHelper.read(f),
+//                "application/octet-stream"));
+//    }
+    
+    private boolean deleteTempFiles(File workFolder) {
+		String workFolderName = workFolder.getPath();
+		if (workFolder.isDirectory()){
+			File[] entries = workFolder.listFiles();
+				for (int i=0;i<entries.length;i++){
+					File current = entries[i];
+					deleteTempFiles(current);
+				}
+			if (workFolder.delete()) {
+				log.info("Deleted: " + workFolderName);
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			if (workFolder.delete()) {
+				log.info("Deleted: " + workFolderName);
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
 
 }

@@ -51,10 +51,10 @@ public class MP3ToOggSox implements BasicMigrateOneBinary {
 	@WebResult(name = BasicMigrateOneBinary.NAME + "Result", targetNamespace = PlanetsServices.NS
 			+ "/" + BasicMigrateOneBinary.NAME, partName = BasicMigrateOneBinary.NAME
 			+ "Result") 
-	public @XmlMimeType(value="application/octet-stream") byte[] basicMigrateOneBinary(
+	public  byte[] basicMigrateOneBinary(
 			@WebParam(name = "binary", targetNamespace = PlanetsServices.NS
 					+ "/" + BasicMigrateOneBinary.NAME, partName = "binary")
-			 @XmlMimeType(value="application/octet-stream")
+			 
 					byte[] inFile) throws PlanetsException {
 		SoxMigrations soxm = null;
 		File sourceAudioFile = null;
@@ -62,24 +62,24 @@ public class MP3ToOggSox implements BasicMigrateOneBinary {
 		return soxm.transformMp3ToOgg(inFile);
 	}
 
-	
-	@WebMethod(operationName = BasicMigrateOneBinary.NAME+"DH", action = PlanetsServices.NS
-			+ "/" + BasicMigrateOneBinary.NAME+"DH")
-	@WebResult(name = BasicMigrateOneBinary.NAME+"DH" + "Result", targetNamespace = PlanetsServices.NS
-			+ "/" + BasicMigrateOneBinary.NAME, partName = BasicMigrateOneBinary.NAME+"DH"
-			+ "Result") 
-	public DataHandler basicMigrateOneBinaryDH(
-			@WebParam(name = "dataHandler", targetNamespace = PlanetsServices.NS
-					+ "/" + BasicMigrateOneBinary.NAME, partName = "dataHandler")
-					DataHandler inSrc) throws PlanetsException {
-		log.info("basicMigrateOneBinaryDH start");
-		SoxMigrations soxm = null;
-		File sourceAudioFile = null;
-		soxm = new SoxMigrations();
-
-		log.info("basicMigrateOneBinary end");
-		return soxm.transformMp3ToOggDH(inSrc);
-	}
+//	
+//	@WebMethod(operationName = BasicMigrateOneBinary.NAME+"DH", action = PlanetsServices.NS
+//			+ "/" + BasicMigrateOneBinary.NAME+"DH")
+//	@WebResult(name = BasicMigrateOneBinary.NAME+"DH" + "Result", targetNamespace = PlanetsServices.NS
+//			+ "/" + BasicMigrateOneBinary.NAME, partName = BasicMigrateOneBinary.NAME+"DH"
+//			+ "Result") 
+//	public DataHandler basicMigrateOneBinaryDH(
+//			@WebParam(name = "dataHandler", targetNamespace = PlanetsServices.NS
+//					+ "/" + BasicMigrateOneBinary.NAME, partName = "dataHandler")
+//					DataHandler inSrc) throws PlanetsException {
+//		log.info("basicMigrateOneBinaryDH start");
+//		SoxMigrations soxm = null;
+//		File sourceAudioFile = null;
+//		soxm = new SoxMigrations();
+//
+//		log.info("basicMigrateOneBinary end");
+//		return soxm.transformMp3ToOggDH(inSrc);
+//	}
 	
 	
 	
