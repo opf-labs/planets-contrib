@@ -88,36 +88,26 @@ public class BasicMigrateOneAudioBinaryTests {
             
             
             if(srcFormat.equalsIgnoreCase(".mp3") || destformat.equalsIgnoreCase(".mp3")) {
-        		System.err.println("To use SoX for mp3 conversion, you need to have an additional external" +
-        				"\n mp3-Converter/library installed (e.g. LAME)");
-        		
         		if(resdh_orig == null) {
+        			System.err.println("To use SoX for mp3 conversion, you need to have an additional external" +
+    				"\n mp3-Converter/library installed (e.g. LAME)");
         			assertTrue("mp3-Conversion-Test skipped", (srcFormat.equalsIgnoreCase(".mp3") || destformat.equalsIgnoreCase(".mp3")));
-        		}
-        		else {
-        			assertFalse("Result file is empty", resultFile.length() == 0);
         		}
             }
     		
             if(srcFormat.equalsIgnoreCase(".ogg") || destformat.equalsIgnoreCase(".ogg")) {
-    			System.err.println("To use SoX for \"ogg\" conversion, you need to have an additional external" +
-						"\n OggVorbis-Converter/library installed!");
     			if(resdh_orig == null) {
+    				System.err.println("To use SoX for \"ogg\" conversion, you need to have an additional external" +
+					"\n OggVorbis-Converter/library installed!");
     				assertTrue("ogg-Conversion-Test skipped", (srcFormat.equalsIgnoreCase(".ogg") || destformat.equalsIgnoreCase(".ogg")));
     			}
-    			else {
-        			assertFalse("Result file is empty", resultFile.length() == 0);
-        		}
     		}
     		if(srcFormat.equalsIgnoreCase(".flac") || destformat.equalsIgnoreCase(".flac")) {
-    			System.err.println("To use SoX for \"flac\" conversion, you need to have an additional external" +
-						"\n Flac-Converter/library installed!");
     			if(resdh_orig == null) {
+    				System.err.println("To use SoX for \"flac\" conversion, you need to have an additional external" +
+					"\n Flac-Converter/library installed!");
     				assertTrue("Flac-Conversion-Test skipped", (srcFormat.equalsIgnoreCase(".flac") || destformat.equalsIgnoreCase(".flac")));
     			}
-    			else {
-        			assertFalse("Result file is empty", resultFile.length() == 0);
-        		}
     		}
             
         } catch (MalformedURLException e) {
@@ -144,24 +134,31 @@ public class BasicMigrateOneAudioBinaryTests {
         System.out.println("**********************************************");
         
         test(new WavToAiffSox(), ".wav", ".aiff");
+        
         System.out.println("**********************************************");
         
         test(new WavToAiffSox(), ".aiff", ".wav");
+        
         System.out.println("**********************************************");
 
         test(new MP3ToWavSox(), ".mp3", ".wav");
+        
         System.out.println("**********************************************");
 
         test(new MP3ToOggSox(), ".mp3", ".ogg");
+        
         System.out.println("**********************************************");
 
         test(new MP3ToFlacSox(), ".mp3", ".flac");
+        
         System.out.println("**********************************************");
 
         test(new WavToFlacSox(), ".wav", ".flac");
+        
         System.out.println("**********************************************");
 
         test(new WavToOggSox(), ".wav", ".ogg");
+        
         System.out.println("**********************************************");
 
     }
@@ -182,47 +179,43 @@ public class BasicMigrateOneAudioBinaryTests {
 
             System.out.println("**********************************************");
 
-//            service = Service.create(new URL(
-//            "http://localhost:8080/pserv-pa-sox/MP3ToOggSox?wsdl"),
-//            new QName(PlanetsServices.NS, BasicMigrateOneBinary.NAME));
-//            servicePort = service.getPort(BasicMigrateOneBinary.class);
-//            test(servicePort, ".mp3", ".ogg");
-//
-//            System.out
-//            .println("**********************************************");
-//            
-//            service = Service.create(new URL(
-//                    "http://localhost:8080/pserv-pa-sox/MP3ToWavSox?wsdl"),
-//                    new QName(PlanetsServices.NS, BasicMigrateOneBinary.NAME));
-//            servicePort = service.getPort(BasicMigrateOneBinary.class);
-//            test(servicePort, ".mp3", ".wav");
-//
-//            System.out
-//                    .println("**********************************************");
-//
-//            service = Service.create(new URL(
-//                    "http://localhost:8080/pserv-pa-sox/MP3ToFlacSox?wsdl"),
-//                    new QName(PlanetsServices.NS, BasicMigrateOneBinary.NAME));
-//            servicePort = service.getPort(BasicMigrateOneBinary.class);
-//            test(servicePort, ".mp3", ".flac");
-//
-//            System.out
-//                    .println("**********************************************");
-//
-//            service = Service.create(new URL(
-//                    "http://localhost:8080/pserv-pa-sox/WavToOggSox?wsdl"),
-//                    new QName(PlanetsServices.NS, BasicMigrateOneBinary.NAME));
-//            servicePort = service.getPort(BasicMigrateOneBinary.class);
-//            test(servicePort, ".wav", ".ogg");
-//
-//            System.out
-//                    .println("**********************************************");
-//
-//            service = Service.create(new URL(
-//                    "http://localhost:8080/pserv-pa-sox/WavToFlacSox?wsdl"),
-//                    new QName(PlanetsServices.NS, BasicMigrateOneBinary.NAME));
-//            servicePort = service.getPort(BasicMigrateOneBinary.class);
-//            test(servicePort, ".wav", ".flac");
+            service = Service.create(new URL(
+            "http://localhost:8080/pserv-pa-sox/MP3ToOggSox?wsdl"),
+            new QName(PlanetsServices.NS, BasicMigrateOneBinary.NAME));
+            servicePort = service.getPort(BasicMigrateOneBinary.class);
+            test(servicePort, ".mp3", ".ogg");
+
+            System.out.println("**********************************************");
+            
+            service = Service.create(new URL(
+                    "http://localhost:8080/pserv-pa-sox/MP3ToWavSox?wsdl"),
+                    new QName(PlanetsServices.NS, BasicMigrateOneBinary.NAME));
+            servicePort = service.getPort(BasicMigrateOneBinary.class);
+            test(servicePort, ".mp3", ".wav");
+
+            System.out.println("**********************************************");
+
+            service = Service.create(new URL(
+                    "http://localhost:8080/pserv-pa-sox/MP3ToFlacSox?wsdl"),
+                    new QName(PlanetsServices.NS, BasicMigrateOneBinary.NAME));
+            servicePort = service.getPort(BasicMigrateOneBinary.class);
+            test(servicePort, ".mp3", ".flac");
+
+            System.out.println("**********************************************");
+
+            service = Service.create(new URL(
+                    "http://localhost:8080/pserv-pa-sox/WavToOggSox?wsdl"),
+                    new QName(PlanetsServices.NS, BasicMigrateOneBinary.NAME));
+            servicePort = service.getPort(BasicMigrateOneBinary.class);
+            test(servicePort, ".wav", ".ogg");
+
+            System.out.println("**********************************************");
+
+            service = Service.create(new URL(
+                    "http://localhost:8080/pserv-pa-sox/WavToFlacSox?wsdl"),
+                    new QName(PlanetsServices.NS, BasicMigrateOneBinary.NAME));
+            servicePort = service.getPort(BasicMigrateOneBinary.class);
+            test(servicePort, ".wav", ".flac");
 
         } catch (IOException e) {
             fail(e.getMessage());
