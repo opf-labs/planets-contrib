@@ -53,10 +53,7 @@ public class SoxMigrations {
 
 	public byte[] transformMp3ToOgg(byte[] input) {
         log.info("transformMp3ToOgg begin ");
-        SoxMigrationResults migrationResults = new SoxMigrationResults();
-        
-        genericTransformAudioSrcToAudioDest(input, ".mp3", ".ogg", null);
-        return migrationResults.getByteArray();
+        return genericTransformAudioSrcToAudioDest(input, ".mp3", ".ogg", null);
     }
     
     public byte[] transformWavToAiff(byte[] input) {
