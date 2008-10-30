@@ -36,7 +36,7 @@ import eu.planets_project.services.utils.PlanetsLogger;
         name = "DocToODFXena", 
         serviceName = BasicMigrateOneBinary.NAME,
         targetNamespace = PlanetsServices.NS,
-        endpointInterface = "eu.planets_project.ifr.core.common.services.migrate.BasicMigrateOneBinary" )
+        endpointInterface = "eu.planets_project.services.migrate.BasicMigrateOneBinary" )
 public class DocToODFXena implements BasicMigrateOneBinary {
     
     PlanetsLogger log = PlanetsLogger.getLogger(DocToODFXena.class);
