@@ -88,6 +88,9 @@ public class BasicMigrateOneAudioBinaryTests {
             
             
             if(srcFormat.equalsIgnoreCase(".mp3") || destformat.equalsIgnoreCase(".mp3")) {
+        		System.err.println("To use SoX for mp3 conversion, you need to have an additional external" +
+        				"\n mp3-Converter/library installed (e.g. LAME)");
+        		
         		if(resdh_orig == null) {
         			System.err.println("To use SoX for mp3 conversion, you need to have an additional external" +
     				"\n mp3-Converter/library installed (e.g. LAME)");
@@ -96,6 +99,9 @@ public class BasicMigrateOneAudioBinaryTests {
             }
     		
             if(srcFormat.equalsIgnoreCase(".ogg") || destformat.equalsIgnoreCase(".ogg")) {
+    			System.err.println("To use SoX for \"ogg\" conversion, you need to have an additional external" +
+						"\n OggVorbis-Converter/library installed!");
+
     			if(resdh_orig == null) {
     				System.err.println("To use SoX for \"ogg\" conversion, you need to have an additional external" +
 					"\n OggVorbis-Converter/library installed!");
@@ -103,6 +109,10 @@ public class BasicMigrateOneAudioBinaryTests {
     			}
     		}
     		if(srcFormat.equalsIgnoreCase(".flac") || destformat.equalsIgnoreCase(".flac")) {
+    			System.err.println("To use SoX for \"flac\" conversion, you need to have an additional external" +
+						"\n Flac-Converter/library installed!");
+
+
     			if(resdh_orig == null) {
     				System.err.println("To use SoX for \"flac\" conversion, you need to have an additional external" +
 					"\n Flac-Converter/library installed!");

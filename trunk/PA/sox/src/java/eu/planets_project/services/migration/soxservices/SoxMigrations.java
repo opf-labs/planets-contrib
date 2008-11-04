@@ -29,6 +29,13 @@ public class SoxMigrations {
     public SoxMigrations() {
     	
     	SOX_HOME = System.getenv("SOX_HOME") + File.separator;
+    	
+    	if(SOX_HOME==null){
+    		System.err.println("SOX_HOME is not set! Please create an system variable\n" +
+    				"and point it to the SoX installation folder!");
+    		log.error("SOX_HOME is not set! Please create an system variable\n" +
+    				"and point it to the SoX installation folder!");
+    	}
 		
 		if(SYSTEM_TEMP.endsWith(File.separator)) {
 		    if (SYSTEM_TEMP.endsWith(File.separator + File.separator)) {
