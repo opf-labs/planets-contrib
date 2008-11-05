@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import eu.planets_project.services.utils.ByteArrayHelper;
+import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
 
@@ -18,12 +19,12 @@ import eu.planets_project.services.utils.ProcessRunner;
 public class SoxMigrations {
 
     public final String SOX = "sox";
-    PlanetsLogger log = PlanetsLogger.getLogger(SoxMigrations.class);
+    PlanetsLogger plogger = PlanetsLogger.getLogger(SoxMigrations.class);
 
     public static final String SYSTEM_TEMP = System.getProperty("java.io.tmpdir") + File.separator;
-    public static  String SoX_WORK_DIR = null;
-    public static  String SoX_IN = null;
-    public static  String SoX_OUTPUT_DIR = null;
+    public static  String SoX_WORK_DIR = "SOX";
+    public static  String SoX_IN = "INPUT";
+    public static  String SoX_OUTPUT_DIR = "OUT";
     public static String SOX_HOME = null;
     
     public SoxMigrations() {
@@ -33,58 +34,41 @@ public class SoxMigrations {
     	if(SOX_HOME==null){
     		System.err.println("SOX_HOME is not set! Please create an system variable\n" +
     				"and point it to the SoX installation folder!");
-    		log.error("SOX_HOME is not set! Please create an system variable\n" +
+    		plogger.error("SOX_HOME is not set! Please create an system variable\n" +
     				"and point it to the SoX installation folder!");
     	}
 		
-		if(SYSTEM_TEMP.endsWith(File.separator)) {
-		    if (SYSTEM_TEMP.endsWith(File.separator + File.separator)) {
-		        SoX_WORK_DIR = SYSTEM_TEMP.replace(File.separatorChar + File.separator, File.separator) + "SoX" + File.separator;
-		        SoX_IN = SoX_WORK_DIR + "IN" + File.separator;
-		        SoX_OUTPUT_DIR = SoX_WORK_DIR + "OUT" + File.separator;
-		    }
-		    else {
-		    	SoX_WORK_DIR = SYSTEM_TEMP + File.separator + "SoX" + File.separator;
-		    	SoX_IN = SoX_WORK_DIR + "IN" + File.separator;
-		        SoX_OUTPUT_DIR = SoX_WORK_DIR + "OUT" + File.separator;
-		    }
-		}
-		else {
-			SoX_WORK_DIR = SYSTEM_TEMP + File.separator + "SoX" + File.separator;
-			SoX_IN = SoX_WORK_DIR + "IN" + File.separator;
-		    SoX_OUTPUT_DIR = SoX_WORK_DIR + "OUT" + File.separator;
-		}
-        log.info("Pointed to sox in: " + SOX_HOME);
+        plogger.info("Pointed to sox in: " + SOX_HOME);
         System.out.println("Pointed SoX_HOME to: " + SOX_HOME);
     }
 
 	public byte[] transformMp3ToOgg(byte[] input) {
-        log.info("transformMp3ToOgg begin ");
+        plogger.info("transformMp3ToOgg begin ");
         return genericTransformAudioSrcToAudioDest(input, ".mp3", ".ogg", null);
     }
     
     public byte[] transformWavToAiff(byte[] input) {
-    	log.info("transformWavToAiff begin ");
+    	plogger.info("transformWavToAiff begin ");
     	return genericTransformAudioSrcToAudioDest(input, ".wav", ".aiff", null);
     }
 
     public byte[] transformMp3ToWav(byte[] input) {
-        log.info("transformMp3ToWav begin ");
+        plogger.info("transformMp3ToWav begin ");
         return genericTransformAudioSrcToAudioDest(input, ".mp3", ".wav", null);
     }
 
     public byte[] transformWavToOgg(byte[] input) {
-        log.info("transformWavToOgg begin ");
+        plogger.info("transformWavToOgg begin ");
         return genericTransformAudioSrcToAudioDest(input, ".wav", ".ogg", null);
     }
 
     public byte[] transformWavToFlac(byte[] input) {
-        log.info("transformWavToFlac begin ");
+        plogger.info("transformWavToFlac begin ");
         return genericTransformAudioSrcToAudioDest(input, ".wav", ".flac", null);
     }
 
     public byte[] transformMp3ToFlac(byte[] input) {
-        log.info("transformMp3ToFlac begin ");
+        plogger.info("transformMp3ToFlac begin ");
         return genericTransformAudioSrcToAudioDest(input, ".mp3", ".flac", null);
     }
 
@@ -132,26 +116,15 @@ public class SoxMigrations {
         if (!destSuffix.startsWith("."))
             destSuffix = "." + destSuffix;
         
-        log.info("genericTransformAudioSrcToAudioDest begin: Converting from "
+        plogger.info("genericTransformAudioSrcToAudioDest begin: Converting from "
                 + srcSuffix + " to " + destSuffix);
-        File workFolder = new File(SoX_WORK_DIR);
-        if(!workFolder.exists()) {
-        	workFolder.mkdir();
-        }
+        File workFolder = FileUtils.createWorkFolderInSysTemp(SoX_WORK_DIR);
         
-        File outputFolder = new File(SoX_OUTPUT_DIR);
-        
-        if(!outputFolder.exists()) {
-        	boolean madeOutputFolder = outputFolder.mkdir();
-        }
+        File outputFolder = FileUtils.createFolderInWorkFolder(workFolder, SoX_OUTPUT_DIR);
         
         String outputFilePath = outputFolder.getAbsolutePath() + File.separator + "SoX_OUTPUT_FILE" + destSuffix; 
         
-        File inputFolder = new File(SoX_IN);
-        
-        if(!inputFolder.exists()) {
-        	boolean madeInputFolder = inputFolder.mkdir();
-        }
+        File inputFolder = FileUtils.createFolderInWorkFolder(workFolder, SoX_IN);
         
         String inputFilePath = inputFolder.getAbsolutePath() + File.separator + "SoX_INPUT_FILE" + srcSuffix;
         File inputFile = ByteArrayHelper.writeToDestFile(input, inputFilePath);
@@ -168,32 +141,32 @@ public class SoxMigrations {
             
             pr.setStartingDir(new File(SOX_HOME));
             
-            log.info("Executing: " + commands);
+            plogger.info("Executing: " + commands);
             
             pr.run();
 
-            log.info("SOX call output: " + pr.getProcessOutputAsString());
-            log.error("SOX call error: " + pr.getProcessErrorAsString());
+            plogger.info("SOX call output: " + pr.getProcessOutputAsString());
+            plogger.error("SOX call error: " + pr.getProcessErrorAsString());
             
-            log.debug("Executing: " + commands + " finished.");
+            plogger.debug("Executing: " + commands + " finished.");
 
         } catch (Exception ex) {
-            log.error("SoX could not create the output file");
+            plogger.error("SoX could not create the output file");
         }
-        log.info("genericTransformAudioSrcToAudioDest end");
+        plogger.info("genericTransformAudioSrcToAudioDest end");
         File processOutputFile = new File(outputFilePath);
         byte[] outputFileData = null;
         
         if(processOutputFile.canRead()) {
         	outputFileData = ByteArrayHelper.read(new File(outputFilePath));
-            log.info(outputFileData.length);
+            plogger.info(outputFileData.length);
         }
         else {
         	outputFileData = null;
-        	log.error("SoX didn't create an output file!");
+        	plogger.error("SoX didn't create an output file!");
         }
         
-        boolean deletedFolders = deleteTempFiles(workFolder);
+        boolean deletedFolders = FileUtils.deleteTempFiles(workFolder, plogger);
         
         return outputFileData;
     }
@@ -246,32 +219,4 @@ public class SoxMigrations {
 //        return new DataHandler(new ByteArrayDataSource(ByteArrayHelper.read(f),
 //                "application/octet-stream"));
 //    }
-    
-    private boolean deleteTempFiles(File workFolder) {
-		String workFolderName = workFolder.getPath();
-		if (workFolder.isDirectory()){
-			File[] entries = workFolder.listFiles();
-				for (int i=0;i<entries.length;i++){
-					File current = entries[i];
-					deleteTempFiles(current);
-				}
-			if (workFolder.delete()) {
-				log.info("Deleted: " + workFolderName);
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-		else {
-			if (workFolder.delete()) {
-				log.info("Deleted: " + workFolderName);
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-	}
-
 }

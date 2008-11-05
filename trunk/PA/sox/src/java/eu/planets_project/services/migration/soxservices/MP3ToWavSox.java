@@ -37,7 +37,10 @@ import eu.planets_project.services.utils.PlanetsLogger;
 @Remote(BasicMigrateOneBinary.class)
 @LocalBinding(jndiBinding = "planets/MP3ToWavSox")
 @RemoteBinding(jndiBinding = "planets-project.eu/MP3ToWavSox")
-@WebService(name = "MP3ToWavSox", serviceName = BasicMigrateOneBinary.NAME, targetNamespace = PlanetsServices.NS)
+@WebService(name = "MP3ToWavSox", 
+		 	serviceName = BasicMigrateOneBinary.NAME, 
+		 	targetNamespace = PlanetsServices.NS,
+		 	endpointInterface = "eu.planets_project.services.migrate.BasicMigrateOneBinary")
 @SOAPBinding( style = SOAPBinding.Style.RPC)
 @BindingType(value = "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")
 @MTOM(enabled = true, threshold = 0)

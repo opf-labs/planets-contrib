@@ -63,6 +63,7 @@ public class BasicMigrateOneAudioBinaryTests {
             File resultFile = null;
             
             if(resdh_orig!=null) {
+            	System.out.println("SUCCESS!!!");
             	System.out.println("Service executed, resulting byte array has length: " + resdh_orig.length);
             	System.out.println("Byte [] decoded...");
             	
@@ -87,33 +88,26 @@ public class BasicMigrateOneAudioBinaryTests {
             
             
             
-            if(srcFormat.equalsIgnoreCase(".mp3") || destformat.equalsIgnoreCase(".mp3")) {
-        		System.err.println("To use SoX for mp3 conversion, you need to have an additional external" +
-        				"\n mp3-Converter/library installed (e.g. LAME)");
-        		
+            if(srcFormat.equalsIgnoreCase(".mp3") | destformat.equalsIgnoreCase(".mp3")) {
         		if(resdh_orig == null) {
+        			System.err.println("WARNING: SoX returned NULL as result!");
         			System.err.println("To use SoX for mp3 conversion, you need to have an additional external" +
     				"\n mp3-Converter/library installed (e.g. LAME)");
         			assertTrue("mp3-Conversion-Test skipped", (srcFormat.equalsIgnoreCase(".mp3") || destformat.equalsIgnoreCase(".mp3")));
         		}
             }
     		
-            if(srcFormat.equalsIgnoreCase(".ogg") || destformat.equalsIgnoreCase(".ogg")) {
-    			System.err.println("To use SoX for \"ogg\" conversion, you need to have an additional external" +
-						"\n OggVorbis-Converter/library installed!");
-
+            if(srcFormat.equalsIgnoreCase(".ogg") | destformat.equalsIgnoreCase(".ogg")) {
     			if(resdh_orig == null) {
+    				System.err.println("WARNING: SoX returned NULL as result!");
     				System.err.println("To use SoX for \"ogg\" conversion, you need to have an additional external" +
 					"\n OggVorbis-Converter/library installed!");
     				assertTrue("ogg-Conversion-Test skipped", (srcFormat.equalsIgnoreCase(".ogg") || destformat.equalsIgnoreCase(".ogg")));
     			}
     		}
-    		if(srcFormat.equalsIgnoreCase(".flac") || destformat.equalsIgnoreCase(".flac")) {
-    			System.err.println("To use SoX for \"flac\" conversion, you need to have an additional external" +
-						"\n Flac-Converter/library installed!");
-
-
+    		if(srcFormat.equalsIgnoreCase(".flac") | destformat.equalsIgnoreCase(".flac")) {
     			if(resdh_orig == null) {
+    				System.err.println("WARNING: SoX returned NULL as result!");
     				System.err.println("To use SoX for \"flac\" conversion, you need to have an additional external" +
 					"\n Flac-Converter/library installed!");
     				assertTrue("Flac-Conversion-Test skipped", (srcFormat.equalsIgnoreCase(".flac") || destformat.equalsIgnoreCase(".flac")));
