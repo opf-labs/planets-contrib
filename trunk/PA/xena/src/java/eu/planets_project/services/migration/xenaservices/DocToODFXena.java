@@ -45,7 +45,7 @@ public class DocToODFXena implements BasicMigrateOneBinary {
      * @see eu.planets_project.ifr.core.common.services.migrate.BasicMigrateOneBinary#basicMigrateOneBinary(byte[])
      */
     public byte[] basicMigrateOneBinary ( 
-            byte[] binary ) throws PlanetsException {
+            byte[] binary ) {
 
         XenaMigrations xena = new XenaMigrations();
         xena.setOoffice_import_filter(XenaMigrations.IMPORT_FILTER_DOC);

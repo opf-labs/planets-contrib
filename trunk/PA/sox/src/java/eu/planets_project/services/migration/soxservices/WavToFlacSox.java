@@ -57,13 +57,13 @@ public class WavToFlacSox implements BasicMigrateOneBinary {
 			@WebParam(name = "binary", targetNamespace = PlanetsServices.NS
 					+ "/" + BasicMigrateOneBinary.NAME, partName = "binary")
 			 
-					byte[] inFile) throws PlanetsException {
+					byte[] binary) {
 		log.info("basicMigrateOneBinary start");
 		SoxMigrations soxm = null;
 		soxm = new SoxMigrations();
 
 		log.info("basicMigrateOneBinary end");
-		return soxm.transformWavToFlac(inFile);
+		return soxm.transformWavToFlac(binary);
 	}
 
 	

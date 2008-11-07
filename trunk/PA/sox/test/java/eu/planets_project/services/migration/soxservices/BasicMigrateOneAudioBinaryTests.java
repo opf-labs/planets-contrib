@@ -24,96 +24,114 @@ import org.junit.Test;
 import eu.planets_project.services.PlanetsException;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.migrate.BasicMigrateOneBinary;
+import eu.planets_project.services.utils.test.ServiceCreator;
 
 public class BasicMigrateOneAudioBinaryTests {
 
     public void test(BasicMigrateOneBinary converter, String srcFormat,
             String destformat) {
-    	
+
         try {
             System.out.println("Sourceformat: " + srcFormat);
-            
+
             System.out.println("Targetformat: " + destformat);
-            
+
             String fileName = "PA/sox/test/resources/input" + srcFormat;
-            
+
             DataSource ds = new FileDataSource(fileName);
             DataHandler dataHandler = new DataHandler(ds);
 
             File srcFile = new File(fileName);
-            
+
             if (srcFile.exists() && srcFile.canRead()) {
                 System.out.println("OK.");
                 System.out.println(srcFile.getAbsolutePath());
             }
-            
+
             System.out.println("creating Byte[]");
-            
+
             byte[] imageData = getByteArrayFromFile(srcFile);
-            
-            System.out.println("data byta array has length: " + imageData.length);
+
+            System.out.println("data byta array has length: "
+                    + imageData.length);
             System.out.println("Sending audio data...");
             System.out.println(imageData.length + " Byte");
-            System.out.println(converter.QNAME + " Class: " + converter.getClass().getName());
-            
+            System.out.println(converter.QNAME + " Class: "
+                    + converter.getClass().getName());
+
             byte[] resdh_orig = converter.basicMigrateOneBinary(imageData);
-            
-//            assertTrue("Sox returned null data;", resdh_orig != null);
-            
+
+            // assertTrue("Sox returned null data;", resdh_orig != null);
+
             File resultFile = null;
-            
-            if(resdh_orig!=null) {
-            	System.out.println("SUCCESS!!!");
-            	System.out.println("Service executed, resulting byte array has length: " + resdh_orig.length);
-            	System.out.println("Byte [] decoded...");
-            	
-            	File testdir = new File(System.getProperty("user.home") + System.getProperty("file.separator") + "soundconversion");
-                
+
+            if (resdh_orig != null) {
+                System.out.println("SUCCESS!!!");
+                System.out
+                        .println("Service executed, resulting byte array has length: "
+                                + resdh_orig.length);
+                System.out.println("Byte [] decoded...");
+
+                File testdir = new File(System.getProperty("user.home")
+                        + System.getProperty("file.separator")
+                        + "soundconversion");
+
                 if (!testdir.exists())
                     testdir.mkdir();
-                
+
                 resultFile = new File(testdir, "converted" + destformat);
-                
+
                 if (!resultFile.exists()) {
                     resultFile.createNewFile();
                 }
-                
+
                 FileOutputStream fos = new FileOutputStream(resultFile);
                 fos.write(resdh_orig);
                 fos.flush();
                 fos.close();
-                
-                System.out.println(resultFile.getAbsolutePath() + " has " + resultFile.length() + "  bytes.");
+
+                System.out.println(resultFile.getAbsolutePath() + " has "
+                        + resultFile.length() + "  bytes.");
             }
-            
-            
-            
-            if(srcFormat.equalsIgnoreCase(".mp3") | destformat.equalsIgnoreCase(".mp3")) {
-        		if(resdh_orig == null) {
-        			System.err.println("WARNING: SoX returned NULL as result!");
-        			System.err.println("To use SoX for mp3 conversion, you need to have an additional external" +
-    				"\n mp3-Converter/library installed (e.g. LAME)");
-        			assertTrue("mp3-Conversion-Test skipped", (srcFormat.equalsIgnoreCase(".mp3") || destformat.equalsIgnoreCase(".mp3")));
-        		}
+
+            if (srcFormat.equalsIgnoreCase(".mp3")
+                    | destformat.equalsIgnoreCase(".mp3")) {
+                if (resdh_orig == null) {
+                    System.err.println("WARNING: SoX returned NULL as result!");
+                    System.err
+                            .println("To use SoX for mp3 conversion, you need to have an additional external"
+                                    + "\n mp3-Converter/library installed (e.g. LAME)");
+                    assertTrue("mp3-Conversion-Test skipped", (srcFormat
+                            .equalsIgnoreCase(".mp3") || destformat
+                            .equalsIgnoreCase(".mp3")));
+                }
             }
-    		
-            if(srcFormat.equalsIgnoreCase(".ogg") | destformat.equalsIgnoreCase(".ogg")) {
-    			if(resdh_orig == null) {
-    				System.err.println("WARNING: SoX returned NULL as result!");
-    				System.err.println("To use SoX for \"ogg\" conversion, you need to have an additional external" +
-					"\n OggVorbis-Converter/library installed!");
-    				assertTrue("ogg-Conversion-Test skipped", (srcFormat.equalsIgnoreCase(".ogg") || destformat.equalsIgnoreCase(".ogg")));
-    			}
-    		}
-    		if(srcFormat.equalsIgnoreCase(".flac") | destformat.equalsIgnoreCase(".flac")) {
-    			if(resdh_orig == null) {
-    				System.err.println("WARNING: SoX returned NULL as result!");
-    				System.err.println("To use SoX for \"flac\" conversion, you need to have an additional external" +
-					"\n Flac-Converter/library installed!");
-    				assertTrue("Flac-Conversion-Test skipped", (srcFormat.equalsIgnoreCase(".flac") || destformat.equalsIgnoreCase(".flac")));
-    			}
-    		}
-            
+
+            if (srcFormat.equalsIgnoreCase(".ogg")
+                    | destformat.equalsIgnoreCase(".ogg")) {
+                if (resdh_orig == null) {
+                    System.err.println("WARNING: SoX returned NULL as result!");
+                    System.err
+                            .println("To use SoX for \"ogg\" conversion, you need to have an additional external"
+                                    + "\n OggVorbis-Converter/library installed!");
+                    assertTrue("ogg-Conversion-Test skipped", (srcFormat
+                            .equalsIgnoreCase(".ogg") || destformat
+                            .equalsIgnoreCase(".ogg")));
+                }
+            }
+            if (srcFormat.equalsIgnoreCase(".flac")
+                    | destformat.equalsIgnoreCase(".flac")) {
+                if (resdh_orig == null) {
+                    System.err.println("WARNING: SoX returned NULL as result!");
+                    System.err
+                            .println("To use SoX for \"flac\" conversion, you need to have an additional external"
+                                    + "\n Flac-Converter/library installed!");
+                    assertTrue("Flac-Conversion-Test skipped", (srcFormat
+                            .equalsIgnoreCase(".flac") || destformat
+                            .equalsIgnoreCase(".flac")));
+                }
+            }
+
         } catch (MalformedURLException e) {
             fail(e.getMessage());
             e.printStackTrace();
@@ -123,108 +141,97 @@ public class BasicMigrateOneAudioBinaryTests {
         } catch (IOException e) {
             fail(e.getMessage());
             e.printStackTrace();
-        } catch (PlanetsException e) {
-            fail(e.getMessage());
-            e.printStackTrace();
         }
     }
 
-    /**
-     * 
-     * 23.07.2008 13:31:10
-     */
     @Test
-    public void localTests() {
+    public void localTestsMp3ToWav() {
         System.out.println("**********************************************");
-        
-        test(new WavToAiffSox(), ".wav", ".aiff");
-        
-        System.out.println("**********************************************");
-        
-        test(new WavToAiffSox(), ".aiff", ".wav");
-        
-        System.out.println("**********************************************");
-
         test(new MP3ToWavSox(), ".mp3", ".wav");
-        
-        System.out.println("**********************************************");
-
-        test(new MP3ToOggSox(), ".mp3", ".ogg");
-        
-        System.out.println("**********************************************");
-
-        test(new MP3ToFlacSox(), ".mp3", ".flac");
-        
-        System.out.println("**********************************************");
-
-        test(new WavToFlacSox(), ".wav", ".flac");
-        
-        System.out.println("**********************************************");
-
-        test(new WavToOggSox(), ".wav", ".ogg");
-        
-        System.out.println("**********************************************");
-
     }
 
     @Test
-    public void clientTest() {
-        try {
-            Service service = null;
-            BasicMigrateOneBinary servicePort = null;
+    public void localTestsMp3ToOgg() {
+        System.out.println("**********************************************");
+        test(new MP3ToOggSox(), ".mp3", ".ogg");
+    }
 
-            System.out.println("**********************************************");
+    @Test
+    public void localTestsMp3ToFlac() {
+        System.out.println("**********************************************");
+        test(new MP3ToFlacSox(), ".mp3", ".flac");
+    }
 
-            service = Service.create(new URL(
-                    "http://localhost:8080/pserv-pa-sox/WavToAiffSox?wsdl"),
-                    new QName(PlanetsServices.NS, BasicMigrateOneBinary.NAME));
-            servicePort = service.getPort(BasicMigrateOneBinary.class);
-            test(servicePort, ".wav", ".aiff");
+    @Test
+    public void localTestsWavToAiff() {
+        System.out.println("**********************************************");
+        test(new WavToAiffSox(), ".wav", ".aiff");
+    }
 
-            System.out.println("**********************************************");
+    @Test
+    public void localTestsWavToFlac() {
+        System.out.println("**********************************************");
+        test(new WavToFlacSox(), ".wav", ".flac");
+    }
 
-            service = Service.create(new URL(
-            "http://localhost:8080/pserv-pa-sox/MP3ToOggSox?wsdl"),
-            new QName(PlanetsServices.NS, BasicMigrateOneBinary.NAME));
-            servicePort = service.getPort(BasicMigrateOneBinary.class);
-            test(servicePort, ".mp3", ".ogg");
+    @Test
+    public void localTestsWavToOgg() {
+        System.out.println("**********************************************");
+        test(new WavToOggSox(), ".wav", ".ogg");
+    }
 
-            System.out.println("**********************************************");
-            
-            service = Service.create(new URL(
-                    "http://localhost:8080/pserv-pa-sox/MP3ToWavSox?wsdl"),
-                    new QName(PlanetsServices.NS, BasicMigrateOneBinary.NAME));
-            servicePort = service.getPort(BasicMigrateOneBinary.class);
-            test(servicePort, ".mp3", ".wav");
+    @Test
+    public void clientTestMp3ToOgg() {
+        System.out.println("**********************************************");
+        BasicMigrateOneBinary migrate = ServiceCreator.createTestService(
+                BasicMigrateOneBinary.QNAME, MP3ToOggSox.class,
+                "/pserv-pa-sox/MP3ToOggSox?wsdl");
+        test(migrate, ".mp3", ".ogg");
+    }
 
-            System.out.println("**********************************************");
+    @Test
+    public void clientTestMp3ToWav() {
+        System.out.println("**********************************************");
+        BasicMigrateOneBinary migrate = ServiceCreator.createTestService(
+                BasicMigrateOneBinary.QNAME, MP3ToWavSox.class,
+                "/pserv-pa-sox/MP3ToWavSox?wsdl");
+        test(migrate, ".mp3", ".wav");
+    }
 
-            service = Service.create(new URL(
-                    "http://localhost:8080/pserv-pa-sox/MP3ToFlacSox?wsdl"),
-                    new QName(PlanetsServices.NS, BasicMigrateOneBinary.NAME));
-            servicePort = service.getPort(BasicMigrateOneBinary.class);
-            test(servicePort, ".mp3", ".flac");
+    @Test
+    public void clientTestMp3ToFlac() {
+        System.out.println("**********************************************");
+        BasicMigrateOneBinary migrate = ServiceCreator.createTestService(
+                BasicMigrateOneBinary.QNAME, MP3ToFlacSox.class,
+                "/pserv-pa-sox/MP3ToFlacSox?wsdl");
+        test(migrate, ".mp3", ".flac");
+    }
 
-            System.out.println("**********************************************");
+    @Test
+    public void clientTestWavToOgg() {
+        System.out.println("**********************************************");
+        BasicMigrateOneBinary migrate = ServiceCreator.createTestService(
+                BasicMigrateOneBinary.QNAME, WavToOggSox.class,
+                "/pserv-pa-sox/WavToOggSox?wsdl");
+        test(migrate, ".wav", ".ogg");
+    }
 
-            service = Service.create(new URL(
-                    "http://localhost:8080/pserv-pa-sox/WavToOggSox?wsdl"),
-                    new QName(PlanetsServices.NS, BasicMigrateOneBinary.NAME));
-            servicePort = service.getPort(BasicMigrateOneBinary.class);
-            test(servicePort, ".wav", ".ogg");
+    @Test
+    public void clientTestWavToFlac() {
+        System.out.println("**********************************************");
+        BasicMigrateOneBinary migrate = ServiceCreator.createTestService(
+                BasicMigrateOneBinary.QNAME, WavToFlacSox.class,
+                "/pserv-pa-sox/WavToFlacSox?wsdl");
+        test(migrate, ".wav", ".flac");
+    }
 
-            System.out.println("**********************************************");
-
-            service = Service.create(new URL(
-                    "http://localhost:8080/pserv-pa-sox/WavToFlacSox?wsdl"),
-                    new QName(PlanetsServices.NS, BasicMigrateOneBinary.NAME));
-            servicePort = service.getPort(BasicMigrateOneBinary.class);
-            test(servicePort, ".wav", ".flac");
-
-        } catch (IOException e) {
-            fail(e.getMessage());
-        }
-
+    @Test
+    public void clientTestWavToAiff() {
+        System.out.println("**********************************************");
+        BasicMigrateOneBinary migrate = ServiceCreator.createTestService(
+                BasicMigrateOneBinary.QNAME, WavToAiffSox.class,
+                "/pserv-pa-sox/WavToAiffSox?wsdl");
+        test(migrate, ".wav", ".aiff");
     }
 
     private static byte[] getByteArrayFromFile(File file) throws IOException {

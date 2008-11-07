@@ -58,11 +58,11 @@ public class MP3ToOggSox implements BasicMigrateOneBinary {
 			@WebParam(name = "binary", targetNamespace = PlanetsServices.NS
 					+ "/" + BasicMigrateOneBinary.NAME, partName = "binary")
 			 
-					byte[] inFile) throws PlanetsException {
+					byte[] binary) {
 		SoxMigrations soxm = null;
 		File sourceAudioFile = null;
 		soxm = new SoxMigrations();
-		return soxm.transformMp3ToOgg(inFile);
+		return soxm.transformMp3ToOgg(binary);
 	}
 
 //	

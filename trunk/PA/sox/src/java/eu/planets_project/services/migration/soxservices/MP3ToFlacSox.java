@@ -37,7 +37,8 @@ import eu.planets_project.services.utils.PlanetsLogger;
 @Remote(BasicMigrateOneBinary.class)
 @LocalBinding(jndiBinding = "planets/MP3ToFlacSox")
 @RemoteBinding(jndiBinding = "planets-project.eu/MP3ToFlacSox")
-@WebService(name = "MP3ToFlacSox", serviceName = BasicMigrateOneBinary.NAME, targetNamespace = PlanetsServices.NS)
+@WebService(name = "MP3ToFlacSox", serviceName = BasicMigrateOneBinary.NAME, 
+        targetNamespace = PlanetsServices.NS, endpointInterface = "eu.planets_project.services.migrate.BasicMigrateOneBinary")
 @SOAPBinding( style = SOAPBinding.Style.RPC)
 @BindingType(value = "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")
 @MTOM(enabled = true, threshold = 0)
@@ -55,14 +56,14 @@ public class MP3ToFlacSox implements BasicMigrateOneBinary {
 			@WebParam(name = "binary", targetNamespace = PlanetsServices.NS
 					+ "/" + BasicMigrateOneBinary.NAME, partName = "binary")
 			 
-					byte[] inFile) throws PlanetsException {
+					byte[] binary) {
 		log.info("basicMigrateOneBinary start");
 		SoxMigrations soxm = null;
 		File sourceAudioFile = null;
 		soxm = new SoxMigrations();
 
 		log.info("basicMigrateOneBinary end");
-		return soxm.transformMp3ToFlac(inFile);
+		return soxm.transformMp3ToFlac(binary);
 	}
 
 	

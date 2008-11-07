@@ -59,7 +59,7 @@ public class ODFToPDFXena implements BasicMigrateOneBinary {
                     name = "binary", 
                     targetNamespace = PlanetsServices.NS + "/" + BasicMigrateOneBinary.NAME, 
                     partName = "binary")
-            byte[] binary )  throws PlanetsException {
+            byte[] binary ) {
 
         XenaMigrations xena = new XenaMigrations();
         xena.setOoffice_import_filter(XenaMigrations.IMPORT_FILTER_NONE);

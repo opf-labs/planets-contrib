@@ -58,10 +58,10 @@ public class WavToAiffSox implements BasicMigrateOneBinary {
 			@WebParam(name = "binary", targetNamespace = PlanetsServices.NS
 					+ "/" + BasicMigrateOneBinary.NAME, partName = "binary")
 					
-					byte[] inputData) throws PlanetsException {
+					byte[] binary) {
 		log.info("basicMigrateOneBinary start");
 		SoxMigrations soxm = new SoxMigrations();
-		byte[] resultArray = soxm.transformWavToAiff(inputData);
+		byte[] resultArray = soxm.transformWavToAiff(binary);
 		log.info("basicMigrateOneBinary end");
 		return resultArray;
 	}

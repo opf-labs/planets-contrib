@@ -54,15 +54,15 @@ public class BasicOpenXMLMigration implements BasicMigrateOneBinary {
      * @see eu.planets_project.ifr.core.common.services.migrate.BasicMigrateOneBinary#basicMigrateOneBinary(byte[])
      */
     public byte[] basicMigrateOneBinary ( 
-            byte[] binary ) throws PlanetsException {
+            byte[] binary ) {
         // Serialise the file:
-        File input;
+        File input = null;
         try {
             input = File.createTempFile("input",".doc");
             input.deleteOnExit();
         } catch ( IOException e ) {
             log.error("Could not create temporary files! "+e);
-            throw new PlanetsException(e);
+            e.printStackTrace();
         }
         
         try {
@@ -72,14 +72,14 @@ public class BasicOpenXMLMigration implements BasicMigrateOneBinary {
             fos.close();
         } catch( FileNotFoundException e ) {
             log.error("Creating "+input.getAbsolutePath()+" :: " +e);
-            throw new PlanetsException(e);
+            e.printStackTrace();
         } catch( IOException e ) {
             log.error("Creating "+input.getAbsolutePath()+" :: " +e);
-            throw new PlanetsException(e);
+            e.printStackTrace();
         }
 
         // Do the conversion:
-        String outputFile;
+        String outputFile = null;
         try {
             OpenXMLMigration ooxm = new OpenXMLMigration();
             String inputFile = input.getCanonicalPath().toString();
@@ -87,10 +87,10 @@ public class BasicOpenXMLMigration implements BasicMigrateOneBinary {
             outputFile = ooxm.convertFileRef(inputFile);
         } catch (IOException e) {
             log.error("Migration: IOException :: " +e);
-            throw new PlanetsException(e);
+            e.printStackTrace();
         } catch (PlanetsServiceException e) {
             log.error("Migration: Planets Service Exception :: " +e);
-            throw new PlanetsException(e);
+            e.printStackTrace();
         }
         
         // Get the result as a byte array:
@@ -99,7 +99,7 @@ public class BasicOpenXMLMigration implements BasicMigrateOneBinary {
             result = getByteArrayFromFile(new File(outputFile));
         } catch( IOException e ) {
             log.error("Returning "+outputFile+" :: " +e);
-            throw new PlanetsException(e);
+            e.printStackTrace();
         }
         
         // Delete the temporaries:
