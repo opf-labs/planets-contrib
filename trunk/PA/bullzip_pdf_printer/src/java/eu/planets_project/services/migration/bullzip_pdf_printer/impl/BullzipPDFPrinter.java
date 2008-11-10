@@ -66,22 +66,22 @@ public class BullzipPDFPrinter {
 	}
 	
 	public byte[] printTxtToPDF(byte[] inputFileBlob) {
-		return genericPrintInFormatToOutFormat(inputFileBlob, ".txt", ".pdf");
+		return genericPrintFormatXtoFormatY(inputFileBlob, ".txt", ".pdf");
 	}
 	
 	public byte[] printDocToPDF(byte[] inputFileBlob) {
-		return genericPrintInFormatToOutFormat(inputFileBlob, ".doc", ".pdf");
+		return genericPrintFormatXtoFormatY(inputFileBlob, ".doc", ".pdf");
 	}
 	
 	public byte[] printOdtToPDF(byte[] inputFileBlob) {
-		return genericPrintInFormatToOutFormat(inputFileBlob, ".odt", ".pdf");
+		return genericPrintFormatXtoFormatY(inputFileBlob, ".odt", ".pdf");
 	}
 	
 	public byte[] printRtfToPDF(byte[] inputFileBlob) {
-		return genericPrintInFormatToOutFormat(inputFileBlob, ".rtf", ".pdf");
+		return genericPrintFormatXtoFormatY(inputFileBlob, ".rtf", ".pdf");
 	}
 	
-	private byte[] genericPrintInFormatToOutFormat(byte[] inputFileBlob, String inputFormatExt, String outputFormatExt) {
+	private byte[] genericPrintFormatXtoFormatY(byte[] inputFileBlob, String inputFormatExt, String outputFormatExt) {
 		if(!inputFormatExt.startsWith(".")) {
 			inputFormatExt = "." + inputFormatExt;
 		}
