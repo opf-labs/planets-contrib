@@ -10,13 +10,10 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-import javax.xml.ws.BindingType;
 
 import org.jboss.annotation.ejb.LocalBinding;
 import org.jboss.annotation.ejb.RemoteBinding;
 
-import eu.planets_project.services.PlanetsException;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.migrate.BasicMigrateOneBinary;
 import eu.planets_project.services.utils.PlanetsLogger;
@@ -32,14 +29,10 @@ import eu.planets_project.services.utils.PlanetsLogger;
 @RemoteBinding(jndiBinding = "planets-project.eu/XenaService/BasicMigrateOneBinary/ODFtoPDF")
 
 // Web Service Annotations, copied from the inherited interface.
-@WebService(
-        name = "ODFToPDFXena", 
+@WebService( name = "ODFToPDFXena", 
         serviceName = BasicMigrateOneBinary.NAME, 
-        targetNamespace = PlanetsServices.NS )
-@SOAPBinding(
-        parameterStyle = SOAPBinding.ParameterStyle.BARE,
-        style = SOAPBinding.Style.RPC)
-@BindingType(value = "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")
+        targetNamespace = PlanetsServices.NS,
+        endpointInterface = "eu.planets_project.services.migrate.BasicMigrateOneBinary")
 public class ODFToPDFXena implements BasicMigrateOneBinary {
     
     PlanetsLogger log = PlanetsLogger.getLogger(DocToODFXena.class);
@@ -47,18 +40,7 @@ public class ODFToPDFXena implements BasicMigrateOneBinary {
     /* (non-Javadoc)
      * @see eu.planets_project.ifr.core.common.services.migrate.BasicMigrateOneBinary#basicMigrateOneBinary(byte[])
      */
-    @WebMethod(
-            operationName = BasicMigrateOneBinary.NAME, 
-            action = PlanetsServices.NS + "/" + BasicMigrateOneBinary.NAME)
-    @WebResult(
-            name = BasicMigrateOneBinary.NAME+"Result", 
-            targetNamespace = PlanetsServices.NS + "/" + BasicMigrateOneBinary.NAME, 
-            partName = BasicMigrateOneBinary.NAME + "Result")
     public byte[] basicMigrateOneBinary ( 
-            @WebParam(
-                    name = "binary", 
-                    targetNamespace = PlanetsServices.NS + "/" + BasicMigrateOneBinary.NAME, 
-                    partName = "binary")
             byte[] binary ) {
 
         XenaMigrations xena = new XenaMigrations();
