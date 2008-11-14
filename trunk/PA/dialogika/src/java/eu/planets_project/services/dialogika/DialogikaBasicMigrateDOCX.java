@@ -8,10 +8,14 @@ import java.net.URL;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import de.dialogika.planets.planets_webservice.genericmigration.ArrayOfParameter;
 import de.dialogika.planets.planets_webservice.genericmigration.GenericMigration;
+import de.dialogika.planets.planets_webservice.genericmigration.GenericMigrationSoap;
 import de.dialogika.planets.planets_webservice.genericmigration.MigrateOneBinaryResult;
-import de.dialogika.planets.planets_webservice.genericmigration.Parameter;
+//import de.dialogika.planets.planets_webservice.genericmigration.Parameter;
 import eu.planets_project.services.migrate.BasicMigrateOneBinary;
 
 /**
@@ -22,6 +26,8 @@ import eu.planets_project.services.migrate.BasicMigrateOneBinary;
  */
 @SuppressWarnings("deprecation")
 public class DialogikaBasicMigrateDOCX implements BasicMigrateOneBinary {
+
+    private static Log log = LogFactory.getLog(DialogikaBasicMigrateDOCX.class);
 
     /* (non-Javadoc)
      * @see eu.planets_project.services.migrate.BasicMigrateOneBinary#basicMigrateOneBinary(byte[])
@@ -38,7 +44,12 @@ public class DialogikaBasicMigrateDOCX implements BasicMigrateOneBinary {
             e.printStackTrace();
             return null;
         }
-        MigrateOneBinaryResult res = mob.getGenericMigrationSoap12().migrateOneBinary(binary, null);
+        log.info("Initialised GenericMigration.");
+        ArrayOfParameter pars = new ArrayOfParameter();
+        GenericMigrationSoap gms = mob.getGenericMigrationSoap();
+        log.info("Got SOAP implementation.  Invoking...");
+        MigrateOneBinaryResult res = gms.migrateOneBinary(binary, pars);
+        log.info("Got result. Returning.");
         return res.getBinary();
     }
 
