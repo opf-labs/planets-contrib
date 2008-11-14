@@ -33,7 +33,7 @@ public class DialogikaBasicMigrateDOCXTest {
      */
     @Before
     public void setUp() {
-
+        System.out.println("Attempting to create a test service... ");
         bmob = ServiceCreator.createTestService(BasicMigrateOneBinary.QNAME, DialogikaBasicMigrateDOCX.class, wsdlLoc );
         System.out.println("Connected to service, got: "+bmob);
 
@@ -57,8 +57,11 @@ public class DialogikaBasicMigrateDOCXTest {
         System.setProperty("file.encoding","utf-8");
         System.out.println("The HTTP Proxy host is: "+System.getProperty("http.proxyHost"));
 */
+        System.out.println("Reading in the input...");
         byte[] input = ByteArrayHelper.read(new File("PA/dialogika/test/resources/test.doc"));
+        System.out.println("Invoking the service...");
         byte[] output = bmob.basicMigrateOneBinary(input);
+        System.out.println("Checking the result...");
         assertTrue("The byte[] output should not be NULL.", output != null );
     }
 
