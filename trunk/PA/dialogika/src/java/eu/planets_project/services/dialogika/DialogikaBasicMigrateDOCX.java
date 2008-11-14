@@ -34,6 +34,7 @@ public class DialogikaBasicMigrateDOCX implements BasicMigrateOneBinary {
      */
     public byte[] basicMigrateOneBinary(byte[] binary) {
         GenericMigration mob;
+        log.warn("Initialising GenericMigration...");
         try {
             mob = new GenericMigration(
                     new URL( "http://www.dialogika.de/planets/planets.webservice/GenericMigration.asmx?outtype=docx&WSDL"), 
@@ -44,12 +45,12 @@ public class DialogikaBasicMigrateDOCX implements BasicMigrateOneBinary {
             e.printStackTrace();
             return null;
         }
-        log.info("Initialised GenericMigration.");
+        log.warn("Initialised GenericMigration.");
         ArrayOfParameter pars = new ArrayOfParameter();
         GenericMigrationSoap gms = mob.getGenericMigrationSoap();
-        log.info("Got SOAP implementation.  Invoking...");
+        log.warn("Got SOAP implementation.  Invoking...");
         MigrateOneBinaryResult res = gms.migrateOneBinary(binary, pars);
-        log.info("Got result. Returning.");
+        log.warn("Got result. Returning.");
         return res.getBinary();
     }
 
