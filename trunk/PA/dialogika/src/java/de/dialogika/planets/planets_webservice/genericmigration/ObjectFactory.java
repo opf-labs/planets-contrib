@@ -30,43 +30,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link GetAllTypesResponse }
-     * 
-     */
-    public GetAllTypesResponse createGetAllTypesResponse() {
-        return new GetAllTypesResponse();
-    }
-
-    /**
-     * Create an instance of {@link MigrateOneBinaryResult }
-     * 
-     */
-    public MigrateOneBinaryResult createMigrateOneBinaryResult() {
-        return new MigrateOneBinaryResult();
-    }
-
-    /**
-     * Create an instance of {@link GetAllTypes }
-     * 
-     */
-    public GetAllTypes createGetAllTypes() {
-        return new GetAllTypes();
-    }
-
-    /**
      * Create an instance of {@link GetMatchingOutType }
      * 
      */
     public GetMatchingOutType createGetMatchingOutType() {
         return new GetMatchingOutType();
-    }
-
-    /**
-     * Create an instance of {@link MigrateOneBinaryResponse }
-     * 
-     */
-    public MigrateOneBinaryResponse createMigrateOneBinaryResponse() {
-        return new MigrateOneBinaryResponse();
     }
 
     /**
@@ -78,19 +46,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link MigrateOneBinary }
+     * Create an instance of {@link GetAllTypesResponse }
      * 
      */
-    public MigrateOneBinary createMigrateOneBinary() {
-        return new MigrateOneBinary();
+    public GetAllTypesResponse createGetAllTypesResponse() {
+        return new GetAllTypesResponse();
     }
 
     /**
-     * Create an instance of {@link GetMatchingOutTypeResponse }
+     * Create an instance of {@link Parameter }
      * 
      */
-    public GetMatchingOutTypeResponse createGetMatchingOutTypeResponse() {
-        return new GetMatchingOutTypeResponse();
+    public Parameter createParameter() {
+        return new Parameter();
     }
 
     /**
@@ -102,11 +70,43 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Parameter }
+     * Create an instance of {@link GetMatchingOutTypeResponse }
      * 
      */
-    public Parameter createParameter() {
-        return new Parameter();
+    public GetMatchingOutTypeResponse createGetMatchingOutTypeResponse() {
+        return new GetMatchingOutTypeResponse();
+    }
+
+    /**
+     * Create an instance of {@link MigrateOneBinary }
+     * 
+     */
+    public MigrateOneBinary createMigrateOneBinary() {
+        return new MigrateOneBinary();
+    }
+
+    /**
+     * Create an instance of {@link MigrateOneBinaryResponse }
+     * 
+     */
+    public MigrateOneBinaryResponse createMigrateOneBinaryResponse() {
+        return new MigrateOneBinaryResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetAllTypes }
+     * 
+     */
+    public GetAllTypes createGetAllTypes() {
+        return new GetAllTypes();
+    }
+
+    /**
+     * Create an instance of {@link MigrateOneBinaryResult }
+     * 
+     */
+    public MigrateOneBinaryResult createMigrateOneBinaryResult() {
+        return new MigrateOneBinaryResult();
     }
 
 }

@@ -55,4 +55,14 @@ public class GenericMigration
         return super.getPort(new QName("http://www.dialogika.de/Planets/planets.webservice/GenericMigration", "GenericMigrationSoap"), GenericMigrationSoap.class);
     }
 
+    /**
+     * 
+     * @return
+     *     returns GenericMigrationSoap
+     */
+    @WebEndpoint(name = "GenericMigrationSoap12")
+    public GenericMigrationSoap getGenericMigrationSoap12() {
+        return super.getPort(new QName("http://www.dialogika.de/Planets/planets.webservice/GenericMigration", "GenericMigrationSoap12"), GenericMigrationSoap.class);
+    }
+
 }

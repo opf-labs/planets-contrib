@@ -44,8 +44,19 @@ public class DialogikaBasicMigrateDOCXTest {
      */
     @Test
     public void testInvoke() {
+        /*
+        #http-proxy-host = bspcache.bl.uk
+        #http-proxy-port = 8080
+        #http-proxy-host = loncache.bl.uk
+        #http-proxy-host = anjackson.net
+        #http-proxy-port = 38080
+        */
+/*        
+        System.setProperty("http.proxyHost","bspcache.bl.uk");
+        System.setProperty("http.proxyPort", "8080");
+        System.setProperty("file.encoding","utf-8");
         System.out.println("The HTTP Proxy host is: "+System.getProperty("http.proxyHost"));
-
+*/
         byte[] input = ByteArrayHelper.read(new File("PA/dialogika/test/resources/test.doc"));
         byte[] output = bmob.basicMigrateOneBinary(input);
         assertTrue("The byte[] output should not be NULL.", output != null );
