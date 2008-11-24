@@ -19,7 +19,6 @@ import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.migration.dvips.DviPsMigration;
 import eu.planets_project.services.utils.test.ServiceCreator;
 
 /**
@@ -43,7 +42,7 @@ public final class Gimp26MigrationTest {
      */
     @Before
     public void setUp() throws Exception {
-        dom = ServiceCreator.createTestService(Migrate.QNAME, DviPsMigration.class, wsdlLoc );
+        dom = ServiceCreator.createTestService(Migrate.QNAME, Gimp26Migration.class, wsdlLoc );
     }
 
     /*
@@ -61,7 +60,8 @@ public final class Gimp26MigrationTest {
     @Test
     public void testDescribe() {
         ServiceDescription desc = dom.describe();
-        System.out.println("Recieved service description: " + desc);
+        System.out.println("Received service description: ");
+        System.out.println(desc.toXml());
         assertTrue("The ServiceDescription should not be NULL.", desc != null );
     }
 
@@ -98,7 +98,7 @@ public final class Gimp26MigrationTest {
             throws IOException {
         byte[] binary = new byte[0];
         
-        String strOutFile = "PA/dvips/test/testfiles/testin.dvi";
+        String strOutFile = "PA/gimp/test/testfiles/demonstration.png";
         //String strOutFile = "test/testfiles/testin.dvi";
         fTmpOutFile = new File(strOutFile);
         assertTrue("DVI input file "+fTmpOutFile.getAbsolutePath()+" does not exist.", fTmpOutFile.exists());
@@ -124,7 +124,7 @@ public final class Gimp26MigrationTest {
     synchronized void writeByteArrayToFile( byte[] binary )
             throws IOException {
         try {
-            String strOutFile = "PA/dvips/test/testfiles/testout.ps";
+            String strOutFile = "PA/gimp/test/testfiles/demonstration.jpg";
             //String strOutFile = "test/testfiles/testout.ps";
             this.fTmpInFile = new File(strOutFile);
             System.out.println();

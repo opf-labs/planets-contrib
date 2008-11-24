@@ -119,11 +119,19 @@ public final class Gimp26Migration implements Migrate, Serializable {
             List<String> command = new ArrayList<String>();
             
             // setting up command
-            command.add(this.gimp_app_name);
-            command.add("-o");
-            command.add(tmpInFile.getAbsolutePath()+"."+this.gimp_outfile_ext);
-            command.add(tmpInFile.getAbsolutePath());
-            //command.add(strCmd);
+            command.add("/usr/bin/gimp");
+            
+            command.add("-c");
+            command.add("-i");
+            command.add("-d");
+            
+            /*command.add("-b");
+            command.add("'(dmmConvertPNGtoJPG");
+            command.add("\""+tmpInFile.getAbsolutePath()+"\"");
+            command.add("\""+tmpInFile.getAbsolutePath()+".jpg\")'");*/
+            
+            command.add("-b");
+            command.add("'(gimp-quit 0)'");
             
             runner.setCommand(command);
             runner.setInputStream(inputStream);
