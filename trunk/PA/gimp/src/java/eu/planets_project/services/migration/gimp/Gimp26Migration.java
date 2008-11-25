@@ -88,8 +88,8 @@ public final class Gimp26Migration implements Migrate, Serializable {
              
         } catch( Exception e ) {
             // // config vars
-            this.gimp_install_dir  = "C:/Programme/Gimp-2.0/bin";
-            this.gimp_app_name = "gimp-2.6";
+            this.gimp_install_dir  = "/home/georg/Projects/PLANETS/";
+            this.gimp_app_name = "dmmConvertPNGtoJPG.sh";
             this.gimp_outfile_ext = "tmp";
         }
         log.info("Using gimp install directory: "+this.gimp_install_dir);
@@ -119,19 +119,21 @@ public final class Gimp26Migration implements Migrate, Serializable {
             List<String> command = new ArrayList<String>();
             
             // setting up command
-            command.add("/usr/bin/gimp");
+            command.add(gimp_install_dir+gimp_app_name);
+            command.add(tmpInFile.getAbsolutePath());
+            command.add(tmpInFile.getAbsolutePath()+".jpg");
             
-            command.add("-c");
+            /*command.add("-c");
             command.add("-i");
             command.add("-d");
             
-            /*command.add("-b");
+            command.add("-b");
             command.add("'(dmmConvertPNGtoJPG");
             command.add("\""+tmpInFile.getAbsolutePath()+"\"");
-            command.add("\""+tmpInFile.getAbsolutePath()+".jpg\")'");*/
+            command.add("\""+tmpInFile.getAbsolutePath()+".jpg\")'");
             
             command.add("-b");
-            command.add("'(gimp-quit 0)'");
+            command.add("'(gimp-quit 0)'");*/
             
             runner.setCommand(command);
             runner.setInputStream(inputStream);
