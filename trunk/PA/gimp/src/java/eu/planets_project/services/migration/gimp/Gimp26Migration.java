@@ -159,40 +159,76 @@ public final class Gimp26Migration implements Migrate, Serializable {
     public ServiceDescription describe() {
 
         // parameters
+        // gif
         List<Parameter> parameterList = new ArrayList<Parameter>();
-        Parameter compressionTypeParam = new Parameter("compressionType", "0-10");
-        compressionTypeParam.setDescription("Allowed int values: 0 - 10");
-        parameterList.add(compressionTypeParam);
-
-        Parameter compressionLevelParam = new Parameter("compressionQuality", "0-100");
-        compressionLevelParam.setDescription("This should be an int value between: 0 - 100, representing the compression quality in percent.");
-        parameterList.add(compressionLevelParam);
+        Parameter gifInterlaceParam = new Parameter("gifInterlace", "true/false");
+        gifInterlaceParam.setDescription("GIF-Parameter: Boolean value true/false indicating if interlacing should be used.");
+        parameterList.add(gifInterlaceParam);
+        
+        // eps
+        Parameter epsPostscriptLevel2Param = new Parameter("epsPostscriptLevel2", "true/false");
+        epsPostscriptLevel2Param.setDescription("EPS-Parameter: Boolean value true/false indicating if the target format should be postscript level 2.");
+        parameterList.add(epsPostscriptLevel2Param);
+        Parameter epsEmbeddedPostscriptParam = new Parameter("epsEmbeddedPostscript", "true/false");
+        epsEmbeddedPostscriptParam.setDescription("EPS-Parameter: Boolean value true/false indicating if the target format should be embedded postscript.");
+        parameterList.add(epsEmbeddedPostscriptParam);
+        Parameter epsWithPreviewParam = new Parameter("epsWithPreview", "true/false");
+        epsWithPreviewParam.setDescription("EPS-Parameter: Boolean value true/false indicating if a preview image is used.");
+        parameterList.add(epsWithPreviewParam);
+        Parameter epsPreviewSizeParam = new Parameter("epsPreviewSize", "0-1024");
+        epsPreviewSizeParam.setDescription("EPS-Parameter: Integer value in the range 0-1024 representing the size of the preview image.");
+        parameterList.add(epsPreviewSizeParam);
+        
+        // jpeg
+        Parameter jpgCompressionRateParam = new Parameter("jpgCompressionRate", "{0,100}");
+        jpgCompressionRateParam.setDescription("JPG-Parameter: Integer value in the range 0-100 representing the compression rate.");
+        parameterList.add(jpgCompressionRateParam);
+        Parameter jpgOptimizeParam = new Parameter("jpgOptimize", "true/false");
+        jpgOptimizeParam.setDescription("JPG-Parameter: Boolean value true/false indicating if the Jpeg should be optimized.");
+        parameterList.add(jpgOptimizeParam);
+        Parameter jpgProgressiveParam = new Parameter("jpgProgressive", "true/false");
+        jpgProgressiveParam.setDescription("JPG-Parameter: Boolean value true/false indicating if progressive should be used.");
+        parameterList.add(jpgProgressiveParam);
+        Parameter jpgSmoothingParam = new Parameter("jpgSmoothing", "[0,1]");
+        jpgSmoothingParam.setDescription("JPG-Parameter: Floating point number indicating the smoothing grade.");
+        parameterList.add(jpgSmoothingParam);
 
         Parameters parameters = new Parameters();
         parameters.setParameters(parameterList);
 
         // input formats
         List<String> inputFormats = new ArrayList<String>();
-        inputFormats.add("JPEG");
-        inputFormats.add("TIFF");
-        inputFormats.add("GIF");
+        inputFormats.add("XCF");
+        inputFormats.add("GIF"); 
+        inputFormats.add("EPS"); 
+        inputFormats.add("JPEG"); 
         inputFormats.add("PNG");
+        inputFormats.add("PS");
+        inputFormats.add("PPM"); 
+        inputFormats.add("TIFF");
         inputFormats.add("BMP");
-        inputFormats.add("RAW");
-        inputFormats.add("PCX");
-        inputFormats.add("TGA");
-        inputFormats.add("PCD");
-        inputFormats.add("PDF");
 
         // output formats
         List<String> outputFormats = new ArrayList<String>();
-        outputFormats.add("TIFF");
-        outputFormats.add("PNG");
-        outputFormats.add("JPEG");
-        outputFormats.add("GIF");
-        outputFormats.add("PDF");
+        outputFormats.add("GIF"); // (interlace)
+        outputFormats.add("EPS"); // (Postscript Level2, Embedded Postscript, with preview size {0..1024})
+        outputFormats.add("JPEG"); // (quality {0..100}, optimize, progressive, smoothing [0,1])
+        outputFormats.add("PNG"); // (Interlacing, compression {0..9})
+        outputFormats.add("PS"); // (Postscript Level2, Embedded Postscript, with preview size {0..1024})
+        outputFormats.add("TIFF"); // (Compression {none, LZW, PackBits, Deflate, JPEG})
+        outputFormats.add("BMP"); // (depth {16 bit, 24 bit, 32 bit})
 
-        ServiceDescription mds = new ServiceDescription.Builder(NAME, Migrate.class.getName()).author("Sven Schlarb <shsschlarb-planets@yahoo.de>, Georg Petz <georg.petz@onb.ac.at>").classname(this.getClass().getCanonicalName()).description("Wrapper for GIMP version 2.6").version("0.1").parameters(parameters).paths(createMigrationPathwayMatrix(inputFormats, outputFormats)).build();
+        ServiceDescription mds = new ServiceDescription.Builder(NAME, Migrate.class.getName())
+                .author("Sven Schlarb <shsschlarb-planets@yahoo.de>, Georg Petz <georg.petz@onb.ac.at>")
+                .classname(this.getClass().getCanonicalName())
+                .description("A wrapper for file migrations using GIMP version 2.6" +
+                             "This service accepts input and target formats of the form: " +
+                             "'planets:fmt/ext/[extension]'\n" +
+                             "e.g. 'planets:fmt/ext/tiff' or 'planets:fmt/ext/tif'")
+                .version("0.1")
+                .parameters(parameters)
+                .paths(createMigrationPathwayMatrix(inputFormats, outputFormats))
+                .build();
         return mds;
     }
 
