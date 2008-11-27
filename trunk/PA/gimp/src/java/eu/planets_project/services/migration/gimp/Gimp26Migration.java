@@ -204,7 +204,6 @@ public final class Gimp26Migration implements Migrate, Serializable {
         inputFormats.add("JPEG"); 
         inputFormats.add("PNG");
         inputFormats.add("PS");
-        inputFormats.add("PPM"); 
         inputFormats.add("TIFF");
         inputFormats.add("BMP");
 
