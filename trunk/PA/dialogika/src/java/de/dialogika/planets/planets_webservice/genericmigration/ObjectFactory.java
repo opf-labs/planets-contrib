@@ -38,19 +38,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ArrayOfString }
+     * Create an instance of {@link GetAllTypes }
      * 
      */
-    public ArrayOfString createArrayOfString() {
-        return new ArrayOfString();
-    }
-
-    /**
-     * Create an instance of {@link GetAllTypesResponse }
-     * 
-     */
-    public GetAllTypesResponse createGetAllTypesResponse() {
-        return new GetAllTypesResponse();
+    public GetAllTypes createGetAllTypes() {
+        return new GetAllTypes();
     }
 
     /**
@@ -62,11 +54,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ArrayOfParameter }
+     * Create an instance of {@link MigrateOneBinaryResponse }
      * 
      */
-    public ArrayOfParameter createArrayOfParameter() {
-        return new ArrayOfParameter();
+    public MigrateOneBinaryResponse createMigrateOneBinaryResponse() {
+        return new MigrateOneBinaryResponse();
     }
 
     /**
@@ -78,27 +70,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link MigrateOneBinary }
+     * Create an instance of {@link ArrayOfString }
      * 
      */
-    public MigrateOneBinary createMigrateOneBinary() {
-        return new MigrateOneBinary();
-    }
-
-    /**
-     * Create an instance of {@link MigrateOneBinaryResponse }
-     * 
-     */
-    public MigrateOneBinaryResponse createMigrateOneBinaryResponse() {
-        return new MigrateOneBinaryResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetAllTypes }
-     * 
-     */
-    public GetAllTypes createGetAllTypes() {
-        return new GetAllTypes();
+    public ArrayOfString createArrayOfString() {
+        return new ArrayOfString();
     }
 
     /**
@@ -107,6 +83,30 @@ public class ObjectFactory {
      */
     public MigrateOneBinaryResult createMigrateOneBinaryResult() {
         return new MigrateOneBinaryResult();
+    }
+
+    /**
+     * Create an instance of {@link ArrayOfParameter }
+     * 
+     */
+    public ArrayOfParameter createArrayOfParameter() {
+        return new ArrayOfParameter();
+    }
+
+    /**
+     * Create an instance of {@link MigrateOneBinary }
+     * 
+     */
+    public MigrateOneBinary createMigrateOneBinary() {
+        return new MigrateOneBinary();
+    }
+
+    /**
+     * Create an instance of {@link GetAllTypesResponse }
+     * 
+     */
+    public GetAllTypesResponse createGetAllTypesResponse() {
+        return new GetAllTypesResponse();
     }
 
 }
