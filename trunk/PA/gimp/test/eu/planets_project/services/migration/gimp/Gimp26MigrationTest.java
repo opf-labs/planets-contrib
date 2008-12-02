@@ -92,7 +92,7 @@ public final class Gimp26MigrationTest {
 
     }
 
-    @Test
+    //@Test
     public void testMigrateJPGtoPNG() throws IOException {
         try {
             /*

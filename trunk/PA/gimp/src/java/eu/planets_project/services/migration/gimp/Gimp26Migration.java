@@ -34,6 +34,7 @@ import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.ByteArrayHelper;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
+import java.util.Arrays;
 
 /**
  * The Gimp26Migration class migrates various image file formats. 
@@ -113,9 +114,14 @@ public final class Gimp26Migration implements Migrate, Serializable {
             ProcessRunner runner = new ProcessRunner();
             List<String> command = new ArrayList<String>();
 
+            System.out.println("tmpInFile: " + tmpInFile.getAbsolutePath());
+
+            String[] commands = null;
+            String outFormat = null;
+
             if (inputFormat.equals(Format.extensionToURI("PNG")) && outputFormat.equals(Format.extensionToURI("JPG"))) {
 
-                command.add("gimp");
+                /*command.add("gimp");
                 command.add("--verbose");
                 command.add("-c");
                 command.add("-d");
@@ -123,13 +129,38 @@ public final class Gimp26Migration implements Migrate, Serializable {
                 command.add("-b");
                 command.add("(dmmConvertPNGtoJPG");
                 command.add(" \""+tmpInFile.getAbsolutePath()+"\"");
-                command.add(" \""+tmpInFile.getAbsolutePath()+".png\"");
+                command.add(" \""+tmpInFile.getAbsolutePath()+".jpg\"");
                 command.add("-b");
-                command.add("(gimp-quit 0)");
+                command.add("(gimp-quit 0)");*/
+                /*commands = new String[]{
+                            "gimp", "--verbose",
+                            "-c",
+                            "-i",
+                            "-d",
+                            "-b",
+                            "(dmmConvertPNGtoJPG" +
+                            " \"" + tmpInFile.getAbsolutePath() + "\"" +
+                            " \"" + tmpInFile.getAbsolutePath() + ".jpg\")",
+                            "-b",
+                            "(gimp-quit 0)"
+                        };*/
                 
+                commands = new String[]{
+                            "gimp", "--verbose",
+                            "-c",
+                            "-i",
+                            "-d",
+                            "-b",
+                            "(planetsMigratePNGtoJPEG" +
+                            " \"" + tmpInFile.getAbsolutePath() + "\"" +
+                            " \"" + tmpInFile.getAbsolutePath() + ".jpg\" 0.1 1 1 1)",
+                            "-b",
+                            "(gimp-quit 0)"
+                        };
+                outFormat = "jpg";
+
             } else if (inputFormat.equals(Format.extensionToURI("JPG")) && outputFormat.equals(Format.extensionToURI("PNG"))) {
-                
-                command.add("gimp");
+                /*command.add("gimp");
                 command.add("--verbose");
                 command.add("-c");
                 command.add("-d");
@@ -139,14 +170,16 @@ public final class Gimp26Migration implements Migrate, Serializable {
                 command.add(" \""+tmpInFile.getAbsolutePath()+"\"");
                 command.add(" \""+tmpInFile.getAbsolutePath()+".png\"");
                 command.add("-b");
-                command.add("(gimp-quit 0)");
-                
+                command.add("(gimp-quit 0)");*/
             }
 
-            runner.setCommand(command);
+            //runner.setCommand(command);
+            runner.setCommand(Arrays.asList(commands));
             runner.setInputStream(inputStream);
 
             runner.run();
+
+            System.out.println(runner.getProcessErrorAsString());
 
             int return_code = runner.getReturnCode();
 
@@ -156,7 +189,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
 
             // read byte array from temporary file
             if (tmpInFile.isFile() && tmpInFile.canRead()) {
-                binary = readByteArrayFromTmpFile();
+                binary = readByteArrayFromTmpFile(outFormat);
             } else {
                 log.error("Error: Unable to read temporary file " + tmpInFile.getPath() + tmpInFile.getName());
             }
@@ -184,7 +217,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
         Parameter gifInterlaceParam = new Parameter("gifInterlace", "true/false");
         gifInterlaceParam.setDescription("GIF-Parameter: Boolean value true/false indicating if interlacing should be used.");
         parameterList.add(gifInterlaceParam);
-        
+
         // eps
         Parameter epsPostscriptLevel2Param = new Parameter("epsPostscriptLevel2", "true/false");
         epsPostscriptLevel2Param.setDescription("EPS-Parameter: Boolean value true/false indicating if the target format should be postscript level 2.");
@@ -198,7 +231,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
         Parameter epsPreviewSizeParam = new Parameter("epsPreviewSize", "0-1024");
         epsPreviewSizeParam.setDescription("EPS-Parameter: Integer value in the range 0-1024 representing the size of the preview image.");
         parameterList.add(epsPreviewSizeParam);
-        
+
         // jpeg
         Parameter jpgCompressionRateParam = new Parameter("jpgCompressionRate", "{0,100}");
         jpgCompressionRateParam.setDescription("JPG-Parameter: Integer value in the range 0-100 representing the compression rate.");
@@ -219,9 +252,9 @@ public final class Gimp26Migration implements Migrate, Serializable {
         // input formats
         List<String> inputFormats = new ArrayList<String>();
         inputFormats.add("XCF");
-        inputFormats.add("GIF"); 
-        inputFormats.add("EPS"); 
-        inputFormats.add("JPEG"); 
+        inputFormats.add("GIF");
+        inputFormats.add("EPS");
+        inputFormats.add("JPEG");
         inputFormats.add("PNG");
         inputFormats.add("PS");
         inputFormats.add("TIFF");
@@ -237,17 +270,10 @@ public final class Gimp26Migration implements Migrate, Serializable {
         outputFormats.add("TIFF"); // (Compression {none, LZW, PackBits, Deflate, JPEG})
         outputFormats.add("BMP"); // (depth {16 bit, 24 bit, 32 bit})
 
-        ServiceDescription mds = new ServiceDescription.Builder(NAME, Migrate.class.getName())
-                .author("Sven Schlarb <shsschlarb-planets@yahoo.de>, Georg Petz <georg.petz@onb.ac.at>")
-                .classname(this.getClass().getCanonicalName())
-                .description("A wrapper for file migrations using GIMP version 2.6" +
-                             "This service accepts input and target formats of the form: " +
-                             "'planets:fmt/ext/[extension]'\n" +
-                             "e.g. 'planets:fmt/ext/tiff' or 'planets:fmt/ext/tif'")
-                .version("0.1")
-                .parameters(parameters)
-                .paths(createMigrationPathwayMatrix(inputFormats, outputFormats))
-                .build();
+        ServiceDescription mds = new ServiceDescription.Builder(NAME, Migrate.class.getName()).author("Sven Schlarb <shsschlarb-planets@yahoo.de>, Georg Petz <georg.petz@onb.ac.at>").classname(this.getClass().getCanonicalName()).description("A wrapper for file migrations using GIMP version 2.6" +
+                "This service accepts input and target formats of the form: " +
+                "'planets:fmt/ext/[extension]'\n" +
+                "e.g. 'planets:fmt/ext/tiff' or 'planets:fmt/ext/tif'").version("0.1").parameters(parameters).paths(createMigrationPathwayMatrix(inputFormats, outputFormats)).build();
         return mds;
     }
 
@@ -264,10 +290,11 @@ public final class Gimp26Migration implements Migrate, Serializable {
 
     /* (non-Javadoc)
      */
-    synchronized byte[] readByteArrayFromTmpFile() throws IOException {
-        String strOutFile = tmpInFile.getAbsolutePath() + "." + gimp_outfile_ext;
+    synchronized byte[] readByteArrayFromTmpFile(String format) throws IOException {
+        String strOutFile = tmpInFile.getAbsolutePath() + "." + format;
+        System.out.println("read: " + strOutFile);
         tmpOutFile = new File(strOutFile);
-        byte[] binary = ByteArrayHelper.read(tmpInFile);
+        byte[] binary = ByteArrayHelper.read(tmpOutFile);
         return binary;
     }
 
