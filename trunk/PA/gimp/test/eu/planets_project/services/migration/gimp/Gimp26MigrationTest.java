@@ -92,7 +92,7 @@ public final class Gimp26MigrationTest {
 
     }
 
-    //@Test
+    @Test
     public void testMigrateJPGtoPNG() throws IOException {
         try {
             /*
@@ -102,7 +102,7 @@ public final class Gimp26MigrationTest {
             byte[] binary = this.readByteArrayFromFile("PA/gimp/test/testfiles/demonstration.jpg");
             DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
 
-            MigrateResult mr = dom.migrate(input, Format.extensionToURI("PNG"), Format.extensionToURI("JPG"), null);
+            MigrateResult mr = dom.migrate(input, Format.extensionToURI("JPG"), Format.extensionToURI("PNG"), null);
             DigitalObject doOut = mr.getDigitalObject();
 
             assertTrue("Resulting digital object is null.", doOut != null);

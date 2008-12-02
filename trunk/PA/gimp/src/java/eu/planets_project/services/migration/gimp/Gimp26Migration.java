@@ -112,7 +112,6 @@ public final class Gimp26Migration implements Migrate, Serializable {
             InputStream inputStream = new ByteArrayInputStream(binary);
 
             ProcessRunner runner = new ProcessRunner();
-            List<String> command = new ArrayList<String>();
 
             System.out.println("tmpInFile: " + tmpInFile.getAbsolutePath());
 
@@ -121,30 +120,6 @@ public final class Gimp26Migration implements Migrate, Serializable {
 
             if (inputFormat.equals(Format.extensionToURI("PNG")) && outputFormat.equals(Format.extensionToURI("JPG"))) {
 
-                /*command.add("gimp");
-                command.add("--verbose");
-                command.add("-c");
-                command.add("-d");
-                command.add("-i");
-                command.add("-b");
-                command.add("(dmmConvertPNGtoJPG");
-                command.add(" \""+tmpInFile.getAbsolutePath()+"\"");
-                command.add(" \""+tmpInFile.getAbsolutePath()+".jpg\"");
-                command.add("-b");
-                command.add("(gimp-quit 0)");*/
-                /*commands = new String[]{
-                            "gimp", "--verbose",
-                            "-c",
-                            "-i",
-                            "-d",
-                            "-b",
-                            "(dmmConvertPNGtoJPG" +
-                            " \"" + tmpInFile.getAbsolutePath() + "\"" +
-                            " \"" + tmpInFile.getAbsolutePath() + ".jpg\")",
-                            "-b",
-                            "(gimp-quit 0)"
-                        };*/
-                
                 commands = new String[]{
                             "gimp", "--verbose",
                             "-c",
@@ -160,20 +135,22 @@ public final class Gimp26Migration implements Migrate, Serializable {
                 outFormat = "jpg";
 
             } else if (inputFormat.equals(Format.extensionToURI("JPG")) && outputFormat.equals(Format.extensionToURI("PNG"))) {
-                /*command.add("gimp");
-                command.add("--verbose");
-                command.add("-c");
-                command.add("-d");
-                command.add("-i");
-                command.add("-b");
-                command.add("(dmmConvertJPGtoPNG");
-                command.add(" \""+tmpInFile.getAbsolutePath()+"\"");
-                command.add(" \""+tmpInFile.getAbsolutePath()+".png\"");
-                command.add("-b");
-                command.add("(gimp-quit 0)");*/
+
+                commands = new String[]{
+                            "gimp", "--verbose",
+                            "-c",
+                            "-i",
+                            "-d",
+                            "-b",
+                            "(planetsMigrateJPEGtoPNG" +
+                            " \"" + tmpInFile.getAbsolutePath() + "\"" +
+                            " \"" + tmpInFile.getAbsolutePath() + ".png\" 1 1 1)",
+                            "-b",
+                            "(gimp-quit 0)"
+                        };
+                outFormat = "png";
             }
 
-            //runner.setCommand(command);
             runner.setCommand(Arrays.asList(commands));
             runner.setInputStream(inputStream);
 
