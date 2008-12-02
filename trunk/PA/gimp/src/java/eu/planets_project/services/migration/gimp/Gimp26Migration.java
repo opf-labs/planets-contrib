@@ -114,13 +114,33 @@ public final class Gimp26Migration implements Migrate, Serializable {
             List<String> command = new ArrayList<String>();
 
             if (inputFormat.equals(Format.extensionToURI("PNG")) && outputFormat.equals(Format.extensionToURI("JPG"))) {
-                command.add(gimp_install_dir + gimp_app_name);
-                command.add(tmpInFile.getAbsolutePath());
-                command.add(tmpInFile.getAbsolutePath() + ".jpg");
+
+                command.add("gimp");
+                command.add("--verbose");
+                command.add("-c");
+                command.add("-d");
+                command.add("-i");
+                command.add("-b");
+                command.add("(dmmConvertPNGtoJPG");
+                command.add(" \""+tmpInFile.getAbsolutePath()+"\"");
+                command.add(" \""+tmpInFile.getAbsolutePath()+".png\"");
+                command.add("-b");
+                command.add("(gimp-quit 0)");
+                
             } else if (inputFormat.equals(Format.extensionToURI("JPG")) && outputFormat.equals(Format.extensionToURI("PNG"))) {
-                command.add(gimp_install_dir + "dmmConvertJPGtoPNG.sh");
-                command.add(tmpInFile.getAbsolutePath());
-                command.add(tmpInFile.getAbsolutePath() + ".png");
+                
+                command.add("gimp");
+                command.add("--verbose");
+                command.add("-c");
+                command.add("-d");
+                command.add("-i");
+                command.add("-b");
+                command.add("(dmmConvertJPGtoPNG");
+                command.add(" \""+tmpInFile.getAbsolutePath()+"\"");
+                command.add(" \""+tmpInFile.getAbsolutePath()+".png\"");
+                command.add("-b");
+                command.add("(gimp-quit 0)");
+                
             }
 
             runner.setCommand(command);
