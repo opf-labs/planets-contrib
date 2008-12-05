@@ -21,6 +21,9 @@ import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.test.ServiceCreator;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Local and client tests of the digital object migration functionality.
@@ -36,6 +39,9 @@ public final class Gimp26MigrationTest {
     Migrate dom = null;
     private File fTmpInFile;
     private File fTmpOutFile;
+    // Input and output formats are based on the same set
+    List<String> formats = null;
+    
     /*
      * (non-Javadoc)
      * 
@@ -44,6 +50,14 @@ public final class Gimp26MigrationTest {
 
     @Before
     public void setUp() throws Exception {
+        formats = new ArrayList<String>();
+        formats.add("GIF");
+        formats.add("EPS");
+        formats.add("JPEG");
+        formats.add("PNG");
+        formats.add("PS");
+        formats.add("TIFF");
+        formats.add("BMP");
         dom = ServiceCreator.createTestService(Migrate.QNAME, Gimp26Migration.class, wsdlLoc);
     }
 
@@ -66,58 +80,47 @@ public final class Gimp26MigrationTest {
         System.out.println(desc.toXml());
         assertTrue("The ServiceDescription should not be NULL.", desc != null);
     }
-
+    
     @Test
-    public void testMigratePNGtoJPG() throws IOException {
-        try {
-            /*
-             * To test usability of the digital object instance in web services,
-             * we simply pass one into the service and expect one back:
-             */
-            byte[] binary = this.readByteArrayFromFile("PA/gimp/test/testfiles/demonstration.png");
-            DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
-
-            MigrateResult mr = dom.migrate(input, Format.extensionToURI("PNG"), Format.extensionToURI("JPG"), null);
-            DigitalObject doOut = mr.getDigitalObject();
-
-            assertTrue("Resulting digital object is null.", doOut != null);
-
-
-            writeByteArrayToFile(doOut.getContent().getValue(), "PA/gimp/test/testfiles/demonstrationFromPNG.jpg");
-
-
-        } catch (MalformedURLException e) {
-            fail("Malformed URL exception: " + e.toString());
+    public void testMigrateBMPtoEPS() throws IOException {
+        String origExt = null;
+        String destExt = null;
+        // Tests will be executed for 3 sets of test files of the formats
+        // that the GIMP service wrapper supports:
+        // demonstration1.bmp, demonstration1.gif, demonstration1.eps ...,
+        // demonstration2.bmp, demonstration2.gif, demonstration2.eps ...,
+        // demonstration3.bmp, demonstration3.gif, demonstration3.eps ...
+        for(int i = 1; i < 4; i++)
+        {
+            for (Iterator itr1 = formats.iterator(); itr1.hasNext();) {
+                origExt = (String) itr1.next();
+                for (Iterator itr2 = formats.iterator(); itr2.hasNext();)
+                {
+                    destExt = (String) itr2.next();
+                    // do the migration only if original file extension differs
+                    // from destination file extension
+                    if( !origExt.equalsIgnoreCase(destExt) )
+                        doMigration(origExt,destExt, i);
+                }
+            }
         }
-
     }
-
-    @Test
-    public void testMigrateJPGtoPNG() throws IOException {
-        try {
-            /*
-             * To test usability of the digital object instance in web services,
-             * we simply pass one into the service and expect one back:
-             */
-            byte[] binary = this.readByteArrayFromFile("PA/gimp/test/testfiles/demonstration.jpg");
-            DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
-
-            MigrateResult mr = dom.migrate(input, Format.extensionToURI("JPG"), Format.extensionToURI("PNG"), null);
-            DigitalObject doOut = mr.getDigitalObject();
-
-            assertTrue("Resulting digital object is null.", doOut != null);
-
-
-            writeByteArrayToFile(doOut.getContent().getValue(), "PA/gimp/test/testfiles/demonstrationFromJPG.png");
-
-
-        } catch (MalformedURLException e) {
-            fail("Malformed URL exception: " + e.toString());
-        }
-
+    
+    private void doMigration(String origExt, String destExt, int cycle) throws IOException
+    {
+        // Test file name
+        String inTestFileName = "PA/gimp/test/testfiles/demonstration"+String.valueOf(cycle)+"." + origExt.toLowerCase();
+        // Output file name
+        String outTestFileName = "PA/gimp/test/testfiles/planetsMigrate"+origExt+"to"+destExt+String.valueOf(cycle)+"."+destExt.toLowerCase();
+        byte[] binary = this.readByteArrayFromFile(inTestFileName);
+        DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
+        MigrateResult mr = dom.migrate(input, Format.extensionToURI(origExt), Format.extensionToURI(destExt), null);
+        DigitalObject doOut = mr.getDigitalObject();
+        assertTrue("Resulting digital object is null for planetsMigrate"+origExt+"to"+destExt+".", doOut != null);
+        writeByteArrayToFile(doOut.getContent().getValue(), outTestFileName);
     }
-
-    synchronized byte[] readByteArrayFromFile(String strInFile)
+    
+    private synchronized byte[] readByteArrayFromFile(String strInFile)
             throws IOException {
         byte[] binary = new byte[0];
 
@@ -141,7 +144,7 @@ public final class Gimp26MigrationTest {
         return binary;
     }
 
-    synchronized void writeByteArrayToFile(byte[] binary, String strOutFile)
+    private synchronized void writeByteArrayToFile(byte[] binary, String strOutFile)
             throws IOException {
         try {
             //String strOutFile = "PA/gimp/test/testfiles/demonstration.jpg";

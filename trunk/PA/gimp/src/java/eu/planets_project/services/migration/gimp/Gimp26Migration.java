@@ -1,11 +1,7 @@
-/*
- * 
- */
 package eu.planets_project.services.migration.gimp;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
@@ -21,6 +17,7 @@ import javax.ejb.Stateless;
 import javax.jws.WebService;
 
 import eu.planets_project.ifr.core.techreg.api.formats.Format;
+import eu.planets_project.ifr.core.techreg.impl.formats.FormatRegistryImpl;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
@@ -35,6 +32,8 @@ import eu.planets_project.services.utils.ByteArrayHelper;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Set;
 
 /**
  * The Gimp26Migration class migrates various image file formats. 
@@ -54,13 +53,59 @@ public final class Gimp26Migration implements Migrate, Serializable {
     private static Logger logger = Logger.getLogger(Gimp26Migration.class.getName());
     public String gimp_install_dir;
     public String gimp_app_name;
-    public String gimp_outfile_ext;
     private File tmpInFile;
     private File tmpOutFile;
+    
+    private String gimpFuScriptCmdStr;
     /***/
     static final String NAME = "Gimp26Migration";
     /***/
     private static final long serialVersionUID = 2127494848765937613L;
+    
+    List<String> inputFormats = null;
+    HashMap  outputFormats = null;
+    HashMap  formatMapping = null;
+    
+    private void init()
+    {
+        gimpFuScriptCmdStr = null;
+        
+        // input formats
+        inputFormats = new ArrayList<String>();
+        inputFormats.add("GIF");
+        inputFormats.add("EPS");
+        inputFormats.add("JPEG");
+        inputFormats.add("PNG");
+        inputFormats.add("PS");
+        inputFormats.add("TIFF");
+        inputFormats.add("BMP");
+
+        // output formats and associated output parameters
+        outputFormats = new HashMap();
+        // options: interlace dither palette num-colors alpha-dither remove-unused
+        outputFormats.put("GIF"," 1 0 256 0 0"); 
+        // options:  width height x-offset y-offset unit keep-ratio rotation 
+        // preview level
+        outputFormats.put("EPS"," 0 0 0 0 0 1 0 0 2"); 
+        // options:  quality smoothing optimize progressive
+        outputFormats.put("JPEG"," 0.1 0 1 1"); 
+        // options: interlace compression
+        outputFormats.put("PNG"," 1 1"); 
+        // options:  width height x-offset y-offset unit keep-ratio rotation 
+        // preview level
+        outputFormats.put("PS"," 0 0 0 0 0 1 0 0 2"); 
+        // options: compression Compression type: {None (0), LZW (1), PACKBITS(2), 
+        // DEFLATE (3), JPEG (4), CCITT G3 Fax (5), CCITT G4 Fax (6)}
+        outputFormats.put("TIFF"," 1");
+        // options: none
+        outputFormats.put("BMP",""); 
+        
+        // FIXIT This should be supported by the FormatRegistryImpl class, but
+        // it does not provide the complete set at the moment.
+        formatMapping = new HashMap();
+        formatMapping.put("JPG","JPEG");
+        formatMapping.put("TIF","TIFF");
+    }
 
     /**
      * {@inheritDoc}
@@ -69,117 +114,81 @@ public final class Gimp26Migration implements Migrate, Serializable {
      */
     public MigrateResult migrate(final DigitalObject digitalObject, URI inputFormat,
             URI outputFormat, Parameters parameters) {
-
-        System.out.println(inputFormat.toString());
-        System.out.println(outputFormat.toString());
-
+        
+        // initialise variables
+        init();
+        
+        // configuration parameters
         Properties props = new Properties();
         try {
+            // @FIXIT Does not load the properties 
             String strRsc = "/eu/planets_project/services/migration/gimp/gimp26.properties";
             props.load(this.getClass().getResourceAsStream(strRsc));
-            // config vars
             this.gimp_install_dir = props.getProperty("gimp.install.dir");
             this.gimp_app_name = props.getProperty("gimp.app.name");
-            this.gimp_outfile_ext = props.getProperty("gimp.outfile.ext");
-
         } catch (Exception e) {
-            // // config vars
             this.gimp_install_dir = "/home/georg/Projects/PLANETS/";
-            this.gimp_app_name = "dmmConvertPNGtoJPG.sh";
-            this.gimp_outfile_ext = "tmp";
+            this.gimp_app_name = "gimp";
         }
         log.info("Using gimp install directory: " + this.gimp_install_dir);
         log.info("Using gimp application name: " + this.gimp_app_name);
         log.info("Using gimp application name: " + this.gimp_app_name);
-
-        /*
-         * We just return a new digital object with the same required arguments
-         * as the given:
-         */
+        
+        // get binary data from digital object
         byte[] binary = digitalObject.getContent().getValue();
 
-        try {
+       
+        // write binary array to temporary file
+        tmpInFile = ByteArrayHelper.write(binary);
+        System.out.println("tmpInFile: " + tmpInFile.getAbsolutePath());
 
-            // write binary array to temporary file
-            writeByteArrayToTmpFile(binary);
+        // Create inputstream from binary array
+        InputStream inputStream = new ByteArrayInputStream(binary);
 
-            // outfile name = infilename + ".ps" extension
-            String outFileStr = tmpInFile.getAbsolutePath() + "." + gimp_outfile_ext;
-
-            // temporary outfile
+        // set gimp fu-script command
+        gimpFuScriptCmdStr = getFuScriptMigrationStr(inputFormat,outputFormat);
+        if( gimpFuScriptCmdStr != null )
+        {
+            // commands string array
+            String[] commands = new String[]{
+                    gimp_app_name, 
+                    "--verbose",
+                    "-c",
+                    "-i",
+                    "-d",
+                    "-b",
+                    gimpFuScriptCmdStr, // Migration Fu-Script function call
+                    "-b",
+                    "(gimp-quit 0)"
+                };
+            
+            // temporary outfile, outfile name = infilename + ".out"
+            String outFileStr = tmpInFile.getAbsolutePath() + ".out";
             tmpOutFile = new File(outFileStr);
 
-            InputStream inputStream = new ByteArrayInputStream(binary);
-
+            // Create process runner and execute commands
             ProcessRunner runner = new ProcessRunner();
-
-            System.out.println("tmpInFile: " + tmpInFile.getAbsolutePath());
-
-            String[] commands = null;
-            String outFormat = null;
-
-            if (inputFormat.equals(Format.extensionToURI("PNG")) && outputFormat.equals(Format.extensionToURI("JPG"))) {
-
-                commands = new String[]{
-                            "gimp", "--verbose",
-                            "-c",
-                            "-i",
-                            "-d",
-                            "-b",
-                            "(planetsMigratePNGtoJPEG" +
-                            " \"" + tmpInFile.getAbsolutePath() + "\"" +
-                            " \"" + tmpInFile.getAbsolutePath() + ".jpg\" 0.1 1 1 1)",
-                            "-b",
-                            "(gimp-quit 0)"
-                        };
-                outFormat = "jpg";
-
-            } else if (inputFormat.equals(Format.extensionToURI("JPG")) && outputFormat.equals(Format.extensionToURI("PNG"))) {
-
-                commands = new String[]{
-                            "gimp", "--verbose",
-                            "-c",
-                            "-i",
-                            "-d",
-                            "-b",
-                            "(planetsMigrateJPEGtoPNG" +
-                            " \"" + tmpInFile.getAbsolutePath() + "\"" +
-                            " \"" + tmpInFile.getAbsolutePath() + ".png\" 1 1 1)",
-                            "-b",
-                            "(gimp-quit 0)"
-                        };
-                outFormat = "png";
-            }
-
             runner.setCommand(Arrays.asList(commands));
             runner.setInputStream(inputStream);
-
             runner.run();
-
             System.out.println(runner.getProcessErrorAsString());
-
             int return_code = runner.getReturnCode();
-
             if (return_code != 0) {
                 log.error("Gimp conversion error code: " + Integer.toString(return_code));
             }
 
             // read byte array from temporary file
-            if (tmpInFile.isFile() && tmpInFile.canRead()) {
-                binary = readByteArrayFromTmpFile(outFormat);
+            if (tmpOutFile.isFile() && tmpOutFile.canRead()) {
+                binary = ByteArrayHelper.read(tmpOutFile);
             } else {
                 log.error("Error: Unable to read temporary file " + tmpInFile.getPath() + tmpInFile.getName());
             }
-        } catch (IOException e) {
-            log.error("IO Error:" + e.toString());
-        } finally {
         }
+        
+        // digital object output
         DigitalObject newDO = null;
-
         ServiceReport report = new ServiceReport();
-
         newDO = new DigitalObject.Builder(Content.byValue(binary)).build();
-
         return new MigrateResult(newDO, report);
     }
 
@@ -226,62 +235,121 @@ public final class Gimp26Migration implements Migrate, Serializable {
         Parameters parameters = new Parameters();
         parameters.setParameters(parameterList);
 
-        // input formats
-        List<String> inputFormats = new ArrayList<String>();
-        inputFormats.add("XCF");
-        inputFormats.add("GIF");
-        inputFormats.add("EPS");
-        inputFormats.add("JPEG");
-        inputFormats.add("PNG");
-        inputFormats.add("PS");
-        inputFormats.add("TIFF");
-        inputFormats.add("BMP");
-
-        // output formats
-        List<String> outputFormats = new ArrayList<String>();
-        outputFormats.add("GIF"); // (interlace)
-        outputFormats.add("EPS"); // (Postscript Level2, Embedded Postscript, with preview size {0..1024})
-        outputFormats.add("JPEG"); // (quality {0..100}, optimize, progressive, smoothing [0,1])
-        outputFormats.add("PNG"); // (Interlacing, compression {0..9})
-        outputFormats.add("PS"); // (Postscript Level2, Embedded Postscript, with preview size {0..1024})
-        outputFormats.add("TIFF"); // (Compression {none, LZW, PackBits, Deflate, JPEG})
-        outputFormats.add("BMP"); // (depth {16 bit, 24 bit, 32 bit})
-
-        ServiceDescription mds = new ServiceDescription.Builder(NAME, Migrate.class.getName()).author("Sven Schlarb <shsschlarb-planets@yahoo.de>, Georg Petz <georg.petz@onb.ac.at>").classname(this.getClass().getCanonicalName()).description("A wrapper for file migrations using GIMP version 2.6" +
+        ServiceDescription mds = new ServiceDescription.Builder(NAME, Migrate.class.getName())
+                .author("Sven Schlarb <shsschlarb-planets@yahoo.de>, Georg Petz <georg.petz@onb.ac.at>")
+                .classname(this.getClass().getCanonicalName())
+                .description("A wrapper for file migrations using GIMP version 2.6" +
                 "This service accepts input and target formats of the form: " +
                 "'planets:fmt/ext/[extension]'\n" +
-                "e.g. 'planets:fmt/ext/tiff' or 'planets:fmt/ext/tif'").version("0.1").parameters(parameters).paths(createMigrationPathwayMatrix(inputFormats, outputFormats)).build();
+                "e.g. 'planets:fmt/ext/tiff' or 'planets:fmt/ext/tif'")
+                .version("0.1")
+                .parameters(parameters)
+                .paths(createMigrationPathwayMatrix(inputFormats, outputFormats))
+                .build();
+        
         return mds;
     }
-
-    /* (non-Javadoc)
+    
+    /**
+     * Gets one extension from a set of possible extensions for the incoming
+     * request planets URI (e.g. planets:fmt/ext/jpeg) which matches with
+     * one format of the set of GIMP's supported input/output formats. If
+     * isOutput is false, it checks against the gimp input formats ArrayList,
+     * otherwise it checks against the gimp output formats HashMap.
+     * 
+     * @param formatUri Planets URI (e.g. planets:fmt/ext/jpeg) 
+     * @param isOutput Is the format an input or an output format
+     * @return Format extension (e.g. "JPEG")
      */
-    synchronized void writeByteArrayToTmpFile(byte[] binary) throws IOException {
-        tmpInFile = ByteArrayHelper.write(binary);
-        if (tmpInFile.exists()) {
-            log.info("Temporary input file created: " + tmpInFile.getAbsolutePath());
-        } else {
-            log.error("Unable to create temp file");
+    private String getFormatExt( URI formatUri, boolean isOutput  )
+    {
+        String fmtStr = null;
+        // status variable which indicates if an input/out format has been found 
+        // while iterating over possible matches
+        boolean fmtFound = false;
+        // Extensions which correspond to the format
+        // planets:fmt/ext/jpg -> { "JPEG", "JPG" }
+        // or can be found in the list of GIMP supported formats
+        FormatRegistryImpl fmtRegImpl = new FormatRegistryImpl();
+        Format uriFormatObj = fmtRegImpl.getFormatForURI(formatUri);
+        Set<String> reqInputFormatExts = uriFormatObj.getExtensions();
+        Iterator itrReq =reqInputFormatExts.iterator(); 
+        // Iterate either over input formats ArrayList or over output formats
+        // HasMap
+        Iterator itrGimp = (isOutput)?outputFormats.keySet().iterator():inputFormats.iterator();
+        // Iterate over possible extensions that correspond to the request
+        // planets uri.
+        while(itrReq.hasNext()) {
+            // Iterate over the different extensions of the planets:fmt/ext/jpg
+            // format URI, note that the relation of Planets-format-URI to
+            // extensions is 1 : n.
+            String reqFmtExt = normalizeExt((String) itrReq.next());
+            while(itrGimp.hasNext()) {
+                // Iterate over the formats that GIMP offers either as input or
+                // as output format.
+                // See input formats in the this.init() method to see the
+                // GIMP input/output formats offered by this service.
+                String gimpFmtStr = (String) itrGimp.next();
+                if( reqFmtExt.equalsIgnoreCase(gimpFmtStr) )
+                {
+                    // select the gimp supported format
+                    fmtStr = gimpFmtStr;
+                    fmtFound = true;
+                    break;
+                }
+                if( fmtFound )
+                    break;
+            }
         }
+        return fmtStr;
     }
-
-    /* (non-Javadoc)
+    
+    private String normalizeExt(String ext)
+    {
+        String normExt = ext.toUpperCase();
+        return ((formatMapping.containsKey(normExt))?
+            (String)formatMapping.get(normExt):normExt);
+    }
+    
+    /**
+     * Create fu-script command string.
+     * 
+     * @param inputFormat Planets input format URI (e.g. planets:fmt/ext/jpg)
+     * @param outputFormat Planets output format URI (e.g. planets:fmt/ext/jpg)
+     * @return Null if the input or output format is not supported, fu-script 
+     * command string otherwise
      */
-    synchronized byte[] readByteArrayFromTmpFile(String format) throws IOException {
-        String strOutFile = tmpInFile.getAbsolutePath() + "." + format;
-        System.out.println("read: " + strOutFile);
-        tmpOutFile = new File(strOutFile);
-        byte[] binary = ByteArrayHelper.read(tmpOutFile);
-        return binary;
+    private String getFuScriptMigrationStr( URI inputFormat, URI outputFormat )
+    {
+        // fu-script string of the planets migration command
+        String fuScriptMigrString = null;
+        String inputFmtStr = getFormatExt( inputFormat, false );
+        String outputFmtStr = getFormatExt( outputFormat, true );
+        // 
+        if( inputFmtStr != null && outputFmtStr != null )
+        {
+            // build fu-script command of the form e.g.
+            // planetsMigrateJPEGtoPNG(infile.ext outfile.ext 1 1 1)
+            fuScriptMigrString = 
+                            "(planetsMigrate" + 
+                            inputFmtStr +
+                            "to" +
+                            outputFmtStr +
+                            " \"" + tmpInFile.getAbsolutePath() + "\"" +
+                            " \"" + tmpInFile.getAbsolutePath() + ".out\" " +
+                            outputFormats.get(outputFmtStr) + 
+                            ")";
+        }
+        return fuScriptMigrString;
     }
 
-    private MigrationPath[] createMigrationPathwayMatrix(List<String> inputFormats, List<String> outputFormats) {
+    private MigrationPath[] createMigrationPathwayMatrix(List<String> inputFormats, HashMap outputFormats) {
         List<MigrationPath> paths = new ArrayList<MigrationPath>();
 
         for (Iterator iterator = inputFormats.iterator(); iterator.hasNext();) {
             String input = (String) iterator.next();
 
-            for (Iterator iterator2 = outputFormats.iterator(); iterator2.hasNext();) {
+            for (Iterator iterator2 = outputFormats.keySet().iterator(); iterator2.hasNext();) {
                 String output = (String) iterator2.next();
                 MigrationPath path = new MigrationPath(Format.extensionToURI(input),
                         Format.extensionToURI(output), null);
