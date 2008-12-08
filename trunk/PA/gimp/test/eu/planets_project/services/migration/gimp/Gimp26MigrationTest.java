@@ -33,7 +33,7 @@ import java.util.List;
 public final class Gimp26MigrationTest {
 
     /* The location of this service when deployed. */
-    String wsdlLoc = "/pserv-pa-gimp/Gimp26MigrationNew?wsdl";
+    String wsdlLoc = "/pserv-pa-gimp/Gimp26Migration?wsdl";
 
     /* A holder for the object to be tested */
     Migrate dom = null;
@@ -73,14 +73,16 @@ public final class Gimp26MigrationTest {
     /**
      * Test the Description method.
      */
+    /*
     @Test
     public void testDescribe() {
+        System.out.println("Test description");
         ServiceDescription desc = dom.describe();
         System.out.println("Received service description: ");
         System.out.println(desc.toXml());
         assertTrue("The ServiceDescription should not be NULL.", desc != null);
     }
-    
+    */
     @Test
     public void testMigrateBMPtoEPS() throws IOException {
         String origExt = null;
@@ -100,7 +102,10 @@ public final class Gimp26MigrationTest {
                     // do the migration only if original file extension differs
                     // from destination file extension
                     if( !origExt.equalsIgnoreCase(destExt) )
+                    {
+                        System.out.println("Do migration test from "+origExt+" to "+destExt);
                         doMigration(origExt,destExt, i);
+                    }
                 }
             }
         }

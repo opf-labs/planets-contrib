@@ -147,6 +147,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
 
         // set gimp fu-script command
         gimpFuScriptCmdStr = getFuScriptMigrationStr(inputFormat,outputFormat);
+        System.out.println("GIMP Fu-Script command "+gimpFuScriptCmdStr);
         if( gimpFuScriptCmdStr != null )
         {
             // commands string array
