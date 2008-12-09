@@ -83,8 +83,10 @@ public final class Gimp26MigrationTest {
         assertTrue("The ServiceDescription should not be NULL.", desc != null);
     }
     */
+    
     @Test
-    public void testMigrateBMPtoEPS() throws IOException {
+    public void testMigrateAll() throws IOException {
+        
         String origExt = null;
         String destExt = null;
         // Tests will be executed for 3 sets of test files of the formats
@@ -109,6 +111,17 @@ public final class Gimp26MigrationTest {
                 }
             }
         }
+    }
+    
+    @Test
+    public void testMigrateHugeFiles() throws IOException {
+        
+        String origExt = "TIFF";
+        String destExt = "JPEG";
+        System.out.println("Do migration test from "+origExt+" to "+destExt);
+        doMigration(origExt,destExt, 4);
+        System.out.println("Do migration test from "+origExt+" to "+destExt);
+        doMigration(origExt,destExt, 5);
     }
     
     private void doMigration(String origExt, String destExt, int cycle) throws IOException
