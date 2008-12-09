@@ -130,20 +130,58 @@ public final class Gimp26Migration implements Migrate, Serializable {
         // { "JPEG" -> { "jpeg-quality", "jpeg-smoothing", ... } }
         // ...
         defaultParameters = new HashMap();
-        /*
+        
         // Define parameters and default values
         // GIF
         List<Parameter> gifParameterList = new ArrayList<Parameter>();
-        Parameter gifInterlaceParam = new new Parameter("gif-interlace", "1", "xsd:integer { minLength=\"0\" maxLength=\"1\" }");
+        Parameter gifInterlaceParam = new Parameter("gif-interlace", "1");
+        gifInterlaceParam.setDescription("GIF-Parameter: Boolean integer 0/1 indicating if interlacing should be used.");
         gifParameterList.add(gifInterlaceParam);
-        gifParameterList.add(new Parameter("gif-dither", "1", "xsd:integer { minLength=\"0\" maxLength=\"1\" }"));
-        gifParameterList.add(new Parameter("gif-numcolors", "256", "xsd:integer { minLength=\"0\" maxLength=\"256\" }"));
-        gifParameterList.add(new Parameter("gif-dither", "1", "xsd:integer { minLength=\"0\" maxLength=\"1\" }"));
-        gifParameterList.add(new Parameter("gif-alphadither", "1", "xsd:integer { minLength=\"0\" maxLength=\"1\" }"));
-        gifParameterList.add(new Parameter("gif-removeunused", "1", "xsd:integer { minLength=\"0\" maxLength=\"1\" }"));
+        Parameter gifDitherParam = new Parameter("gif-dither", "1");
+        gifDitherParam.setDescription("GIF-Parameter: Boolean integer 0/1 indicating if interlacing should be used.");
+        gifParameterList.add(gifDitherParam);
+        Parameter gifNumcolorsParam = new Parameter("gif-numcolors", "256");
+        gifNumcolorsParam.setDescription("GIF-Parameter: Integer between 0 and 256 indicating how many colors should be used.");
+        gifParameterList.add(gifNumcolorsParam);
+        Parameter gifAlphaditherParam = new Parameter("gif-alphadither", "1");
+        gifAlphaditherParam.setDescription("GIF-Parameter: Boolean integer 0/1 indicating if alpha dither should be used.");
+        gifParameterList.add(gifAlphaditherParam);
+        Parameter gifRemoveunusedParam = new Parameter("gif-removeunused", "1");
+        gifRemoveunusedParam.setDescription("GIF-Parameter: Boolean integer 0/1 indicating if unused colors should be removed.");
+        gifParameterList.add(gifRemoveunusedParam);
         defaultParameters.put("GIF", gifParameterList);
-        */
+        
         // EPS
+        List<Parameter> epsParameterList = new ArrayList<Parameter>();
+        Parameter epsInterlaceParam = new Parameter("eps-width", "0");
+        epsInterlaceParam.setDescription("EPS-Parameter: Positive integer value indicating the width.");
+        epsParameterList.add(epsInterlaceParam);
+        Parameter epsDitherParam = new Parameter("eps-height", "0");
+        epsDitherParam.setDescription("EPS-Parameter: Positive integer value indicating the height.");
+        epsParameterList.add(epsDitherParam);
+        Parameter epsNumcolorsParam = new Parameter("eps-xoffset", "0");
+        epsNumcolorsParam.setDescription("EPS-Parameter: Positive integer value indicating the x-offset.");
+        epsParameterList.add(epsNumcolorsParam);
+        Parameter epsAlphaditherParam = new Parameter("eps-yoffset", "0");
+        epsAlphaditherParam.setDescription("EPS-Parameter: Positive integer value indicating the y-offset.");
+        epsParameterList.add(epsAlphaditherParam);
+        Parameter epsRemoveunusedParam = new Parameter("eps-unit", "0");
+        epsRemoveunusedParam.setDescription("EPS-Parameter: Unit parameter.");
+        epsParameterList.add(epsRemoveunusedParam);
+        Parameter epsKeepratioParam = new Parameter("eps-keepratio", "1");
+        epsKeepratioParam.setDescription("EPS-Parameter: Boolean integer 0/1 indicating if the ratio should be maintained.");
+        epsParameterList.add(epsKeepratioParam);
+        Parameter epsRotationParam = new Parameter("eps-rotation", "0");
+        epsRotationParam.setDescription("EPS-Parameter: Boolean integer 0/1 indicating if the image should be rotated.");
+        epsParameterList.add(epsRotationParam);
+        Parameter epsPreviewParam = new Parameter("eps-preview", "0");
+        epsPreviewParam.setDescription("EPS-Parameter: Boolean integer 0/1 indicating if a preview image should be created.");
+        epsParameterList.add(epsPreviewParam);
+        Parameter epsLevelParam = new Parameter("eps-level", "2");
+        epsLevelParam.setDescription("EPS-Parameter: Positive integer value 1 or 2 indicating the postscript level.");
+        epsParameterList.add(epsLevelParam);
+        defaultParameters.put("EPS", epsParameterList);
+        //
         HashMap epsNameValuePair = new HashMap();
         epsNameValuePair.put("eps-width", "0");
         epsNameValuePair.put("eps-height", "0");
