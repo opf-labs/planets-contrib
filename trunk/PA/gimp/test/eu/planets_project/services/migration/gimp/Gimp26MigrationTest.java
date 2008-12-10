@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.Parameters;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
@@ -83,7 +84,6 @@ public final class Gimp26MigrationTest {
         assertTrue("The ServiceDescription should not be NULL.", desc != null);
     }
     */
-    
     @Test
     public void testMigrateAll() throws IOException {
         
@@ -106,25 +106,33 @@ public final class Gimp26MigrationTest {
                     if( !origExt.equalsIgnoreCase(destExt) )
                     {
                         System.out.println("Do migration test from "+origExt+" to "+destExt);
-                        doMigration(origExt,destExt, i);
+                        doMigration(origExt,destExt, i, null);
                     }
                 }
             }
         }
-    }
-    
+    }    
     @Test
     public void testMigrateHugeFiles() throws IOException {
         
         String origExt = "TIFF";
         String destExt = "JPEG";
         System.out.println("Do migration test from "+origExt+" to "+destExt);
-        doMigration(origExt,destExt, 4);
+        doMigration(origExt,destExt, 4, null);
         System.out.println("Do migration test from "+origExt+" to "+destExt);
-        doMigration(origExt,destExt, 5);
+        doMigration(origExt,destExt, 5, null);
     }
-    
-    private void doMigration(String origExt, String destExt, int cycle) throws IOException
+    @Test
+    public void testMigrateWithParams() throws IOException {
+        String origExt = "TIFF";
+        String destExt = "GIF";
+        System.out.println("Do migration test from "+origExt+" to "+destExt);
+        Parameters parameters = new Parameters();
+        parameters.add("gif-interlace", "1");
+        parameters.add("gif-numcolors", "2");
+        doMigration(origExt,destExt, 6, parameters);
+    }
+    private void doMigration(String origExt, String destExt, int cycle, Parameters params) throws IOException
     {
         // Test file name
         String inTestFileName = "PA/gimp/test/testfiles/demonstration"+String.valueOf(cycle)+"." + origExt.toLowerCase();
@@ -132,12 +140,11 @@ public final class Gimp26MigrationTest {
         String outTestFileName = "PA/gimp/test/testfiles/planetsMigrate"+origExt+"to"+destExt+String.valueOf(cycle)+"."+destExt.toLowerCase();
         byte[] binary = this.readByteArrayFromFile(inTestFileName);
         DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
-        MigrateResult mr = dom.migrate(input, Format.extensionToURI(origExt), Format.extensionToURI(destExt), null);
+        MigrateResult mr = dom.migrate(input, Format.extensionToURI(origExt), Format.extensionToURI(destExt), params);
         DigitalObject doOut = mr.getDigitalObject();
         assertTrue("Resulting digital object is null for planetsMigrate"+origExt+"to"+destExt+".", doOut != null);
         writeByteArrayToFile(doOut.getContent().getValue(), outTestFileName);
     }
-    
     private synchronized byte[] readByteArrayFromFile(String strInFile)
             throws IOException {
         byte[] binary = new byte[0];
