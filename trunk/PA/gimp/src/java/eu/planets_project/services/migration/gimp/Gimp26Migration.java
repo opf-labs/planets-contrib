@@ -64,7 +64,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
     private static final long serialVersionUID = 2127494848765937613L;
     
     List<String> inputFormats = null;
-    HashMap  outputFormats = null;
+    List<String> outputFormats = null;
     HashMap  formatMapping = null;
     HashMap defaultParameters = null;
     
@@ -85,6 +85,33 @@ public final class Gimp26Migration implements Migrate, Serializable {
         inputFormats.add("TIFF");
         inputFormats.add("BMP");
         
+        // output formats and associated output parameters
+        outputFormats = new ArrayList<String>();
+        // options: interlace dither palette num-colors alpha-dither remove-unused
+        // defaults: 1 0 256 0 0
+        outputFormats.add("GIF"); 
+        // options:  width height x-offset y-offset unit keep-ratio rotation 
+        // preview level
+        // defaults: 0 0 0 0 0 1 0 0 2
+        outputFormats.add("EPS"); 
+        // options:  quality smoothing optimize progressive
+        // defaults: 0.1 0 1 1
+        outputFormats.add("JPEG"); 
+        // options: interlace compression
+        // defaults:  1 1
+        outputFormats.add("PNG"); 
+        // options:  width height x-offset y-offset unit keep-ratio rotation 
+        // preview level
+        // default: 0 0 0 0 0 1 0 0 2
+        outputFormats.add("PS"); 
+        // options: compression Compression type: {None (0), LZW (1), PACKBITS(2), 
+        // DEFLATE (3), JPEG (4), CCITT G3 Fax (5), CCITT G4 Fax (6)}
+        // defaults:  1
+        outputFormats.add("TIFF");
+        // options: none
+        // defaults: 
+        outputFormats.add("BMP"); 
+        
         // Disambiguation of extensions, e.g. {"JPG","JPEG"} to {"JPEG"}
         // FIXIT This should be supported by the FormatRegistryImpl class, but
         // it does not provide the complete set at the moment.
@@ -103,36 +130,42 @@ public final class Gimp26Migration implements Migrate, Serializable {
      * Create a white space separated parameter string which can be passed
      * over to the gimp script (e.g.  1 0 256 0 0 for migration to GIF).
      * 
-     * @param paramNameValuePair The data structure containing the parameter
-     * value pairs
-     * @return
+     * @param ext Extension for which we retrieve the parameter list.
+     * @return Paramter string
      */
-    private String getParameterString(HashMap paramNameValuePair)
+    private String getParameterString(String ext)
     {
         StringBuffer paramStrBuff = new StringBuffer();
-        Collection values = paramNameValuePair.values();
-        Iterator itr = values.iterator();
+        List<Parameter> fmtParameterList = (List<Parameter>) defaultParameters.get(ext);
+        Iterator itr = fmtParameterList.iterator();
         while(itr.hasNext()) {
-            paramStrBuff.append(" ");
-            paramStrBuff.append((String) itr.next());
+            Parameter param = (Parameter) itr.next();
+            if( param.value != null )
+            {
+                paramStrBuff.append(" ");
+                paramStrBuff.append(param.value);
+            }
         }
         return paramStrBuff.toString();
     }
     
-    private void setParameters(Parameters parameters)
+    /**
+     * Initialize the parameters list for all migration file formats. Every
+     * parameter has a default value which is overridden where requested
+     * from the user (parameters contains the parameters passed to the
+     * service by the user).
+     */
+    private void initParameters()
     {
-        // output formats and associated output parameters
-        outputFormats = new HashMap();
-        
         // main parameters hashmap
         // e.g. 
-        // { "GIF" -> { "gif-interlace", "gif-dither", ... } }
-        // { "JPEG" -> { "jpeg-quality", "jpeg-smoothing", ... } }
+        // { "GIF" -> { Parameter("gif-interlace","1"), Parameter("gif-dither","1"), ... } }
+        // { "JPEG" -> { Parameter("jpeg-quality","0.9"), Parameter("jpeg-smoothing"),"0.9"), ... } }
         // ...
         defaultParameters = new HashMap();
         
         // Define parameters and default values
-        // GIF
+        // GIF - 5 parameters
         List<Parameter> gifParameterList = new ArrayList<Parameter>();
         Parameter gifInterlaceParam = new Parameter("gif-interlace", "1");
         gifInterlaceParam.setDescription("GIF-Parameter: Boolean integer 0/1 indicating if interlacing should be used.");
@@ -151,7 +184,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
         gifParameterList.add(gifRemoveunusedParam);
         defaultParameters.put("GIF", gifParameterList);
         
-        // EPS
+        // EPS - 9 parameters
         List<Parameter> epsParameterList = new ArrayList<Parameter>();
         Parameter epsInterlaceParam = new Parameter("eps-width", "0");
         epsInterlaceParam.setDescription("EPS-Parameter: Positive integer value indicating the width.");
@@ -181,98 +214,111 @@ public final class Gimp26Migration implements Migrate, Serializable {
         epsLevelParam.setDescription("EPS-Parameter: Positive integer value 1 or 2 indicating the postscript level.");
         epsParameterList.add(epsLevelParam);
         defaultParameters.put("EPS", epsParameterList);
-        //
-        HashMap epsNameValuePair = new HashMap();
-        epsNameValuePair.put("eps-width", "0");
-        epsNameValuePair.put("eps-height", "0");
-        epsNameValuePair.put("eps-xoffset", "0");
-        epsNameValuePair.put("eps-yoffset", "0");
-        epsNameValuePair.put("eps-unit", "0");
-        epsNameValuePair.put("eps-keepratio", "1");
-        epsNameValuePair.put("eps-rotation", "0");
-        epsNameValuePair.put("eps-preview", "0");
-        epsNameValuePair.put("eps-level", "2");
-        defaultParameters.put("EPS", epsNameValuePair);
         
-        // JPEG
-        HashMap jpegNameValuePair = new HashMap();
-        jpegNameValuePair.put("jpeg-quality", "0.1");
-        jpegNameValuePair.put("jpeg-smoothing", "0");
-        jpegNameValuePair.put("jpeg-optimize", "1");
-        jpegNameValuePair.put("jpeg-progressive", "1");
-        defaultParameters.put("JPEG", jpegNameValuePair);
+        // JPEG - 4 parameters
+        List<Parameter> jpegParameterList = new ArrayList<Parameter>();
+        Parameter jpegQualityParam = new Parameter("quality-width", "0.1");
+        jpegQualityParam.setDescription("JPEG-Parameter: Float value in the range from 0 to 1 (step size 0.1) indicating the image quality. 0.1 low quality, 1 high quality.");
+        jpegParameterList.add(jpegQualityParam);
+        Parameter jpegSmoothingParam = new Parameter("quality-smoothing", "0.1");
+        jpegSmoothingParam.setDescription("JPEG-Parameter: Float value in the range from 0 to 1 (step size 0.1) indicating the smoothing intensity. 0 no smoothing, 1 strong smoothing.");
+        jpegParameterList.add(jpegSmoothingParam);
+        Parameter jpegOptimizeParam = new Parameter("quality-optimize", "0");
+        jpegOptimizeParam.setDescription("JPEG-Parameter: Boolean integer 0/1 indicating if the image should be optimized.");
+        jpegParameterList.add(jpegOptimizeParam);
+        Parameter jpegProgressiveParam = new Parameter("quality-progressive", "0");
+        jpegProgressiveParam.setDescription("JPEG-Parameter: Boolean integer 0/1 indicating if progressive storage should be used.");
+        jpegParameterList.add(jpegProgressiveParam);
+        defaultParameters.put("JPEG", jpegParameterList);
         
-        // PNG
-        HashMap pngNameValuePair = new HashMap();
-        pngNameValuePair.put("png-interlace", "1");
-        pngNameValuePair.put("png-compression", "1");
-        defaultParameters.put("PNG", pngNameValuePair);
+        // PNG - 2 parameters
+        List<Parameter> pngParameterList = new ArrayList<Parameter>();
+        Parameter pngInterlaceParam = new Parameter("png-interlace", "1");
+        pngInterlaceParam.setDescription("PNG-Parameter:  Boolean integer 0/1 indicating if interlacing should be used.");
+        pngParameterList.add(pngInterlaceParam);
+        Parameter pngCompressionParam = new Parameter("png-compression", "1");
+        pngCompressionParam.setDescription("PNG-Parameter: Positive integer in the range 0 to 9 (step size 1) indicating the compression grade.");
+        pngParameterList.add(pngCompressionParam);
+        defaultParameters.put("PNG", pngParameterList);
         
-        // PS
-        HashMap psNameValuePair = new HashMap();
-        psNameValuePair.put("ps-width", "0");
-        psNameValuePair.put("ps-height", "0");
-        psNameValuePair.put("ps-xoffset", "0");
-        psNameValuePair.put("ps-yoffset", "0");
-        psNameValuePair.put("ps-unit", "0");
-        psNameValuePair.put("ps-keepratio", "1");
-        psNameValuePair.put("ps-rotation", "0");
-        psNameValuePair.put("ps-preview", "0");
-        psNameValuePair.put("ps-level", "2");
-        defaultParameters.put("PS", psNameValuePair);
+        // PS - 9 parameters
+        List<Parameter> psParameterList = new ArrayList<Parameter>();
+        Parameter psInterlaceParam = new Parameter("ps-width", "0");
+        psInterlaceParam.setDescription("PS-Parameter: Positive integer value indicating the width. 0 indicates to take the size from the original.");
+        psParameterList.add(psInterlaceParam);
+        Parameter psDitherParam = new Parameter("ps-height", "0");
+        psDitherParam.setDescription("PS-Parameter: Positive integer value indicating the height. 0 indicates to take the size from the original.");
+        psParameterList.add(psDitherParam);
+        Parameter psNumcolorsParam = new Parameter("ps-xoffset", "0");
+        psNumcolorsParam.setDescription("PS-Parameter: Positive integer value indicating the x-offset.");
+        psParameterList.add(psNumcolorsParam);
+        Parameter psAlphaditherParam = new Parameter("ps-yoffset", "0");
+        psAlphaditherParam.setDescription("PS-Parameter: Positive integer value indicating the y-offset.");
+        psParameterList.add(psAlphaditherParam);
+        Parameter psRemoveunusedParam = new Parameter("ps-unit", "0");
+        psRemoveunusedParam.setDescription("PS-Parameter: Unit parameter.");
+        psParameterList.add(psRemoveunusedParam);
+        Parameter psKeepratioParam = new Parameter("ps-keepratio", "1");
+        psKeepratioParam.setDescription("PS-Parameter: Boolean integer 0/1 indicating if the ratio should be maintained.");
+        psParameterList.add(psKeepratioParam);
+        Parameter psRotationParam = new Parameter("ps-rotation", "0");
+        psRotationParam.setDescription("PS-Parameter: Boolean integer 0/1 indicating if the image should be rotated.");
+        psParameterList.add(psRotationParam);
+        Parameter psPreviewParam = new Parameter("ps-preview", "0");
+        psPreviewParam.setDescription("PS-Parameter: Boolean integer 0/1 indicating if a preview image should be created.");
+        psParameterList.add(psPreviewParam);
+        Parameter psLevelParam = new Parameter("ps-level", "2");
+        psLevelParam.setDescription("PS-Parameter: Positive integer value 1 or 2 indicating the postscript level.");
+        psParameterList.add(psLevelParam);
+        defaultParameters.put("PS", psParameterList);
         
-        // TIFF
-        HashMap tiffNameValuePair = new HashMap();
-        tiffNameValuePair.put("tiff-compressiontype", "1");
-        defaultParameters.put("TIFF", tiffNameValuePair);
+        // TIFF - 1 parameter
+        List<Parameter> tiffParameterList = new ArrayList<Parameter>();
+        Parameter tiffCompressiontypeParam = new Parameter("tiff-compressiontype", "0");
+        tiffCompressiontypeParam.setDescription("TIFF-Parameter: Positive integer for the compression type to be used. Possible compression types: {None (0), LZW (1), PACKBITS(2), DEFLATE (3), JPEG (4), CCITT G3 Fax (5), CCITT G4 Fax (6)}");
+        tiffParameterList.add(tiffCompressiontypeParam);
+        defaultParameters.put("TIFF", tiffParameterList);
+        
         
         // BMP
-        HashMap bmpNameValuePair = new HashMap();
-        bmpNameValuePair.put("bmp-dummy", "");
-        defaultParameters.put("BMP", bmpNameValuePair);
-        
+        List<Parameter> bmpParameterList = new ArrayList<Parameter>();
+        Parameter pngDummyParam = new Parameter("bmp-dummy", "");
+        pngDummyParam.setDescription("BMP-Parameter: BMP Conversion has no parameters");
+        bmpParameterList.add(pngDummyParam);
+        defaultParameters.put("BMP", bmpParameterList);
+    }
+    
+    private void overrideDefaultParamets(Parameters userParams)
+    {
         // Change default parameters according to the parameters defined by the
         // user
-        List<Parameter> paramList = parameters.getParameters(); // User parameters
-        Iterator itr = paramList.iterator(); 
-        while(itr.hasNext()) {
-            Parameter param = (Parameter) itr.next();
-            String paramName = param.name;
-            String paramValue = param.value;
-            System.out.println("Set parameter: " + paramName + " with value: " + paramValue);
-            HashMap hm = (HashMap)defaultParameters.get(outputFmtExt);
-            // is the parameter permitted?
-            if( hm.containsKey(paramName) )
-            {
-                hm.put(paramName, paramValue); // override default parameter
+        if( userParams != null )
+        {
+            List<Parameter> userParamList = userParams.getParameters(); // User parameters
+            Iterator userParmsItr = userParamList.iterator(); 
+            while(userParmsItr.hasNext()) {
+                Parameter userParam = (Parameter) userParmsItr.next();
+                System.out.println("Set parameter: " + userParam.name + " with value: " + userParam.value);
+                // get hashmap of the desired output format
+                List<Parameter> defaultParamList = (List<Parameter>)defaultParameters.get(outputFmtExt);
+                Iterator defParmsItr = defaultParamList.iterator();
+                int index = 0;
+                while( defParmsItr.hasNext() )
+                {
+                    Parameter defParam = (Parameter) defParmsItr.next();
+                    if( userParam.name.equalsIgnoreCase(defParam.name) )
+                    {
+                        defaultParamList.set(index, userParam);
+                        break;
+                    }
+                    index++;
+                    //hm.put(param.name, param.value); // override default parameter
+                }
+                
             }
         }
-        
-        // options: interlace dither palette num-colors alpha-dither remove-unused
-        // defaults: 1 0 256 0 0
-        //outputFormats.put("GIF",getParameterString(gifNameValuePair)); 
-        // options:  width height x-offset y-offset unit keep-ratio rotation 
-        // preview level
-        // defaults: 0 0 0 0 0 1 0 0 2
-        outputFormats.put("EPS",getParameterString(epsNameValuePair)); 
-        // options:  quality smoothing optimize progressive
-        // defaults: 0.1 0 1 1
-        outputFormats.put("JPEG",getParameterString(jpegNameValuePair)); 
-        // options: interlace compression
-        // defaults:  1 1
-        outputFormats.put("PNG",getParameterString(pngNameValuePair)); 
-        // options:  width height x-offset y-offset unit keep-ratio rotation 
-        // preview level
-        // default: 0 0 0 0 0 1 0 0 2
-        outputFormats.put("PS",getParameterString(psNameValuePair)); 
-        // options: compression Compression type: {None (0), LZW (1), PACKBITS(2), 
-        // DEFLATE (3), JPEG (4), CCITT G3 Fax (5), CCITT G4 Fax (6)}
-        // defaults:  1
-        outputFormats.put("TIFF",getParameterString(tiffNameValuePair));
-        // options: none
-        // defaults: 
-        outputFormats.put("BMP",getParameterString(bmpNameValuePair)); 
     }
+    
     /**
      * {@inheritDoc}
      * 
@@ -281,22 +327,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
     public MigrateResult migrate(final DigitalObject digitalObject, URI inputFormat,
             URI outputFormat, Parameters parameters) {
         
-        // initialise input formats (GIF, JPEG, EPS, ...) and output formats list 
-        // and (GIF, JPEG, EPS, ...) and apply disambiguation ("JPG" -> "JPEG"}
-        init();
-        
-         // set input and output extensions based upon input and output format
-        // e.g. 
-        // inputFormat="planets:fmt/ext/tif" -> inputFmtExt="TIFF"
-        // outputFormat="planets:fmt/ext/jpg" -> outputFmtExt="JPEG"
-        getExtensions(inputFormat,outputFormat);
-        
-        // Set the parameterString depending on the desired output format
-        // which is first initialised by default values which are then
-        // overridden by user parameters of the service call.
-        setParameters(parameters);
-        
-        // configuration parameters
+        // read global gimp configuration parameters from properties file
         Properties props = new Properties();
         try {
             // @FIXIT Does not load the properties 
@@ -312,9 +343,25 @@ public final class Gimp26Migration implements Migrate, Serializable {
         log.info("Using gimp application name: " + this.gimp_app_name);
         log.info("Using gimp application name: " + this.gimp_app_name);
         
+        // initialise input formats (GIF, JPEG, EPS, ...) and output formats list 
+        // (GIF, JPEG, EPS, ...) and apply disambiguation ("JPG" -> "JPEG"}
+        init();
+        
+         // set input and output extensions based upon input and output format
+        // e.g. 
+        // inputFormat="planets:fmt/ext/tif" -> inputFmtExt="TIFF"
+        // outputFormat="planets:fmt/ext/jpg" -> outputFmtExt="JPEG"
+        getExtensions(inputFormat,outputFormat);
+        
+        // Initialise parameters with default values
+        initParameters();
+        
+        // override the default parameters initialised above  by the parameters 
+        // passed by the user
+        overrideDefaultParamets(parameters);
+        
         // get binary data from digital object
         byte[] binary = digitalObject.getContent().getValue();
-
        
         // write binary array to temporary file
         tmpInFile = ByteArrayHelper.write(binary);
@@ -370,63 +417,16 @@ public final class Gimp26Migration implements Migrate, Serializable {
         newDO = new DigitalObject.Builder(Content.byValue(binary)).build();
         return new MigrateResult(newDO, report);
     }
-
+   
     /* (non-Javadoc)
      * @see eu.planets_project.ifr.core.common.services.migrate.MigrateOneDigitalObject#describe()
      */
     public ServiceDescription describe() {
-
-        // parameters
-        // gif
-        // options: interlace dither palette num-colors alpha-dither remove-unused
-        List<Parameter> parameterList = new ArrayList<Parameter>();
-        Parameter gifInterlaceParam = new Parameter("gif-interlace", "true/false");
-        gifInterlaceParam.setDescription("GIF-Parameter: Boolean value true/false indicating if interlacing should be used.");
-        parameterList.add(gifInterlaceParam);
-        Parameter gifDitherParam = new Parameter("gif-dither", "true/false");
-        gifDitherParam.setDescription("GIF-Parameter: Boolean value true/false indicating if dither should be used.");
-        parameterList.add(gifDitherParam);
-        Parameter gifNumcolorsParam = new Parameter("gif-dither", "0-256");
-        gifNumcolorsParam.setDescription("GIF-Parameter: Integer value in the range from 0 to 256 indicating the number of colors to be used.");
-        parameterList.add(gifNumcolorsParam);
-        Parameter gifAlphaditherParam = new Parameter("gif-alphadither", "true/false");
-        gifAlphaditherParam.setDescription("GIF-Parameter: Boolean value true/false indicating if alpha dither should be used.");
-        parameterList.add(gifAlphaditherParam);
-        Parameter gifRemunusedParam = new Parameter("gif-removeunused", "true/false");
-        gifRemunusedParam.setDescription("GIF-Parameter: Boolean value true/false indicating if unused colors should be removed");
-        parameterList.add(gifRemunusedParam);
-
-        // eps
-        Parameter epsPostscriptLevel2Param = new Parameter("epsPostscriptLevel2", "true/false");
-        epsPostscriptLevel2Param.setDescription("EPS-Parameter: Boolean value true/false indicating if the target format should be postscript level 2.");
-        parameterList.add(epsPostscriptLevel2Param);
-        Parameter epsEmbeddedPostscriptParam = new Parameter("epsEmbeddedPostscript", "true/false");
-        epsEmbeddedPostscriptParam.setDescription("EPS-Parameter: Boolean value true/false indicating if the target format should be embedded postscript.");
-        parameterList.add(epsEmbeddedPostscriptParam);
-        Parameter epsWithPreviewParam = new Parameter("epsWithPreview", "true/false");
-        epsWithPreviewParam.setDescription("EPS-Parameter: Boolean value true/false indicating if a preview image is used.");
-        parameterList.add(epsWithPreviewParam);
-        Parameter epsPreviewSizeParam = new Parameter("epsPreviewSize", "0-1024");
-        epsPreviewSizeParam.setDescription("EPS-Parameter: Integer value in the range 0-1024 representing the size of the preview image.");
-        parameterList.add(epsPreviewSizeParam);
-
-        // jpeg
-        Parameter jpgCompressionRateParam = new Parameter("jpgCompressionRate", "{0,100}");
-        jpgCompressionRateParam.setDescription("JPG-Parameter: Integer value in the range 0-100 representing the compression rate.");
-        parameterList.add(jpgCompressionRateParam);
-        Parameter jpgOptimizeParam = new Parameter("jpgOptimize", "true/false");
-        jpgOptimizeParam.setDescription("JPG-Parameter: Boolean value true/false indicating if the Jpeg should be optimized.");
-        parameterList.add(jpgOptimizeParam);
-        Parameter jpgProgressiveParam = new Parameter("jpgProgressive", "true/false");
-        jpgProgressiveParam.setDescription("JPG-Parameter: Boolean value true/false indicating if progressive should be used.");
-        parameterList.add(jpgProgressiveParam);
-        Parameter jpgSmoothingParam = new Parameter("jpgSmoothing", "[0,1]");
-        jpgSmoothingParam.setDescription("JPG-Parameter: Floating point number indicating the smoothing grade.");
-        parameterList.add(jpgSmoothingParam);
-
+        initParameters();
         Parameters parameters = new Parameters();
-        parameters.setParameters(parameterList);
-
+        List<Parameter> list = new ArrayList<Parameter>();
+        list.addAll(defaultParameters.values());
+        parameters.setParameters(list);
         ServiceDescription mds = new ServiceDescription.Builder(NAME, Migrate.class.getName())
                 .author("Sven Schlarb <shsschlarb-planets@yahoo.de>, Georg Petz <georg.petz@onb.ac.at>")
                 .classname(this.getClass().getCanonicalName())
@@ -438,7 +438,6 @@ public final class Gimp26Migration implements Migrate, Serializable {
                 .parameters(parameters)
                 .paths(createMigrationPathwayMatrix(inputFormats, outputFormats))
                 .build();
-        
         return mds;
     }
     
@@ -468,7 +467,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
         Iterator itrReq = reqInputFormatExts.iterator(); 
         // Iterate either over input formats ArrayList or over output formats
         // HasMap
-        Iterator itrGimp = (isOutput)?outputFormats.keySet().iterator():inputFormats.iterator();
+        Iterator itrGimp = (isOutput)?outputFormats.iterator():inputFormats.iterator();
         // Iterate over possible extensions that correspond to the request
         // planets uri.
         while(itrReq.hasNext()) {
@@ -496,6 +495,13 @@ public final class Gimp26Migration implements Migrate, Serializable {
         return fmtStr;
     }
     
+    /**
+     * Disambiguation (e.g. JPG -> JPEG) according to the formatMapping
+     * datas structure defined in this class.
+     * 
+     * @param ext
+     * @return Uppercase disambiguized extension string
+     */
     private String normalizeExt(String ext)
     {
         String normExt = ext.toUpperCase();
@@ -527,19 +533,19 @@ public final class Gimp26Migration implements Migrate, Serializable {
                             outputFmtExt +
                             " \"" + tmpInFile.getAbsolutePath() + "\"" +
                             " \"" + tmpInFile.getAbsolutePath() + ".out\" " +
-                            outputFormats.get(outputFmtExt) + 
+                            getParameterString(outputFmtExt) + 
                             ")";
         }
         return fuScriptMigrString;
     }
 
-    private MigrationPath[] createMigrationPathwayMatrix(List<String> inputFormats, HashMap outputFormats) {
+    private MigrationPath[] createMigrationPathwayMatrix(List<String> inputFormats, List<String> outputFormats) {
         List<MigrationPath> paths = new ArrayList<MigrationPath>();
 
         for (Iterator iterator = inputFormats.iterator(); iterator.hasNext();) {
             String input = (String) iterator.next();
 
-            for (Iterator iterator2 = outputFormats.keySet().iterator(); iterator2.hasNext();) {
+            for (Iterator iterator2 = outputFormats.iterator(); iterator2.hasNext();) {
                 String output = (String) iterator2.next();
                 MigrationPath path = new MigrationPath(Format.extensionToURI(input),
                         Format.extensionToURI(output), null);
