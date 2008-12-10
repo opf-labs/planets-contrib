@@ -113,16 +113,6 @@ public final class Gimp26MigrationTest {
         }
     }    
     @Test
-    public void testMigrateHugeFiles() throws IOException {
-        
-        String origExt = "TIFF";
-        String destExt = "JPEG";
-        System.out.println("Do migration test from "+origExt+" to "+destExt);
-        doMigration(origExt,destExt, 4, null);
-        System.out.println("Do migration test from "+origExt+" to "+destExt);
-        doMigration(origExt,destExt, 5, null);
-    }
-    @Test
     public void testMigrateWithParams() throws IOException {
         String origExt = "TIFF";
         String destExt = "GIF";
@@ -130,8 +120,20 @@ public final class Gimp26MigrationTest {
         Parameters parameters = new Parameters();
         parameters.add("gif-interlace", "1");
         parameters.add("gif-numcolors", "2");
-        doMigration(origExt,destExt, 6, parameters);
+        doMigration(origExt,destExt, 4, parameters);
     }
+    /*
+    @Test
+    public void testMigrateHugeFiles() throws IOException {
+        
+        String origExt = "TIFF";
+        String destExt = "JPEG";
+        System.out.println("Do migration test from "+origExt+" to "+destExt);
+        doMigration(origExt,destExt, 5, null);
+        System.out.println("Do migration test from "+origExt+" to "+destExt);
+        doMigration(origExt,destExt, 6, null);
+    }
+    */
     private void doMigration(String origExt, String destExt, int cycle, Parameters params) throws IOException
     {
         // Test file name
