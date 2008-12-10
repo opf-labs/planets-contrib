@@ -422,6 +422,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
      * @see eu.planets_project.ifr.core.common.services.migrate.MigrateOneDigitalObject#describe()
      */
     public ServiceDescription describe() {
+        init();
         initParameters();
         Parameters parameters = new Parameters();
         List<Parameter> list = new ArrayList<Parameter>();
