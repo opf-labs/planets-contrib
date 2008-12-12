@@ -439,7 +439,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
                 "'planets:fmt/ext/[extension]'\n" +
                 "e.g. 'planets:fmt/ext/tiff' or 'planets:fmt/ext/tif'")
                 .version("0.1")
-                .parameters(parameters)
+                //.parameters(parameters)
                 .paths(createMigrationPathwayMatrix(inputFormats, outputFormats))
                 .build();
         return mds;

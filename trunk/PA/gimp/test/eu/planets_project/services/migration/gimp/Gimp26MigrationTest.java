@@ -73,7 +73,7 @@ public final class Gimp26MigrationTest {
     /**
      * Test the Description method.
      */
-    /*
+    
     @Test
     public void testDescribe() {
         System.out.println("Test description");
@@ -82,7 +82,8 @@ public final class Gimp26MigrationTest {
         System.out.println(desc.toXml());
         assertTrue("The ServiceDescription should not be NULL.", desc != null);
     }
-    */
+    
+    /*
     @Test
     public void testMigrateAll() throws IOException {
         
@@ -111,6 +112,7 @@ public final class Gimp26MigrationTest {
             }
         }
     }
+     */
     /**
      * Testing conversion using parameters
      * @throws java.io.IOException
@@ -136,8 +138,7 @@ public final class Gimp26MigrationTest {
         String origExt = "TIFF";
         String destExt = "JPEG";
         System.out.println("Do migration test from "+origExt+" to "+destExt);
-        Parameters parameters = new Parameters();
-        doMigration(origExt,destExt, 5, parameters);
+        doMigration(origExt,destExt, 5, null);
     }
     /*
     @Test
