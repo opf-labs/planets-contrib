@@ -165,7 +165,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
         defaultParameters = new HashMap();
         
         // Define parameters and default values
-        // GIF - 5 parameters
+        // GIF - 6 parameters
         List<Parameter> gifParameterList = new ArrayList<Parameter>();
         Parameter gifInterlaceParam = new Parameter("gif-interlace", "1");
         gifInterlaceParam.setDescription("GIF-Parameter: Boolean integer 0/1 indicating if interlacing should be used.");
@@ -173,6 +173,9 @@ public final class Gimp26Migration implements Migrate, Serializable {
         Parameter gifDitherParam = new Parameter("gif-dither", "1");
         gifDitherParam.setDescription("GIF-Parameter: Boolean integer 0/1 indicating if interlacing should be used.");
         gifParameterList.add(gifDitherParam);
+        Parameter gifPaletteParam = new Parameter("gif-palette", "0");
+        gifPaletteParam.setDescription("GIF-Parameter: Integer indicating the palette to be used (MAKE-PALETTE (0), WEB-PALETTE (2), MONO-PALETTE (3), CUSTOM-PALETTE (4)).");
+        gifParameterList.add(gifPaletteParam);
         Parameter gifNumcolorsParam = new Parameter("gif-numcolors", "256");
         gifNumcolorsParam.setDescription("GIF-Parameter: Integer between 0 and 256 indicating how many colors should be used.");
         gifParameterList.add(gifNumcolorsParam);
