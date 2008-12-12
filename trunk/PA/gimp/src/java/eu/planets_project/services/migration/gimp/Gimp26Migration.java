@@ -424,6 +424,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
     private Parameters getParameters()
     {
         Parameters parameters = new Parameters();
+        List<Parameter> paramList = new ArrayList();
         Iterator itr = defaultParameters.keySet().iterator();
         while( itr.hasNext() )
         {
@@ -432,10 +433,10 @@ public final class Gimp26Migration implements Migrate, Serializable {
             Iterator itr2 = parameterList.iterator();
             while( itr2.hasNext() )
             {
-                Parameter actParam = (Parameter) itr2.next();
-                parameters.add(actParam.name, actParam.value);
+                paramList.add((Parameter) itr2.next());                
             }
         }
+        parameters.setParameters(paramList);
         return parameters;
     }
     
