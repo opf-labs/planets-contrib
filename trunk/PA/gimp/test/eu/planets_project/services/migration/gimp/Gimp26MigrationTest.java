@@ -111,7 +111,8 @@ public final class Gimp26MigrationTest {
                 }
             }
         }
-    }    
+    }
+    /*
     @Test
     public void testMigrateWithParams() throws IOException {
         String origExt = "TIFF";
@@ -122,6 +123,7 @@ public final class Gimp26MigrationTest {
         parameters.add("gif-numcolors", "2");
         doMigration(origExt,destExt, 4, parameters);
     }
+     */
     /*
     @Test
     public void testMigrateHugeFiles() throws IOException {
