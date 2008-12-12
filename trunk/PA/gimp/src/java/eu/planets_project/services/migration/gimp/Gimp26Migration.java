@@ -421,25 +421,44 @@ public final class Gimp26Migration implements Migrate, Serializable {
         return new MigrateResult(newDO, report);
     }
    
+    private Parameters getParameters()
+    {
+        Parameters parameters = new Parameters();
+        Iterator itr = defaultParameters.keySet().iterator();
+        while( itr.hasNext() )
+        {
+            String key = (String)itr.next();
+            List<Parameter> parameterList = (List<Parameter>) defaultParameters.get(key);
+            Iterator itr2 = parameterList.iterator();
+            while( itr2.hasNext() )
+            {
+                Parameter actParam = (Parameter) itr2.next();
+                parameters.add(actParam.name, actParam.value);
+            }
+        }
+        return parameters;
+    }
+    
     /* (non-Javadoc)
      * @see eu.planets_project.ifr.core.common.services.migrate.MigrateOneDigitalObject#describe()
      */
     public ServiceDescription describe() {
         init();
         initParameters();
-        Parameters parameters = new Parameters();
-        List<Parameter> list = new ArrayList<Parameter>();
-        list.addAll(defaultParameters.values());
-        parameters.setParameters(list);
+        Parameters parameters = getParameters();
         ServiceDescription mds = new ServiceDescription.Builder(NAME, Migrate.class.getName())
                 .author("Sven Schlarb <shsschlarb-planets@yahoo.de>, Georg Petz <georg.petz@onb.ac.at>")
                 .classname(this.getClass().getCanonicalName())
-                .description("A wrapper for file migrations using GIMP version 2.6" +
-                "This service accepts input and target formats of the form: " +
+                .description("This service provides file format migrations using \"The GIMP\" (GNU image manipulation program) version 2.6. " +
+                "Currently, this service only supports migration from one file format to another, not single file format migrations. "+
+                "For example, planets:fmt/ext/tiff to planets:fmt/ext/tiff could migrate a TIFF image without compression to a TIFF image using the LZW compression type. "+
+                "Furthermore, only the conversion to GIF format supports indexed colour (applying fu-script function gimp-convert-indexed). This is not provided for the file formats BMP, PNG, and TIFF which in principle do support indexed colours as well. "+
+                "Alpha Channel transparency exists for some file formats, like GIF, PNG, BMP. If an alpha channel is encountered, the image is flattened using the gimp-image-flatten function. "+
+                "It accepts input and target formats of the form: " +
                 "'planets:fmt/ext/[extension]'\n" +
                 "e.g. 'planets:fmt/ext/tiff' or 'planets:fmt/ext/tif'")
                 .version("0.1")
-                //.parameters(parameters)
+                .parameters(parameters)
                 .paths(createMigrationPathwayMatrix(inputFormats, outputFormats))
                 .build();
         return mds;
@@ -551,10 +570,11 @@ public final class Gimp26Migration implements Migrate, Serializable {
 
             for (Iterator iterator2 = outputFormats.iterator(); iterator2.hasNext();) {
                 String output = (String) iterator2.next();
-                MigrationPath path = new MigrationPath(Format.extensionToURI(input),
-                        Format.extensionToURI(output), null);
-
-                paths.add(path);
+                URI inFmt = Format.extensionToURI(input);
+                URI outFmt = Format.extensionToURI(output);
+                MigrationPath path = new MigrationPath(inFmt,outFmt, null);
+                if( !(inFmt.toString().equals(outFmt.toString())) )
+                    paths.add(path);
             }
         }
         return paths.toArray(new MigrationPath[]{});
