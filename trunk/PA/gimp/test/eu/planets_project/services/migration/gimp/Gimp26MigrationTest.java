@@ -48,7 +48,6 @@ public final class Gimp26MigrationTest {
      * 
      * @see junit.framework.TestCase#setUp()
      */
-
     @Before
     public void setUp() throws Exception {
         formats = new ArrayList<String>();
@@ -112,7 +111,10 @@ public final class Gimp26MigrationTest {
             }
         }
     }
-    
+    /**
+     * Testing conversion using parameters
+     * @throws java.io.IOException
+     */
     @Test
     public void testMigrateWithParams() throws IOException {
         String origExt = "TIFF";
@@ -120,11 +122,17 @@ public final class Gimp26MigrationTest {
         System.out.println("Do migration test from "+origExt+" to "+destExt);
         Parameters parameters = new Parameters();
         parameters.add("gif-interlace", "1");
-        parameters.add("gif-numcolors", "2");
+        parameters.add("gif-numcolors", "2"); // use 2 colours
         doMigration(origExt,destExt, 4, parameters);
     }
+    /**
+     * Testing conversion of an image with embedded colour profile.
+     * By default the GIMP Fu-Scripts used for conversion keep the embedded
+     * color profile and do not convert them to sRGB.
+     * @throws java.io.IOException
+     */
     @Test
-    public void testMigrateImageWithEmbeddedColorProfile() throws IOException {
+    public void testMigrateEmbeddedColorProfile() throws IOException {
         String origExt = "TIFF";
         String destExt = "JPEG";
         System.out.println("Do migration test from "+origExt+" to "+destExt);
