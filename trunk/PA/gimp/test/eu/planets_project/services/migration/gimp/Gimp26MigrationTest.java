@@ -112,7 +112,7 @@ public final class Gimp26MigrationTest {
             }
         }
     }
-    /*
+    
     @Test
     public void testMigrateWithParams() throws IOException {
         String origExt = "TIFF";
@@ -123,11 +123,17 @@ public final class Gimp26MigrationTest {
         parameters.add("gif-numcolors", "2");
         doMigration(origExt,destExt, 4, parameters);
     }
-     */
+    @Test
+    public void testMigrateImageWithEmbeddedColorProfile() throws IOException {
+        String origExt = "TIFF";
+        String destExt = "JPEG";
+        System.out.println("Do migration test from "+origExt+" to "+destExt);
+        Parameters parameters = new Parameters();
+        doMigration(origExt,destExt, 5, parameters);
+    }
     /*
     @Test
     public void testMigrateHugeFiles() throws IOException {
-        
         String origExt = "TIFF";
         String destExt = "JPEG";
         System.out.println("Do migration test from "+origExt+" to "+destExt);
@@ -141,7 +147,7 @@ public final class Gimp26MigrationTest {
         // Test file name
         String inTestFileName = "PA/gimp/test/testfiles/demonstration"+String.valueOf(cycle)+"." + origExt.toLowerCase();
         // Output file name
-        String outTestFileName = "PA/gimp/test/testfiles/planetsMigrate"+origExt+"to"+destExt+String.valueOf(cycle)+"."+destExt.toLowerCase();
+        String outTestFileName = "PA/gimp/test/testfiles/generatedfiles/planetsMigrate"+origExt+"to"+destExt+String.valueOf(cycle)+"."+destExt.toLowerCase();
         byte[] binary = this.readByteArrayFromFile(inTestFileName);
         DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
         MigrateResult mr = dom.migrate(input, Format.extensionToURI(origExt), Format.extensionToURI(destExt), params);
@@ -152,9 +158,6 @@ public final class Gimp26MigrationTest {
     private synchronized byte[] readByteArrayFromFile(String strInFile)
             throws IOException {
         byte[] binary = new byte[0];
-
-        //String strOutFile = "PA/gimp/test/testfiles/demonstration.png";
-        //String strOutFile = "test/testfiles/testin.dvi";
         fTmpOutFile = new File(strInFile);
         assertTrue("input file " + fTmpOutFile.getAbsolutePath() + " does not exist.", fTmpOutFile.exists());
         try {
@@ -176,8 +179,6 @@ public final class Gimp26MigrationTest {
     private synchronized void writeByteArrayToFile(byte[] binary, String strOutFile)
             throws IOException {
         try {
-            //String strOutFile = "PA/gimp/test/testfiles/demonstration.jpg";
-            //String strOutFile = "test/testfiles/testout.ps";
             this.fTmpInFile = new File(strOutFile);
             System.out.println();
             BufferedOutputStream fos =
