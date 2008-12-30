@@ -31,11 +31,11 @@ import eu.planets_project.services.utils.test.ServiceCreator;
 public class Mdb2SiardMigrateTester
 {
 	// private static String sINPUT_FILE = "PA/mdb2siard/test/testfiles/testin.mdb";
-	private static String sINPUT_FILE = "test/testfiles/testin.mdb";
+	private static String sINPUT_FILE = "C:/Projects/pserv/PA/mdb2siard/test/testfiles/testin.mdb";
   // private static String sOUTPUT_FILE = "PA/mdb2siard/test/testfiles/testout.siard";
-  private static String sOUTPUT_FILE = "test/testfiles/testout.siard";
+  private static String sOUTPUT_FILE = "C:/Projects/pserv/PA/mdb2siard/test/testfiles/testout.siard";
   /* The location of this service when deployed. */
-  private static String sWSDL_LOC = "/pserv-pa-mdb2siard/Mbd2SiardMigrate?wsdl";
+  private static String sWSDL_LOC = "/pserv-pa-mdb2siard/Mdb2SiardMigrate?wsdl";
 
   /* A holder for the object to be tested */
   Migrate dom = null;
@@ -44,7 +44,9 @@ public class Mdb2SiardMigrateTester
 	@Before
 	public void setUp() throws Exception
 	{
-    dom = ServiceCreator.createTestService(Migrate.QNAME, Mdb2SiardMigrate.class, sWSDL_LOC );
+    dom = ServiceCreator.createTestService(Migrate.QNAME, 
+    		  Mdb2SiardMigrate.class, sWSDL_LOC, 
+    		  ServiceCreator.Mode.SERVER );
 	} /* setUp */
 
 	/*--------------------------------------------------------------------*/

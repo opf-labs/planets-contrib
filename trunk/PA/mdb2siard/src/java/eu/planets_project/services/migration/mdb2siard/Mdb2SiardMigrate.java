@@ -102,7 +102,8 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	/* (non-Javadoc)
 	 * add warning string to ServiceReport 
 	 */
-	private static void appendWarn(ServiceReport sr, String sWarn)
+	@SuppressWarnings("unused")
+  private static void appendWarn(ServiceReport sr, String sWarn)
 	{
 		System.out.println(sWarn);
 		/* append to previous warning description */
@@ -209,7 +210,11 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
     		/* analyze result */
         int iResult = pr.getReturnCode();
         if (iResult == 0)
+        {
         	appendInfo(sr,"ConvMdb conversion output:\n"+pr.getProcessOutputAsString());
+    			/* signal success */
+      		sr.setErrorState(ServiceReport.SUCCESS);
+        }
         else
         	appendError(sr,"ConvMdb conversion error code: " + Integer.toString(iResult)+"\n"+
         			pr.getProcessErrorAsString());
@@ -258,8 +263,9 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 			fileOutput.deleteOnExit();
 			/* convert files, noting results in the service report */
 			sr = migrate(fileInput, fileOutput, sr);
-			/* read do from temporary file */
-			doOutput = new DigitalObject.Builder(Content.byValue(readByteArrayFromTmpFile(fileOutput))).build();
+	    /* read do from temporary file */
+			if (sr.error_state == ServiceReport.SUCCESS)
+			  doOutput = new DigitalObject.Builder(Content.byValue(readByteArrayFromTmpFile(fileOutput))).build();
 		}
 		catch(Exception e)
 		{
