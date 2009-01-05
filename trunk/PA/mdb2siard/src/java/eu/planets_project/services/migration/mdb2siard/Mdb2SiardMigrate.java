@@ -54,7 +54,9 @@ import java.util.Properties;
 public final class Mdb2SiardMigrate implements Migrate, Serializable
 {
 	/** constants */
-	public static final String sMDB_EXTENSION = ".mdb";  
+	/** The MDB file extension */
+	public static final String sMDB_EXTENSION = ".mdb";
+	/** The siard file extension */
 	public static final String sSIARD_EXTENSION = ".siard";  
 	private static final String sPROPERTIES_RESOURCE = "/eu/planets_project/services/migration/mdb2siard/mdb2siard.properties";
 	private static final String sKEY_CONVMDB_DIR ="convmdb.dir"; 
@@ -69,8 +71,8 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	PlanetsLogger log = PlanetsLogger.getLogger(Mdb2SiardMigrate.class);
 	
 	/*--------------------------------------------------------------------*/
-	/* (non-Javadoc)
-	 * @see eu.planets_project.ifr.core.common.services.migrate.MigrateOneDigitalObject#describe()
+	/**
+	 * @see eu.planets_project.services.PlanetsService#describe()
 	 */
 	public ServiceDescription describe()
 	{
@@ -233,7 +235,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @see eu.planets_project.ifr.core.common.services.migrate.MigrateOneDigitalObject#migrate(eu.planets_project.ifr.core.common.services.datatypes.DigitalObject)
+	 * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameters)
 	 */
 	public MigrateResult migrate(
 			final DigitalObject doInput,

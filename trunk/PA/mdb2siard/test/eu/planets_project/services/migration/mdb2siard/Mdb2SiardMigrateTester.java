@@ -28,6 +28,10 @@ import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.test.ServiceCreator;
 
+/**
+ * test class for the MDB to SIARD migration service
+ *
+ */
 public class Mdb2SiardMigrateTester
 {
 	// private static String sINPUT_FILE = "PA/mdb2siard/test/testfiles/testin.mdb";
@@ -41,6 +45,10 @@ public class Mdb2SiardMigrateTester
   Migrate dom = null;
 
 	/*--------------------------------------------------------------------*/
+	/**
+	 * Set up the tests by creating the service
+	 * @throws Exception
+	 */
 	@Before
 	public void setUp() throws Exception
 	{
@@ -50,12 +58,19 @@ public class Mdb2SiardMigrateTester
 	} /* setUp */
 
 	/*--------------------------------------------------------------------*/
+	/**
+	 * tear down post test
+	 * @throws Exception
+	 */
 	@After
 	public void tearDown() throws Exception
 	{
 	} /* tearDown */
 
 	/*--------------------------------------------------------------------*/
+	/**
+	 * test the describe() method 
+	 */
 	@Test
 	public void testDescribe()
 	{
@@ -65,6 +80,9 @@ public class Mdb2SiardMigrateTester
 	} /* testDescribe */
 
 	/*--------------------------------------------------------------------*/
+	/**
+	 * Test writing a byte array to a temp file 
+	 */
 	@Test
 	public void testWriteByteArrayToTmpFile()
 	{
@@ -85,6 +103,9 @@ public class Mdb2SiardMigrateTester
 	} /* testWriteByteArrayToTmpFile */
 
 	/*--------------------------------------------------------------------*/
+	/**
+	 * Test reading a byte array from a temp file 
+	 */
 	@Test
 	public void testReadByteArrayFromTmpFile()
 	{
@@ -105,6 +126,9 @@ public class Mdb2SiardMigrateTester
 	} /* testReadByteArrayFromTmpFile */
 
 	/*--------------------------------------------------------------------*/
+	/**
+	 * test the creation of the service report 
+	 */
 	@Test
 	public void testMigrateFileFileServiceReport()
 	{
@@ -118,16 +142,16 @@ public class Mdb2SiardMigrateTester
 	} /* testMigrateFileFileServiceReport */
 
 	/*--------------------------------------------------------------------*/
+    /**
+	 * To test usability of the digital object instance in web
+	 * services, we simply pass one into the service and expect one
+	 * back:
+	 */
 	@Test
 	public void testMigrateDigitalObjectURIURIParameters()
 	{
     try
     {
-      /*
-			 * To test usability of the digital object instance in web
-			 * services, we simply pass one into the service and expect one
-			 * back:
-			 */
       File fileOutput = new File(sOUTPUT_FILE);
       if (fileOutput.exists())
         fileOutput.delete();
