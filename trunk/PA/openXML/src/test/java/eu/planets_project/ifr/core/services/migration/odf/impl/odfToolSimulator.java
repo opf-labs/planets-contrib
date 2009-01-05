@@ -49,8 +49,11 @@ import eu.planets_project.ifr.core.services.migration.openXML.common.ConvertedFi
  *               performing any conversion tasks.
  */
 public class odfToolSimulator {
-    public final String triggerExt = new String(".$FILESET$");
+    /** extension to trigger for watched folder */
+        public final String triggerExt = new String(".$FILESET$");
+    /** extension used to mark end of processing */
     public final String endExt = new String(".$END$");
+    /** a temp file extension */
     public final String tempExt = new String(".$TMP$");
     private Config config;
     
@@ -73,8 +76,7 @@ public class odfToolSimulator {
                 // This tests if the file is an end file (ext = .$END$)
                 // The test also sets the loop control boolean
                 if (!(isEndFile = foundFile.getName().endsWith(endExt))) {
-                    // Call the fileset processor
-                    FilesetProcessor filProc = new FilesetProcessor(foundFile, new File(config.getOutputDir()));
+                    new FilesetProcessor(foundFile, new File(config.getOutputDir()));
                 }
             }
             // Delete the end file
@@ -108,15 +110,13 @@ public class odfToolSimulator {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        odfToolSimulator sim = new odfToolSimulator();
+        new odfToolSimulator();
     }
 
     /**
      * Class to open and load the config file into some simple variables
      **/
     private class Config {
-        // Holds the path to the config file and the XML doc representation of the file
-        private String confFilePath;
         private Document confDoc;
         
         // Holds the paths to the watched and the output directories
@@ -129,7 +129,6 @@ public class odfToolSimulator {
         
         // Constructor, opens and parses the config file
         public Config(String path) throws configException {
-            confFilePath = new String(path);
             parseFile(path);
         }
         
@@ -142,8 +141,6 @@ public class odfToolSimulator {
                 // Create a new builder and parse the document
                 DocumentBuilder builder = factory.newDocumentBuilder();
                 confDoc = builder.parse(path);
-                confFilePath = path;
-
                 // Get the watched folder, there can be ONLY ONE
                 NodeList watchedDirNodes = confDoc.getElementsByTagName("watchedDir");
                 if (watchedDirNodes.getLength() != 1) {
@@ -181,10 +178,12 @@ public class odfToolSimulator {
      */
     public class DirectoryWatcher {
        private File watchedDir;
-       /*
-        * Constructor for class sets up the watched directory
-        */
-       public DirectoryWatcher(String watchedDirName) throws DirWatchException {
+    /**
+     * Constructor for class sets up the watched directory
+     * @param watchedDirName
+     * @throws DirWatchException
+     */
+    public DirectoryWatcher(String watchedDirName) throws DirWatchException {
            // Check that both of the folders exist
            try {
                watchedDir = new File(watchedDirName);
@@ -204,8 +203,13 @@ public class odfToolSimulator {
            }
        }
        
-       // Method to poll input directory and flag a file (at first)
+    /**
+    // Method to poll input directory and flag a file (at first)
        // Returns false if finds an end file, true if a trigger file found (file in parameter)
+     * @return the watch directory
+     * @throws InterruptedException
+     * @throws DirWatchException
+     */
        public File watchDirectory () throws InterruptedException, DirWatchException {
            checkWatchedDir();
            boolean isFinished = false;
@@ -236,13 +240,22 @@ public class odfToolSimulator {
        }
     }
     
-    /*
+    /**
      * Class to process a fileset
+     * @author CFWilson
+     *
      */
     public class FilesetProcessor {
         // Looging data
         private ConversionReport conversionReport;
 
+        /**
+         * @param filesetDesc
+         * @param outputDir
+         * @throws IOException
+         * @throws DirWatchException
+         * @throws JAXBException
+         */
         public FilesetProcessor(File filesetDesc, File outputDir) throws IOException,
                                                                          DirWatchException,
                                                                          JAXBException {

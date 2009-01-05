@@ -14,7 +14,9 @@ package eu.planets_project.ifr.core.services.migration.odf.impl;
  * @author CFwilson
  */
 public class configException extends Exception {
-    // Constructor taking a message and a cause
+	private static final long serialVersionUID = 6219329033530800283L;
+
+	// Constructor taking a message and a cause
     configException(String s, Throwable t) {
         super(s, t);
     }

@@ -17,7 +17,8 @@ package eu.planets_project.ifr.core.services.migration.odf.impl;
      * DirWatcherException : Exception class for app defined errors
      */
     public class DirWatchException extends Exception {
-        DirWatchException(String s, Throwable t) {
+		private static final long serialVersionUID = 8657681460313395591L;
+		DirWatchException(String s, Throwable t) {
             super(s, t);
         }
         DirWatchException(String s) {
