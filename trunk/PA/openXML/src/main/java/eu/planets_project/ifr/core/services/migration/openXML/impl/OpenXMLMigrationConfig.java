@@ -31,27 +31,50 @@ import org.xml.sax.SAXParseException;
 public class OpenXMLMigrationConfig {
     // Holds the path to the config file and the XML doc representation of the file
     private String confFilePath = null;
+    /**
+     * @return the config file path
+     */
     public String getConfFilePath() {return confFilePath;}
     private Document confDoc;
 
     // Holds the paths to the conversion and the converted directories
     private String conversionDir = null;
+    /**
+     * @return the conversion directory
+     */
     public String getConversionDir() {return conversionDir;}
     private String convertedDir = null;
+    /**
+     * @return the converted result directory
+     */
     public String getConvertedDir() {return convertedDir;}
     private String outputDir = null;
+    /**
+     * @return the output dir
+     */
     public String getOutputDir() {return outputDir;}
     // Poll frequency default to 5 seconds
     private int pollFrequency = 5000;
+    /**
+     * @return the polling frequency
+     */
     public int  getPollfrequency() {return pollFrequency;}
     private int timeout = 60000;
+    /**
+     * @return a timeout val
+     */
     public int getTimeout() {return timeout;}
     private boolean configValid = false;
+    /**
+     * @return true if config is valid
+     */
     public boolean isConfigValid() {return configValid;}
 
-    /*
+    /**
      * Constructor, opens and parses the config file
      * just takes a location for the xml config file
+     * @param path 
+     * @throws PlanetsServiceException 
      */
     public OpenXMLMigrationConfig(String path) throws PlanetsServiceException {
         // Set the path member and parse the config file
@@ -59,8 +82,10 @@ public class OpenXMLMigrationConfig {
         parseFile(path);
     }
 
-    /*
+    /**
      * Public method to parse the  passed config file
+     * @param path 
+     * @throws PlanetsServiceException 
      */
     public void parseFile(String path) throws PlanetsServiceException {
         // Document builder factory to create the document builder

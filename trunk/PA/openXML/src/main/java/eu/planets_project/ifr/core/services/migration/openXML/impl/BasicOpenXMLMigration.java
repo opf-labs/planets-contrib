@@ -9,18 +9,12 @@
 
 package eu.planets_project.ifr.core.services.migration.openXML.impl;
 
-import eu.planets_project.ifr.core.services.migration.openXML.api.PlanetsServiceException;
-import eu.planets_project.services.PlanetsException;
-import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.migrate.BasicMigrateOneBinary;
-import eu.planets_project.services.utils.PlanetsLogger;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -29,6 +23,11 @@ import javax.jws.WebService;
 
 import org.jboss.annotation.ejb.LocalBinding;
 import org.jboss.annotation.ejb.RemoteBinding;
+
+import eu.planets_project.ifr.core.services.migration.openXML.api.PlanetsServiceException;
+import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.migrate.BasicMigrateOneBinary;
+import eu.planets_project.services.utils.PlanetsLogger;
 
 /**
  *
@@ -50,8 +49,8 @@ public class BasicOpenXMLMigration implements BasicMigrateOneBinary {
     
     PlanetsLogger log = PlanetsLogger.getLogger(BasicOpenXMLMigration.class);
 
-    /* (non-Javadoc)
-     * @see eu.planets_project.ifr.core.common.services.migrate.BasicMigrateOneBinary#basicMigrateOneBinary(byte[])
+    /**
+     * @see eu.planets_project.services.migrate.BasicMigrateOneBinary#basicMigrateOneBinary(byte[])
      */
     public byte[] basicMigrateOneBinary ( 
             byte[] binary ) {

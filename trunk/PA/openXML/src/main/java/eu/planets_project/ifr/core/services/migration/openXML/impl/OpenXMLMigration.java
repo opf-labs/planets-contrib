@@ -57,6 +57,9 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
     // Configuration variable and public method to test that the configuration is OK
     private OpenXMLMigrationConfig config = null;
 
+    /**
+     * @return true if the configuration is valid
+     */
     @javax.jws.WebMethod()
     public boolean isConfigValid() {
         boolean configValid = false;
@@ -71,12 +74,16 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
     
     /** 
      * Creates a new instance of OpenXMLServiceTest
+     * @throws PlanetsServiceException 
      */
     public OpenXMLMigration() throws PlanetsServiceException {
         PlanetsLogger.getLogger(this.getClass(), logConfigFile).debug("OpenXMLMigration: Loading Config File");
         config = new OpenXMLMigrationConfig("eu/planets_project/ifr/core/services/migration/openXML/openXMLMigration-config.xml");
     }
 
+    /**
+     * @see eu.planets_project.ifr.core.services.migration.openXML.api.OpenXMLMigrationServiceRemoteInterface#convertFileRef(java.lang.String)
+     */
     @javax.jws.WebMethod()
     public String convertFileRef(@javax.jws.WebParam(name="fileRef") String toConvert_) throws PlanetsServiceException {
     //public ConversionReport convertFileRef(String toConvert_, String convertPath_) throws PlanetsServiceException {
@@ -100,6 +107,9 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
     }
     
     
+    /**
+     * @see eu.planets_project.ifr.core.services.migration.openXML.api.OpenXMLMigrationServiceRemoteInterface#convertFileRefs(java.lang.String[])
+     */
     @javax.jws.WebMethod()
     public String[] convertFileRefs(@javax.jws.WebParam(name="fileRefs") String[] toConvert_ ) throws PlanetsServiceException {
 
@@ -110,10 +120,13 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
         return ret;
     }
 
-    /*
+    /**
      * Method to take a single file object and request conversion to a path
+     * @param toConvert_
+     * @param convertPath_
+     * @return the list of converted names
+     * @throws PlanetsServiceException
      */
-    //public ConversionReport convertFile(File toConvert_, File convertPath_) throws PlanetsServiceException {
     public ArrayList<String> convertFile(File toConvert_, File convertPath_) throws PlanetsServiceException {
 
         // Let's test that the configuration is OK
