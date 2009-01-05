@@ -65,14 +65,19 @@ public class ConvertedFileNames {
     @XmlElement(required = true, name="actual")
     protected String actual;
 
+    /**
+     * no arg default
+     */
     public ConvertedFileNames()
     {
         this.input = new String("");
         this.output = new String("");
         this.actual = new String("");
     }
-    /*
-     * No default constructor, needs at least two names
+    /**
+     * @param inputVal
+     * @param outputVal
+     * @param actualVal
      */
     public ConvertedFileNames(String inputVal, String outputVal, String actualVal) {
         this.input = new String(inputVal);
@@ -80,6 +85,10 @@ public class ConvertedFileNames {
         this.actual = new String(actualVal);
     }
 
+    /**
+     * @param inputVal
+     * @param outputVal
+     */
     public ConvertedFileNames(String inputVal, String outputVal) {
         this.input = new String(inputVal);
         this.output = new String(outputVal);
@@ -101,7 +110,7 @@ public class ConvertedFileNames {
     /**
      * Sets the value of the input property.
      * 
-     * @param value
+     * @param inputVal
      *     allowed object is
      *     {@link String }
      *     
@@ -125,7 +134,7 @@ public class ConvertedFileNames {
     /**
      * Sets the value of the output property.
      * 
-     * @param value
+     * @param outputVal
      *     allowed object is
      *     {@link String }
      *     
@@ -149,7 +158,7 @@ public class ConvertedFileNames {
     /**
      * Sets the value of the actual property.
      * 
-     * @param value
+     * @param actualVal
      *     allowed object is
      *     {@link String }
      *     

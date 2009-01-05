@@ -13,13 +13,12 @@ package eu.planets_project.ifr.core.services.migration.openXML.common;
  *
  * @author CFwilson
  */
-import java.math.BigInteger;
 import java.util.Date;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for anonymous complex type.
@@ -62,6 +61,9 @@ public class ConversionSummary {
     @XmlElement(required = true, name="fileNum")
     protected int fileNum = 0;
 
+    /**
+     * no arg default
+     */
     public ConversionSummary() {
     }
     /**
@@ -69,7 +71,7 @@ public class ConversionSummary {
      * 
      * @return
      *     possible object is
-     *     {@link Result }
+     *     {@link ConversionResult }
      *     
      */
     public ConversionResult getresult() {
@@ -81,7 +83,7 @@ public class ConversionSummary {
      * 
      * @param value
      *     allowed object is
-     *     {@link Result }
+     *     {@link ConversionResult }
      *     
      */
     public void setresult(ConversionResult value) {
@@ -93,7 +95,7 @@ public class ConversionSummary {
      * 
      * @return
      *     possible object is
-     *     {@link XMLGregorianCalendar }
+     *     {@link javax.xml.datatype.XMLGregorianCalendar }
      *     
      */
     public Date getstarttime() {
@@ -105,7 +107,7 @@ public class ConversionSummary {
      * 
      * @param value
      *     allowed object is
-     *     {@link XMLGregorianCalendar }
+     *     {@link javax.xml.datatype.XMLGregorianCalendar }
      *     
      */
     public void setstarttime(Date value) {
@@ -117,7 +119,7 @@ public class ConversionSummary {
      * 
      * @return
      *     possible object is
-     *     {@link XMLGregorianCalendar }
+     *     {@link javax.xml.datatype.XMLGregorianCalendar }
      *     
      */
     public Date getendtime() {
@@ -129,7 +131,7 @@ public class ConversionSummary {
      * 
      * @param value
      *     allowed object is
-     *     {@link XMLGregorianCalendar }
+     *     {@link javax.xml.datatype.XMLGregorianCalendar }
      *     
      */
     public void setendtime(Date value) {
@@ -141,13 +143,16 @@ public class ConversionSummary {
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link java.math.BigInteger }
      *     
      */
     public int getFileNum() {
         return fileNum;
     }
     
+    /**
+     * @return incremented file numm
+     */
     public int incrementFileNum() {
         return ++fileNum;
     }

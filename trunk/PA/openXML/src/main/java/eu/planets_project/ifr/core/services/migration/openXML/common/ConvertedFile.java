@@ -27,7 +27,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
  * <p>Java class for anonymous complex type.
  * 
@@ -80,6 +79,11 @@ public class ConvertedFile {
     }
     
     
+    /**
+     * @param fileNumber
+     * @param inputFileName
+     * @param outputFileName
+     */
     public ConvertedFile(int fileNumber, String inputFileName, String outputFileName) {
         conversionResult = new ConversionResult();
         convertedFileNames = new ConvertedFileNames(inputFileName, outputFileName);
@@ -90,7 +94,7 @@ public class ConvertedFile {
      * 
      * @return
      *     possible object is
-     *     {@link Result }
+     *     {@link ConversionResult }
      *     
      */
     public ConversionResult getResult() {
@@ -102,7 +106,7 @@ public class ConvertedFile {
      * 
      * @param value
      *     allowed object is
-     *     {@link Result }
+     *     {@link ConversionResult }
      *     
      */
     public void setConversionResult(ConversionResult value) {
@@ -114,7 +118,7 @@ public class ConvertedFile {
      * 
      * @return
      *     possible object is
-     *     {@link XMLGregorianCalendar }
+     *     {@link javax.xml.datatype.XMLGregorianCalendar }
      *     
      */
     public Date getStarttime() {
@@ -126,7 +130,7 @@ public class ConvertedFile {
      * 
      * @param value
      *     allowed object is
-     *     {@link XMLGregorianCalendar }
+     *     {@link javax.xml.datatype.XMLGregorianCalendar }
      *     
      */
     public void setStarttime(Date value) {
@@ -138,7 +142,7 @@ public class ConvertedFile {
      * 
      * @return
      *     possible object is
-     *     {@link XMLGregorianCalendar }
+     *     {@link javax.xml.datatype.XMLGregorianCalendar }
      *     
      */
     public Date getEndtime() {
@@ -150,7 +154,7 @@ public class ConvertedFile {
      * 
      * @param value
      *     allowed object is
-     *     {@link XMLGregorianCalendar }
+     *     {@link javax.xml.datatype.XMLGregorianCalendar }
      *     
      */
     public void setEndtime(Date value) {
@@ -162,7 +166,7 @@ public class ConvertedFile {
      * 
      * @return
      *     possible object is
-     *     {@link Names }
+     *     {@link ConvertedFileNames }
      *     
      */
     public ConvertedFileNames getConvertedFileNames() {
@@ -174,7 +178,7 @@ public class ConvertedFile {
      * 
      * @param value
      *     allowed object is
-     *     {@link Names }
+     *     {@link ConvertedFileNames }
      *     
      */
     public void setConvertedFileNames(ConvertedFileNames value) {
@@ -186,7 +190,7 @@ public class ConvertedFile {
      * 
      * @return
      *     possible object is
-     *     {@link Fileinfo }
+     *     {@link ConvertedFileInfo }
      *     
      */
     public ConvertedFileInfo getConvertedFileInfo() {
@@ -198,7 +202,7 @@ public class ConvertedFile {
      * 
      * @param value
      *     allowed object is
-     *     {@link Fileinfo }
+     *     {@link ConvertedFileInfo }
      *     
      */
     public void setConvertedFileInfo(ConvertedFileInfo value) {
@@ -210,7 +214,7 @@ public class ConvertedFile {
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link java.math.BigInteger }
      *     
      */
     public int getNumber() {
@@ -222,7 +226,7 @@ public class ConvertedFile {
      * 
      * @param value
      *     allowed object is
-     *     {@link BigInteger }
+     *     {@link java.math.BigInteger }
      *     
      */
     public void setNumber(int value) {

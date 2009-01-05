@@ -57,14 +57,23 @@ public class ConversionReport {
     @XmlElementWrapper(name="files")
     @XmlElement(required = true, name="file")
     protected List<ConvertedFile> convertedFileList;
+    /**
+     * name of the report file
+     */
     @XmlTransient
     public String reportFileName;
     
+    /**
+     * no arg constructor
+     */
     public ConversionReport () {
         conversionSummary = new ConversionSummary();
         reportFileName = new String("");
     }
 
+    /**
+     * @param reportFileNameVal a name for the report file
+     */
     public ConversionReport (String reportFileNameVal) {
         conversionSummary = new ConversionSummary();
         reportFileName = new String(reportFileNameVal);
@@ -74,7 +83,7 @@ public class ConversionReport {
      * 
      * @return
      *     possible object is
-     *     {@link Convsummary }
+     *     {@link ConversionSummary }
      *     
      */
     public ConversionSummary getConversionSummary() {
@@ -86,13 +95,16 @@ public class ConversionReport {
      * 
      * @param value
      *     allowed object is
-     *     {@link Convsummary }
+     *     {@link ConversionSummary }
      *     
      */
     public void setConversionSummary(ConversionSummary value) {
         this.conversionSummary = value;
     }
 
+    /**
+     * @return list of converted files
+     */
     public List<ConvertedFile> getConvertedFileList() {
         if (convertedFileList == null) {
             convertedFileList = new ArrayList<ConvertedFile>();
@@ -100,6 +112,10 @@ public class ConversionReport {
         return this.convertedFileList;
     }
     
+    /**
+     * @param theFile
+     * @return the size of the list
+     */
     public int addConvertedFile(ConvertedFile theFile) {
         if (convertedFileList == null) {
             convertedFileList = new ArrayList<ConvertedFile>();

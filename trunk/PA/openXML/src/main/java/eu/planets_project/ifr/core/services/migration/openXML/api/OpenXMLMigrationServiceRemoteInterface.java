@@ -9,8 +9,6 @@
 
 package eu.planets_project.ifr.core.services.migration.openXML.api;
 
-import java.io.File;
-import java.util.ArrayList;
 
 /**
  *
@@ -18,6 +16,16 @@ import java.util.ArrayList;
  */
 
 public interface OpenXMLMigrationServiceRemoteInterface {
+    /**
+     * @param toConvert_
+     * @return the ref to the converted file
+     * @throws PlanetsServiceException
+     */
     public String convertFileRef(String toConvert_) throws PlanetsServiceException;
+    /**
+     * @param toConvert_
+     * @return an array of refs to converted files
+     * @throws PlanetsServiceException
+     */
     public String[] convertFileRefs(String[] toConvert_) throws PlanetsServiceException;
 }

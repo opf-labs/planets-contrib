@@ -121,7 +121,7 @@ public class ConvertedFileInfo {
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link java.math.BigInteger }
      *     
      */
     public int getInputSize() {
@@ -131,9 +131,9 @@ public class ConvertedFileInfo {
     /**
      * Sets the value of the inputsize property.
      * 
-     * @param value
+     * @param inputSizeVal
      *     allowed object is
-     *     {@link BigInteger }
+     *     {@link java.math.BigInteger }
      *     
      */
     public void setInputSize(int inputSizeVal) {
@@ -145,7 +145,7 @@ public class ConvertedFileInfo {
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link java.math.BigInteger }
      *     
      */
     public int getOutputSize() {
@@ -155,9 +155,9 @@ public class ConvertedFileInfo {
     /**
      * Sets the value of the outputsize property.
      * 
-     * @param value
+     * @param outputSizeVal
      *     allowed object is
-     *     {@link BigInteger }
+     *     {@link java.math.BigInteger }
      *     
      */
     public void setOutputSize(int outputSizeVal) {
@@ -169,7 +169,7 @@ public class ConvertedFileInfo {
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link java.math.BigInteger }
      *     
      */
     public int getPages() {
@@ -179,9 +179,9 @@ public class ConvertedFileInfo {
     /**
      * Sets the value of the pages property.
      * 
-     * @param value
+     * @param pagesVal
      *     allowed object is
-     *     {@link BigInteger }
+     *     {@link java.math.BigInteger }
      *     
      */
     public void setPages(int pagesVal) {
@@ -193,7 +193,7 @@ public class ConvertedFileInfo {
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link java.lang.String }
      *     
      */
     public String getCreator() {
@@ -203,9 +203,9 @@ public class ConvertedFileInfo {
     /**
      * Sets the value of the creator property.
      * 
-     * @param value
+     * @param creatorVal
      *     allowed object is
-     *     {@link String }
+     *     {@link java.lang.String }
      *     
      */
     public void setCreator(String creatorVal) {
@@ -217,7 +217,7 @@ public class ConvertedFileInfo {
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link java.lang.String }
      *     
      */
     public String getTitle() {
@@ -227,9 +227,9 @@ public class ConvertedFileInfo {
     /**
      * Sets the value of the title property.
      * 
-     * @param value
+     * @param titleVal
      *     allowed object is
-     *     {@link String }
+     *     {@link java.lang.String }
      *     
      */
     public void setTitle(String titleVal) {
@@ -241,7 +241,7 @@ public class ConvertedFileInfo {
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link java.lang.String }
      *     
      */
     public String getSubject() {
@@ -251,9 +251,9 @@ public class ConvertedFileInfo {
     /**
      * Sets the value of the subject property.
      * 
-     * @param value
+     * @param subjectVal
      *     allowed object is
-     *     {@link String }
+     *     {@link java.lang.String }
      *     
      */
     public void setSubject(String subjectVal) {
@@ -265,7 +265,7 @@ public class ConvertedFileInfo {
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link java.lang.String }
      *     
      */
     public String getKeywords() {
@@ -275,9 +275,9 @@ public class ConvertedFileInfo {
     /**
      * Sets the value of the keywords property.
      * 
-     * @param value
+     * @param keywordsVal
      *     allowed object is
-     *     {@link String }
+     *     {@link java.lang.String }
      *     
      */
     public void setKeywords(String keywordsVal) {
@@ -289,7 +289,7 @@ public class ConvertedFileInfo {
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link java.lang.String }
      *     
      */
     public String getLastModifiedBy() {
@@ -299,9 +299,9 @@ public class ConvertedFileInfo {
     /**
      * Sets the value of the lastModifiedBy property.
      * 
-     * @param value
+     * @param lastModifiedVal
      *     allowed object is
-     *     {@link String }
+     *     {@link java.lang.String }
      *     
      */
     public void setLastModifiedBy(String lastModifiedVal) {
@@ -313,7 +313,7 @@ public class ConvertedFileInfo {
      * 
      * @return
      *     possible object is
-     *     {@link BigInteger }
+     *     {@link java.math.BigInteger }
      *     
      */
     public int getRevision() {
@@ -323,9 +323,9 @@ public class ConvertedFileInfo {
     /**
      * Sets the value of the revision property.
      * 
-     * @param value
+     * @param revisionVal
      *     allowed object is
-     *     {@link BigInteger }
+     *     {@link java.math.BigInteger }
      *     
      */
     public void setRevision(int revisionVal) {
@@ -337,7 +337,7 @@ public class ConvertedFileInfo {
      * 
      * @return
      *     possible object is
-     *     {@link XMLGregorianCalendar }
+     *     {@link javax.xml.datatype.XMLGregorianCalendar }
      *     
      */
     public Date getCreated() {
@@ -347,9 +347,9 @@ public class ConvertedFileInfo {
     /**
      * Sets the value of the created property.
      * 
-     * @param value
+     * @param createdVal
      *     allowed object is
-     *     {@link XMLGregorianCalendar }
+     *     {@link javax.xml.datatype.XMLGregorianCalendar }
      *     
      */
     public void setCreated(Date createdVal) {
@@ -361,7 +361,7 @@ public class ConvertedFileInfo {
      * 
      * @return
      *     possible object is
-     *     {@link XMLGregorianCalendar }
+     *     {@link javax.xml.datatype.XMLGregorianCalendar }
      *     
      */
     public Date getModified() {
@@ -371,9 +371,9 @@ public class ConvertedFileInfo {
     /**
      * Sets the value of the modified property.
      * 
-     * @param value
+     * @param modifiedVal
      *     allowed object is
-     *     {@link XMLGregorianCalendar }
+     *     {@link javax.xml.datatype.XMLGregorianCalendar }
      *     
      */
     public void setModified(Date modifiedVal) {
@@ -385,7 +385,7 @@ public class ConvertedFileInfo {
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link java.lang.String }
      *     
      */
     public String getCompany() {
@@ -395,9 +395,9 @@ public class ConvertedFileInfo {
     /**
      * Sets the value of the company property.
      * 
-     * @param value
+     * @param companyVal
      *     allowed object is
-     *     {@link String }
+     *     {@link java.lang.String }
      *     
      */
     public void setCompany(String companyVal) {
