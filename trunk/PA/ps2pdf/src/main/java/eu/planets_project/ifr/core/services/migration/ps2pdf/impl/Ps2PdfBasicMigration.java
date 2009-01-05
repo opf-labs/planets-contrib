@@ -24,7 +24,10 @@ import eu.planets_project.services.utils.ProcessRunner;
 
 
 
-@SuppressWarnings("serial")
+/**
+ * Postscript to PDF basic migration service
+ *
+ */
 @WebService(name = Ps2PdfBasicMigration.NAME, serviceName = BasicMigrateOneBinary.NAME, targetNamespace = PlanetsServices.NS)
 @SOAPBinding(
         parameterStyle = SOAPBinding.ParameterStyle.BARE,
@@ -37,8 +40,12 @@ public class Ps2PdfBasicMigration implements BasicMigrateOneBinary, Serializable
 {
     
 	private static final long serialVersionUID = 1878137433497934155L;
+	/** The service name */
 	public static final String NAME = "Ps2PdfBasicMigration";
 
+	/**
+	 * @see eu.planets_project.services.migrate.BasicMigrateOneBinary#basicMigrateOneBinary(byte[])
+	 */
 	@WebMethod(operationName = BasicMigrateOneBinary.NAME,
 	           action = PlanetsServices.NS + "/" + BasicMigrateOneBinary.NAME)
 	@WebResult(name = BasicMigrateOneBinary.NAME + "Result",
