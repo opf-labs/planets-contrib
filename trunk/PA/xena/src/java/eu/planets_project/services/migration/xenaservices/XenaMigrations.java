@@ -39,23 +39,34 @@ public class XenaMigrations {
      * Code from the Xena project.
      */
 
+    /** open office installation dir */
     public String ooffice_install_dir;
     // Values like PDF might work, writer_pdf_Export should work.
     //  - http://www.oooforum.org/forum/viewtopic.phtml?p=167815
     //  - List of filters: http://www.oooforum.org/forum/viewtopic.phtml?t=3549
+    /** no export filter */
     public final static String EXPORT_FILTER_NONE = "";
+    /** pdf export filter */
     public final static String EXPORT_FILTER_PDF = "writer_pdf_Export";
+    /** export filter value set to none */
     public String ooffice_export_filter = EXPORT_FILTER_NONE;
     // Import filters:
+    /** No import filter */
     public final static String IMPORT_FILTER_NONE = null;
+    /** doc import filter */
     public final static String IMPORT_FILTER_DOC = "doc";
+    /** input filter value set to doc */
     public String ooffice_import_filter = IMPORT_FILTER_DOC;
     
     
+    /** prefix for open document */
     public final static String OPEN_DOCUMENT_PREFIX = "opendocument";
 //    private final static String OPEN_DOCUMENT_URI = "http://preservation.naa.gov.au/odf/1.0";
+    /** tag name for type */
     public final static String DOCUMENT_TYPE_TAG_NAME = "type";
+    /** tag name for extension */
     public final static String DOCUMENT_EXTENSION_TAG_NAME = "extension";
+    /** tag name for description */
     public final static String PROCESS_DESCRIPTION_TAG_NAME = "description";
     private final static String OS_X_ARCHITECTURE_NAME = "mac os x";
 
@@ -68,7 +79,7 @@ public class XenaMigrations {
 */
     
     /**
-     * 
+     * No arg constructor
      */
     public XenaMigrations() {
         Properties props = new Properties();
@@ -345,7 +356,7 @@ public class XenaMigrations {
      * This is the actual class that does the work.
      * 
      * @param binary
-     * @return
+     * @return the migrated binary
      */
     public byte[] basicMigrateOneBinary ( byte[] binary ) {
 

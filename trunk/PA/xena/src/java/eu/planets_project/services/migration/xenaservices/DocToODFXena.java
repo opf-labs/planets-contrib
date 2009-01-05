@@ -6,17 +6,11 @@ package eu.planets_project.services.migration.xenaservices;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
-import javax.jws.WebResult;
 import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-import javax.xml.ws.BindingType;
 
 import org.jboss.annotation.ejb.LocalBinding;
 import org.jboss.annotation.ejb.RemoteBinding;
 
-import eu.planets_project.services.PlanetsException;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.migrate.BasicMigrateOneBinary;
 import eu.planets_project.services.utils.PlanetsLogger;
@@ -41,8 +35,8 @@ public class DocToODFXena implements BasicMigrateOneBinary {
     
     PlanetsLogger log = PlanetsLogger.getLogger(DocToODFXena.class);
 
-	/* (non-Javadoc)
-     * @see eu.planets_project.ifr.core.common.services.migrate.BasicMigrateOneBinary#basicMigrateOneBinary(byte[])
+	/**
+     * @see eu.planets_project.services.migrate.BasicMigrateOneBinary#basicMigrateOneBinary(byte[])
      */
     public byte[] basicMigrateOneBinary ( 
             byte[] binary ) {
