@@ -1,13 +1,7 @@
-/**
- *  @author : Thomas Krämer thomas.kraemer@uni-koeln.de
- *  created : 14.07.2008
- *  
- */
 package eu.planets_project.services.migration.soxservices;
 
 import java.io.File;
 
-import javax.activation.DataHandler;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
@@ -16,14 +10,12 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
-import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.ws.BindingType;
 import javax.xml.ws.soap.MTOM;
 
 import org.jboss.annotation.ejb.LocalBinding;
 import org.jboss.annotation.ejb.RemoteBinding;
 
-import eu.planets_project.services.PlanetsException;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.migrate.BasicMigrateOneBinary;
 import eu.planets_project.services.utils.PlanetsLogger;
@@ -31,6 +23,8 @@ import eu.planets_project.services.utils.PlanetsLogger;
 /**
  * Convert a file from  mp3 to .ogg.
  * 
+ *  @author : Thomas Kraemer thomas.kraemer@uni-koeln.de
+ *  created : 14.07.2008
  */
 @Stateless
 @Local(BasicMigrateOneBinary.class)
@@ -49,6 +43,9 @@ public class MP3ToOggSox implements BasicMigrateOneBinary {
 	PlanetsLogger log = PlanetsLogger.getLogger(MP3ToOggSox.class);
 
 
+	/**
+	 * @see eu.planets_project.services.migrate.BasicMigrateOneBinary#basicMigrateOneBinary(byte[])
+	 */
 	@WebMethod(operationName = BasicMigrateOneBinary.NAME, action = PlanetsServices.NS
 			+ "/" + BasicMigrateOneBinary.NAME)
 	@WebResult(name = BasicMigrateOneBinary.NAME + "Result", targetNamespace = PlanetsServices.NS
@@ -60,7 +57,6 @@ public class MP3ToOggSox implements BasicMigrateOneBinary {
 			 
 					byte[] binary) {
 		SoxMigrations soxm = null;
-		File sourceAudioFile = null;
 		soxm = new SoxMigrations();
 		return soxm.transformMp3ToOgg(binary);
 	}

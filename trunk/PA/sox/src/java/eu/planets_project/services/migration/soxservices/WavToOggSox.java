@@ -3,7 +3,6 @@
  */
 package eu.planets_project.services.migration.soxservices;
 
-import javax.activation.DataHandler;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
@@ -12,20 +11,18 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
-import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.ws.BindingType;
 import javax.xml.ws.soap.MTOM;
 
 import org.jboss.annotation.ejb.LocalBinding;
 import org.jboss.annotation.ejb.RemoteBinding;
 
-import eu.planets_project.services.PlanetsException;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.migrate.BasicMigrateOneBinary;
 import eu.planets_project.services.utils.PlanetsLogger;
 
 /**
- *  @author : Thomas Krämer thomas.kraemer@uni-koeln.de
+ *  @author : Thomas Kraemer thomas.kraemer@uni-koeln.de
  *  created : 14.07.2008
  *  
  * Convert any sound file from wav to ogg.
@@ -48,6 +45,9 @@ public class WavToOggSox implements BasicMigrateOneBinary {
 	PlanetsLogger log = PlanetsLogger.getLogger(WavToOggSox.class);
 
 
+	/**
+	 * @see eu.planets_project.services.migrate.BasicMigrateOneBinary#basicMigrateOneBinary(byte[])
+	 */
 	@WebMethod(operationName = BasicMigrateOneBinary.NAME, action = PlanetsServices.NS
 			+ "/" + BasicMigrateOneBinary.NAME)
 	@WebResult(name = BasicMigrateOneBinary.NAME + "Result", targetNamespace = PlanetsServices.NS

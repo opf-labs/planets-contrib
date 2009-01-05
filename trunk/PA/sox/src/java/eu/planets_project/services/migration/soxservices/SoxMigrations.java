@@ -13,20 +13,41 @@ import eu.planets_project.services.utils.ProcessRunner;
 /**
  * Common sox invocation class
  * 
- * @author : Thomas Krämer thomas.kraemer@uni-koeln.de created : 14.07.2008
+ * @author : Thomas Kraemer thomas.kraemer@uni-koeln.de created : 14.07.2008
  * 
  */
 public class SoxMigrations {
 
+    /**
+     * SOX as a string
+     */
     public final String SOX = "sox";
     PlanetsLogger plogger = PlanetsLogger.getLogger(SoxMigrations.class);
 
+    /**
+     * the system temp directory
+     */
     public static final String SYSTEM_TEMP = System.getProperty("java.io.tmpdir") + File.separator;
+    /**
+     * the SOX working directory
+     */
     public static  String SoX_WORK_DIR = "SOX";
+    /**
+     * the SOX input dir
+     */
     public static  String SoX_IN = "INPUT";
+    /**
+     * the SOX output dir
+     */
     public static  String SoX_OUTPUT_DIR = "OUT";
+    /**
+     * SOX home dir
+     */
     public static String SOX_HOME = null;
     
+    /**
+     * no arg default constructor, sets up the directories
+     */
     public SoxMigrations() {
     	
     	SOX_HOME = System.getenv("SOX_HOME") + File.separator;
@@ -42,31 +63,55 @@ public class SoxMigrations {
         System.out.println("Pointed SoX_HOME to: " + SOX_HOME);
     }
 
+	/**
+	 * @param input
+	 * @return the migrated OGG file
+	 */
 	public byte[] transformMp3ToOgg(byte[] input) {
         plogger.info("transformMp3ToOgg begin ");
         return genericTransformAudioSrcToAudioDest(input, ".mp3", ".ogg", null);
     }
     
+	/**
+	 * @param input
+	 * @return the migrated AIFF file
+	 */
     public byte[] transformWavToAiff(byte[] input) {
     	plogger.info("transformWavToAiff begin ");
     	return genericTransformAudioSrcToAudioDest(input, ".wav", ".aiff", null);
     }
 
+	/**
+	 * @param input
+	 * @return the migrated WAV file
+	 */
     public byte[] transformMp3ToWav(byte[] input) {
         plogger.info("transformMp3ToWav begin ");
         return genericTransformAudioSrcToAudioDest(input, ".mp3", ".wav", null);
     }
 
+	/**
+	 * @param input
+	 * @return the migrated OGG file
+	 */
     public byte[] transformWavToOgg(byte[] input) {
         plogger.info("transformWavToOgg begin ");
         return genericTransformAudioSrcToAudioDest(input, ".wav", ".ogg", null);
     }
 
+	/**
+	 * @param input
+	 * @return the migrated FLAC file
+	 */
     public byte[] transformWavToFlac(byte[] input) {
         plogger.info("transformWavToFlac begin ");
         return genericTransformAudioSrcToAudioDest(input, ".wav", ".flac", null);
     }
 
+	/**
+	 * @param input
+	 * @return the migrated FLAC file
+	 */
     public byte[] transformMp3ToFlac(byte[] input) {
         plogger.info("transformMp3ToFlac begin ");
         return genericTransformAudioSrcToAudioDest(input, ".mp3", ".flac", null);
@@ -107,6 +152,13 @@ public class SoxMigrations {
 //                null);
 //    }
 
+    /**
+     * @param input
+     * @param srcSuffix
+     * @param destSuffix
+     * @param soxCliParams
+     * @return the migrated byte[]
+     */
     public byte[] genericTransformAudioSrcToAudioDest(byte[] input,
             String srcSuffix, String destSuffix, ArrayList<String> soxCliParams) {
     	
@@ -166,7 +218,7 @@ public class SoxMigrations {
         	plogger.error("SoX didn't create an output file!");
         }
         
-        boolean deletedFolders = FileUtils.deleteTempFiles(workFolder, plogger);
+        FileUtils.deleteTempFiles(workFolder, plogger);
         
         return outputFileData;
     }
