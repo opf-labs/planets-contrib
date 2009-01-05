@@ -32,7 +32,6 @@ import eu.planets_project.services.utils.ByteArrayHelper;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -51,8 +50,11 @@ endpointInterface = "eu.planets_project.services.migrate.Migrate")
 public final class Gimp26Migration implements Migrate, Serializable {
 
     PlanetsLogger log = PlanetsLogger.getLogger(Gimp26Migration.class);
-    private static Logger logger = Logger.getLogger(Gimp26Migration.class.getName());
+    @SuppressWarnings("unused")
+	private static Logger logger = Logger.getLogger(Gimp26Migration.class.getName());
+    /** The GIMP install directory */
     public String gimp_install_dir;
+    /** The application name */
     public String gimp_app_name;
     private File tmpInFile;
     private File tmpOutFile;
@@ -65,8 +67,8 @@ public final class Gimp26Migration implements Migrate, Serializable {
     
     List<String> inputFormats = null;
     List<String> outputFormats = null;
-    HashMap  formatMapping = null;
-    HashMap defaultParameters = null;
+    HashMap<String, String>  formatMapping = null;
+    HashMap<String, List<Parameter>> defaultParameters = null;
     
     String inputFmtExt = null;
     String outputFmtExt = null;
@@ -115,7 +117,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
         // Disambiguation of extensions, e.g. {"JPG","JPEG"} to {"JPEG"}
         // FIXIT This should be supported by the FormatRegistryImpl class, but
         // it does not provide the complete set at the moment.
-        formatMapping = new HashMap();
+        formatMapping = new HashMap<String, String>();
         formatMapping.put("JPG","JPEG");
         formatMapping.put("TIF","TIFF");
     }
@@ -137,7 +139,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
     {
         StringBuffer paramStrBuff = new StringBuffer();
         List<Parameter> fmtParameterList = (List<Parameter>) defaultParameters.get(ext);
-        Iterator itr = fmtParameterList.iterator();
+        Iterator<Parameter> itr = fmtParameterList.iterator();
         while(itr.hasNext()) {
             Parameter param = (Parameter) itr.next();
             if( param.value != null )
@@ -162,7 +164,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
         // { "GIF" -> { Parameter("gif-interlace","1"), Parameter("gif-dither","1"), ... } }
         // { "JPEG" -> { Parameter("jpeg-quality","0.9"), Parameter("jpeg-smoothing"),"0.9"), ... } }
         // ...
-        defaultParameters = new HashMap();
+        defaultParameters = new HashMap<String, List<Parameter>>();
         
         // Define parameters and default values
         // GIF - 6 parameters
@@ -298,13 +300,13 @@ public final class Gimp26Migration implements Migrate, Serializable {
         if( userParams != null )
         {
             List<Parameter> userParamList = userParams.getParameters(); // User parameters
-            Iterator userParmsItr = userParamList.iterator(); 
+            Iterator<Parameter> userParmsItr = userParamList.iterator(); 
             while(userParmsItr.hasNext()) {
                 Parameter userParam = (Parameter) userParmsItr.next();
                 System.out.println("Set parameter: " + userParam.name + " with value: " + userParam.value);
                 // get hashmap of the desired output format
                 List<Parameter> defaultParamList = (List<Parameter>)defaultParameters.get(outputFmtExt);
-                Iterator defParmsItr = defaultParamList.iterator();
+                Iterator<Parameter> defParmsItr = defaultParamList.iterator();
                 int index = 0;
                 while( defParmsItr.hasNext() )
                 {
@@ -325,7 +327,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
     /**
      * {@inheritDoc}
      * 
-     * @see eu.planets_project.ifr.core.common.services.migrate.MigrateOneDigitalObject#migrate(eu.planets_project.ifr.core.common.services.datatypes.DigitalObject)
+     * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameters)
      */
     public MigrateResult migrate(final DigitalObject digitalObject, URI inputFormat,
             URI outputFormat, Parameters parameters) {
@@ -424,13 +426,13 @@ public final class Gimp26Migration implements Migrate, Serializable {
     private Parameters getParameters()
     {
         Parameters parameters = new Parameters();
-        List<Parameter> paramList = new ArrayList();
-        Iterator itr = defaultParameters.keySet().iterator();
+        List<Parameter> paramList = new ArrayList<Parameter>();
+        Iterator<String> itr = defaultParameters.keySet().iterator();
         while( itr.hasNext() )
         {
             String key = (String)itr.next();
             List<Parameter> parameterList = (List<Parameter>) defaultParameters.get(key);
-            Iterator itr2 = parameterList.iterator();
+            Iterator<Parameter> itr2 = parameterList.iterator();
             while( itr2.hasNext() )
             {
                 paramList.add((Parameter) itr2.next());                
@@ -440,8 +442,8 @@ public final class Gimp26Migration implements Migrate, Serializable {
         return parameters;
     }
     
-    /* (non-Javadoc)
-     * @see eu.planets_project.ifr.core.common.services.migrate.MigrateOneDigitalObject#describe()
+    /**
+     * @see eu.planets_project.services.migrate.Migrate#describe()
      */
     public ServiceDescription describe() {
         init();
@@ -488,10 +490,10 @@ public final class Gimp26Migration implements Migrate, Serializable {
         FormatRegistryImpl fmtRegImpl = new FormatRegistryImpl();
         Format uriFormatObj = fmtRegImpl.getFormatForURI(formatUri);
         Set<String> reqInputFormatExts = uriFormatObj.getExtensions();
-        Iterator itrReq = reqInputFormatExts.iterator(); 
+        Iterator<String> itrReq = reqInputFormatExts.iterator(); 
         // Iterate either over input formats ArrayList or over output formats
         // HasMap
-        Iterator itrGimp = (isOutput)?outputFormats.iterator():inputFormats.iterator();
+        Iterator<String> itrGimp = (isOutput)?outputFormats.iterator():inputFormats.iterator();
         // Iterate over possible extensions that correspond to the request
         // planets uri.
         while(itrReq.hasNext()) {
@@ -566,10 +568,10 @@ public final class Gimp26Migration implements Migrate, Serializable {
     private MigrationPath[] createMigrationPathwayMatrix(List<String> inputFormats, List<String> outputFormats) {
         List<MigrationPath> paths = new ArrayList<MigrationPath>();
 
-        for (Iterator iterator = inputFormats.iterator(); iterator.hasNext();) {
+        for (Iterator<String> iterator = inputFormats.iterator(); iterator.hasNext();) {
             String input = (String) iterator.next();
 
-            for (Iterator iterator2 = outputFormats.iterator(); iterator2.hasNext();) {
+            for (Iterator<String> iterator2 = outputFormats.iterator(); iterator2.hasNext();) {
                 String output = (String) iterator2.next();
                 URI inFmt = Format.extensionToURI(input);
                 URI outFmt = Format.extensionToURI(output);

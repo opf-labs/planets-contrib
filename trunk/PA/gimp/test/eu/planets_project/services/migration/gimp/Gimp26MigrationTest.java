@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -43,9 +42,8 @@ public final class Gimp26MigrationTest {
     // Input and output formats are based on the same set
     List<String> formats = null;
     
-    /*
-     * (non-Javadoc)
-     * 
+    /** 
+     * @throws Exception 
      * @see junit.framework.TestCase#setUp()
      */
     @Before
@@ -61,9 +59,9 @@ public final class Gimp26MigrationTest {
         dom = ServiceCreator.createTestService(Migrate.QNAME, Gimp26Migration.class, wsdlLoc);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      * 
+     * @throws Exception 
      * @see junit.framework.TestCase#tearDown()
      */
     @After
@@ -84,6 +82,10 @@ public final class Gimp26MigrationTest {
     }
     
     
+    /**
+     * test for all migrations
+     * @throws IOException
+     */
     @Test
     public void testMigrateAll() throws IOException {
         
@@ -96,9 +98,9 @@ public final class Gimp26MigrationTest {
         // demonstration3.bmp, demonstration3.gif, demonstration3.eps ...
         for(int i = 1; i < 4; i++)
         {
-            for (Iterator itr1 = formats.iterator(); itr1.hasNext();) {
+            for (Iterator<String> itr1 = formats.iterator(); itr1.hasNext();) {
                 origExt = (String) itr1.next();
-                for (Iterator itr2 = formats.iterator(); itr2.hasNext();)
+                for (Iterator<String> itr2 = formats.iterator(); itr2.hasNext();)
                 {
                     destExt = (String) itr2.next();
                     // do the migration only if original file extension differs
