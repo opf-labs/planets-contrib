@@ -1,6 +1,5 @@
 package eu.planets_project.services.migration.soxservices;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -11,24 +10,28 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
-import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
 
 import org.junit.Test;
 
-import eu.planets_project.services.PlanetsException;
-import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.migrate.BasicMigrateOneBinary;
 import eu.planets_project.services.utils.test.ServiceCreator;
 
+/**
+ *
+ */
 public class BasicMigrateOneAudioBinaryTests {
 
-    public void test(BasicMigrateOneBinary converter, String srcFormat,
+    /**
+     * @param converter
+     * @param srcFormat
+     * @param destformat
+     */
+//    @SuppressWarnings({ "static-access" })
+	public void test(BasicMigrateOneBinary converter, String srcFormat,
             String destformat) {
 
         try {
@@ -39,7 +42,6 @@ public class BasicMigrateOneAudioBinaryTests {
             String fileName = "PA/sox/test/resources/input" + srcFormat;
 
             DataSource ds = new FileDataSource(fileName);
-            DataHandler dataHandler = new DataHandler(ds);
 
             File srcFile = new File(fileName);
 
@@ -56,7 +58,7 @@ public class BasicMigrateOneAudioBinaryTests {
                     + imageData.length);
             System.out.println("Sending audio data...");
             System.out.println(imageData.length + " Byte");
-            System.out.println(converter.QNAME + " Class: "
+            System.out.println(BasicMigrateOneBinary.QNAME + " Class: "
                     + converter.getClass().getName());
 
             byte[] resdh_orig = converter.basicMigrateOneBinary(imageData);
@@ -144,42 +146,64 @@ public class BasicMigrateOneAudioBinaryTests {
         }
     }
 
+    /**
+     * local test for mp3 to wav
+     */
     @Test
     public void localTestsMp3ToWav() {
         System.out.println("**********************************************");
         test(new MP3ToWavSox(), ".mp3", ".wav");
     }
 
+    /**
+     * local test for mp3 to ogg
+     */
     @Test
     public void localTestsMp3ToOgg() {
         System.out.println("**********************************************");
         test(new MP3ToOggSox(), ".mp3", ".ogg");
     }
 
+
+    /**
+    * local test for mp3 to flac
+     */
     @Test
     public void localTestsMp3ToFlac() {
         System.out.println("**********************************************");
         test(new MP3ToFlacSox(), ".mp3", ".flac");
     }
 
+    /**
+    * local test for wav to aiff
+     */
     @Test
     public void localTestsWavToAiff() {
         System.out.println("**********************************************");
         test(new WavToAiffSox(), ".wav", ".aiff");
     }
 
+    /**
+    * local test for wav to FLAC
+     */
     @Test
     public void localTestsWavToFlac() {
         System.out.println("**********************************************");
         test(new WavToFlacSox(), ".wav", ".flac");
     }
 
+    /**
+     * local test wav to ogg
+     */
     @Test
     public void localTestsWavToOgg() {
         System.out.println("**********************************************");
         test(new WavToOggSox(), ".wav", ".ogg");
     }
 
+    /**
+     * client test of mp3 to ogg
+     */
     @Test
     public void clientTestMp3ToOgg() {
         System.out.println("**********************************************");
@@ -189,6 +213,9 @@ public class BasicMigrateOneAudioBinaryTests {
         test(migrate, ".mp3", ".ogg");
     }
 
+    /**
+     * client test of mp3 to wav
+     */
     @Test
     public void clientTestMp3ToWav() {
         System.out.println("**********************************************");
@@ -198,6 +225,9 @@ public class BasicMigrateOneAudioBinaryTests {
         test(migrate, ".mp3", ".wav");
     }
 
+    /**
+     * client test mp3 to FLAC
+     */
     @Test
     public void clientTestMp3ToFlac() {
         System.out.println("**********************************************");
@@ -207,6 +237,9 @@ public class BasicMigrateOneAudioBinaryTests {
         test(migrate, ".mp3", ".flac");
     }
 
+    /**
+     * client test wav to ogg
+     */
     @Test
     public void clientTestWavToOgg() {
         System.out.println("**********************************************");
@@ -216,6 +249,9 @@ public class BasicMigrateOneAudioBinaryTests {
         test(migrate, ".wav", ".ogg");
     }
 
+    /**
+     * client test wav to FLAC
+     */
     @Test
     public void clientTestWavToFlac() {
         System.out.println("**********************************************");
@@ -225,6 +261,9 @@ public class BasicMigrateOneAudioBinaryTests {
         test(migrate, ".wav", ".flac");
     }
 
+    /**
+     * client test of wav to aiff
+     */
     @Test
     public void clientTestWavToAiff() {
         System.out.println("**********************************************");
