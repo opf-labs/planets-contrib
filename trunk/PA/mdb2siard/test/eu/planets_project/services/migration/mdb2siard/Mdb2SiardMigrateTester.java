@@ -26,6 +26,7 @@ import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.migration.mdb2siard.Mdb2SiardMigrate;
 import eu.planets_project.services.utils.test.ServiceCreator;
 
 /**
@@ -52,9 +53,13 @@ public class Mdb2SiardMigrateTester
 	@Before
 	public void setUp() throws Exception
 	{
+		/* this is configured by the system properties
+		 * pserv.test.context default: local (standalone or server)
+		 * pserv.test.host host name for non-local context default:localhost
+		 * pserv.test.port port number for non-local context default:8080
+		 */
     dom = ServiceCreator.createTestService(Migrate.QNAME, 
-    		  Mdb2SiardMigrate.class, sWSDL_LOC, 
-    		  ServiceCreator.Mode.SERVER );
+    		  Mdb2SiardMigrate.class, sWSDL_LOC);
 	} /* setUp */
 
 	/*--------------------------------------------------------------------*/
@@ -162,7 +167,16 @@ public class Mdb2SiardMigrateTester
       MigrateResult mr = dom.migrate(doInput, null, null, null);
       DigitalObject doOutput = mr.getDigitalObject();
       assertTrue("Resulting digital object is null.", doOutput != null);
-      Mdb2SiardMigrate.writeByteArrayToTmpFile(doOutput.getContent().getValue(), fileOutput);
+      if (mr.getReport().getErrorState() != ServiceReport.ERROR)
+      {
+        Mdb2SiardMigrate.writeByteArrayToTmpFile(doOutput.getContent().getValue(), fileOutput);
+        if (mr.getReport().warn != null)
+        	System.out.println("Warning: "+mr.getReport().warn);
+        if (mr.getReport().info != null)
+        	System.out.println("Information: "+mr.getReport().info);
+      }
+      else
+      	System.out.println("Error: "+mr.getReport().error);
   		assertTrue((mr.getReport().getErrorState() == ServiceReport.ERROR) || fileOutput.exists());
     }
     catch (Exception e) 
