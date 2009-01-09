@@ -54,9 +54,7 @@ import java.util.Properties;
 public final class Mdb2SiardMigrate implements Migrate, Serializable
 {
 	/** constants */
-	/** The MDB file extension */
-	public static final String sMDB_EXTENSION = ".mdb";
-	/** The siard file extension */
+	public static final String sMDB_EXTENSION = ".mdb";  
 	public static final String sSIARD_EXTENSION = ".siard";  
 	private static final String sPROPERTIES_RESOURCE = "/eu/planets_project/services/migration/mdb2siard/mdb2siard.properties";
 	private static final String sKEY_CONVMDB_DIR ="convmdb.dir"; 
@@ -71,8 +69,8 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	PlanetsLogger log = PlanetsLogger.getLogger(Mdb2SiardMigrate.class);
 	
 	/*--------------------------------------------------------------------*/
-	/**
-	 * @see eu.planets_project.services.PlanetsService#describe()
+	/* (non-Javadoc)
+	 * @see eu.planets_project.ifr.core.common.services.migrate.MigrateOneDigitalObject#describe()
 	 */
 	public ServiceDescription describe()
 	{
@@ -143,20 +141,20 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	/* (non-Javadoc)
 	 * write the bytes to the given file.
 	 */
-	static void writeByteArrayToTmpFile(byte[] buffer, File file)
+	static void writeByteArrayToFile(byte[] buffer, File file)
     throws IOException
 	{
     BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
     bos.write(buffer);
     bos.flush();
     bos.close();
-	} /* writeByteArrayToTmpFile */
+	} /* writeByteArrayToFile */
 
 	/*--------------------------------------------------------------------*/
 	/* (non-Javadoc)
-	 * reads a temporary file into a byte array.
+	 * reads a file into a byte array.
 	 */
-	static byte[] readByteArrayFromTmpFile(File file)
+	static byte[] readByteArrayFromFile(File file)
 	  throws IOException, IllegalArgumentException
 	{
 		byte[] buffer = new byte[0]; // avoid returning null
@@ -235,7 +233,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameters)
+	 * @see eu.planets_project.ifr.core.common.services.migrate.MigrateOneDigitalObject#migrate(eu.planets_project.ifr.core.common.services.datatypes.DigitalObject)
 	 */
 	public MigrateResult migrate(
 			final DigitalObject doInput,
@@ -254,7 +252,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	    fileInput = File.createTempFile("planets", sMDB_EXTENSION);
 	    /* make sure, it is at least deleted, when the Web Service is stopped */
 	    fileInput.deleteOnExit();
-			writeByteArrayToTmpFile(doInput.getContent().getValue(),fileInput);
+			writeByteArrayToFile(doInput.getContent().getValue(),fileInput);
 			/* output file has same unique file name with different extension */
 			String sInputFile = fileInput.getAbsolutePath();
 			String sOutputFile = sInputFile.substring(0,sInputFile.lastIndexOf("."))+sSIARD_EXTENSION;
@@ -267,7 +265,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 			sr = migrate(fileInput, fileOutput, sr);
 	    /* read do from temporary file */
 			if (sr.error_state == ServiceReport.SUCCESS)
-			  doOutput = new DigitalObject.Builder(Content.byValue(readByteArrayFromTmpFile(fileOutput))).build();
+			  doOutput = new DigitalObject.Builder(Content.byValue(readByteArrayFromFile(fileOutput))).build();
 		}
 		catch(Exception e)
 		{

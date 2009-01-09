@@ -29,10 +29,6 @@ import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.migration.mdb2siard.Mdb2SiardMigrate;
 import eu.planets_project.services.utils.test.ServiceCreator;
 
-/**
- * test class for the MDB to SIARD migration service
- *
- */
 public class Mdb2SiardMigrateTester
 {
 	// private static String sINPUT_FILE = "PA/mdb2siard/test/testfiles/testin.mdb";
@@ -46,10 +42,6 @@ public class Mdb2SiardMigrateTester
   Migrate dom = null;
 
 	/*--------------------------------------------------------------------*/
-	/**
-	 * Set up the tests by creating the service
-	 * @throws Exception
-	 */
 	@Before
 	public void setUp() throws Exception
 	{
@@ -63,19 +55,12 @@ public class Mdb2SiardMigrateTester
 	} /* setUp */
 
 	/*--------------------------------------------------------------------*/
-	/**
-	 * tear down post test
-	 * @throws Exception
-	 */
 	@After
 	public void tearDown() throws Exception
 	{
 	} /* tearDown */
 
 	/*--------------------------------------------------------------------*/
-	/**
-	 * test the describe() method 
-	 */
 	@Test
 	public void testDescribe()
 	{
@@ -85,9 +70,6 @@ public class Mdb2SiardMigrateTester
 	} /* testDescribe */
 
 	/*--------------------------------------------------------------------*/
-	/**
-	 * Test writing a byte array to a temp file 
-	 */
 	@Test
 	public void testWriteByteArrayToTmpFile()
 	{
@@ -97,7 +79,7 @@ public class Mdb2SiardMigrateTester
     try
     {
       byte[] buffer = new byte[] { 0, 1, 2, 3};
-      Mdb2SiardMigrate.writeByteArrayToTmpFile(buffer,fileOutput);
+      Mdb2SiardMigrate.writeByteArrayToFile(buffer,fileOutput);
   		assertTrue(fileOutput.exists());
   		assertTrue(fileOutput.length() == buffer.length);
     }
@@ -108,16 +90,13 @@ public class Mdb2SiardMigrateTester
 	} /* testWriteByteArrayToTmpFile */
 
 	/*--------------------------------------------------------------------*/
-	/**
-	 * Test reading a byte array from a temp file 
-	 */
 	@Test
 	public void testReadByteArrayFromTmpFile()
 	{
     File fileInput = new File(sINPUT_FILE);
     try
     {
-      byte[] buffer = Mdb2SiardMigrate.readByteArrayFromTmpFile(fileInput);
+      byte[] buffer = Mdb2SiardMigrate.readByteArrayFromFile(fileInput);
   		assertTrue(buffer.length == fileInput.length());
   		assertTrue(buffer[0] == 0);
   		assertTrue(buffer[1] == 1);
@@ -131,9 +110,6 @@ public class Mdb2SiardMigrateTester
 	} /* testReadByteArrayFromTmpFile */
 
 	/*--------------------------------------------------------------------*/
-	/**
-	 * test the creation of the service report 
-	 */
 	@Test
 	public void testMigrateFileFileServiceReport()
 	{
@@ -147,29 +123,29 @@ public class Mdb2SiardMigrateTester
 	} /* testMigrateFileFileServiceReport */
 
 	/*--------------------------------------------------------------------*/
-    /**
-	 * To test usability of the digital object instance in web
-	 * services, we simply pass one into the service and expect one
-	 * back:
-	 */
 	@Test
 	public void testMigrateDigitalObjectURIURIParameters()
 	{
     try
     {
+      /*
+			 * To test usability of the digital object instance in web
+			 * services, we simply pass one into the service and expect one
+			 * back:
+			 */
       File fileOutput = new File(sOUTPUT_FILE);
       if (fileOutput.exists())
         fileOutput.delete();
       File fileInput = new File(sINPUT_FILE);
       DigitalObject doInput = new DigitalObject.Builder(
       		Content.byValue(
-      				Mdb2SiardMigrate.readByteArrayFromTmpFile(fileInput))).build();
+      				Mdb2SiardMigrate.readByteArrayFromFile(fileInput))).build();
       MigrateResult mr = dom.migrate(doInput, null, null, null);
       DigitalObject doOutput = mr.getDigitalObject();
       assertTrue("Resulting digital object is null.", doOutput != null);
       if (mr.getReport().getErrorState() != ServiceReport.ERROR)
       {
-        Mdb2SiardMigrate.writeByteArrayToTmpFile(doOutput.getContent().getValue(), fileOutput);
+        Mdb2SiardMigrate.writeByteArrayToFile(doOutput.getContent().getValue(), fileOutput);
         if (mr.getReport().warn != null)
         	System.out.println("Warning: "+mr.getReport().warn);
         if (mr.getReport().info != null)
