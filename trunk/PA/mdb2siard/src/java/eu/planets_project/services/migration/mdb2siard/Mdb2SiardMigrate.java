@@ -14,6 +14,7 @@ Sponsor    : Swiss Federal Archives, Berne, Switzerland
 
 package eu.planets_project.services.migration.mdb2siard;
 
+import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.List;
@@ -54,6 +55,8 @@ import java.util.Properties;
 public final class Mdb2SiardMigrate implements Migrate, Serializable
 {
 	/** constants */
+	private static int iBUFFER_SIZE = 8192;
+	private static int iEOS = -1;
 	public static final String sMDB_EXTENSION = ".mdb";  
 	public static final String sSIARD_EXTENSION = ".siard";  
 	private static final String sPROPERTIES_RESOURCE = "/eu/planets_project/services/migration/mdb2siard/mdb2siard.properties";
@@ -129,16 +132,6 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	
 	/*--------------------------------------------------------------------*/
 	/* (non-Javadoc)
-	 * log error string and set it in ServiceReport 
-	 */
-	private void setError(ServiceReport sr, String sError)
-	{
-		log.error(sError);
-		appendError(sr,sError);
-	} /* setError */
-	
-	/*--------------------------------------------------------------------*/
-	/* (non-Javadoc)
 	 * write the bytes to the given file.
 	 */
 	static void writeByteArrayToFile(byte[] buffer, File file)
@@ -149,6 +142,22 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
     bos.flush();
     bos.close();
 	} /* writeByteArrayToFile */
+
+	/*--------------------------------------------------------------------*/
+	/* (non-Javadoc)
+	 * write the bytes to the given file.
+	 */
+	static void writeByteContentToFile(Content content, File file)
+    throws IOException
+	{
+    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+    InputStream is = content.read();
+    byte[] buffer = new byte[iBUFFER_SIZE];
+    for (int iRead = is.read(buffer); iRead != iEOS; iRead = is.read(buffer))
+    	bos.write(buffer, 0, iRead);
+    bos.flush();
+    bos.close();
+	} /* writeByteContentToFile */
 
 	/*--------------------------------------------------------------------*/
 	/* (non-Javadoc)
@@ -225,6 +234,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
     catch(Exception e)
     {
     	appendError(sr,e.getClass().getName()+": "+e.getMessage());
+    	e.printStackTrace();
     }
 		return sr;
 	} /* migrate */
@@ -252,7 +262,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	    fileInput = File.createTempFile("planets", sMDB_EXTENSION);
 	    /* make sure, it is at least deleted, when the Web Service is stopped */
 	    fileInput.deleteOnExit();
-			writeByteArrayToFile(doInput.getContent().getValue(),fileInput);
+			writeByteContentToFile(doInput.getContent(),fileInput);
 			/* output file has same unique file name with different extension */
 			String sInputFile = fileInput.getAbsolutePath();
 			String sOutputFile = sInputFile.substring(0,sInputFile.lastIndexOf("."))+sSIARD_EXTENSION;
@@ -269,7 +279,8 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 		}
 		catch(Exception e)
 		{
-			setError(sr,e.getClass().getName()+": "+e.getMessage());
+			appendError(sr,e.getClass().getName()+": "+e.getMessage());
+			e.printStackTrace();
 		}
 		finally
 		{
