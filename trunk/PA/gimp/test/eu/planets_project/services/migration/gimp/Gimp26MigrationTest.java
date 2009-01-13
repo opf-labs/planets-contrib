@@ -77,7 +77,7 @@ public final class Gimp26MigrationTest {
         System.out.println("Test description");
         ServiceDescription desc = dom.describe();
         System.out.println("Received service description: ");
-        System.out.println(desc.toXml());
+        System.out.println(desc.toXmlFormatted());
         assertTrue("The ServiceDescription should not be NULL.", desc != null);
     }
     
