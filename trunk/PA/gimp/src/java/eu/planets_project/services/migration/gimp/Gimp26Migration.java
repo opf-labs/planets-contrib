@@ -31,6 +31,11 @@ import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.ByteArrayHelper;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.lang.Exception;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
@@ -452,6 +457,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
         ServiceDescription mds = new ServiceDescription.Builder(NAME, Migrate.class.getName())
                 .author("Sven Schlarb <shsschlarb-planets@yahoo.de>, Georg Petz <georg.petz@onb.ac.at>")
                 .classname(this.getClass().getCanonicalName())
+//                .description(description)
                 .description("This service provides file format migrations using \"The GIMP\" (GNU image manipulation program) version 2.6. " +
                 "Currently, this service only supports migration from one file format to another, not single file format migrations. "+
                 "For example, planets:fmt/ext/tiff to planets:fmt/ext/tiff could migrate a TIFF image without compression to a TIFF image using the LZW compression type. "+

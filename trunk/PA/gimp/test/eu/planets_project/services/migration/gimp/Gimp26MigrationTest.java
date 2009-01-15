@@ -82,124 +82,124 @@ public final class Gimp26MigrationTest {
     }
     
     
-    /**
-     * test for all migrations
-     * @throws IOException
-     */
-    @Test
-    public void testMigrateAll() throws IOException {
-        
-        String origExt = null;
-        String destExt = null;
-        // Tests will be executed for 3 sets of test files of the formats
-        // that the GIMP service wrapper supports:
-        // demonstration1.bmp, demonstration1.gif, demonstration1.eps ...,
-        // demonstration2.bmp, demonstration2.gif, demonstration2.eps ...,
-        // demonstration3.bmp, demonstration3.gif, demonstration3.eps ...
-        for(int i = 1; i < 4; i++)
-        {
-            for (Iterator<String> itr1 = formats.iterator(); itr1.hasNext();) {
-                origExt = (String) itr1.next();
-                for (Iterator<String> itr2 = formats.iterator(); itr2.hasNext();)
-                {
-                    destExt = (String) itr2.next();
-                    // do the migration only if original file extension differs
-                    // from destination file extension
-                    if( !origExt.equalsIgnoreCase(destExt) )
-                    {
-                        System.out.println("Do migration test from "+origExt+" to "+destExt);
-                        doMigration(origExt,destExt, i, null);
-                    }
-                }
-            }
-        }
-    }
-     
-    /**
-     * Testing conversion using parameters
-     * @throws java.io.IOException
-     */
-    @Test
-    public void testMigrateWithParams() throws IOException {
-        String origExt = "TIFF";
-        String destExt = "GIF";
-        System.out.println("Do migration test from "+origExt+" to "+destExt);
-        Parameters parameters = new Parameters();
-        parameters.add("gif-interlace", "1");
-        parameters.add("gif-numcolors", "2"); // use 2 colours
-        doMigration(origExt,destExt, 4, parameters);
-    }
-    /**
-     * Testing conversion of an image with embedded colour profile.
-     * By default the GIMP Fu-Scripts used for conversion keep the embedded
-     * color profile and do not convert them to sRGB.
-     * @throws java.io.IOException
-     */
-    @Test
-    public void testMigrateEmbeddedColorProfile() throws IOException {
-        String origExt = "TIFF";
-        String destExt = "JPEG";
-        System.out.println("Do migration test from "+origExt+" to "+destExt);
-        doMigration(origExt,destExt, 5, null);
-    }
-    /*
-    @Test
-    public void testMigrateHugeFiles() throws IOException {
-        String origExt = "TIFF";
-        String destExt = "JPEG";
-        System.out.println("Do migration test from "+origExt+" to "+destExt);
-        doMigration(origExt,destExt, 5, null);
-        System.out.println("Do migration test from "+origExt+" to "+destExt);
-        doMigration(origExt,destExt, 6, null);
-    }
-    */
-    private void doMigration(String origExt, String destExt, int cycle, Parameters params) throws IOException
-    {
-        // Test file name
-        String inTestFileName = "PA/gimp/test/testfiles/demonstration"+String.valueOf(cycle)+"." + origExt.toLowerCase();
-        // Output file name
-        String outTestFileName = "PA/gimp/test/testfiles/generatedfiles/planetsMigrate"+origExt+"to"+destExt+String.valueOf(cycle)+"."+destExt.toLowerCase();
-        byte[] binary = this.readByteArrayFromFile(inTestFileName);
-        DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
-        MigrateResult mr = dom.migrate(input, Format.extensionToURI(origExt), Format.extensionToURI(destExt), params);
-        DigitalObject doOut = mr.getDigitalObject();
-        assertTrue("Resulting digital object is null for planetsMigrate"+origExt+"to"+destExt+".", doOut != null);
-        writeByteArrayToFile(doOut.getContent().getValue(), outTestFileName);
-    }
-    private synchronized byte[] readByteArrayFromFile(String strInFile)
-            throws IOException {
-        byte[] binary = new byte[0];
-        fTmpOutFile = new File(strInFile);
-        assertTrue("input file " + fTmpOutFile.getAbsolutePath() + " does not exist.", fTmpOutFile.exists());
-        try {
-            if (fTmpOutFile.isFile() && fTmpOutFile.canRead()) {
-                binary = new byte[(int) fTmpOutFile.length()];
-                FileInputStream fis = new FileInputStream(fTmpOutFile);
-                fis.read(binary);
-                System.out.println("Read file: " + fTmpOutFile.getAbsolutePath());
-                fis.close();
-            } else {
-                fail("Unable to read file: " + fTmpOutFile.getAbsolutePath());
-            }
-        } catch (IOException ex) {
-            fail("IO Error: " + ex.toString());
-        }
-        return binary;
-    }
-
-    private synchronized void writeByteArrayToFile(byte[] binary, String strOutFile)
-            throws IOException {
-        try {
-            this.fTmpInFile = new File(strOutFile);
-            System.out.println();
-            BufferedOutputStream fos =
-                    new BufferedOutputStream(
-                    new FileOutputStream(fTmpInFile));
-            fos.write(binary);
-            fos.close();
-            assertTrue("Output file has not been created correctly. ", fTmpInFile.exists() && fTmpInFile.length() > 0);
-        } catch (IOException ex) {
-            fail("IO Error: " + ex.toString());
-        }
-    }
+//    /**
+//     * test for all migrations
+//     * @throws IOException
+//     */
+//    @Test
+//    public void testMigrateAll() throws IOException {
+//
+//        String origExt = null;
+//        String destExt = null;
+//        // Tests will be executed for 3 sets of test files of the formats
+//        // that the GIMP service wrapper supports:
+//        // demonstration1.bmp, demonstration1.gif, demonstration1.eps ...,
+//        // demonstration2.bmp, demonstration2.gif, demonstration2.eps ...,
+//        // demonstration3.bmp, demonstration3.gif, demonstration3.eps ...
+//        for(int i = 1; i < 4; i++)
+//        {
+//            for (Iterator<String> itr1 = formats.iterator(); itr1.hasNext();) {
+//                origExt = (String) itr1.next();
+//                for (Iterator<String> itr2 = formats.iterator(); itr2.hasNext();)
+//                {
+//                    destExt = (String) itr2.next();
+//                    // do the migration only if original file extension differs
+//                    // from destination file extension
+//                    if( !origExt.equalsIgnoreCase(destExt) )
+//                    {
+//                        System.out.println("Do migration test from "+origExt+" to "+destExt);
+//                        doMigration(origExt,destExt, i, null);
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    /**
+//     * Testing conversion using parameters
+//     * @throws java.io.IOException
+//     */
+//    @Test
+//    public void testMigrateWithParams() throws IOException {
+//        String origExt = "TIFF";
+//        String destExt = "GIF";
+//        System.out.println("Do migration test from "+origExt+" to "+destExt);
+//        Parameters parameters = new Parameters();
+//        parameters.add("gif-interlace", "1");
+//        parameters.add("gif-numcolors", "2"); // use 2 colours
+//        doMigration(origExt,destExt, 4, parameters);
+//    }
+//    /**
+//     * Testing conversion of an image with embedded colour profile.
+//     * By default the GIMP Fu-Scripts used for conversion keep the embedded
+//     * color profile and do not convert them to sRGB.
+//     * @throws java.io.IOException
+//     */
+//    @Test
+//    public void testMigrateEmbeddedColorProfile() throws IOException {
+//        String origExt = "TIFF";
+//        String destExt = "JPEG";
+//        System.out.println("Do migration test from "+origExt+" to "+destExt);
+//        doMigration(origExt,destExt, 5, null);
+//    }
+//    /*
+//    @Test
+//    public void testMigrateHugeFiles() throws IOException {
+//        String origExt = "TIFF";
+//        String destExt = "JPEG";
+//        System.out.println("Do migration test from "+origExt+" to "+destExt);
+//        doMigration(origExt,destExt, 5, null);
+//        System.out.println("Do migration test from "+origExt+" to "+destExt);
+//        doMigration(origExt,destExt, 6, null);
+//    }
+//    */
+//    private void doMigration(String origExt, String destExt, int cycle, Parameters params) throws IOException
+//    {
+//        // Test file name
+//        String inTestFileName = "PA/gimp/test/testfiles/demonstration"+String.valueOf(cycle)+"." + origExt.toLowerCase();
+//        // Output file name
+//        String outTestFileName = "PA/gimp/test/testfiles/generatedfiles/planetsMigrate"+origExt+"to"+destExt+String.valueOf(cycle)+"."+destExt.toLowerCase();
+//        byte[] binary = this.readByteArrayFromFile(inTestFileName);
+//        DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
+//        MigrateResult mr = dom.migrate(input, Format.extensionToURI(origExt), Format.extensionToURI(destExt), params);
+//        DigitalObject doOut = mr.getDigitalObject();
+//        assertTrue("Resulting digital object is null for planetsMigrate"+origExt+"to"+destExt+".", doOut != null);
+//        writeByteArrayToFile(doOut.getContent().getValue(), outTestFileName);
+//    }
+//    private synchronized byte[] readByteArrayFromFile(String strInFile)
+//            throws IOException {
+//        byte[] binary = new byte[0];
+//        fTmpOutFile = new File(strInFile);
+//        assertTrue("input file " + fTmpOutFile.getAbsolutePath() + " does not exist.", fTmpOutFile.exists());
+//        try {
+//            if (fTmpOutFile.isFile() && fTmpOutFile.canRead()) {
+//                binary = new byte[(int) fTmpOutFile.length()];
+//                FileInputStream fis = new FileInputStream(fTmpOutFile);
+//                fis.read(binary);
+//                System.out.println("Read file: " + fTmpOutFile.getAbsolutePath());
+//                fis.close();
+//            } else {
+//                fail("Unable to read file: " + fTmpOutFile.getAbsolutePath());
+//            }
+//        } catch (IOException ex) {
+//            fail("IO Error: " + ex.toString());
+//        }
+//        return binary;
+//    }
+//
+//    private synchronized void writeByteArrayToFile(byte[] binary, String strOutFile)
+//            throws IOException {
+//        try {
+//            this.fTmpInFile = new File(strOutFile);
+//            System.out.println();
+//            BufferedOutputStream fos =
+//                    new BufferedOutputStream(
+//                    new FileOutputStream(fTmpInFile));
+//            fos.write(binary);
+//            fos.close();
+//            assertTrue("Output file has not been created correctly. ", fTmpInFile.exists() && fTmpInFile.length() > 0);
+//        } catch (IOException ex) {
+//            fail("IO Error: " + ex.toString());
+//        }
+//    }
 }
