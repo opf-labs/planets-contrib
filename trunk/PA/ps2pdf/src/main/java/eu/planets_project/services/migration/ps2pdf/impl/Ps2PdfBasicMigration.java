@@ -1,4 +1,4 @@
-package eu.planets_project.ifr.core.services.migration.ps2pdf.impl;
+package eu.planets_project.services.migration.ps2pdf.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -34,7 +34,7 @@ import eu.planets_project.services.utils.ProcessRunner;
         style = SOAPBinding.Style.RPC)
 @Stateless
 @Remote(BasicMigrateOneBinary.class)
-@RemoteBinding(jndiBinding="planets-project.eu/Ps2PdfBasicMigrationServiceRemote")
+@RemoteBinding(jndiBinding="planets_project.eu/Ps2PdfBasicMigrationServiceRemote")
 @BindingType(value="http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")
 public class Ps2PdfBasicMigration implements BasicMigrateOneBinary, Serializable
 {
