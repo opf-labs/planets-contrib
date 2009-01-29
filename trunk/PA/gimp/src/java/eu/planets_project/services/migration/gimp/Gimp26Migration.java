@@ -49,7 +49,7 @@ import java.util.Set;
 @Local(Migrate.class)
 @Remote(Migrate.class)
 @Stateless
-@WebService(/* name = Gimp26Migration.NAME ,*/serviceName = Migrate.NAME,
+@WebService(name = Gimp26Migration.NAME ,serviceName = Migrate.NAME,
 targetNamespace = PlanetsServices.NS,
 endpointInterface = "eu.planets_project.services.migrate.Migrate")
 public final class Gimp26Migration implements Migrate, Serializable {
