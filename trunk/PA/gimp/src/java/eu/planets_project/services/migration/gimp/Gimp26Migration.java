@@ -29,12 +29,9 @@ import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.ByteArrayHelper;
+import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.lang.Exception;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -371,14 +368,17 @@ public final class Gimp26Migration implements Migrate, Serializable {
         overrideDefaultParamets(parameters);
         
         // get binary data from digital object
-        byte[] binary = digitalObject.getContent().getValue();
+        byte[] binary = null;
+        InputStream inputStream = digitalObject.getContent().read();
        
         // write binary array to temporary file
-        tmpInFile = ByteArrayHelper.write(binary);
+        //tmpInFile = ByteArrayHelper.write(binary);
+        tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets", inputFmtExt);
+
         System.out.println("tmpInFile: " + tmpInFile.getAbsolutePath());
 
         // Create inputstream from binary array
-        InputStream inputStream = new ByteArrayInputStream(binary);
+        //InputStream inputStream = new ByteArrayInputStream(binary);
 
         // set gimp fu-script command
         gimpFuScriptCmdStr = getFuScriptMigrationStr();

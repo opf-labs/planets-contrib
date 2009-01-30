@@ -20,6 +20,7 @@ import eu.planets_project.services.datatypes.Parameters;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -154,20 +155,24 @@ public final class Gimp26MigrationTest {
         doMigration(origExt,destExt, 6, null);
     }
     */
-    
     private void doMigration(String origExt, String destExt, int cycle, Parameters params) throws IOException
     {
         // Test file name
         String inTestFileName = "PA/gimp/test/testfiles/demonstration"+String.valueOf(cycle)+"." + origExt.toLowerCase();
         // Output file name
-        String outTestFileName = "PA/gimp/test/testfiles/generatedfiles/planetsMigrate"+origExt+"to"+destExt+String.valueOf(cycle)+"."+destExt.toLowerCase();
+        //String outTestFileName = "PA/jasper19/test/testfiles/generatedfiles/planetsMigrate"+origExt+"to"+destExt+String.valueOf(cycle)+"."+destExt.toLowerCase();
+        String resFileDir = "PA/gimp/test/testfiles/generatedfiles/";
+        String resFileName = "planetsMigrate"+origExt.toUpperCase()+"to"+destExt.toUpperCase()+String.valueOf(cycle)+"."+destExt.toLowerCase();
         byte[] binary = this.readByteArrayFromFile(inTestFileName);
         DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
         MigrateResult mr = dom.migrate(input, Format.extensionToURI(origExt), Format.extensionToURI(destExt), params);
         DigitalObject doOut = mr.getDigitalObject();
         assertTrue("Resulting digital object is null for planetsMigrate"+origExt+"to"+destExt+".", doOut != null);
-        writeByteArrayToFile(doOut.getContent().getValue(), outTestFileName);
+        FileUtils.writeInputStreamToFile(doOut.getContent().read(), new File( resFileDir), resFileName);
+        File resultFile = new File(resFileDir+resFileName);
+        assertTrue("Result file was not created successfully!", resultFile.exists());
     }
+    
     private synchronized byte[] readByteArrayFromFile(String strInFile)
             throws IOException {
         byte[] binary = new byte[0];
