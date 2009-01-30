@@ -139,7 +139,7 @@ public final class Jasper19Migration implements Migrate, Serializable {
          * We just return a new digital object with the same required arguments
          * as the given:
          */
-
+       
         // 29.01.09: replaced deprecated method getValue()
         //byte[] binary = digitalObject.getContent().getValue();
         byte[] binary = null;
