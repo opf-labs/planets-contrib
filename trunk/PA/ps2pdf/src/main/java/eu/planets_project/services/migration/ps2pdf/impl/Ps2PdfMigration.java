@@ -4,6 +4,8 @@
 package eu.planets_project.services.migration.ps2pdf.impl;
 
 import eu.planets_project.ifr.core.techreg.api.formats.Format;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
 
 import java.net.URI;
 
@@ -123,9 +125,9 @@ public final class Ps2PdfMigration implements Migrate, Serializable {
         builder.author("Asger Blekinge-Rasmussen <abr@statsbiblioteket.dk>");
         builder.classname(this.getClass().getCanonicalName());
         builder.description("Simple ps2pdf wrapper for Ps (postscript) to PDF conversions.");
-        MigrationPath[] mPaths = new MigrationPath []{new MigrationPath(Format.extensionToURI("pdf"), Format.extensionToURI("ps"),null)};
-        builder.paths(mPaths);
-        builder.classname(this.getClass().getCanonicalName());
+        FormatRegistry fm= FormatRegistryFactory.getFormatRegistry();
+        MigrationPath[] paths = MigrationPath.constructPaths(fm.getURIsForExtension("ps"),fm.getURIsForExtension("pdf"));
+        builder.paths(paths);
         builder.version("0.1");
 
         ServiceDescription mds =builder.build();
