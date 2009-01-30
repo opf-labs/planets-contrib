@@ -44,7 +44,7 @@ import java.util.List;
 @Local(Migrate.class)
 @Remote(Migrate.class)
 @Stateless
-@WebService(/* name = Pdf2PsMigration.NAME ,*/ 
+@WebService(name = Pdf2PsMigration.NAME ,
         serviceName = Migrate.NAME, 
         targetNamespace = PlanetsServices.NS,
         endpointInterface = "eu.planets_project.services.migrate.Migrate" )
