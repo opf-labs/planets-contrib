@@ -1,24 +1,23 @@
 package eu.planets_project.services.migration.pdf2ps;
 
-import eu.planets_project.services.datatypes.Parameters;
-import java.net.MalformedURLException;
+import eu.planets_project.ifr.core.techreg.api.formats.Format;
 
-import java.net.URI;
 import org.junit.Test;
 
-import eu.planets_project.services.migration.pdf2ps.Pdf2PsMigration;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.Parameters;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.utils.ByteArrayHelper;
+import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
@@ -27,31 +26,34 @@ import static org.junit.Assert.*;
 
 /**
  * Local and client tests of the digital object migration functionality.
- * 
+ *
  * @author Sven Schlarb <shsschlarb-planets@yahoo.de>
  */
 public final class Pdf2PsMigrationTest extends TestCase {
-    
+
     /* The location of this service when deployed. */
     String wsdlLoc = "/pserv-pa-pdf2ps/Pdf2PsMigration?wsdl";
 
     /* A holder for the object to be tested */
     Migrate dom = null;
-    private File fTmpInFile;
-    private File fTmpOutFile;
+
+    List<String> formats = null;
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see junit.framework.TestCase#setUp()
      */
     @Before
     public void setUp() throws Exception {
-        dom = ServiceCreator.createTestService(Migrate.QNAME, Pdf2PsMigration.class, wsdlLoc );
+        formats = new ArrayList<String>();
+        formats.add("pdf");
+        formats.add("ps");
+        dom = ServiceCreator.createTestService(Migrate.QNAME, Pdf2PsMigration.class, wsdlLoc);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see junit.framework.TestCase#tearDown()
      */
     @After
@@ -69,90 +71,47 @@ public final class Pdf2PsMigrationTest extends TestCase {
     }
 
     /**
-     * Test the pass-thru migration.
+     * test for all migrations
+     * @throws IOException
      */
     @Test
-    public void testMigrate() throws IOException {
-        try {
-            /*
-             * To test usability of the digital object instance in web services,
-             * we simply pass one into the service and expect one back:
-             */
-            byte[] binary = this.readByteArrayFromFile();
-            DigitalObject input = new DigitalObject.Builder( Content.byValue(binary))
-                    .build();
-
-            MigrateResult mr = dom.migrate(input, null, null, null);
-            DigitalObject doOut = mr.getDigitalObject();
-
-            assertTrue("Resulting digital object is null.", doOut != null);
-
-            
-            writeByteArrayToFile(getByteArrayFromInputStream(doOut.getContent().read()));
-            
-
-        } catch (MalformedURLException e) {
-            fail("Malformed URL exception: "+e.toString());
-        }
-
-    }
-    
-    synchronized byte[] readByteArrayFromFile() 
-            throws IOException {
-        byte[] binary = new byte[0];
-        
-        String strInFile = "PA/pdf2ps/test/testfiles/testin.pdf";
-        fTmpOutFile = new File(strInFile);
-        assertTrue("PDF input file "+fTmpOutFile.getAbsolutePath()+" does not exist.", fTmpOutFile.exists());
-        try {
-            if( fTmpOutFile.isFile() && fTmpOutFile.canRead())
+    public void testMigrateAll() throws IOException {
+        String origExt = null;
+        String destExt = null;
+        // Tests will be executed for 1 test file of the formats
+        // that the pdf2ps service wrapper supports:
+        // demonstration.dvi
+        for (Iterator<String> itr1 = formats.iterator(); itr1.hasNext();) {
+            origExt = (String) itr1.next();
+            for (Iterator<String> itr2 = formats.iterator(); itr2.hasNext();)
             {
-                binary = new byte[(int)fTmpOutFile.length()];
-                FileInputStream fis = new FileInputStream(fTmpOutFile);
-                fis.read(binary);
-                System.out.println("Read file: " + fTmpOutFile.getAbsolutePath());
-                fis.close();
+                destExt = (String) itr2.next();
+                // do the migration only if original file extension differs
+                // from destination file extension
+                if( origExt.equalsIgnoreCase("pdf") && !origExt.equalsIgnoreCase(destExt) )
+                {
+                    System.out.println("Do migration test from "+origExt+" to "+destExt);
+                    doMigration(origExt,destExt, null);
+                }
             }
-            else
-            {
-                fail("Unable to read file: "+fTmpOutFile.getAbsolutePath());
-            }
-        } catch(IOException ex) {
-            fail("IO Error: "+ex.toString());
-        }
-        return binary;
-    }
-    
-    synchronized void writeByteArrayToFile( byte[] binary )
-            throws IOException {
-        try {
-            String strOutFile = "PA/pdf2ps/test/testfiles/testout.ps";
-            //String strOutFile = "test/testfiles/testout.ps";
-            this.fTmpInFile = new File(strOutFile);
-            System.out.println();
-            BufferedOutputStream fos = 
-                            new BufferedOutputStream(
-                            new FileOutputStream(fTmpInFile));
-            fos.write(binary);
-            fos.close();
-            assertTrue("Output file has not been created correctly. ", fTmpInFile.exists() && fTmpInFile.length() > 0);
-        } catch(IOException ex) {
-            fail("IO Error: "+ex.toString());
         }
     }
 
-    private byte[] getByteArrayFromInputStream( InputStream is ) throws IOException
+    private void doMigration(String origExt, String destExt, Parameters params) throws IOException
     {
-        int bytesRead=0;
-        int bytesToRead=1024;
-        byte[] input = new byte[bytesToRead];
-        while (bytesRead < bytesToRead) {
-          int result = is.read(input, bytesRead, bytesToRead - bytesRead);
-          if (result == -1) break;
-          bytesRead += result;
-        }
-        return input;
+        // Test file name
+        String inTestFileName = "PA/pdf2ps/test/testfiles/demonstration." + origExt.toLowerCase();
+        // Output file name
+        //String outTestFileName = "PA/pdf2ps/test/testfiles/generatedfiles/planetsMigrate"+origExt+"to"+destExt+String.valueOf(cycle)+"."+destExt.toLowerCase();
+        String resFileDir = "PA/pdf2ps/test/testfiles/generatedfiles/";
+        String resFileName = "planetsMigrate"+origExt.toUpperCase()+"to"+destExt.toUpperCase()+"."+destExt.toLowerCase();
+        byte[] binary = ByteArrayHelper.read(new File(inTestFileName));
+        DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
+        MigrateResult mr = dom.migrate(input, Format.extensionToURI(origExt), Format.extensionToURI(destExt), params);
+        DigitalObject doOut = mr.getDigitalObject();
+        assertTrue("Resulting digital object is null for planetsMigrate"+origExt+"to"+destExt+".", doOut != null);
+        FileUtils.writeInputStreamToFile(doOut.getContent().read(), new File( resFileDir), resFileName);
+        File resultFile = new File(resFileDir+resFileName);
+        assertTrue("Result file was not created successfully!", resultFile.exists());
     }
-
 }
-
