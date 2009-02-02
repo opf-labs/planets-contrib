@@ -1,11 +1,9 @@
 package eu.planets_project.services.migration.jasper;
 
 import eu.planets_project.ifr.core.techreg.api.formats.Format;
-import java.net.MalformedURLException;
 
 import org.junit.Test;
 
-import eu.planets_project.services.migration.jasper.Jasper19Migration;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameters;
@@ -15,12 +13,10 @@ import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
 import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -33,7 +29,7 @@ import static org.junit.Assert.*;
 /**
  * Local and client tests of the digital object migration functionality.
  * 
- * @author Sven Schlarb <shsschlarb-planets@yahoo.de>, Georg Petz <georg.petz@onb.ac.at>
+ * @author Sven Schlarb <shsschlarb-planets@yahoo.de>
  */
 public final class Jasper19MigrationTest extends TestCase {
     
@@ -85,27 +81,25 @@ public final class Jasper19MigrationTest extends TestCase {
      */
     @Test
     public void testMigrateAll() throws IOException {
-
         String origExt = null;
         String destExt = null;
         // Tests will be executed for 1 set of test files of the formats
         // that the jasper19 service wrapper supports:
-        // demonstration1.jpg, demonstration1.jp2
-            for (Iterator<String> itr1 = formats.iterator(); itr1.hasNext();) {
-                origExt = (String) itr1.next();
-                for (Iterator<String> itr2 = formats.iterator(); itr2.hasNext();)
+        // demonstration.jpg, demonstration.jp2
+        for (Iterator<String> itr1 = formats.iterator(); itr1.hasNext();) {
+            origExt = (String) itr1.next();
+            for (Iterator<String> itr2 = formats.iterator(); itr2.hasNext();)
+            {
+                destExt = (String) itr2.next();
+                // do the migration only if original file extension differs
+                // from destination file extension
+                if( !origExt.equalsIgnoreCase(destExt) )
                 {
-                    destExt = (String) itr2.next();
-                    // do the migration only if original file extension differs
-                    // from destination file extension
-                    if( !origExt.equalsIgnoreCase(destExt) )
-                    {
-                        System.out.println("Do migration test from "+origExt+" to "+destExt);
-                        doMigration(origExt,destExt, null);
-                    }
+                    System.out.println("Do migration test from "+origExt+" to "+destExt);
+                    doMigration(origExt,destExt, null);
                 }
             }
-        
+        }
     }
 
     private void doMigration(String origExt, String destExt, Parameters params) throws IOException
@@ -166,7 +160,6 @@ public final class Jasper19MigrationTest extends TestCase {
     synchronized byte[] readByteArrayFromFile() 
             throws IOException {
         byte[] binary = new byte[0];
-        
         String strOutFile = "PA/jasper19/test/testfiles/testin.jpg";
         fTmpOutFile = new File(strOutFile);
         assertTrue("JPG input file "+fTmpOutFile.getAbsolutePath()+" does not exist.", fTmpOutFile.exists());
@@ -189,7 +182,7 @@ public final class Jasper19MigrationTest extends TestCase {
         return binary;
     }
 
-        private synchronized byte[] readByteArrayFromFile(String strInFile)
+    private synchronized byte[] readByteArrayFromFile(String strInFile)
             throws IOException {
         byte[] binary = new byte[0];
         fTmpOutFile = new File(strInFile);
