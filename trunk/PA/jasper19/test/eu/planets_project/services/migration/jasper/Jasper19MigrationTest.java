@@ -91,8 +91,6 @@ public final class Jasper19MigrationTest extends TestCase {
         // Tests will be executed for 1 set of test files of the formats
         // that the jasper19 service wrapper supports:
         // demonstration1.jpg, demonstration1.jp2
-        for(int i = 1; i < 2; i++)
-        {
             for (Iterator<String> itr1 = formats.iterator(); itr1.hasNext();) {
                 origExt = (String) itr1.next();
                 for (Iterator<String> itr2 = formats.iterator(); itr2.hasNext();)
@@ -103,21 +101,21 @@ public final class Jasper19MigrationTest extends TestCase {
                     if( !origExt.equalsIgnoreCase(destExt) )
                     {
                         System.out.println("Do migration test from "+origExt+" to "+destExt);
-                        doMigration(origExt,destExt, i, null);
+                        doMigration(origExt,destExt, null);
                     }
                 }
             }
-        }
+        
     }
 
-    private void doMigration(String origExt, String destExt, int cycle, Parameters params) throws IOException
+    private void doMigration(String origExt, String destExt, Parameters params) throws IOException
     {
         // Test file name
-        String inTestFileName = "PA/jasper19/test/testfiles/demonstration"+String.valueOf(cycle)+"." + origExt.toLowerCase();
+        String inTestFileName = "PA/jasper19/test/testfiles/demonstration." + origExt.toLowerCase();
         // Output file name
         //String outTestFileName = "PA/jasper19/test/testfiles/generatedfiles/planetsMigrate"+origExt+"to"+destExt+String.valueOf(cycle)+"."+destExt.toLowerCase();
         String resFileDir = "PA/jasper19/test/testfiles/generatedfiles/";
-        String resFileName = "planetsMigrate"+origExt.toUpperCase()+"to"+destExt.toUpperCase()+String.valueOf(cycle)+"."+destExt.toLowerCase();
+        String resFileName = "planetsMigrate"+origExt.toUpperCase()+"to"+destExt.toUpperCase()+"."+destExt.toLowerCase();
         byte[] binary = this.readByteArrayFromFile(inTestFileName);
         DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
         MigrateResult mr = dom.migrate(input, Format.extensionToURI(origExt), Format.extensionToURI(destExt), params);
@@ -131,39 +129,39 @@ public final class Jasper19MigrationTest extends TestCase {
     /**
      * Test the pass-thru migration.
      */
-    @Test
-    public void testMigrateJPEGtoJP2() throws IOException {
-        try {
-            /*
-             * To test usability of the digital object instance in web services,
-             * we simply pass one into the service and expect one back:
-             */
-            byte[] binary = this.readByteArrayFromFile();
-            DigitalObject input = new DigitalObject.Builder( Content.byValue(binary))
-                    .build();
-
-            MigrateResult mr = dom.migrate(input, Format.extensionToURI("jpg"), Format.extensionToURI("jp2"), null);
-            assertTrue("Migration result object is null.", mr != null);
-            DigitalObject doOut = mr.getDigitalObject();
-
-            assertTrue("Resulting digital object is null.", doOut != null);
-
-            //String strOutFile = "PA/jasper19/test/testfiles/testout.jp2";
-            //File file = new File(strOutFile);
-            InputStream is = doOut.getContent().read();
-            //writeByteArrayToFile(doOut.getContent().getValue());
-            String resFileDir = "PA/jasper19/test/testfiles/";
-            String resFileName = "testout.jp2";
-            FileUtils.writeInputStreamToFile(is, new File( resFileDir), resFileName);
-            File resFile = new File( resFileDir+resFileName);
-            assertTrue("Result file has not been created successfully.", resFile.exists());
-           
-
-        } catch (MalformedURLException e) {
-            fail("Malformed URL exception: "+e.toString());
-        }
-
-    }
+//    @Test
+//    public void testMigrateJPEGtoJP2() throws IOException {
+//        try {
+//            /*
+//             * To test usability of the digital object instance in web services,
+//             * we simply pass one into the service and expect one back:
+//             */
+//            byte[] binary = this.readByteArrayFromFile();
+//            DigitalObject input = new DigitalObject.Builder( Content.byValue(binary))
+//                    .build();
+//
+//            MigrateResult mr = dom.migrate(input, Format.extensionToURI("jpg"), Format.extensionToURI("jp2"), null);
+//            assertTrue("Migration result object is null.", mr != null);
+//            DigitalObject doOut = mr.getDigitalObject();
+//
+//            assertTrue("Resulting digital object is null.", doOut != null);
+//
+//            //String strOutFile = "PA/jasper19/test/testfiles/testout.jp2";
+//            //File file = new File(strOutFile);
+//            InputStream is = doOut.getContent().read();
+//            //writeByteArrayToFile(doOut.getContent().getValue());
+//            String resFileDir = "PA/jasper19/test/testfiles/";
+//            String resFileName = "testout.jp2";
+//            FileUtils.writeInputStreamToFile(is, new File( resFileDir), resFileName);
+//            File resFile = new File( resFileDir+resFileName);
+//            assertTrue("Result file has not been created successfully.", resFile.exists());
+//
+//
+//        } catch (MalformedURLException e) {
+//            fail("Malformed URL exception: "+e.toString());
+//        }
+//
+//    }
     
     synchronized byte[] readByteArrayFromFile() 
             throws IOException {

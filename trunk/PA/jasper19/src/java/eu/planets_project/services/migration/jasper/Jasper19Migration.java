@@ -31,6 +31,7 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,7 +67,7 @@ public final class Jasper19Migration implements Migrate, Serializable {
     /** The jasper19 application name */
     public String jasper19_app_name;
     /** The output file extension */
-    public String jasper19_outfile_ext;
+    //public String jasper19_outfile_ext;
     private File tmpInFile;
     private File tmpOutFile;
 
@@ -120,17 +121,17 @@ public final class Jasper19Migration implements Migrate, Serializable {
             // config vars
             this.jasper19_install_dir = props.getProperty("jasper19.install.dir");
             this.jasper19_app_name = props.getProperty("jasper19.app.name");
-            this.jasper19_outfile_ext = props.getProperty("jasper19.outfile.ext");
+            //this.jasper19_outfile_ext = props.getProperty("jasper19.outfile.ext");
              
         } catch( Exception e ) {
             // // config vars
             this.jasper19_install_dir  = "/usr/bin";
             this.jasper19_app_name = "jasper";
-            this.jasper19_outfile_ext = "jp2";
+            //this.jasper19_outfile_ext = "jp2";
         }
         log.info("Using jasper19 install directory: "+this.jasper19_install_dir);
         log.info("Using jasper19 application name: "+this.jasper19_app_name);
-        log.info("Using jasper19 outfile extension: "+this.jasper19_outfile_ext);
+        //log.info("Using jasper19 outfile extension: "+this.jasper19_outfile_ext);
 
         init();
         getExtensions(inputFormat,outputFormat);
@@ -146,52 +147,47 @@ public final class Jasper19Migration implements Migrate, Serializable {
         InputStream inputStream = digitalObject.getContent().read();
         try {
             
-            // write binary array to temporary file
+            // write input stream to temporary file
             tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets", inputFmtExt);
             if( !(tmpInFile.exists() && tmpInFile.isFile() && tmpInFile.canRead() ))
             {
-                System.out.println("Error: corrupt file!");
+                log.error("[Jasper19Migration] Unable to create temporary input file!");
                 return null;
             }
-            
-            // outfile name = infilename + extension
+            log.info("[Jasper19Migration] Temporary input file created: "+tmpInFile.getAbsolutePath());
+
+            // outfile name = infilename + output extension
             String outFileStr = tmpInFile.getAbsolutePath()+"."+outputFmtExt;
-            // temporary outfile
-            tmpOutFile = new File(outFileStr);
-            
-            //InputStream inputStream = new ByteArrayInputStream(binary);
-            
+            log.info("[Jasper19Migration] Output file name: "+outFileStr);
+
+            // run command
             ProcessRunner runner = new ProcessRunner();
             List<String> command = new ArrayList<String>();
             // setting up command
             // Example: jasper --input testin.jpeg --input-format jpg --output-format jp2 --output testout.jp2
             // Example (short version): jasper -f testin.jpg -t jpg -F testin.jp2 -T jp2
             command.add(this.jasper19_app_name);
-            command.add("-f");
+            command.add("--input");
             command.add(tmpInFile.getAbsolutePath());
-            command.add("-t");
+            command.add("--input-format");
             command.add(inputFmtExt);
-            command.add("-F");
-            command.add(tmpOutFile.getAbsolutePath());
-            command.add("-T");
+            command.add("--output");
+            command.add(outFileStr);
+            command.add("--output-format");
             command.add(outputFmtExt);
-            
             runner.setCommand(command);
-
-
             runner.setInputStream(inputStream);
-            
+            log.info("[Jasper19Migration] Executing command: "+command.toString() +" ...");
             runner.run();
-            
             int return_code = runner.getReturnCode();
-
             if (return_code != 0){
-                System.out.println("Jasper conversion error code: " + Integer.toString(return_code));
-                System.out.println(runner.getProcessErrorAsString());
-                System.out.println(runner.getProcessOutputAsString());
+                log.error("[Jasper19Migration] Jasper conversion error code: " + Integer.toString(return_code));
+                log.error("[Jasper19Migration] " + runner.getProcessErrorAsString());
+                //log.error("[Jasper19Migration] Output: "+runner.getProcessOutputAsString());
                 return null;
             }
-
+            
+            tmpOutFile = new File(outFileStr);
 
             // read byte array from temporary file
             if( tmpOutFile.isFile() && tmpOutFile.canRead() )
