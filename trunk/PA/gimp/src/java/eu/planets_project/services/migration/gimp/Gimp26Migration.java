@@ -459,13 +459,23 @@ public final class Gimp26Migration implements Migrate, Serializable {
                 .classname(this.getClass().getCanonicalName())
 //                .description(description)
                 .description("This service provides file format migrations using \"The GIMP\" (GNU image manipulation program) version 2.6. " +
-                "Currently, this service only supports migration from one file format to another, not single file format migrations. "+
-                "For example, planets:fmt/ext/tiff to planets:fmt/ext/tiff could migrate a TIFF image without compression to a TIFF image using the LZW compression type. "+
-                "Furthermore, only the conversion to GIF format supports indexed colour (applying fu-script function gimp-convert-indexed). This is not provided for the file formats BMP, PNG, and TIFF which in principle do support indexed colours as well. "+
-                "Alpha Channel transparency exists for some file formats, like GIF, PNG, BMP. If an alpha channel is encountered, the image is flattened using the gimp-image-flatten function. "+
-                "It accepts input and target formats of the form: " +
-                "'planets:fmt/ext/[extension]'\n" +
-                "e.g. 'planets:fmt/ext/tiff' or 'planets:fmt/ext/tif'")
+                            "GIMP is  the  GNU Image Manipulation Program. It is used to edit and manipulate images. It can load and save a variety of image"+
+                            "formats and can be used to convert between formats."+
+                            "GIMP can also be used as a paint program. It features a set of drawing and painting tools such as airbrush, clone,  pencil,  and"+
+                            "paint  brush.  Painting and drawing tools can be applied to an image with a variety of paint modes.  It also offers an extensive"+
+                            "array of selection tools like rectangle, ellipse, fuzzy select, bezier select, intelligent scissors, and select by color."+
+                            "GIMP offers a variety of plug-ins that perform a variety of image manipulations.  Examples include bumpmap, edge  detect,  gaus-"+
+                            "sian  blur, and many others. In addition, GIMP has several scripting extension which allow for advanced non-interactive process-"+
+                            "ing and creation of images."+
+                            "GIMP ships with a second binary called gimp-console. This binary is a console-only version and behaves as  if  gimp  was  called"+
+                            "with the --no-interface command-line option. The gimp-console is the program used in this wrapper."+
+                            "Currently, this service only supports migration from one file format to another, not single file format migrations. "+
+                            "For example, planets:fmt/ext/tiff to planets:fmt/ext/tiff could migrate a TIFF image without compression to a TIFF image using the LZW compression type. "+
+                            "Furthermore, only the conversion to GIF format supports indexed colour (applying fu-script function gimp-convert-indexed). This is not provided for the file formats BMP, PNG, and TIFF which in principle do support indexed colours as well. "+
+                            "Alpha Channel transparency exists for some file formats, like GIF, PNG, BMP. If an alpha channel is encountered, the image is flattened using the gimp-image-flatten function. "+
+                            "It accepts input and target formats of the form: " +
+                            "'planets:fmt/ext/[extension]'\n" +
+                            "e.g. 'planets:fmt/ext/tiff' or 'planets:fmt/ext/tif'")
                 .version("0.1")
                 .parameters(parameters)
                 .paths(createMigrationPathwayMatrix(inputFormats, outputFormats))
