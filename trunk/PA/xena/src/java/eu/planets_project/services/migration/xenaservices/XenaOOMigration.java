@@ -46,6 +46,10 @@ public class XenaOOMigration implements Migrate, Serializable {
         //ODF -> PDF
         xena.setOoffice_import_filter(XenaMigrations.IMPORT_FILTER_NONE);
         xena.setOoffice_export_filter(XenaMigrations.EXPORT_FILTER_PDF);
+        
+        //DOC -> ODF
+//        xena.setOoffice_import_filter(XenaMigrations.IMPORT_FILTER_DOC);
+//        xena.setOoffice_export_filter(XenaMigrations.EXPORT_FILTER_NONE);
 
         byte[] binary = xena.basicMigrateOneBinary(FileUtils.writeInputStreamToBinary(inputStream));
 
@@ -64,8 +68,13 @@ public class XenaOOMigration implements Migrate, Serializable {
 
         builder.author("Sven Schlarb <shsschlarb-planets@yahoo.de>, Georg Petz <georg.petz@onb.ac.at");
         builder.classname(this.getClass().getCanonicalName());
-        builder.description("Simple DVIps wrapper for DVI (device independant) to PS (postscript).");
-        MigrationPath[] mPaths = new MigrationPath []{new MigrationPath(Format.extensionToURI("dvi"), Format.extensionToURI("ps"),null)};
+        builder.description("XENA OO Wrapper");
+        MigrationPath[] mPaths = new MigrationPath []{
+            new MigrationPath(Format.extensionToURI("odt"), Format.extensionToURI("pdf"),null),
+            new MigrationPath(Format.extensionToURI("odp"), Format.extensionToURI("pdf"),null),
+            new MigrationPath(Format.extensionToURI("ods"), Format.extensionToURI("pdf"),null),
+            new MigrationPath(Format.extensionToURI("odg"), Format.extensionToURI("pdf"),null),
+            new MigrationPath(Format.extensionToURI("odb"), Format.extensionToURI("pdf"),null)};
         builder.paths(mPaths);
         builder.classname(this.getClass().getCanonicalName());
         builder.version("0.1");

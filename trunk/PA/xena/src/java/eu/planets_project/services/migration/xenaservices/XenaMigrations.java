@@ -34,11 +34,11 @@ import eu.planets_project.services.utils.PlanetsLogger;
  *
  */
 public class XenaMigrations {
+
     PlanetsLogger log = PlanetsLogger.getLogger(XenaMigrations.class);
     /*
      * Code from the Xena project.
      */
-
     /** open office installation dir */
     public String ooffice_install_dir;
     // Values like PDF might work, writer_pdf_Export should work.
@@ -57,8 +57,6 @@ public class XenaMigrations {
     public final static String IMPORT_FILTER_DOC = "doc";
     /** input filter value set to doc */
     public String ooffice_import_filter = IMPORT_FILTER_DOC;
-    
-    
     /** prefix for open document */
     public final static String OPEN_DOCUMENT_PREFIX = "opendocument";
 //    private final static String OPEN_DOCUMENT_URI = "http://preservation.naa.gov.au/odf/1.0";
@@ -69,28 +67,31 @@ public class XenaMigrations {
     /** tag name for description */
     public final static String PROCESS_DESCRIPTION_TAG_NAME = "description";
     private final static String OS_X_ARCHITECTURE_NAME = "mac os x";
-
-    private static Logger logger = Logger.getLogger(DocToODFXena.class.getName());
+    private static Logger logger = Logger.getLogger(XenaMigrations.class.getName());
 
     /*
     private final static String DESCRIPTION =
-        "The following data is a MIME-compliant (RFC 1421) PEM base64 (RFC 1421) representation of an Open Document Format "
-                + "(ISO 26300, Version 1.0) document, produced by Open Office version 2.0.";
-*/
-    
+    "The following data is a MIME-compliant (RFC 1421) PEM base64 (RFC 1421) representation of an Open Document Format "
+    + "(ISO 26300, Version 1.0) document, produced by Open Office version 2.0.";
+     */
     /**
      * No arg constructor
      */
     public XenaMigrations() {
         Properties props = new Properties();
         try {
-            props.load( this.getClass().getResourceAsStream("/eu/planets_project/services/migration/xenaservices/xena.properties"));
-            this.ooffice_install_dir = props.getProperty("openoffice.install.dir");
-        } catch( IOException e ) {
+            InputStream propStrem = this.getClass().getResourceAsStream("/eu/planets_project/services/migration/xenaservices/xena.properties");
+            if (propStrem != null) {
+                props.load(propStrem);
+                this.ooffice_install_dir = props.getProperty("openoffice.install.dir");
+            } else {
+                this.ooffice_install_dir = "C:/Programme/OpenOffice.org 3";
+            }
+        } catch (IOException e) {
             // Use a default for now.
-            this.ooffice_install_dir  = "C:/Program Files/OpenOffice.org 2.3";
+            this.ooffice_install_dir = "C:/Programme/OpenOffice.org 3";
         }
-        log.info("Pointed to OOffice in: "+this.ooffice_install_dir);
+        log.info("Pointed to OOffice in: " + this.ooffice_install_dir);
     }
 
     /**
@@ -102,7 +103,7 @@ public class XenaMigrations {
      * @return
      * @throws Exception
      */
-    private XComponent loadDocument(String fname, InputStream is, String extension, boolean visible ) throws Exception {
+    private XComponent loadDocument(String fname, InputStream is, String extension, boolean visible) throws Exception {
         File input = File.createTempFile("input", "." + extension);
         try {
             input.deleteOnExit();
@@ -113,7 +114,7 @@ public class XenaMigrations {
                 fos.write(buf, 0, n);
             }
             fos.close();
-            XComponent rtn = loadDocument(fname, input, visible );
+            XComponent rtn = loadDocument(fname, input, visible);
             return rtn;
         } finally {
             input.delete();
@@ -176,7 +177,7 @@ public class XenaMigrations {
          * the environment for components which can instanciate within frames.
          */
         XComponentLoader xcomponentloader =
-            (XComponentLoader) UnoRuntime.queryInterface(XComponentLoader.class, xmultiservicefactory.createInstance("com.sun.star.frame.Desktop"));
+                (XComponentLoader) UnoRuntime.queryInterface(XComponentLoader.class, xmultiservicefactory.createInstance("com.sun.star.frame.Desktop"));
 
         PropertyValue[] loadProperties = null;
         if (visible) {
@@ -196,8 +197,8 @@ public class XenaMigrations {
      * @throws Exception
      * @throws InterruptedException
      */
-    private static void startOpenOffice(String fname ) throws Exception, InterruptedException {
-        
+    private static void startOpenOffice(String fname) throws Exception, InterruptedException {
+
         if (fname == null || fname.equals("")) {
             throw new Exception("OpenOffice.org location not configured.");
         }
@@ -217,7 +218,7 @@ public class XenaMigrations {
         commandList.add("-accept=socket,port=8100;urp;");
         String[] commandArr = commandList.toArray(new String[0]);
         try {
-            logger.info("Starting OpenOffice process: "+commandArr);
+            logger.info("Starting OpenOffice process: " + commandArr);
             Runtime.getRuntime().exec(commandArr);
         } catch (IOException x) {
             throw new Exception("Cannot start OpenOffice.org. Try Checking Office Properties. " + sofficeProgram.getAbsolutePath(), x);
@@ -240,15 +241,15 @@ public class XenaMigrations {
      * @throws IOException
      */
     public void transform(URI input, URI output) throws SAXException, IOException {
-        
-        FileInputStream inputStream = new FileInputStream( new File( input ));
+
+        FileInputStream inputStream = new FileInputStream(new File(input));
 
         try {
             boolean visible = false;
 
             // Open our office document...
             XComponent objectDocumentToStore =
-                loadDocument( this.ooffice_install_dir, inputStream, this.ooffice_import_filter, visible );
+                    loadDocument(this.ooffice_install_dir, inputStream, this.ooffice_import_filter, visible);
 
             // Getting an object that will offer a simple way to store a document to a URL.
             XStorable xstorable = (XStorable) UnoRuntime.queryInterface(XStorable.class, objectDocumentToStore);
@@ -265,31 +266,28 @@ public class XenaMigrations {
             propertyvalue[0].Value = new Boolean(true);
 
             // Setting the optional filter name
-            if (ooffice_export_filter != null
-                    && !"".equals(ooffice_export_filter)) {
+            if (ooffice_export_filter != null && !"".equals(ooffice_export_filter)) {
                 propertyvalue[1] = new PropertyValue();
                 propertyvalue[1].Name = "FilterName";
 
                 propertyvalue[1].Value = ooffice_export_filter;
             }
-            
+
             // Storing and converting the document
             try {
                 xstorable.storeToURL(output.toURL().toString(), propertyvalue);
             } catch (Exception e) {
                 throw new Exception(
-                                        "Cannot convert to open document format. Maybe your OpenOffice.org installation does not have installed: "
-                                                + ooffice_export_filter
-                                                + " or maybe the document is password protected or has some other problem. Try opening in OpenOffice.org manually.",
-                                        e);
+                        "Cannot convert to open document format. Maybe your OpenOffice.org installation does not have installed: " + ooffice_export_filter + " or maybe the document is password protected or has some other problem. Try opening in OpenOffice.org manually.",
+                        e);
             }
             // Getting the method dispose() for closing the document
             XComponent xcomponent = (XComponent) UnoRuntime.queryInterface(XComponent.class, xstorable);
             // Closing the converted document
             xcomponent.dispose();
-/*          if (output.length() == 0) {
-                throw new Exception("OpenOffice open document file is empty. Do you have OpenOffice Java integration installed?");
-            }*/
+        /*          if (output.length() == 0) {
+        throw new Exception("OpenOffice open document file is empty. Do you have OpenOffice Java integration installed?");
+        }*/
         } catch (Exception e) {
             logger.log(Level.FINEST, "Problem normalisting office document", e);
             throw new SAXException(e);
@@ -297,7 +295,7 @@ public class XenaMigrations {
         // Check file was created successfully by opening up the zip and checking for at least one entry
         // Base64 encode the file and write out to content handler
         try {
-/*
+            /*
             ContentHandler ch = getContentHandler();
             AttributesImpl att = new AttributesImpl();
             String tagURI = OPEN_DOCUMENT_URI;
@@ -305,25 +303,24 @@ public class XenaMigrations {
             ZipFile openDocumentZip = new ZipFile(output);
             // Not sure if this is even possible, but worth checking I guess...
             if (openDocumentZip.size() == 0) {
-                throw new IOException("An empty document was created by OpenOffice");
+            throw new IOException("An empty document was created by OpenOffice");
             }
             att.addAttribute(OPEN_DOCUMENT_URI, PROCESS_DESCRIPTION_TAG_NAME, PROCESS_DESCRIPTION_TAG_NAME, "CDATA", DESCRIPTION);
             att.addAttribute(OPEN_DOCUMENT_URI, DOCUMENT_TYPE_TAG_NAME, DOCUMENT_TYPE_TAG_NAME, "CDATA", type.getName());
             att.addAttribute(OPEN_DOCUMENT_URI, DOCUMENT_EXTENSION_TAG_NAME, DOCUMENT_EXTENSION_TAG_NAME, "CDATA", officeType.fileExtension());
-
+            
             InputStream is = new FileInputStream(output);
             ch.startElement(tagURI, tagPrefix, tagPrefix + ":" + tagPrefix, att);
             InputStreamEncoder.base64Encode(is, ch);
             ch.endElement(tagURI, tagPrefix, tagPrefix + ":" + tagPrefix);
-        } catch (ZipException ex) {
+            } catch (ZipException ex) {
             throw new IOException("OpenOffice could not create the open document file");
-            */
+             */
         } finally {
 //          output.delete();
         }
     }
-    
-    
+
     /**
      * @return the ooffice_export_filter
      */
@@ -337,7 +334,7 @@ public class XenaMigrations {
     public void setOoffice_export_filter(String ooffice_export_filter) {
         this.ooffice_export_filter = ooffice_export_filter;
     }
-    
+
     /**
      * @return the ooffice_import_filter
      */
@@ -358,58 +355,58 @@ public class XenaMigrations {
      * @param binary
      * @return the migrated binary
      */
-    public byte[] basicMigrateOneBinary ( byte[] binary ) {
+    public byte[] basicMigrateOneBinary(byte[] binary) {
 
-        File input, output;
+        File input,output ;
         try {
-            input = File.createTempFile("input","0");
+            input = File.createTempFile("input", "0");
             input.deleteOnExit();
-            output = File.createTempFile("output","0");
+            output = File.createTempFile("output", "0");
             output.deleteOnExit();
-        } catch ( IOException e ) {
-            log.error("Could not create temporary files! "+e);
+        } catch (IOException e) {
+            log.error("Could not create temporary files! " + e);
             return null;
         }
-        
+
         try {
             FileOutputStream fos = new FileOutputStream(input);
             fos.write(binary);
             fos.flush();
             fos.close();
-        } catch( FileNotFoundException e ) {
-            log.error("Creating "+input.getAbsolutePath()+" :: " +e);
+        } catch (FileNotFoundException e) {
+            log.error("Creating " + input.getAbsolutePath() + " :: " + e);
             return null;
-        } catch( IOException e ) {
-            log.error("Creating "+input.getAbsolutePath()+" :: " +e);
+        } catch (IOException e) {
+            log.error("Creating " + input.getAbsolutePath() + " :: " + e);
             return null;
         }
         try {
             this.transform(input.toURI(), output.toURI());
-        } catch( SAXException e ) {
-            log.error("Transforming "+input.getAbsolutePath()+" :: " +e);
+        } catch (SAXException e) {
+            log.error("Transforming " + input.getAbsolutePath() + " :: " + e);
             return null;
-        } catch( IOException e ) {
-            log.error("Transforming "+input.getAbsolutePath()+" :: " +e);
+        } catch (IOException e) {
+            log.error("Transforming " + input.getAbsolutePath() + " :: " + e);
             return null;
         }
-        
-        
+
+
         byte[] result = null;
         try {
             result = XenaMigrations.getByteArrayFromFile(output);
-        } catch( IOException e ) {
-            log.error("Returning "+input.getAbsolutePath()+" :: " +e);
+        } catch (IOException e) {
+            log.error("Returning " + input.getAbsolutePath() + " :: " + e);
             return null;
         }
-        
+
         // Delete the temporaries:
         input.delete();
         output.delete();
-        
+
         // Return the result.
-        return result; 
+        return result;
     }
-    
+
     /**
      *     // FIXME Refactor this into common.
      * @param file
@@ -439,20 +436,17 @@ public class XenaMigrations {
         // Read in the bytes
         int offset = 0;
         int numRead = 0;
-        while (offset < bytes.length
-                && (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
+        while (offset < bytes.length && (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
             offset += numRead;
         }
 
         // Ensure all the bytes have been read in
         if (offset < bytes.length) {
-            throw new IOException("Could not completely read file "
-                    + file.getName());
+            throw new IOException("Could not completely read file " + file.getName());
         }
 
         // Close the input stream and return bytes
         is.close();
         return bytes;
     }
-    
 }
