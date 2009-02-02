@@ -27,12 +27,7 @@ import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -46,7 +41,7 @@ import java.util.Set;
 
 
 /**
- * The Jasper19Migration migrates JPEG files to JP2 files.
+ * The Jasper19Migration migrates JPEG files to JP2 files and vice versa.
  * 
  * @author Sven Schlarb <shsschlarb-planets@yahoo.de>
  */
@@ -140,12 +135,8 @@ public final class Jasper19Migration implements Migrate, Serializable {
          * We just return a new digital object with the same required arguments
          * as the given:
          */
-       
-        // 29.01.09: replaced deprecated method getValue()
-        //byte[] binary = digitalObject.getContent().getValue();
         byte[] binary = null;
         InputStream inputStream = digitalObject.getContent().read();
-        try {
             
             // write input stream to temporary file
             tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets", inputFmtExt);
@@ -156,7 +147,7 @@ public final class Jasper19Migration implements Migrate, Serializable {
             }
             log.info("[Jasper19Migration] Temporary input file created: "+tmpInFile.getAbsolutePath());
 
-            // outfile name = infilename + output extension
+            // outfile name 
             String outFileStr = tmpInFile.getAbsolutePath()+"."+outputFmtExt;
             log.info("[Jasper19Migration] Output file name: "+outFileStr);
 
@@ -188,19 +179,12 @@ public final class Jasper19Migration implements Migrate, Serializable {
             }
             
             tmpOutFile = new File(outFileStr);
-
             // read byte array from temporary file
             if( tmpOutFile.isFile() && tmpOutFile.canRead() )
-                binary = readByteArrayFromTmpFile(); 
+                binary = ByteArrayHelper.read(tmpOutFile);
             else
-                System.out.println( "Error: Unable to read temporary file "
-                        +tmpOutFile.getAbsolutePath() );
-            
-        } catch(IOException e) {
-            log.error( "IO Error:" + e.toString() );
-        } finally {
-            
-        }
+                log.error( "Error: Unable to read temporary file "+tmpOutFile.getAbsolutePath() );
+
         DigitalObject newDO = null;
         
         ServiceReport report = new ServiceReport();
@@ -307,26 +291,4 @@ public final class Jasper19Migration implements Migrate, Serializable {
         
         return mds;
     }
-    
-    /* (non-Javadoc)
-     */
-    synchronized void writeByteArrayToTmpFile( byte[] binary ) throws IOException {
-            tmpInFile = ByteArrayHelper.write(binary);
-            if( tmpInFile.exists() )
-                log.info("Temporary input file created: " + tmpInFile.getAbsolutePath());
-            else
-                log.error("Unable to create temp file");
-    }
-
-    
-
-    /* (non-Javadoc)
-     */
-    synchronized byte[] readByteArrayFromTmpFile() throws IOException {
-        byte[] binary = ByteArrayHelper.read(tmpOutFile);
-        return binary;
-    }
-
-
-
 }

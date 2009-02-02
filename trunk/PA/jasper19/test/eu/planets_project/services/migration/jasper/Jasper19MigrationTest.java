@@ -10,6 +10,7 @@ import eu.planets_project.services.datatypes.Parameters;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.utils.ByteArrayHelper;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
 import java.io.BufferedOutputStream;
@@ -38,9 +39,6 @@ public final class Jasper19MigrationTest extends TestCase {
 
     /* A holder for the object to be tested */
     Migrate dom = null;
-    private File fTmpInFile;
-    private File fTmpOutFile;
-
 
     List<String> formats = null;
     /*
@@ -110,7 +108,7 @@ public final class Jasper19MigrationTest extends TestCase {
         //String outTestFileName = "PA/jasper19/test/testfiles/generatedfiles/planetsMigrate"+origExt+"to"+destExt+String.valueOf(cycle)+"."+destExt.toLowerCase();
         String resFileDir = "PA/jasper19/test/testfiles/generatedfiles/";
         String resFileName = "planetsMigrate"+origExt.toUpperCase()+"to"+destExt.toUpperCase()+"."+destExt.toLowerCase();
-        byte[] binary = this.readByteArrayFromFile(inTestFileName);
+        byte[] binary = ByteArrayHelper.read(new File(inTestFileName));
         DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
         MigrateResult mr = dom.migrate(input, Format.extensionToURI(origExt), Format.extensionToURI(destExt), params);
         DigitalObject doOut = mr.getDigitalObject();
@@ -118,106 +116,5 @@ public final class Jasper19MigrationTest extends TestCase {
         FileUtils.writeInputStreamToFile(doOut.getContent().read(), new File( resFileDir), resFileName);
         File resultFile = new File(resFileDir+resFileName);
         assertTrue("Result file was not created successfully!", resultFile.exists());
-    }
-
-    /**
-     * Test the pass-thru migration.
-     */
-//    @Test
-//    public void testMigrateJPEGtoJP2() throws IOException {
-//        try {
-//            /*
-//             * To test usability of the digital object instance in web services,
-//             * we simply pass one into the service and expect one back:
-//             */
-//            byte[] binary = this.readByteArrayFromFile();
-//            DigitalObject input = new DigitalObject.Builder( Content.byValue(binary))
-//                    .build();
-//
-//            MigrateResult mr = dom.migrate(input, Format.extensionToURI("jpg"), Format.extensionToURI("jp2"), null);
-//            assertTrue("Migration result object is null.", mr != null);
-//            DigitalObject doOut = mr.getDigitalObject();
-//
-//            assertTrue("Resulting digital object is null.", doOut != null);
-//
-//            //String strOutFile = "PA/jasper19/test/testfiles/testout.jp2";
-//            //File file = new File(strOutFile);
-//            InputStream is = doOut.getContent().read();
-//            //writeByteArrayToFile(doOut.getContent().getValue());
-//            String resFileDir = "PA/jasper19/test/testfiles/";
-//            String resFileName = "testout.jp2";
-//            FileUtils.writeInputStreamToFile(is, new File( resFileDir), resFileName);
-//            File resFile = new File( resFileDir+resFileName);
-//            assertTrue("Result file has not been created successfully.", resFile.exists());
-//
-//
-//        } catch (MalformedURLException e) {
-//            fail("Malformed URL exception: "+e.toString());
-//        }
-//
-//    }
-    
-    synchronized byte[] readByteArrayFromFile() 
-            throws IOException {
-        byte[] binary = new byte[0];
-        String strOutFile = "PA/jasper19/test/testfiles/testin.jpg";
-        fTmpOutFile = new File(strOutFile);
-        assertTrue("JPG input file "+fTmpOutFile.getAbsolutePath()+" does not exist.", fTmpOutFile.exists());
-        try {
-            if( fTmpOutFile.isFile() && fTmpOutFile.canRead())
-            {
-                binary = new byte[(int)fTmpOutFile.length()];
-                FileInputStream fis = new FileInputStream(fTmpOutFile);
-                fis.read(binary);
-                System.out.println("Read file: " + fTmpOutFile.getAbsolutePath());
-                fis.close();
-            }
-            else
-            {
-                fail("Unable to read file: "+fTmpOutFile.getAbsolutePath());
-            }
-        } catch(IOException ex) {
-            fail("IO Error: "+ex.toString());
-        }
-        return binary;
-    }
-
-    private synchronized byte[] readByteArrayFromFile(String strInFile)
-            throws IOException {
-        byte[] binary = new byte[0];
-        fTmpOutFile = new File(strInFile);
-        assertTrue("input file " + fTmpOutFile.getAbsolutePath() + " does not exist.", fTmpOutFile.exists());
-        try {
-            if (fTmpOutFile.isFile() && fTmpOutFile.canRead()) {
-                binary = new byte[(int) fTmpOutFile.length()];
-                FileInputStream fis = new FileInputStream(fTmpOutFile);
-                fis.read(binary);
-                System.out.println("Read file: " + fTmpOutFile.getAbsolutePath());
-                fis.close();
-            } else {
-                fail("Unable to read file: " + fTmpOutFile.getAbsolutePath());
-            }
-        } catch (IOException ex) {
-            fail("IO Error: " + ex.toString());
-        }
-        return binary;
-    }
-    
-    synchronized void writeByteArrayToFile( byte[] binary )
-            throws IOException {
-        try {
-            String strOutFile = "PA/jasper19/test/testfiles/testout.jp2";
-            //String strOutFile = "test/testfiles/testout.ps";
-            this.fTmpInFile = new File(strOutFile);
-            System.out.println();
-            BufferedOutputStream fos = 
-                            new BufferedOutputStream(
-                            new FileOutputStream(fTmpInFile));
-            fos.write(binary);
-            fos.close();
-            assertTrue("Output file has not been created correctly. ", fTmpInFile.exists() && fTmpInFile.length() > 0);
-        } catch(IOException ex) {
-            fail("IO Error: "+ex.toString());
-        }
     }
 }
