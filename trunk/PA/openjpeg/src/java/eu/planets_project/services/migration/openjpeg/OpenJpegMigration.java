@@ -1,3 +1,6 @@
+/*
+ *
+ */
 package eu.planets_project.services.migration.openjpeg;
 
 import eu.planets_project.ifr.core.techreg.api.formats.Format;
@@ -24,11 +27,7 @@ import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -42,34 +41,34 @@ import java.util.Set;
 
 
 /**
- * The OpenJpegMigration migrates JPEG files to JP2 files.
- * 
+ * The OpenJpegMigration migrates JPEG files to JP2 files and vice versa.
+ *
  * @author Sven Schlarb <shsschlarb-planets@yahoo.de>
  */
 @Local(Migrate.class)
-@Remote(Migrate.class) 
+@Remote(Migrate.class)
 @Stateless
 @WebService( name = OpenJpegMigration.NAME ,
-        serviceName = Migrate.NAME, 
+        serviceName = Migrate.NAME,
         targetNamespace = PlanetsServices.NS,
         endpointInterface = "eu.planets_project.services.migrate.Migrate" )
 public final class OpenJpegMigration implements Migrate, Serializable {
-    
+
     PlanetsLogger log = PlanetsLogger.getLogger(OpenJpegMigration.class);
-    
-    
+
+
     /** The dvi ps installation dir */
     public String openjpeg_install_dir;
     /** The openjpeg application name */
     public String openjpeg_app_name;
     /** The output file extension */
-    public String openjpeg_outfile_ext;
+    //public String openjpeg_outfile_ext;
     private File tmpInFile;
     private File tmpOutFile;
 
     String inputFmtExt = null;
     String outputFmtExt = null;
-    
+
     /***/
     static final String NAME = "OpenJpegMigration";
 
@@ -77,7 +76,7 @@ public final class OpenJpegMigration implements Migrate, Serializable {
     List<String> inputFormats = null;
     List<String> outputFormats = null;
     HashMap<String, String>  formatMapping = null;
-    
+
     /***/
     private static final long serialVersionUID = 2127494848765937613L;
 
@@ -103,65 +102,54 @@ public final class OpenJpegMigration implements Migrate, Serializable {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameters)
      */
     public MigrateResult migrate( final DigitalObject digitalObject, URI inputFormat,
             URI outputFormat, Parameters parameters) {
-        
+
         Properties props = new Properties();
         try {
-            
+
             String strRsc = "/eu/planets_project/services/migration/openjpeg/openjpeg.properties";
             props.load( this.getClass().getResourceAsStream(strRsc));
             // config vars
             this.openjpeg_install_dir = props.getProperty("openjpeg.install.dir");
-            this.openjpeg_app_name = props.getProperty("openjpeg.app.name");
-            this.openjpeg_outfile_ext = props.getProperty("openjpeg.outfile.ext");
-             
         } catch( Exception e ) {
             // // config vars
             this.openjpeg_install_dir  = "/usr/bin";
-            this.openjpeg_app_name = "image_to_j2k";
-            this.openjpeg_outfile_ext = "jp2";
         }
         log.info("Using openjpeg install directory: "+this.openjpeg_install_dir);
-        log.info("Using openjpeg application name: "+this.openjpeg_app_name);
-        log.info("Using openjpeg outfile extension: "+this.openjpeg_outfile_ext);
-
         init();
         getExtensions(inputFormat,outputFormat);
-        
+
         /*
          * We just return a new digital object with the same required arguments
          * as the given:
          */
-       
-        // 29.01.09: replaced deprecated method getValue()
-        //byte[] binary = digitalObject.getContent().getValue();
         byte[] binary = null;
         InputStream inputStream = digitalObject.getContent().read();
-        try {
-            
-            // write binary array to temporary file
+
+            // write input stream to temporary file
             tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets", inputFmtExt);
             if( !(tmpInFile.exists() && tmpInFile.isFile() && tmpInFile.canRead() ))
             {
-                System.out.println("Error: corrupt file!");
+                log.error("[OpenJpegMigration] Unable to create temporary input file!");
                 return null;
             }
-            
-            // outfile name = infilename + extension
+            log.info("[OpenJpegMigration] Temporary input file created: "+tmpInFile.getAbsolutePath());
+
+            // outfile name
             String outFileStr = tmpInFile.getAbsolutePath()+"."+outputFmtExt;
-            // temporary outfile
-            tmpOutFile = new File(outFileStr);
-            
-            //InputStream inputStream = new ByteArrayInputStream(binary);
-            
+            log.info("[OpenJpegMigration] Output file name: "+outFileStr);
+
+            // run command
             ProcessRunner runner = new ProcessRunner();
             List<String> command = new ArrayList<String>();
             // setting up command
             // Example: image_to_j2k -i testin.tif -o neutest.jp2
+            // j2k_to_image: application name for jp2 to tif conversion
+            // image_to_j2k: application name for tif to jp2 conversion
             if( inputFmtExt.equalsIgnoreCase("jp2"))
                 this.openjpeg_app_name = "j2k_to_image";
             else if(inputFmtExt.equalsIgnoreCase("tif"))
@@ -170,43 +158,32 @@ public final class OpenJpegMigration implements Migrate, Serializable {
             command.add("-i");
             command.add(tmpInFile.getAbsolutePath());
             command.add("-o");
-            command.add(tmpOutFile.getAbsolutePath());
-            
+            command.add(outFileStr);
             runner.setCommand(command);
-
-
             runner.setInputStream(inputStream);
-            
+            log.info("[OpenJpegMigration] Executing command: "+command.toString() +" ...");
             runner.run();
-            
             int return_code = runner.getReturnCode();
-
             if (return_code != 0){
-                System.out.println("OpenJpeg conversion error code: " + Integer.toString(return_code));
-                System.out.println(runner.getProcessErrorAsString());
-                System.out.println(runner.getProcessOutputAsString());
+                log.error("[OpenJpegMigration] Jasper conversion error code: " + Integer.toString(return_code));
+                log.error("[OpenJpegMigration] " + runner.getProcessErrorAsString());
+                //log.error("[OpenJpegMigration] Output: "+runner.getProcessOutputAsString());
                 return null;
             }
 
-
+            tmpOutFile = new File(outFileStr);
             // read byte array from temporary file
             if( tmpOutFile.isFile() && tmpOutFile.canRead() )
-                binary = readByteArrayFromTmpFile(); 
+                binary = ByteArrayHelper.read(tmpOutFile);
             else
-                System.out.println( "Error: Unable to read temporary file "
-                        +tmpOutFile.getAbsolutePath() );
-            
-        } catch(IOException e) {
-            log.error( "IO Error:" + e.toString() );
-        } finally {
-            
-        }
+                log.error( "Error: Unable to read temporary file "+tmpOutFile.getAbsolutePath() );
+
         DigitalObject newDO = null;
-        
+
         ServiceReport report = new ServiceReport();
-        
+
         newDO = new DigitalObject.Builder(Content.byValue(binary)).build();
-        
+
         return new MigrateResult(newDO, report);
     }
 
@@ -222,7 +199,7 @@ public final class OpenJpegMigration implements Migrate, Serializable {
         /**
      * Gets one extension from a set of possible extensions for the incoming
      * request planets URI (e.g. planets:fmt/ext/jpeg) which matches with
-     * one format of the set of OpenJpegs's supported input/output formats. If
+     * one format of the set of openjpeg's supported input/output formats. If
      * isOutput is false, it checks against the gimp input formats ArrayList,
      * otherwise it checks against the gimp output formats HashMap.
      *
@@ -245,7 +222,7 @@ public final class OpenJpegMigration implements Migrate, Serializable {
         Iterator<String> itrReq = reqInputFormatExts.iterator();
         // Iterate either over input formats ArrayList or over output formats
         // HasMap
-        Iterator<String> itrOpenJpeg = (isOutput)?outputFormats.iterator():inputFormats.iterator();
+        Iterator<String> itrJasper = (isOutput)?outputFormats.iterator():inputFormats.iterator();
         // Iterate over possible extensions that correspond to the request
         // planets uri.
         while(itrReq.hasNext()) {
@@ -253,12 +230,12 @@ public final class OpenJpegMigration implements Migrate, Serializable {
             // format URI, note that the relation of Planets-format-URI to
             // extensions is 1 : n.
             String reqFmtExt = normalizeExt((String) itrReq.next());
-            while(itrOpenJpeg.hasNext()) {
+            while(itrJasper.hasNext()) {
                 // Iterate over the formats that openjpeg offers either as input or
                 // as output format.
                 // See input formats in the this.init() method to see the
                 // openjpeg input/output formats offered by this service.
-                String gimpFmtStr = (String) itrOpenJpeg.next();
+                String gimpFmtStr = (String) itrJasper.next();
                 if( reqFmtExt.equalsIgnoreCase(gimpFmtStr) )
                 {
                     // select the gimp supported format
@@ -292,41 +269,24 @@ public final class OpenJpegMigration implements Migrate, Serializable {
      */
     public ServiceDescription describe() {
         ServiceDescription.Builder builder = new ServiceDescription.Builder(NAME, Migrate.class.getName());
-
         builder.author("Sven Schlarb <shsschlarb-planets@yahoo.de>");
         builder.classname(this.getClass().getCanonicalName());
-        builder.description("Simple service for OpenJpeg for TIF to JP2 (JPEG2000) and, vice versa, JP2 to TIF conversion.");
+        builder.description("This is a simple wrapper of the OpenJPEG library. It offers access to "+
+                            "the tools j2k_to_image for JP2 to TIF and image_to_j2k for TIF to JP2 "+
+                            "conversion. "+
+                            "The OpenJPEG library is an open-source JPEG 2000 codec "+
+                            "written in C language. It has been developed in order to "+
+                            "promote the use of JPEG 2000, the new still-image compression "+
+                            "standard from the Joint Photographic Experts Group (JPEG). ");
         MigrationPath[] mPaths = new MigrationPath []{
-            new MigrationPath(Format.extensionToURI("tif"), Format.extensionToURI("jp2"),null),
-            new MigrationPath(Format.extensionToURI("jp2"), Format.extensionToURI("tif"),null)};
+            new MigrationPath(Format.extensionToURI("jpg"), Format.extensionToURI("jp2"),null),
+            new MigrationPath(Format.extensionToURI("jp2"), Format.extensionToURI("jpg"),null)};
         builder.paths(mPaths);
         builder.classname(this.getClass().getCanonicalName());
         builder.version("0.1");
 
         ServiceDescription mds =builder.build();
-        
+
         return mds;
     }
-    
-    /* (non-Javadoc)
-     */
-    synchronized void writeByteArrayToTmpFile( byte[] binary ) throws IOException {
-            tmpInFile = ByteArrayHelper.write(binary);
-            if( tmpInFile.exists() )
-                log.info("Temporary input file created: " + tmpInFile.getAbsolutePath());
-            else
-                log.error("Unable to create temp file");
-    }
-
-    
-
-    /* (non-Javadoc)
-     */
-    synchronized byte[] readByteArrayFromTmpFile() throws IOException {
-        byte[] binary = ByteArrayHelper.read(tmpOutFile);
-        return binary;
-    }
-
-
-
 }
