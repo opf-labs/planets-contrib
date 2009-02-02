@@ -279,7 +279,16 @@ public final class Jasper19Migration implements Migrate, Serializable {
 
         builder.author("Sven Schlarb <shsschlarb-planets@yahoo.de>");
         builder.classname(this.getClass().getCanonicalName());
-        builder.description("Simple service for Jasper version 1.9 for JPG to JP2 (JPEG2000) and, vice versa, JP2 to JPG conversion.");
+        builder.description("Simple service for Jasper Transcoder Version 1.900.1 for JPG to JP2 (JPEG2000)"+
+                "and, vice versa, JP2 to JPG conversion."+
+                "Jasper is a file format converter specialized in JPEG-2000 encoding"+
+                "Copyright (c) 1999-2000 Image Power, Inc. and the University of"+
+                "British Columbia."+
+                "All rights reserved."+
+                "For more information about this software, please visit the following"+
+                "web sites/pages:"+
+                "http://www.ece.uvic.ca/~mdadams/jasper"+
+                "http://www.jpeg.org/software");
         MigrationPath[] mPaths = new MigrationPath []{
             new MigrationPath(Format.extensionToURI("jpg"), Format.extensionToURI("jp2"),null),
             new MigrationPath(Format.extensionToURI("jp2"), Format.extensionToURI("jpg"),null)};
