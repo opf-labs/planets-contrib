@@ -1,5 +1,6 @@
 package eu.planets_project.services.migration.xenaservices;
 
+import eu.planets_project.ifr.core.techreg.api.formats.Format;
 import org.junit.Test;
 
 import eu.planets_project.services.migration.xenaservices.XenaOOMigration;
@@ -32,8 +33,6 @@ public final class XenaServicesMigrationTest extends TestCase {
 
     /* A holder for the object to be tested */
     Migrate dom = null;
-    private File fTmpInFile;
-    private File fTmpOutFile;
     /*
      * (non-Javadoc)
      * 
@@ -73,11 +72,13 @@ public final class XenaServicesMigrationTest extends TestCase {
 
         byte[] binary_odt = ByteArrayHelper.read(new File("PA/xena/test/testfiles/testin.odt"));
         byte[] binary_odf = ByteArrayHelper.read(new File("PA/xena/test/testfiles/testin.odf"));
+        byte[] binary_doc = ByteArrayHelper.read(new File("PA/xena/test/testfiles/testin.doc"));
 
         DigitalObject input_odt = new DigitalObject.Builder(Content.byValue(binary_odt)).build();
         DigitalObject input_odf = new DigitalObject.Builder(Content.byValue(binary_odf)).build();
+        DigitalObject input_doc = new DigitalObject.Builder(Content.byValue(binary_doc)).build();
 
-        MigrateResult mr_odt = dom.migrate(input_odt, null, null, null);
+        MigrateResult mr_odt = dom.migrate(input_odt, Format.extensionToURI("odt"), Format.extensionToURI("pdf"), null);
         DigitalObject doOut_odt = mr_odt.getDigitalObject();
 
         assertTrue("Resulting digital object is null.", doOut_odt != null);
@@ -85,9 +86,9 @@ public final class XenaServicesMigrationTest extends TestCase {
 
         InputStream inputStream_odt = doOut_odt.getContent().read();
 
-        FileUtils.writeInputStreamToFile(inputStream_odt, new File("PA/xena/test/testfiles"), "testout_odt.pdf");
+        FileUtils.writeInputStreamToFile(inputStream_odt, new File("PA/xena/test/testfiles/out"), "testout_odt.pdf");
         
-        MigrateResult mr_odf = dom.migrate(input_odf, null, null, null);
+        MigrateResult mr_odf = dom.migrate(input_odf, Format.extensionToURI("ODF"), Format.extensionToURI("pdf"), null);
         DigitalObject doOut_odf = mr_odf.getDigitalObject();
 
         assertTrue("Resulting digital object is null.", doOut_odf != null);
@@ -95,7 +96,17 @@ public final class XenaServicesMigrationTest extends TestCase {
 
         InputStream inputStream_odf = doOut_odf.getContent().read();
 
-        FileUtils.writeInputStreamToFile(inputStream_odf, new File("PA/xena/test/testfiles"), "testout_odf.pdf");
+        FileUtils.writeInputStreamToFile(inputStream_odf, new File("PA/xena/test/testfiles/out"), "testout_odf.pdf");
+        
+        MigrateResult mr_doc = dom.migrate(input_doc, Format.extensionToURI("doc"), Format.extensionToURI("odt"), null);
+        DigitalObject doOut_doc = mr_doc.getDigitalObject();
+
+        assertTrue("Resulting digital object is null.", doOut_doc != null);
+
+
+        InputStream inputStream_doc = doOut_doc.getContent().read();
+
+        FileUtils.writeInputStreamToFile(inputStream_doc, new File("PA/xena/test/testfiles/out"), "testout_doc.odt");
 
     }
 }
