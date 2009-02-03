@@ -129,9 +129,9 @@ public final class AbiWordMigration implements Migrate, Serializable {
             this.abiword_app_name = "abiword";
             //this.abiword_outfile_ext = "jp2";
         }
-        System.out.println("Using abiword install directory: "+this.abiword_install_dir);
-        System.out.println("Using abiword application name: "+this.abiword_app_name);
-        //System.out.println("Using abiword outfile extension: "+this.abiword_outfile_ext);
+        log.info("Using abiword install directory: "+this.abiword_install_dir);
+        log.info("Using abiword application name: "+this.abiword_app_name);
+        //log.info("Using abiword outfile extension: "+this.abiword_outfile_ext);
 
         init();
         getExtensions(inputFormat,outputFormat);
@@ -150,11 +150,11 @@ public final class AbiWordMigration implements Migrate, Serializable {
                 log.error("[AbiWordMigration] Unable to create temporary input file!");
                 return null;
             }
-            System.out.println("[AbiWordMigration] Temporary input file created: "+tmpInFile.getAbsolutePath());
+            log.info("[AbiWordMigration] Temporary input file created: "+tmpInFile.getAbsolutePath());
 
             // outfile name
             String outFileStr = tmpInFile.getAbsolutePath()+"."+outputFmtExt;
-            System.out.println("[AbiWordMigration] Output file name: "+outFileStr);
+            log.info("[AbiWordMigration] Output file name: "+outFileStr);
 
             // run command
             ProcessRunner runner = new ProcessRunner();
@@ -167,7 +167,7 @@ public final class AbiWordMigration implements Migrate, Serializable {
             command.add(tmpInFile.getAbsolutePath());
             runner.setCommand(command);
             runner.setInputStream(inputStream);
-            System.out.println("[AbiWordMigration] Executing command: "+command.toString() +" ...");
+            log.info("[AbiWordMigration] Executing command: "+command.toString() +" ...");
             runner.run();
             int return_code = runner.getReturnCode();
             if (return_code != 0){

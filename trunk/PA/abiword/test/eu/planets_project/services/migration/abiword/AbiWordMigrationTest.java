@@ -12,6 +12,7 @@ import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.ByteArrayHelper;
 import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.test.ServiceCreator;
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +34,8 @@ public final class AbiWordMigrationTest extends TestCase {
 
     /* The location of this service when deployed. */
     String wsdlLoc = "/pserv-pa-abiword/AbiWordMigration?wsdl";
+
+    PlanetsLogger log = PlanetsLogger.getLogger(AbiWordMigrationTest.class);
 
     /* A holder for the object to be tested */
     Migrate dom = null;
@@ -69,7 +72,7 @@ public final class AbiWordMigrationTest extends TestCase {
     @Test
     public void testDescribe() {
         ServiceDescription desc = dom.describe();
-        System.out.println("Recieved service description: \n\n" + desc.toXmlFormatted());
+        log.info("Recieved service description: \n\n" + desc.toXmlFormatted());
         assertTrue("The ServiceDescription should not be NULL.", desc != null );
     }
 
@@ -93,7 +96,7 @@ public final class AbiWordMigrationTest extends TestCase {
                 // from destination file extension
                 if( !origExt.equalsIgnoreCase(destExt) )
                 {
-                    System.out.println("Do migration test from "+origExt+" to "+destExt);
+                    log.info("Do migration test from "+origExt+" to "+destExt);
                     doMigration(origExt,destExt, null);
                 }
             }
