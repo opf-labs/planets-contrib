@@ -26,11 +26,11 @@ import static org.junit.Assert.*;
 
 /**
  * Local and client tests of the digital object migration functionality.
- * 
+ *
  * @author Sven Schlarb <shsschlarb-planets@yahoo.de>
  */
 public final class AbiWordMigrationTest extends TestCase {
-    
+
     /* The location of this service when deployed. */
     String wsdlLoc = "/pserv-pa-abiword/AbiWordMigration?wsdl";
 
@@ -40,7 +40,7 @@ public final class AbiWordMigrationTest extends TestCase {
     List<String> formats = null;
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see junit.framework.TestCase#setUp()
      */
     @Before
@@ -56,7 +56,7 @@ public final class AbiWordMigrationTest extends TestCase {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see junit.framework.TestCase#tearDown()
      */
     @After
@@ -111,6 +111,7 @@ public final class AbiWordMigrationTest extends TestCase {
         byte[] binary = ByteArrayHelper.read(new File(inTestFileName));
         DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
         MigrateResult mr = dom.migrate(input, Format.extensionToURI(origExt), Format.extensionToURI(destExt), params);
+        assertTrue("Migration result is null is null for planetsMigrate"+origExt+"to"+destExt+".", mr != null);
         DigitalObject doOut = mr.getDigitalObject();
         assertTrue("Resulting digital object is null for planetsMigrate"+origExt+"to"+destExt+".", doOut != null);
         FileUtils.writeInputStreamToFile(doOut.getContent().read(), new File( resFileDir), resFileName);

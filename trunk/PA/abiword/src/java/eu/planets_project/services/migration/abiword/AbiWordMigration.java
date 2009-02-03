@@ -1,5 +1,5 @@
 /*
- * 
+ *
  */
 package eu.planets_project.services.migration.abiword;
 
@@ -42,31 +42,33 @@ import java.util.Set;
 
 /**
  * The AbiWordMigration migrates JPEG files to JP2 files and vice versa.
- * 
+ *
  * @author Sven Schlarb <shsschlarb-planets@yahoo.de>
  */
 @Local(Migrate.class)
 @Remote(Migrate.class)
 @Stateless
 @WebService( name = AbiWordMigration.NAME ,
-        serviceName = Migrate.NAME, 
+        serviceName = Migrate.NAME,
         targetNamespace = PlanetsServices.NS,
         endpointInterface = "eu.planets_project.services.migrate.Migrate" )
 public final class AbiWordMigration implements Migrate, Serializable {
-    
+
     PlanetsLogger log = PlanetsLogger.getLogger(AbiWordMigration.class);
-    
-    
+
+
     /** The dvi ps installation dir */
     public String abiword_install_dir;
     /** The abiword application name */
     public String abiword_app_name;
+    /** The output file extension */
+    //public String abiword_outfile_ext;
     private File tmpInFile;
     private File tmpOutFile;
 
     String inputFmtExt = null;
     String outputFmtExt = null;
-    
+
     /***/
     static final String NAME = "AbiWordMigration";
 
@@ -74,13 +76,12 @@ public final class AbiWordMigration implements Migrate, Serializable {
     List<String> inputFormats = null;
     List<String> outputFormats = null;
     HashMap<String, String>  formatMapping = null;
-    
+
     /***/
     private static final long serialVersionUID = 2127494848765937613L;
 
     private void init()
     {
-
         // input formats
         inputFormats = new ArrayList<String>();
         inputFormats.add("doc");
@@ -106,39 +107,42 @@ public final class AbiWordMigration implements Migrate, Serializable {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameters)
      */
     public MigrateResult migrate( final DigitalObject digitalObject, URI inputFormat,
             URI outputFormat, Parameters parameters) {
-        
+
         Properties props = new Properties();
         try {
-            
+
             String strRsc = "/eu/planets_project/services/migration/abiword/abiword.properties";
             props.load( this.getClass().getResourceAsStream(strRsc));
             // config vars
             this.abiword_install_dir = props.getProperty("abiword.install.dir");
             this.abiword_app_name = props.getProperty("abiword.app.name");
-             
+            //this.abiword_outfile_ext = props.getProperty("abiword.outfile.ext");
+
         } catch( Exception e ) {
             // // config vars
             this.abiword_install_dir  = "/usr/bin";
             this.abiword_app_name = "abiword";
+            //this.abiword_outfile_ext = "jp2";
         }
-        log.info("Using abiword install directory: "+this.abiword_install_dir);
-        log.info("Using abiword application name: "+this.abiword_app_name);
+        System.out.println("Using abiword install directory: "+this.abiword_install_dir);
+        System.out.println("Using abiword application name: "+this.abiword_app_name);
+        //System.out.println("Using abiword outfile extension: "+this.abiword_outfile_ext);
 
         init();
         getExtensions(inputFormat,outputFormat);
-        
+
         /*
          * We just return a new digital object with the same required arguments
          * as the given:
          */
         byte[] binary = null;
         InputStream inputStream = digitalObject.getContent().read();
-            
+
             // write input stream to temporary file
             tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets", inputFmtExt);
             if( !(tmpInFile.exists() && tmpInFile.isFile() && tmpInFile.canRead() ))
@@ -146,31 +150,33 @@ public final class AbiWordMigration implements Migrate, Serializable {
                 log.error("[AbiWordMigration] Unable to create temporary input file!");
                 return null;
             }
-            log.info("[AbiWordMigration] Temporary input file created: "+tmpInFile.getAbsolutePath());
+            System.out.println("[AbiWordMigration] Temporary input file created: "+tmpInFile.getAbsolutePath());
 
-            // outfile name 
+            // outfile name
             String outFileStr = tmpInFile.getAbsolutePath()+"."+outputFmtExt;
-            log.info("[AbiWordMigration] Output file name: "+outFileStr);
+            System.out.println("[AbiWordMigration] Output file name: "+outFileStr);
 
             // run command
             ProcessRunner runner = new ProcessRunner();
             List<String> command = new ArrayList<String>();
             // setting up command
+            // Example: abiword --input testin.jpeg --input-format jpg --output-format jp2 --output testout.jp2
+            // Example (short version): abiword -f testin.jpg -t jpg -F testin.jp2 -T jp2
             command.add(this.abiword_app_name);
             command.add("--to="+outFileStr);
             command.add(tmpInFile.getAbsolutePath());
             runner.setCommand(command);
             runner.setInputStream(inputStream);
-            log.info("[AbiWordMigration] Executing command: "+command.toString() +" ...");
+            System.out.println("[AbiWordMigration] Executing command: "+command.toString() +" ...");
             runner.run();
             int return_code = runner.getReturnCode();
             if (return_code != 0){
-                log.error("[AbiWordMigration] Abiword conversion error code: " + Integer.toString(return_code));
+                log.error("[AbiWordMigration] Jasper conversion error code: " + Integer.toString(return_code));
                 log.error("[AbiWordMigration] " + runner.getProcessErrorAsString());
                 //log.error("[AbiWordMigration] Output: "+runner.getProcessOutputAsString());
                 return null;
             }
-            
+
             tmpOutFile = new File(outFileStr);
             // read byte array from temporary file
             if( tmpOutFile.isFile() && tmpOutFile.canRead() )
@@ -179,11 +185,11 @@ public final class AbiWordMigration implements Migrate, Serializable {
                 log.error( "Error: Unable to read temporary file "+tmpOutFile.getAbsolutePath() );
 
         DigitalObject newDO = null;
-        
+
         ServiceReport report = new ServiceReport();
-        
+
         newDO = new DigitalObject.Builder(Content.byValue(binary)).build();
-        
+
         return new MigrateResult(newDO, report);
     }
 
@@ -196,7 +202,7 @@ public final class AbiWordMigration implements Migrate, Serializable {
         }
     }
 
-    /**
+        /**
      * Gets one extension from a set of possible extensions for the incoming
      * request planets URI (e.g. planets:fmt/ext/jpeg) which matches with
      * one format of the set of abiword's supported input/output formats. If
@@ -222,7 +228,7 @@ public final class AbiWordMigration implements Migrate, Serializable {
         Iterator<String> itrReq = reqInputFormatExts.iterator();
         // Iterate either over input formats ArrayList or over output formats
         // HasMap
-        Iterator<String> itrAbiword = (isOutput)?outputFormats.iterator():inputFormats.iterator();
+        Iterator<String> itrJasper = (isOutput)?outputFormats.iterator():inputFormats.iterator();
         // Iterate over possible extensions that correspond to the request
         // planets uri.
         while(itrReq.hasNext()) {
@@ -230,12 +236,12 @@ public final class AbiWordMigration implements Migrate, Serializable {
             // format URI, note that the relation of Planets-format-URI to
             // extensions is 1 : n.
             String reqFmtExt = normalizeExt((String) itrReq.next());
-            while(itrAbiword.hasNext()) {
+            while(itrJasper.hasNext()) {
                 // Iterate over the formats that abiword offers either as input or
                 // as output format.
                 // See input formats in the this.init() method to see the
                 // abiword input/output formats offered by this service.
-                String gimpFmtStr = (String) itrAbiword.next();
+                String gimpFmtStr = (String) itrJasper.next();
                 if( reqFmtExt.equalsIgnoreCase(gimpFmtStr) )
                 {
                     // select the gimp supported format
@@ -304,14 +310,13 @@ public final class AbiWordMigration implements Migrate, Serializable {
             new MigrationPath(Format.extensionToURI("txt"), Format.extensionToURI("doc"),null),
             new MigrationPath(Format.extensionToURI("txt"), Format.extensionToURI("html"),null),
             new MigrationPath(Format.extensionToURI("txt"), Format.extensionToURI("pdf"),null),
-            new MigrationPath(Format.extensionToURI("txt"), Format.extensionToURI("rtf"),null)
-        };
+            new MigrationPath(Format.extensionToURI("txt"), Format.extensionToURI("rtf"),null)};
         builder.paths(mPaths);
         builder.classname(this.getClass().getCanonicalName());
         builder.version("0.1");
 
         ServiceDescription mds =builder.build();
-        
+
         return mds;
     }
 }
