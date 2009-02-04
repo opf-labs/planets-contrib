@@ -54,6 +54,7 @@ public final class AbiWordMigrationTest extends TestCase {
         formats.add("html");
         formats.add("pdf");
         formats.add("txt");
+//        formats.add("txt"); // Not sure that odt works on ubuntu (bug)
         dom = ServiceCreator.createTestService(Migrate.QNAME, AbiWordMigration.class, wsdlLoc);
     }
 

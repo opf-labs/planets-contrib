@@ -89,6 +89,7 @@ public final class AbiWordMigration implements Migrate, Serializable {
         inputFormats.add("pdf");
         inputFormats.add("rtf");
         inputFormats.add("txt");
+//        inputFormats.add("odt"); // Not sure that odt works on ubuntu (bug)
 
         // output formats and associated output parameters
         outputFormats = new ArrayList<String>();
@@ -97,6 +98,8 @@ public final class AbiWordMigration implements Migrate, Serializable {
         outputFormats.add("pdf");
         outputFormats.add("rtf");
         outputFormats.add("txt");
+//        inputFormats.add("odt"); // Not sure that odt works on ubuntu (bug)
+
 
         // Disambiguation of extensions, e.g. {"JPG","JPEG"} to {"JPEG"}
         // FIXIT This should be supported by the FormatRegistryImpl class, but
@@ -121,17 +124,14 @@ public final class AbiWordMigration implements Migrate, Serializable {
             // config vars
             this.abiword_install_dir = props.getProperty("abiword.install.dir");
             this.abiword_app_name = props.getProperty("abiword.app.name");
-            //this.abiword_outfile_ext = props.getProperty("abiword.outfile.ext");
 
         } catch( Exception e ) {
             // // config vars
             this.abiword_install_dir  = "/usr/bin";
             this.abiword_app_name = "abiword";
-            //this.abiword_outfile_ext = "jp2";
         }
         log.info("Using abiword install directory: "+this.abiword_install_dir);
         log.info("Using abiword application name: "+this.abiword_app_name);
-        //log.info("Using abiword outfile extension: "+this.abiword_outfile_ext);
 
         init();
         getExtensions(inputFormat,outputFormat);
@@ -202,7 +202,7 @@ public final class AbiWordMigration implements Migrate, Serializable {
         }
     }
 
-        /**
+    /**
      * Gets one extension from a set of possible extensions for the incoming
      * request planets URI (e.g. planets:fmt/ext/jpeg) which matches with
      * one format of the set of abiword's supported input/output formats. If
@@ -279,7 +279,7 @@ public final class AbiWordMigration implements Migrate, Serializable {
         builder.author("Sven Schlarb <shsschlarb-planets@yahoo.de>");
         builder.classname(this.getClass().getCanonicalName());
         builder.description("Simple service for Abiword (Version: GNOME AbiWord-2.4 2.4.6) "+
-                "document conversions between the formats doc, html, pdf, rtf, txt (all directions)."+
+                "document conversions between the formats doc, html, pdf, rtf, txt, odt (all directions)."+
                 "AbiWord can convert documents in one format (it doesn't have to be "+
                 "AbiWord, just a format AbiWord supports) to OpenOffice.org Writer, "+
                 "or Word, or any of a heck of a lot other formats. Even better, you "+
@@ -295,22 +295,33 @@ public final class AbiWordMigration implements Migrate, Serializable {
             new MigrationPath(Format.extensionToURI("doc"), Format.extensionToURI("pdf"),null),
             new MigrationPath(Format.extensionToURI("doc"), Format.extensionToURI("rtf"),null),
             new MigrationPath(Format.extensionToURI("doc"), Format.extensionToURI("txt"),null),
+//            new MigrationPath(Format.extensionToURI("doc"), Format.extensionToURI("odt"),null), // Not sure that odt works on ubuntu (bug)
             new MigrationPath(Format.extensionToURI("html"), Format.extensionToURI("doc"),null),
             new MigrationPath(Format.extensionToURI("html"), Format.extensionToURI("pdf"),null),
             new MigrationPath(Format.extensionToURI("html"), Format.extensionToURI("rtf"),null),
             new MigrationPath(Format.extensionToURI("html"), Format.extensionToURI("txt"),null),
+//            new MigrationPath(Format.extensionToURI("html"), Format.extensionToURI("odt"),null), // Not sure that odt works on ubuntu (bug)
             new MigrationPath(Format.extensionToURI("pdf"), Format.extensionToURI("doc"),null),
             new MigrationPath(Format.extensionToURI("pdf"), Format.extensionToURI("html"),null),
             new MigrationPath(Format.extensionToURI("pdf"), Format.extensionToURI("rtf"),null),
             new MigrationPath(Format.extensionToURI("pdf"), Format.extensionToURI("txt"),null),
+//            new MigrationPath(Format.extensionToURI("pdf"), Format.extensionToURI("odt"),null), // Not sure that odt works on ubuntu (bug)
             new MigrationPath(Format.extensionToURI("rtf"), Format.extensionToURI("doc"),null),
             new MigrationPath(Format.extensionToURI("rtf"), Format.extensionToURI("html"),null),
             new MigrationPath(Format.extensionToURI("rtf"), Format.extensionToURI("pdf"),null),
             new MigrationPath(Format.extensionToURI("rtf"), Format.extensionToURI("txt"),null),
+//            new MigrationPath(Format.extensionToURI("rtf"), Format.extensionToURI("odt"),null), // Not sure that odt works on ubuntu (bug)
             new MigrationPath(Format.extensionToURI("txt"), Format.extensionToURI("doc"),null),
             new MigrationPath(Format.extensionToURI("txt"), Format.extensionToURI("html"),null),
             new MigrationPath(Format.extensionToURI("txt"), Format.extensionToURI("pdf"),null),
-            new MigrationPath(Format.extensionToURI("txt"), Format.extensionToURI("rtf"),null)};
+            new MigrationPath(Format.extensionToURI("txt"), Format.extensionToURI("rtf"),null)/*,
+            new MigrationPath(Format.extensionToURI("txt"), Format.extensionToURI("odt"),null),
+            new MigrationPath(Format.extensionToURI("odt"), Format.extensionToURI("doc"),null),
+            new MigrationPath(Format.extensionToURI("odt"), Format.extensionToURI("html"),null),
+            new MigrationPath(Format.extensionToURI("odt"), Format.extensionToURI("pdf"),null),
+            new MigrationPath(Format.extensionToURI("odt"), Format.extensionToURI("rtf"),null),
+            new MigrationPath(Format.extensionToURI("odt"), Format.extensionToURI("txt"),null),*/ // Not sure that odt works on ubuntu (bug)
+        };
         builder.paths(mPaths);
         builder.classname(this.getClass().getCanonicalName());
         builder.version("0.1");
