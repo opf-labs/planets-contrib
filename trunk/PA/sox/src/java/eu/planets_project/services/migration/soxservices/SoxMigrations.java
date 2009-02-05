@@ -11,11 +11,16 @@ import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.datatypes.Parameters;
 
 /**
+ * @deprecated Use {@link SoX} instead.
+ */
+
+/**
  * Common sox invocation class
  * 
  * @author : Thomas Kraemer thomas.kraemer@uni-koeln.de created : 14.07.2008
  * 
  */
+@Deprecated
 public class SoxMigrations {
 
     /**

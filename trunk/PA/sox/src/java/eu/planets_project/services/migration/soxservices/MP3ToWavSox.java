@@ -19,6 +19,10 @@ import eu.planets_project.services.migrate.BasicMigrateOneBinary;
 import eu.planets_project.services.utils.PlanetsLogger;
 
 /**
+ * @deprecated Use {@link SoX} instead.
+ */
+
+/**
  * Convert a file from  mp3 to .wav.
  *  @author : Thomas Kraemer thomas.kraemer@uni-koeln.de
  *  created : 14.07.2008
@@ -35,6 +39,7 @@ import eu.planets_project.services.utils.PlanetsLogger;
 @SOAPBinding( style = SOAPBinding.Style.RPC)
 @BindingType(value = "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")
 @MTOM(enabled = true, threshold = 0)
+@Deprecated
 public class MP3ToWavSox implements BasicMigrateOneBinary {
 
 	PlanetsLogger log = PlanetsLogger.getLogger(MP3ToWavSox.class);
