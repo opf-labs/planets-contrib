@@ -279,8 +279,8 @@ public final class OpenJpegMigration implements Migrate, Serializable {
                             "promote the use of JPEG 2000, the new still-image compression "+
                             "standard from the Joint Photographic Experts Group (JPEG). ");
         MigrationPath[] mPaths = new MigrationPath []{
-            new MigrationPath(Format.extensionToURI("jpg"), Format.extensionToURI("jp2"),null),
-            new MigrationPath(Format.extensionToURI("jp2"), Format.extensionToURI("jpg"),null)};
+            new MigrationPath(Format.extensionToURI("tif"), Format.extensionToURI("jp2"),null),
+            new MigrationPath(Format.extensionToURI("jp2"), Format.extensionToURI("tif"),null)};
         builder.paths(mPaths);
         builder.classname(this.getClass().getCanonicalName());
         builder.version("0.1");
