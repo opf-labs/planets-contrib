@@ -79,18 +79,18 @@ public final class AvidemuxMigration implements Migrate, Serializable {
     HashMap<String, String>  formatMapping = null;
     HashMap<String, Parameter> defaultParameters = null;
 
+    List<Parameter> parameterList;
+
     /***/
     private static final long serialVersionUID = 2127494848765937613L;
 
     private List<String> getCommandsStringArray() {
         // Example command:
-        // avidemux2_cli --nogui --save out.avi --load in.avi --audio-bitrate 320
-        // --fps 1000 --audio-codec MP3 --video-codec Divx --video-conf 2pass=700
-        // --autoindex --output-format AVI
         List<String> commands = new ArrayList<String>();
         if( avidemux_app_name == null || tmpOutFile == null || tmpInFile == null )
             return null;
-        // avidemux2_cli --nogui --autoindex --load demonstration2.mpeg
+        // Simple example command:
+        // avidemux --nogui --autoindex --load demonstration2.mpeg
         // --audio-codec NONE --video-codec XVID4 --output-format AVI
         // --save out2.avi --quit
         commands.add(this.avidemux_install_dir+"/"+this.avidemux_app_name);
@@ -98,21 +98,22 @@ public final class AvidemuxMigration implements Migrate, Serializable {
         commands.add("--autoindex");
         commands.add("--load");
         commands.add(this.tmpInFile.getAbsolutePath());
+        /* FIXME Audio bitrate has been deactivated - Correct input has to be checked, otherwise crash in libc */
 //        commands.add("--audio-bitrate");
 //        commands.add(this.defaultParameters.get("audio-bitrate").value);
-//        commands.add("--fps");
-//        commands.add(this.defaultParameters.get("fbs").value);
+        commands.add("--fps");
+        commands.add(this.defaultParameters.get("fps").value);
         commands.add("--audio-codec");
         commands.add(this.defaultParameters.get("audio-codec").value);
         commands.add("--video-codec");
-        commands.add(this.defaultParameters.get("video-codec").value);
+        String vidCod = this.defaultParameters.get("video-codec").value;
+        commands.add(vidCod);
         commands.add("--output-format");
         commands.add("AVI");
         commands.add("--save");
         commands.add(this.tmpOutFile.getAbsolutePath());
-//      commands.add("--video-conf");
-//      commands.add("2pass="+this.defaultParameters.get("video-config-2pass-size").value);
         commands.add("--quit");
+        System.out.println(commands.toString());
         return commands;
     }
 
@@ -155,23 +156,22 @@ public final class AvidemuxMigration implements Migrate, Serializable {
 
         String videoCodecParamName = "video-codec";
         Parameter videoCodecParam = new Parameter(videoCodecParamName, "XVID4");
-        videoCodecParam.setDescription("Choose one of Divx, Xvid, FFmpeg4, VCD, SVCD, DVD, XVCD, XSVCD, COPY (one argument - case sensitive!). The audio track will be encoded using the selected encoder (COPY leaves the audio-track unchanged)");
+        videoCodecParam.setDescription("Choose one of XVID4, X264, FFMPEG4 (LavCodec), COPY (one argument). The video track will be encoded using the selected encoder (COPY leaves the video-track unchanged)");
         this.defaultParameters.put(videoCodecParamName, videoCodecParam);
 
-        String audioBitrateParamName = "audio-bitrate";
-        Parameter audioBitrateParam = new Parameter(audioBitrateParamName, "128");
-        audioBitrateParam.setDescription("Choose one of the integers 56, 64, 80, 96, 112, 128, 160, 192, 224 for the audio bitrate.");
-        this.defaultParameters.put(audioBitrateParamName, audioBitrateParam);
+        /* FIXME Audio bitrate has been deactivated - Correct input has to be checked, otherwise crash in libc! */
+//        String audioBitrateParamName = "audio-bitrate";
+//        Parameter audioBitrateParam = new Parameter(audioBitrateParamName, "128");
+//        audioBitrateParam.setDescription("Choose one of the integers 56, 64, 80, 96, 112, 128, 160, 192, 224 for the audio bitrate.");
+//        this.defaultParameters.put(audioBitrateParamName, audioBitrateParam);
 
         String fpsParamName = "fps";
         Parameter fpsParam = new Parameter(fpsParamName, "30");
         fpsParam.setDescription("Positive integer for the frames per second of the video.");
         this.defaultParameters.put(fpsParamName, fpsParam);
 
-        String videoConfigParamName = "video-config-2pass-size";
-        Parameter videoConfigParam = new Parameter(videoConfigParamName, "0");
-        videoConfigParam.setDescription("Video config 2pass size: Positive integer which indicates the size of the result video. 0 means that no 2pass encoding is applied. Note that 2 pass means that encoding has to be performed twice and therefore takes more time.");
-        this.defaultParameters.put(videoConfigParamName, videoConfigParam);
+        // Get list for the migration path parameter
+        parameterList = this.getParameters().getParameters();
     }
 
     /**
@@ -253,7 +253,7 @@ public final class AvidemuxMigration implements Migrate, Serializable {
         if( tmpOutFile.isFile() && tmpOutFile.canRead() )
             binary = ByteArrayHelper.read(tmpOutFile);
         else {
-            String errorMsg =  "Error: Unable to read temporary file "+tmpOutFile.getAbsolutePath();
+            String errorMsg =  "[AvidemuxMigration] Error: Unable to read temporary file "+tmpOutFile.getAbsolutePath();
             log.error(errorMsg);
             return new MigrateResult( null, ServiceUtils.createErrorReport(errorMsg) );
         }
@@ -276,21 +276,10 @@ public final class AvidemuxMigration implements Migrate, Serializable {
             while(userParmsItr.hasNext()) {
                 Parameter userParam = (Parameter) userParmsItr.next();
                 log.info("Set parameter: " + userParam.name + " with value: " + userParam.value);
-                // get hashmap of the desired output format
-                List<Parameter> defaultParamList = (List<Parameter>)defaultParameters.get(outputFmtExt);
-                Iterator<Parameter> defParmsItr = defaultParamList.iterator();
-                int index = 0;
-                while( defParmsItr.hasNext() )
-                {
-                    Parameter defParam = (Parameter) defParmsItr.next();
-                    if( userParam.name.equalsIgnoreCase(defParam.name) )
-                    {
-                        defaultParamList.set(index, userParam);
-                        break;
-                    }
-                    index++;
-                }
-
+                if( defaultParameters.containsKey(userParam.name))
+                    this.defaultParameters.put(userParam.name, userParam);
+                else
+                    log.info("[AvidemuxMigration] Warning: Parameter ignored: " + userParam.name + " with value: " + userParam.value);
             }
         }
     }
@@ -397,25 +386,29 @@ public final class AvidemuxMigration implements Migrate, Serializable {
         initParameters();
         Parameters parameters = getParameters();
         ServiceDescription.Builder builder = new ServiceDescription.Builder(NAME, Migrate.class.getName());
-
         builder.author("Sven Schlarb <shsschlarb-planets@yahoo.de>");
         builder.classname(this.getClass().getCanonicalName());
         builder.description(
             "This service offers MPEG to AVI migration using a small subset of " +
             "the configuration parameters that the program Avidemux offers. "+
-            "The strength of Avidemux is that it offers GUI (Grafical user interface) "+
-            "and CLI (Command line interface) interfaces for video editing and " +
-            "conversion with numerous configuration parameters and filters that " +
-            "can be applied.\n" +
-            "In this preliminar PLANETS Avidemux service implementation, different codecs for " +
-            "audio and video track as well as filters for audio and video still" +
-            "cannot be selected.\n" +
-            "Later on configuration options, like codecs and filters will be added."+
-            "This will be e.g. codecs for the audio and video track, options like the audio bitrate and" +
-            "frames per second of the video track, etc. Filters will be e.g. deinterlacing, " +
-            "noise reduction, or sharpen filters.\n" +
-            "Please contact the service developer if specific desired options should be considered.\n"+
-            "Some information on Avidemux (source: Wikipedia):\n"+
+            "Avidemux offers a GUI (Grafical user interface) "+
+            "and a CLI (Command line interface) for video editing and " +
+            "conversion with numerous configuration parameters and filters for " +
+            "compressing the video file. A huge set of parameters allows reducing " +
+            "the file size while keeping - if the parameters are combined thoroughly -  " +
+            "video and audio quality close to the original video file.\n\n" +
+            "The service offers some of the configuration options, like codecs " +
+            "and filters for the audio and/or the video track of " +
+            "the video file, or options like frames per second " +
+            "of the video track, etc. Furthermore, it offers filters, like e.g.  " +
+            "deinterlacing, noise reduction, or sharpen filters.\n" +
+            "Please contact the service developer if specific parameters " +
+            "should be considered.\n\n" +
+            "The service requires the package avidemux-cli (openSUSE/debian based Linux " +
+            "distribution). Only if this package is installed, the command line " +
+            "program /usr/bin/avidemux2_cli is available. Often there is a symbol " +
+            "/usr/bin/avidemux2_qt4 to the Qt-GUI version."+
+            "Further information on Avidemux (source: Wikipedia):\n"+
             "Avidemux is a free open-source program designed for "+
             "multi-purpose video editing and processing. It is written in C/C++, "+
             "using either the GTK+ or Qt graphics toolkit or a command line interface, "+
@@ -429,8 +422,9 @@ public final class AvidemuxMigration implements Migrate, Serializable {
             "The program can be run in 64-bit operating systems that are "+
             "non-Windows and non-Macintosh based.\n");
         MigrationPath[] mPaths = new MigrationPath []{
-            new MigrationPath(Format.extensionToURI("mpeg"), Format.extensionToURI("avi"),null)
+            new MigrationPath(Format.extensionToURI("mpeg"), Format.extensionToURI("avi"),this.parameterList)
         };
+
         builder.paths(mPaths);
         builder.parameters(parameters);
         builder.classname(this.getClass().getCanonicalName());

@@ -78,37 +78,60 @@ public final class AvidemuxMigrationTest extends TestCase {
      * @throws IOException
      */
     @Test
-    public void testMigrateAll() throws IOException {
-        String origExt = null;
-        String destExt = null;
-        // Tests will be executed for 1 set of test files of the formats
-        // that the avidemux service wrapper supports:
-        // demonstration.jpg, demonstration.jp2
-        for (Iterator<String> itr1 = formats.iterator(); itr1.hasNext();) {
-            origExt = (String) itr1.next();
-            for (Iterator<String> itr2 = formats.iterator(); itr2.hasNext();)
-            {
-                destExt = (String) itr2.next();
-                // do the migration only if original file extension differs
-                // from destination file extension
-                if( origExt.equalsIgnoreCase("mpeg") && !origExt.equalsIgnoreCase(destExt) )
-                {
-                    log.info("Do migration test from "+origExt+" to "+destExt);
-                    doMigration(origExt,destExt, "1",null);
-                    doMigration(origExt,destExt, "2",null);
-                }
-            }
-        }
+    public void testMigrateDefault() throws IOException {
+        doMigration("mpeg","avi", "1" , "1_DefaultParameters",null);
+        doMigration("mpeg","avi", "2" , "2_DefaultParameters",null);
+    }
+    
+    public void tParameter(String paramName,String codecName) throws IOException {
+        Parameters parameters = new Parameters();
+        parameters.add(paramName, codecName);
+        doMigration("mpeg","avi", "2" , "2_TestParameter_"+paramName+"_"+codecName,parameters);
+    }
+    @Test
+    public void testParameterVideoCodec_XVID4() throws IOException
+    {
+        tParameter("video-codec","XVID4");
+    }
+    @Test
+    public void testParameterVideoCodec_X264() throws IOException
+    {
+        tParameter("video-codec","X264");
+    }
+    @Test
+    public void testParameterVideoCodec_FFMPEG4() throws IOException
+    {
+        tParameter("video-codec","FFMPEG4");
+    }
+    @Test
+    public void testParameterAudioCodec_MP2() throws IOException
+    {
+        tParameter("audio-codec","MP2");
+    }
+    @Test
+    public void testParameterAudioCodec_MP3() throws IOException
+    {
+        tParameter("audio-codec","MP3");
+    }
+    @Test
+    public void testParameterAudioCodec_AC3() throws IOException
+    {
+        tParameter("audio-codec","AC3");
+    }
+    @Test
+    public void testParameterFPS() throws IOException
+    {
+        tParameter("fps","5"); // Should make the video "studdering" and desynchronize audio and video
     }
 
-    private void doMigration(String origExt, String destExt, String suffix, Parameters params) throws IOException
+    private void doMigration(String origExt, String destExt, String origSuffix, String destSuffix, Parameters params) throws IOException
     {
         // Test file name
-        String inTestFileName = "PA/avidemux/test/testfiles/demonstration"+suffix+"." + origExt.toLowerCase();
+        String inTestFileName = "PA/avidemux/test/testfiles/demonstration"+origSuffix+"." + origExt.toLowerCase();
         // Output file name
         //String outTestFileName = "PA/avidemux/test/testfiles/generatedfiles/planetsMigrate"+origExt+"to"+destExt+String.valueOf(cycle)+"."+destExt.toLowerCase();
         String resFileDir = "PA/avidemux/test/testfiles/generatedfiles/";
-        String resFileName = "planetsMigrate"+origExt.toUpperCase()+"to"+destExt.toUpperCase()+suffix+"."+destExt.toLowerCase();
+        String resFileName = "planetsMigrate"+origExt.toUpperCase()+"to"+destExt.toUpperCase()+destSuffix+"."+destExt.toLowerCase();
         byte[] binary = ByteArrayHelper.read(new File(inTestFileName));
         DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
         MigrateResult mr = dom.migrate(input, Format.extensionToURI(origExt), Format.extensionToURI(destExt), params);
