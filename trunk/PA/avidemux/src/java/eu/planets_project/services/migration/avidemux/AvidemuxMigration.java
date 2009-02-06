@@ -390,37 +390,23 @@ public final class AvidemuxMigration implements Migrate, Serializable {
         builder.classname(this.getClass().getCanonicalName());
         builder.description(
             "This service offers MPEG to AVI migration using a small subset of " +
-            "the configuration parameters that the program Avidemux offers. "+
-            "Avidemux offers a GUI (Grafical user interface) "+
-            "and a CLI (Command line interface) for video editing and " +
-            "conversion with numerous configuration parameters and filters for " +
-            "compressing the video file. A huge set of parameters allows reducing " +
+            "the comprehensive functionality of the open-source program Avidemux.\n\n "+
+            "Avidemux is available with a GUI (Grafical user interface) "+
+            "and a CLI (Command line interface) version for video editing and " +
+            "conversion. It offers numerous configuration parameters and filters for " +
+            "compressing video files. A huge set of parameters allows reducing " +
             "the file size while keeping - if the parameters are combined thoroughly -  " +
             "video and audio quality close to the original video file.\n\n" +
-            "The service offers some of the configuration options, like codecs " +
-            "and filters for the audio and/or the video track of " +
-            "the video file, or options like frames per second " +
-            "of the video track, etc. Furthermore, it offers filters, like e.g.  " +
-            "deinterlacing, noise reduction, or sharpen filters.\n" +
-            "Please contact the service developer if specific parameters " +
-            "should be considered.\n\n" +
+            "The service allows you to select codecs for the audio and/or the video " +
+            "track of the video file and some further options, like e.g. frames " +
+            "per second (fps) of the video track."+
+            "Please contact the service developer if you believe that specific " +
+            "parameters should be considered.\n\n" +
             "The service requires the package avidemux-cli (openSUSE/debian based Linux " +
             "distribution). Only if this package is installed, the command line " +
-            "program /usr/bin/avidemux2_cli is available. Often there is a symbol " +
-            "/usr/bin/avidemux2_qt4 to the Qt-GUI version."+
-            "Further information on Avidemux (source: Wikipedia):\n"+
-            "Avidemux is a free open-source program designed for "+
-            "multi-purpose video editing and processing. It is written in C/C++, "+
-            "using either the GTK+ or Qt graphics toolkit or a command line interface, "+
-            "and is a platform independent, universal video processing program. "+
-            "It is available for almost all distributions of Linux that are "+
-            "capable of compiling C/C++, GTK+ and the SpiderMonkey ECMAScript "+
-            "scripting engine. A Win32 version of this program is also available "+
-            "for Windows users, as well as Mac OS X, FreeBSD, NetBSD and OpenBSD "+
-            "ports and packages. The program has also been successfully run "+
-            "under Solaris, though no official packages or binaries exist for it. "+
-            "The program can be run in 64-bit operating systems that are "+
-            "non-Windows and non-Macintosh based.\n");
+            "program /usr/bin/avidemux2_cli is available. On most Linux distributions, the " +
+            "symbolic link 'avidemux' points to the GUI version, like the Qt-GUI version " +
+            "/usr/bin/avidemux2_qt4 for KDE-Linux-Desktops.");
         MigrationPath[] mPaths = new MigrationPath []{
             new MigrationPath(Format.extensionToURI("mpeg"), Format.extensionToURI("avi"),this.parameterList)
         };
