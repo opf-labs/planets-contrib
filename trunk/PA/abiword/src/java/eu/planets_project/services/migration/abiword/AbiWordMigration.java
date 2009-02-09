@@ -278,18 +278,15 @@ public final class AbiWordMigration implements Migrate, Serializable {
 
         builder.author("Sven Schlarb <shsschlarb-planets@yahoo.de>");
         builder.classname(this.getClass().getCanonicalName());
-        builder.description("Simple service for Abiword (Version: GNOME AbiWord-2.4 2.4.6) "+
-                "document conversions between the formats doc, html, pdf, rtf, txt, odt (all directions)."+
-                "AbiWord can convert documents in one format (it doesn't have to be "+
-                "AbiWord, just a format AbiWord supports) to OpenOffice.org Writer, "+
-                "or Word, or any of a heck of a lot other formats. Even better, you "+
-                "can do these conversions via the command line. For instance, let's "+
-                "say you have a Word document named foo.doc, and you want to convert "+
-                "it to AbiWord format without having to open the program. This is the" +
-                "functionality used by this wrapper. The main strength of Abiword is"+
-                "that you can write additional so called exporters which add new"+
-                "migration functionality. Therefore, this service really extensible" +
-                "in the functionality it offers.");
+        builder.description("This service provides Abiword (Version: GNOME AbiWord-2.4 2.4.6) "+
+                "document conversions between the formats doc, html, pdf, rtf, txt, odt " +
+                "(all directions).\n\n"+
+                "The OpenOffice conversion (odt) has been left out in this implementation because" +
+                "of a bug in the Ubuntu Linux distribution (exporter for odt does not work):\n" +
+                "https://bugs.launchpad.net/ubuntu/+source/abiword/+bug/24195\n" +
+                "This functionality can be easily added afterwards. With Abiword, you can write " +
+                "additional so called exporters which add new migration functionality. " +
+                "Therefore, this service is extensible in the functionality it offers.");
         MigrationPath[] mPaths = new MigrationPath []{
             new MigrationPath(Format.extensionToURI("doc"), Format.extensionToURI("html"),null),
             new MigrationPath(Format.extensionToURI("doc"), Format.extensionToURI("pdf"),null),
