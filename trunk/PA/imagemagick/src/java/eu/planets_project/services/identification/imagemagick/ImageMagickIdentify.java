@@ -51,7 +51,7 @@ public class ImageMagickIdentify implements Identify, Serializable {
 	
 	public static final String NAME = "ImageMagickIdentify";
 	
-	private static final long serialVersionUID = -772290809743383420L;
+	public static final long serialVersionUID = -772290809743383420L;
 	
 	private PlanetsLogger PLOGGER = PlanetsLogger.getLogger(this.getClass()) ;
 	

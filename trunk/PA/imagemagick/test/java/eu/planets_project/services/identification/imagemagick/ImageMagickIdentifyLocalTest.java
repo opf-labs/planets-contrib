@@ -19,12 +19,15 @@ import org.junit.Test;
 import eu.planets_project.ifr.core.techreg.api.formats.Format;
 import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
+import eu.planets_project.services.datatypes.Agent;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.Event;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.identify.Identify;
 import eu.planets_project.services.identify.IdentifyResult;
+import eu.planets_project.services.utils.ServiceUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
 
 /**
@@ -73,12 +76,22 @@ public class ImageMagickIdentifyLocalTest {
 		
 		Set<File> fileSet = files.keySet();
 		
+		Event event = new Event();
+		Agent agent = new Agent();
+		agent.id = Long.toString(ImageMagickIdentify.serialVersionUID);
+		agent.name = this.getClass().getCanonicalName();
+		agent.type = "JUnit Testcase";
+		event.agent = agent;
+		event.datetime = ServiceUtils.getSystemDateAndTimeFormatted();
+		event.summary = "This is just a short test of the Event construct...using ImageMagickIdentify...";
+		
 		for (File file : fileSet) {
 			String ext = files.get(file);
 			DigitalObject digObj = DigitalObject.create(Content.byValue(file))
 			.permanentUrl(new URL("http://planets-project.eu/services/pserv-pa-imagemagickidentify-test"))
 			.format(Format.extensionToURI(ext))
 			.title(file.getName())
+			.events(event)
 			.build();
 			System.out.println("Testing identification of " + ext.toUpperCase() + ": " + file.getName());
 			IdentifyResult ir = imIdentify.identify(digObj);
