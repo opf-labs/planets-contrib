@@ -34,14 +34,14 @@ import javax.jws.WebService;
 @Local(Migrate.class)
 @Remote(Migrate.class)
 @Stateless
-@WebService(/* name = XenaOOMigration.NAME ,*/serviceName = Migrate.NAME,
+@WebService( name = XenaOOMigration.NAME ,serviceName = Migrate.NAME,
 targetNamespace = PlanetsServices.NS,
 endpointInterface = "eu.planets_project.services.migrate.Migrate")
 public class XenaOOMigration implements Migrate, Serializable {
 
-    public enum Odf {
+    public enum supportedOdfFormats {
 
-        odt, odp, ods, odg, odb, odf
+        odt, ods, odg, odf
     };
     PlanetsLogger log = PlanetsLogger.getLogger(XenaOOMigration.class);
     private static final long serialVersionUID = 3952711367037433051L;
@@ -51,12 +51,12 @@ public class XenaOOMigration implements Migrate, Serializable {
         FormatRegistryImpl fmtRegImpl = new FormatRegistryImpl();
         Format uriFormatObj = fmtRegImpl.getFormatForURI(formatUri);
         Set<String> reqInputFormatExts = uriFormatObj.getExtensions();
-        Odf ext = null;
+        supportedOdfFormats ext = null;
 
         for (String inFormat : reqInputFormatExts) {
-            System.out.println("possible informat: " + inFormat);
+            System.out.println("possible format: " + inFormat);
             try {
-                ext = Odf.valueOf(inFormat);
+                ext = supportedOdfFormats.valueOf(inFormat);
             } catch (IllegalArgumentException e) {
                 return null;
             }
@@ -70,7 +70,7 @@ public class XenaOOMigration implements Migrate, Serializable {
         Set<String> reqInputFormatExts = uriFormatObj.getExtensions();
 
         for (String inFormat : reqInputFormatExts) {
-            System.out.println("possible informat: " + inFormat);
+            System.out.println("possible format: " + inFormat);
             if (inFormat.equals(ext)) {
                 return true;
             }
@@ -118,13 +118,13 @@ public class XenaOOMigration implements Migrate, Serializable {
     public ServiceDescription describe() {
         ServiceDescription.Builder builder = new ServiceDescription.Builder(NAME, Migrate.class.getName());
 
-        builder.author("Sven Schlarb <shsschlarb-planets@yahoo.de>, Georg Petz <georg.petz@onb.ac.at");
+        builder.author("Georg Petz <georg.petz@onb.ac.at");
         builder.classname(this.getClass().getCanonicalName());
         builder.description("XENA OO Wrapper");
 
         ArrayList<MigrationPath> mPathsList = new ArrayList<MigrationPath>();
 
-                for (Odf odfExt : Odf.values()){
+                for (supportedOdfFormats odfExt : supportedOdfFormats.values()){
             mPathsList.add(new MigrationPath(Format.extensionToURI(odfExt.toString()), Format.extensionToURI("pdf"), null));
         }
         mPathsList.add(new MigrationPath(Format.extensionToURI("doc"), Format.extensionToURI("odt"), null));
