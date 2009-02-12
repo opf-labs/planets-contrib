@@ -16,6 +16,7 @@ import org.junit.Test;
 import eu.planets_project.ifr.core.techreg.api.formats.Format;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.Event;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.Parameters;
 import eu.planets_project.services.datatypes.ServiceDescription;
@@ -539,6 +540,16 @@ public class ImageMagickMigrateLocalTest {
             System.out.println("DigitalObject.getFormat(): " + doOut.getFormat().toASCIIString());
             System.out.println("DigitalObject.content.isByValue: " + doOut.getContent().isByValue());
             System.out.println("DigitalObject.content.getReference: " + doOut.getContent().getReference());
+            System.out.println("Events: ");
+            List<Event> events = doOut.getEvents();
+            for (Event event : events) {
+				System.out.println("Agent name: " + event.agent.name);
+				System.out.println("Agent type: " + event.agent.type);
+				System.out.println("Agent id: " + event.agent.id);
+				System.out.println("Event summary: " + event.summary);
+				System.out.println("Event datetime: " + event.datetime);
+				System.out.println("Event duration: " + event.duration);
+			}
             
             int compressionType = 1;
             String compressionQuality= "";

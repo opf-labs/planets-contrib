@@ -2,6 +2,7 @@ package eu.planets_project.services.migration.imagemagick;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -24,8 +25,10 @@ import eu.planets_project.ifr.core.techreg.api.formats.Format;
 import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.datatypes.Agent;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.Event;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.Parameters;
@@ -52,8 +55,13 @@ import eu.planets_project.services.utils.ServiceUtils;
         serviceName = Migrate.NAME,
         targetNamespace = PlanetsServices.NS,
         endpointInterface = "eu.planets_project.services.migrate.Migrate")
-public class ImageMagickMigrate implements Migrate {
+public class ImageMagickMigrate implements Migrate, Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1999759257332654952L;
+
 	/**
 	 * the service name
 	 */
@@ -75,6 +83,8 @@ public class ImageMagickMigrate implements Migrate {
 	private static String OUTPUT_FILE_NAME = null;
 	private static final String IMAGE_MAGICK_URI = "http://www.imagemagick.org";
 	private static final FormatRegistry formatRegistry = FormatRegistryFactory.getFormatRegistry();
+	private static long START_TIME = 0;
+	private static long END_TIME = 0;
 	
 	/**
 	 * default no arg constructor
@@ -169,6 +179,7 @@ public class ImageMagickMigrate implements Migrate {
 				URI outputFormat, Parameters parameters) {
 			
 			plogger.info("...and ready! Checking input...");
+			START_TIME = System.currentTimeMillis();
 			URI inputFormatFromDigObj = digitalObject.getFormat();
 			String inputExt = null;
 			
@@ -344,18 +355,27 @@ public class ImageMagickMigrate implements Migrate {
 			
 			File outputFile = new File(outputFilePath);
 			
-	//		byte[] bytes = ByteArrayHelper.read(new File(outputFilePath));
-	//		plogger.info("Created byte[] from result file...");
-	//		DigitalObject newDigObj = this.createDigitalObject(null, bytes);
-			
 			DigitalObject newDigObj = null;
 			ServiceReport report = null;
 			
 			try {
+				Agent agent = new Agent();
+				agent.id = Long.toString(serialVersionUID);
+				agent.name = this.NAME;
+				agent.type = "Migrate";
+
+				Event event = new Event(); 
+				event.agent = agent;
+				event.datetime = ServiceUtils.getSystemDateAndTimeFormatted();
+				event.summary = "Image migration from " + inputExt.toUpperCase() + " to " + outputExt.toUpperCase() + ".\nUsed tool: ImageMagick.";
+				END_TIME = System.currentTimeMillis();
+				event.duration = ServiceUtils.calculateDuration(START_TIME, END_TIME);
+					
 				newDigObj = DigitalObject.create(Content.byValue(outputFile))
 											.format(outputFormat)
 											.title(outputFile.getName())
 											.permanentUrl(new URL("http://planets.services.migration.ImageMagickMigrate"))
+											.events(event)
 											.build();
 				
 				plogger.info("Created new DigitalObject for result file...");
