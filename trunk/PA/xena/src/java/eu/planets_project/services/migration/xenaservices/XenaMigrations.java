@@ -259,7 +259,7 @@ public class XenaMigrations {
             }
 
             // Preparing properties for converting the document
-            PropertyValue propertyvalue[] = new PropertyValue[2];
+            PropertyValue propertyvalue[] = new PropertyValue[3];
             // Setting the flag for overwriting
             propertyvalue[0] = new PropertyValue();
             propertyvalue[0].Name = "Overwrite";
@@ -271,7 +271,14 @@ public class XenaMigrations {
                 propertyvalue[1].Name = "FilterName";
 
                 propertyvalue[1].Value = ooffice_export_filter;
+                
+                if (ooffice_export_filter.equals(EXPORT_FILTER_PDF)){
+
+                    propertyvalue[2]=new PropertyValue();
+                    propertyvalue[2].Name = "SelectPdfVersion";
+                    propertyvalue[2].Value = 1;
             }
+                }
 
             // Storing and converting the document
             try {
