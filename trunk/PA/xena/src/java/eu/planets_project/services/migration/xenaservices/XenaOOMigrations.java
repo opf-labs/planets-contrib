@@ -6,7 +6,6 @@ package eu.planets_project.services.migration.xenaservices;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,9 +15,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.xml.sax.SAXException;
-
 import com.sun.star.beans.PropertyValue;
 import com.sun.star.bridge.XUnoUrlResolver;
 import com.sun.star.frame.XComponentLoader;
@@ -26,8 +23,8 @@ import com.sun.star.frame.XStorable;
 import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.uno.UnoRuntime;
-
 import eu.planets_project.services.utils.ByteArrayHelper;
+import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 
 /**
@@ -273,29 +270,44 @@ public class XenaOOMigrations {
             }
 
             // Preparing properties for converting the document
-            PropertyValue propertyvalue[] = new PropertyValue[3];
+            PropertyValue propertyvalue[] = new PropertyValue[2];
             // Setting the flag for overwriting
             propertyvalue[0] = new PropertyValue();
             propertyvalue[0].Name = "Overwrite";
             propertyvalue[0].Value = new Boolean(true);
 
-            // Setting the optional filter name
-            if (ooffice_export_filter != null && !"".equals(ooffice_export_filter)) {
-                propertyvalue[1] = new PropertyValue();
-                propertyvalue[1].Name = "FilterName";
+            propertyvalue[1] = new PropertyValue();
+            propertyvalue[1].Name = "SelectPdfVersion";
+            if (pdfa) {
+                propertyvalue[1].Value = new Integer(1);
+            } else {
 
-                propertyvalue[1].Value = ooffice_export_filter;
-
-                if (pdfa) {
-                    propertyvalue[2] = new PropertyValue();
-                    propertyvalue[2].Name = "SelectPdfVersion";
-                    propertyvalue[2].Value = 1;
-                }
+                propertyvalue[1].Value = new Integer(0);
             }
+
+            PropertyValue[] aMediaDescriptor = new PropertyValue[2];
+            aMediaDescriptor[0] = new PropertyValue();
+            aMediaDescriptor[0].Name = "FilterName";
+            aMediaDescriptor[0].Value = "writer_pdf_Export";
+            aMediaDescriptor[1] = new PropertyValue();
+            aMediaDescriptor[1].Name = "FilterData";
+            aMediaDescriptor[1].Value = propertyvalue;
+
+
+
+            // Setting the optional filter name
+//            if (ooffice_export_filter != null && !"".equals(ooffice_export_filter)) {
+//                propertyvalue[1] = new PropertyValue();
+//                propertyvalue[1].Name = "FilterName";
+//
+//                propertyvalue[1].Value = ooffice_export_filter;
+
+
+//            }
 
             // Storing and converting the document
             try {
-                xstorable.storeToURL(output.toURL().toString(), propertyvalue);
+                xstorable.storeToURL(output.toURL().toString(), aMediaDescriptor);
             } catch (Exception e) {
                 throw new Exception(
                         "Cannot convert to open document format. Maybe your OpenOffice.org installation does not have installed: " + ooffice_export_filter + " or maybe the document is password protected or has some other problem. Try opening in OpenOffice.org manually.",
@@ -375,31 +387,16 @@ public class XenaOOMigrations {
      * @param binary
      * @return the migrated binary
      */
-    public byte[] basicMigrateOneBinary(byte[] binary) {
+    public byte[] migrate(byte[] binary) {
 
-        File input, output;
-        try {
-            input = File.createTempFile("input", "0");
-            input.deleteOnExit();
-            output = File.createTempFile("output", "0");
-            output.deleteOnExit();
-        } catch (IOException e) {
-            log.error("Could not create temporary files! " + e);
-            return null;
-        }
+        File input = FileUtils.getTempFile("input", "0");
+        input.deleteOnExit();
+        
+        input = ByteArrayHelper.write(binary);
 
-        try {
-            FileOutputStream fos = new FileOutputStream(input);
-            fos.write(binary);
-            fos.flush();
-            fos.close();
-        } catch (FileNotFoundException e) {
-            log.error("Creating " + input.getAbsolutePath() + " :: " + e);
-            return null;
-        } catch (IOException e) {
-            log.error("Creating " + input.getAbsolutePath() + " :: " + e);
-            return null;
-        }
+        File output = FileUtils.getTempFile("output", "0");
+        output.deleteOnExit();
+
         try {
             this.transform(input.toURI(), output.toURI());
         } catch (SAXException e) {

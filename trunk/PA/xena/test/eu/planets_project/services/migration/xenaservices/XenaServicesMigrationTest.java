@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 
 public final class XenaServicesMigrationTest extends TestCase {
 
-    public enum OdfFormat {
+    private enum OdfFormat {
 
         ODT, ODS, ODG, ODF;
 
@@ -36,7 +36,7 @@ public final class XenaServicesMigrationTest extends TestCase {
         }
     };
 
-    public enum MSOfficeFormat {
+    private enum MSOfficeFormat {
 
         DOC, XLS;
 
@@ -71,7 +71,7 @@ public final class XenaServicesMigrationTest extends TestCase {
         assertTrue("The ServiceDescription should not be NULL.", desc != null);
     }
 
-//    @Test
+    @Test
     public void testMigrate() throws IOException {
 
         for (OdfFormat odfExt : OdfFormat.values()) {
@@ -99,6 +99,10 @@ public final class XenaServicesMigrationTest extends TestCase {
         DigitalObject doOut = mr.getDigitalObject();
         assertTrue("Resulting digital object is null.", doOut != null);
         InputStream inputStream_odf = doOut.getContent().read();
-        FileUtils.writeInputStreamToFile(inputStream_odf, new File("PA/xena/test/testfiles/out"), "testout_" + from + ".pdf");
+        if (to.equals("fmt/18")) {
+            FileUtils.writeInputStreamToFile(inputStream_odf, new File("PA/xena/test/testfiles/out"), "testout_" + from + ".pdf");
+        } else if (to.equals("fmt/95")){
+            FileUtils.writeInputStreamToFile(inputStream_odf, new File("PA/xena/test/testfiles/out"), "testout_" + from + "A.pdf");
+        }
     }
 }

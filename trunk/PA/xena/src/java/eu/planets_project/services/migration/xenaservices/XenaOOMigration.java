@@ -23,6 +23,9 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 
+/**
+ * @author Georg Petz <georg.petz@onb.ac.at> *
+ */
 @Local(Migrate.class)
 @Remote(Migrate.class)
 @Stateless
@@ -34,6 +37,9 @@ public class XenaOOMigration implements Migrate, Serializable {
     private static final URI PRONOMPDFAID = Format.pronomIdToURI("fmt/95");
     private static final URI PRONOMPDFID = Format.pronomIdToURI("fmt/18");
 
+    /**
+     * all suported odf file formats
+     */
     public enum OdfFormat {
 
         ODT, ODS, ODG, ODF;
@@ -47,6 +53,9 @@ public class XenaOOMigration implements Migrate, Serializable {
         }
     };
 
+    /**
+     * all supported ms office file formats
+     */
     public enum MSOfficeFormat {
 
         DOC, XLS;
@@ -63,6 +72,11 @@ public class XenaOOMigration implements Migrate, Serializable {
     private static final long serialVersionUID = 3952711367037433051L;
     static final String NAME = "XenaOOMigration";
 
+    /**
+     * checks if the odf format exists in the registry
+     * @param formatUri the format uri for checking
+     * @return the odf format if it exists, else null
+     */
     private OdfFormat getOdfFormatExt(URI formatUri) {
         FormatRegistryImpl fmtRegImpl = new FormatRegistryImpl();
         Format uriFormatObj = fmtRegImpl.getFormatForURI(formatUri);
@@ -80,6 +94,11 @@ public class XenaOOMigration implements Migrate, Serializable {
         }
     }
 
+    /**
+     * checks if the ms office format exists in the registry
+     * @param formatUri the format uri for checking
+     * @return the ms office format if it exists, else null
+     */
     private MSOfficeFormat getMsOfficeFormatExt(URI formatUri) {
         FormatRegistryImpl fmtRegImpl = new FormatRegistryImpl();
         Format uriFormatObj = fmtRegImpl.getFormatForURI(formatUri);
@@ -110,6 +129,15 @@ public class XenaOOMigration implements Migrate, Serializable {
 //        }
 //        return false;
 //    }
+
+    /**
+     *
+     * @param digitalObject
+     * @param inputFormat
+     * @param outputFormat
+     * @param parameters
+     * @return
+     */
     public MigrateResult migrate(DigitalObject digitalObject, URI inputFormat, URI outputFormat, Parameters parameters) {
         InputStream inputStream = digitalObject.getContent().read();
         XenaOOMigrations xena = new XenaOOMigrations();
@@ -152,7 +180,7 @@ public class XenaOOMigration implements Migrate, Serializable {
             xena.setPdfa(false);
         }
 
-        byte[] binary = xena.basicMigrateOneBinary(FileUtils.writeInputStreamToBinary(inputStream));
+        byte[] binary = xena.migrate(FileUtils.writeInputStreamToBinary(inputStream));
 
         DigitalObject newDO = null;
         ServiceReport report = new ServiceReport();
@@ -162,6 +190,10 @@ public class XenaOOMigration implements Migrate, Serializable {
 
     }
 
+    /**
+     * 
+     * @return
+     */
     public ServiceDescription describe() {
         ServiceDescription.Builder builder = new ServiceDescription.Builder(NAME, Migrate.class.getName());
 
