@@ -2,13 +2,13 @@ package eu.planets_project.services.migration.xenaservices;
 
 import eu.planets_project.ifr.core.techreg.api.formats.Format;
 import org.junit.Test;
-
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.migration.xenaservices.XenaOOMigration.supportedOdfFormats;
+//import eu.planets_project.services.migration.xenaservices.XenaOOMigration.MSOfficeFormat;
+//import eu.planets_project.services.migration.xenaservices.XenaOOMigration.OdfFormat;
 import eu.planets_project.services.utils.ByteArrayHelper;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
@@ -21,12 +21,33 @@ import org.junit.Before;
 
 import static org.junit.Assert.*;
 
-/**
- * Local and client tests of the digital object migration functionality.
- * 
- * @author Sven Schlarb <shsschlarb-planets@yahoo.de>, Georg Petz <georg.petz@onb.ac.at>
- */
 public final class XenaServicesMigrationTest extends TestCase {
+
+    public enum OdfFormat {
+
+        ODT, ODS, ODG, ODF;
+
+        public static OdfFormat toOddFormat(String str) {
+            try {
+                return valueOf(str);
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        }
+    };
+
+    public enum MSOfficeFormat {
+
+        DOC, XLS;
+
+        public static MSOfficeFormat toMSOfficeFormat(String str) {
+            try {
+                return valueOf(str);
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        }
+    };
 
     /* The location of this service when deployed. */
     String wsdlLoc = "/pserv-pa-xena/XenaOOMigration?wsdl";
@@ -50,22 +71,34 @@ public final class XenaServicesMigrationTest extends TestCase {
         assertTrue("The ServiceDescription should not be NULL.", desc != null);
     }
 
-    @Test
+//    @Test
     public void testMigrate() throws IOException {
 
-        for (supportedOdfFormats odfExt : supportedOdfFormats.values()) {
-            migrate(odfExt.toString(), "pdf");
+        for (OdfFormat odfExt : OdfFormat.values()) {
+            migrate(odfExt.toString().toLowerCase(), "fmt/95");
         }
-        migrate("odt", "doc");
+
+        for (MSOfficeFormat officeExt : MSOfficeFormat.values()) {
+            migrate(officeExt.toString().toLowerCase(), "fmt/95");
+        }
+
+        for (OdfFormat odfExt : OdfFormat.values()) {
+            migrate(odfExt.toString().toLowerCase(), "fmt/18");
+        }
+
+        for (MSOfficeFormat officeExt : MSOfficeFormat.values()) {
+            migrate(officeExt.toString().toLowerCase(), "fmt/18");
+        }
+
     }
 
     private void migrate(String from, String to) {
         byte[] binary = ByteArrayHelper.read(new File("PA/xena/test/testfiles/testin." + from));
         DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
-        MigrateResult mr = dom.migrate(input, Format.extensionToURI(from), Format.extensionToURI(to), null);
+        MigrateResult mr = dom.migrate(input, Format.extensionToURI(from), Format.pronomIdToURI(to), null);
         DigitalObject doOut = mr.getDigitalObject();
         assertTrue("Resulting digital object is null.", doOut != null);
         InputStream inputStream_odf = doOut.getContent().read();
-        FileUtils.writeInputStreamToFile(inputStream_odf, new File("PA/xena/test/testfiles/out"), "testout_" + from + "." + to);
+        FileUtils.writeInputStreamToFile(inputStream_odf, new File("PA/xena/test/testfiles/out"), "testout_" + from + ".pdf");
     }
 }
