@@ -99,7 +99,9 @@ public class ImageMagickIdentify implements Identify, Serializable {
 		String fileName = digitalObject.getTitle();
 		PLOGGER.info("Input file to identify: " +fileName);
 		URI inputFormat = digitalObject.getFormat();
-		PLOGGER.info("Assumed file format: " + inputFormat.toASCIIString());
+        if(inputFormat!=null) {
+            PLOGGER.info("Assumed file format: " + inputFormat.toASCIIString());
+        }
 		String extension = null;
 		
 		if(inputFormat!=null) {
