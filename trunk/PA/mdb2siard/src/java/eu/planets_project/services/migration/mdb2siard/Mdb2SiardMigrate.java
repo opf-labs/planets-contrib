@@ -250,7 +250,8 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	    URI inputFormat, URI outputFormat,
 	    Parameters parameters)
 	{
-		DigitalObject doOutput = null;
+		/* empty doOutput in case of error ... */
+		DigitalObject doOutput = new DigitalObject.Builder(Content.byValue(new byte[] {})).build();
 		File fileInput = null;
 		File fileOutput = null;
 		ServiceReport sr = new ServiceReport();
@@ -298,7 +299,8 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 		  log.info("Mdb2Siard migrate succeeded");
 		else
 		  log.info("Mdb2Siard migrate failed!");
-		return new MigrateResult(doOutput,sr);
+		MigrateResult mr = new MigrateResult(doOutput,sr);
+		return mr;
 	} /* migrate */
 
 } /* class Mdb2SiardMigrate */
