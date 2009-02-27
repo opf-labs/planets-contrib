@@ -7,21 +7,24 @@ import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
+import eu.planets_project.services.utils.cli.CliMigrationPaths;
+import org.xml.sax.SAXException;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.ws.BindingType;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.URISyntaxException;
+import java.util.Arrays;
 
 /**
- * The Pdf2HtmlMigration migrates between its own formats and a number of formats
- *
+ * The class migrates between a number of formats
  * @author Asger Blekinge-Rasmussen <abr@statsbiblioteket.dk>
  */
 @Local(Migrate.class)
@@ -41,6 +44,10 @@ public class NetPbmMigration implements Migrate, Serializable {
      * The service name.
      */
     static final String NAME = "NetPBMMigration";
+    static final String configfile = "netpbm.paths.xml";
+
+
+    private CliMigrationPaths migrationPaths = null;
 
     /**
      * {@inheritDoc}
@@ -50,20 +57,24 @@ public class NetPbmMigration implements Migrate, Serializable {
     public MigrateResult migrate(final DigitalObject digitalObject,
                                  URI inputFormat, URI outputFormat, Parameters parameters) {
 
-        java.util.Properties props = new java.util.Properties();
-        try {
-
-            String strRsc = "/eu/planets_project/services/migration/netpbm/netpbm.properties";
-            props.load( this.getClass().getResourceAsStream(strRsc));
-            // config vars
-
-
-        } catch( Exception e ) {
-            // // config vars
-
-        }
 
         ServiceReport report = new ServiceReport();
+        try {
+            init();
+        } catch (URISyntaxException e) {
+            log.error("Invalid URI in the paths file",e);
+            return fail(null);
+        }
+
+
+        String command = migrationPaths.findMigrationCommand(inputFormat,outputFormat);
+
+        if (command == null){
+            report.setError("Could not find a migrationPath for the input and output formats");
+            return fail(report);
+        }
+
+
         //log.info("Using ps2pdf application name: "+this.ps2pdf_app_name);
 
 
@@ -72,43 +83,15 @@ public class NetPbmMigration implements Migrate, Serializable {
          * as the given:
          */
 
-        NetPbmFormat in = null;
-        try {
-            in = NetPbmFormat.loopup(inputFormat);
-        } catch (NoSuchFormatException e) {
-            report.setError("The input format is not on the known list");
-            return fail(report);
-        }
-        NetPbmFormat out = null;
-        try {
-            out = NetPbmFormat.loopup(outputFormat);
-        } catch (NoSuchFormatException e) {
-            report.setError("The output format is not on the known list");
-            return fail(report);
-        }
-        String[] migrationPath = null;
-
-        try {
-            migrationPath = NetPbmMigrationPath.lookup(in,out).getTool();
-        } catch (NoSuchMigrationPathException e) {
-            report.setError("No conversionpath for these formats");
-            return fail(report);
-
-        }
-
 
         InputStream psfile = digitalObject.getContent().read();
 
 
 
         ProcessRunner runner = new ProcessRunner();
-        List<String> command = new ArrayList<String>();
-        for (String element : migrationPath){
-            command.add(element);
-        }
 
+        runner.setCommand(Arrays.asList("/bin/sh","-c",command));
 
-        runner.setCommand(command);
         runner.setInputStream(psfile);
         runner.setCollection(true);
         runner.setOutputCollectionByteSize(-1);
@@ -140,23 +123,35 @@ public class NetPbmMigration implements Migrate, Serializable {
     public ServiceDescription describe() {
 
         ServiceDescription.Builder builder = new ServiceDescription.Builder(NAME, Migrate.class.getName());
+        try {
+            init();
+            builder.paths(migrationPaths.getAsPlanetsPaths());
+        } catch (URISyntaxException e) {
+            log.warn("Invalid URI in the paths file",e);
+        }
 
         builder.author("Asger Blekinge-Rasmussen <abr@statsbiblioteket.dk>");
         builder.classname(this.getClass().getCanonicalName());
         builder.description("Converts between a number of image formats");
 
-        NetPbmMigrationPath[] mypaths = NetPbmMigrationPath.values();
-        MigrationPath[] paths = new MigrationPath[mypaths.length];
-        int i=0;
-        for (NetPbmMigrationPath mypath: mypaths){
-            paths[i] = new MigrationPath(mypath.getIn().getFormat(),mypath.getOut().getFormat(),null);
-        }
-
-        builder.paths(paths);
         builder.version("0.1");
 
         return builder.build();
 
+    }
+
+    private void init() throws URISyntaxException {
+        try {
+            if (migrationPaths == null){
+                migrationPaths = CliMigrationPaths.initialiseFromFile(configfile);
+            }
+        } catch (ParserConfigurationException e) {
+            throw new Error("Not supposed to happen",e);
+        } catch (IOException e) {
+            throw new Error("Not supposed to happen",e);
+        } catch (SAXException e) {
+            throw new Error("Not supposed to happen",e);
+        }
     }
 
 
