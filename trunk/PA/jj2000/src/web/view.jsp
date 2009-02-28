@@ -1,5 +1,5 @@
 <%@ page
-  import="java.io.*,java.net.URLDecoder,java.util.List,javax.activation.MimetypesFileTypeMap,eu.planets_project.services.jj2000.JJ2000ViewerService,eu.planets_project.services.datatypes.DigitalObject"
+  import="java.io.*,java.net.URLDecoder,java.util.List,javax.activation.MimetypesFileTypeMap,eu.planets_project.services.jj2000.JJ2000ViewerService,eu.planets_project.services.datatypes.DigitalObject,eu.planets_project.services.utils.cache.DigitalObjectDiskCache"
 %><% 
 
 // Pick up the parameters:
@@ -13,7 +13,7 @@ if(request.getParameter("fid") != null ) {
 sid = URLDecoder.decode(sid, "UTF-8");
 
 // Look at the file list:
-List<DigitalObject> dobs = JJ2000ViewerService.recoverDigitalObjects(sid);
+List<DigitalObject> dobs = DigitalObjectDiskCache.recoverDigitalObjects(sid);
 if( fid >= dobs.size() ) fid = 0;
 
 %>

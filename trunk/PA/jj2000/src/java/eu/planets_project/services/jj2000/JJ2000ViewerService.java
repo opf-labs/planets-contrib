@@ -10,17 +10,25 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.jws.WebService;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
+import javax.xml.ws.Service;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.utils.cache.DigitalObjectDiskCache;
 import eu.planets_project.services.view.CreateView;
 import eu.planets_project.services.view.CreateViewResult;
 import eu.planets_project.services.view.ViewStatus;
@@ -46,9 +54,21 @@ public class JJ2000ViewerService implements CreateView {
 
     /** The default context path */
     private static final String CONTEXT_PATH = "/pserv-pa-jj2000/";
+    private static URL defaultBaseUrl;
+    static {
+       try {
+           defaultBaseUrl = new URL("http","localhost",8080,CONTEXT_PATH);
+       } catch (MalformedURLException e) {
+           e.printStackTrace();
+       }
+    }
 
     /** A logger */
-    private static Log log = LogFactory.getLog(JJ2000ViewerService.class);
+    public static Log log = LogFactory.getLog(JJ2000ViewerService.class);
+    
+    /** A reference to the web service context. */
+    @Resource 
+    WebServiceContext wsc;
 
     /* (non-Javadoc)
      * @see eu.planets_project.services.view.CreateView#describe()
@@ -79,7 +99,22 @@ public class JJ2000ViewerService implements CreateView {
      * @see eu.planets_project.services.view.CreateView#createView(java.util.List)
      */
     public CreateViewResult createView(List<DigitalObject> digitalObjects) {
-        return createViewerSession( digitalObjects );
+        // Lookup server config from message context:
+        // @see https://jax-ws.dev.java.net/articles/MessageContext.html
+        MessageContext mc = wsc.getMessageContext();
+        ServletRequest request = (ServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
+        ServletContext sc = (ServletContext) mc.get(MessageContext.SERVLET_CONTEXT);
+
+        // Construct a base URL;
+        URL baseUrl = null;
+        try {
+            baseUrl = new URL( request.getScheme(), request.getServerName(), request.getServerPort(), sc.getContextPath()+"/" );
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        
+        // Instanciate the View:
+        return createViewerSession( digitalObjects, baseUrl );
     }
 
     /**
@@ -87,19 +122,19 @@ public class JJ2000ViewerService implements CreateView {
      * @param digitalObjects
      * @return
      */
-    public static CreateViewResult createViewerSession(List<DigitalObject> digitalObjects) {
+    public static CreateViewResult createViewerSession(List<DigitalObject> digitalObjects, URL baseUrl ) {
         // Store copies of the viewable digital objects:
         for( DigitalObject dob : digitalObjects ) {
             // Can only cope if the object is 'simple':
-            if( dob.getContained() != null ) {
+            if( dob.getContent() == null ) {
                 return returnWithErrorMessage("The Content of the DigitalObject should not be NULL.");
             }
         }
         
-        String sessionID = cacheDigitalObjects(digitalObjects);
+        String sessionID = DigitalObjectDiskCache.cacheDigitalObjects(digitalObjects);
         URL sessionURL;
         try {
-            sessionURL = new URL(CONTEXT_PATH+"view.jsp?sid="+sessionID);
+            sessionURL = new URL(baseUrl, "view.jsp?sid="+sessionID);
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return returnWithErrorMessage("Failed to construct session URL.");
@@ -112,13 +147,39 @@ public class JJ2000ViewerService implements CreateView {
         // Return the view id:
         return new CreateViewResult(sessionURL, sessionID, rep);
     }
+    
+    /**
+     * @param jp2url
+     * @return
+     */
+    public static CreateViewResult createViewerSession( URL jp2url ) {
+        DigitalObject dob = new DigitalObject.Builder( Content.byReference(jp2url) ).build();
+        List<DigitalObject> dobs = new ArrayList<DigitalObject>();
+        dobs.add(dob);
+        return createViewerSession(dobs, defaultBaseUrl);
+    }
+    
+    public static CreateViewResult createViewerSessionViaService( URL testUrl ) throws MalformedURLException {
+        Service service = Service.create( 
+                new URL(defaultBaseUrl, "JJ2000ViewerService?wsdl"), JJ2000ViewerService.QNAME );
+        CreateView jj2k = service.getPort(CreateView.class);
+        
+//        URL testUrl = new URL("http","localhost",8080,CONTEXT_PATH+"/resources/world.jp2");
+        DigitalObject.Builder dob = new DigitalObject.Builder( Content.byReference( testUrl ));
+
+        List<DigitalObject> digitalObjects = new ArrayList<DigitalObject>();
+        digitalObjects.add(dob.build());
+        
+        CreateViewResult cvr = jj2k.createView(digitalObjects);
+        return cvr;
+    }
 
     /* (non-Javadoc)
      * @see eu.planets_project.services.view.CreateView#getViewStatus(java.lang.String)
      */
     public ViewStatus getViewStatus(String sessionIdentifier) {
         // Lookup this cache:
-        File cache = findCacheDir( sessionIdentifier );
+        File cache = DigitalObjectDiskCache.findCacheDir( sessionIdentifier );
         
         // Default to 'inactive'
         ViewStatus vs = new ViewStatus( ViewStatus.INACTIVE, null );
@@ -128,64 +189,6 @@ public class JJ2000ViewerService implements CreateView {
             vs = new ViewStatus( ViewStatus.ACTIVE, null );
         }
         return vs;
-    }
-    
-    
-    /* -- Cache Management --- */
-    
-    private static File findCacheDir( String sessionId ) {
-        // For security reasons, do not allow directory separators:
-        if( sessionId.contains("/") ) return null;
-        if( sessionId.contains("\\") ) return null;
-        return new File(System.getProperty("java.io.tmpdir"), "pserv-pa-jj2000/"+sessionId);
-    }
-
-    /**
-     * @param digitalObjects
-     * @return
-     */
-    private static String cacheDigitalObjects( List<DigitalObject> digitalObjects ) {
-        // Generate a UUID to act as the session ID:
-        String sessionId = UUID.randomUUID().toString();
-        
-        // Create a directory in the temp space, and store the DOs in there.
-        File cachedir = findCacheDir( sessionId );
-        cachedir.mkdir();
-        
-        log.info("Created cache dir: " + cachedir.getAbsolutePath() );
-        
-        // Store Digital Objects:
-        
-        return sessionId;
-    }
-
-    /**
-     * @param sessionId
-     * @return
-     */
-    public static List<DigitalObject> recoverDigitalObjects( String sessionId ) {
-        List<DigitalObject> dobs = new ArrayList<DigitalObject>();
-        // Lookup stored items:
-        
-        // Parse back into DigObjects:
-        
-        return dobs;
-    }
-
-    /**
-     * @param sessionId
-     * @param i
-     * @return
-     */
-    public static DigitalObject findCachedDigitalObject( String sessionId, int i ) {
-        List<DigitalObject> digitalObjects = recoverDigitalObjects(sessionId);
-        if( digitalObjects == null ) return null;
-        if( digitalObjects.size() == 0 ) return null;
-        // Range check:
-        if( i < 0 ) i = 0;
-        if( i >= digitalObjects.size() ) i = 0;
-        // Return:
-        return digitalObjects.get(i);
     }
     
 }
