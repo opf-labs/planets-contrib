@@ -81,6 +81,7 @@ public class JJ2000ViewerService implements CreateView {
         // Add a link to the JJ2000 homepage.
         try {
             mds.furtherInfo(new URI("http://jj2000.epfl.ch/"));
+            mds.logo( getBaseUrlFromWSContext(wsc).toURI().resolve("logos/jj2000_logo_150w.png") );
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -94,11 +95,8 @@ public class JJ2000ViewerService implements CreateView {
         rep.setError("message");
         return new CreateViewResult(null, null, rep);
     }
-
-    /* (non-Javadoc)
-     * @see eu.planets_project.services.view.CreateView#createView(java.util.List)
-     */
-    public CreateViewResult createView(List<DigitalObject> digitalObjects) {
+    
+    private static URL getBaseUrlFromWSContext( WebServiceContext wsc ) {
         // Lookup server config from message context:
         // @see https://jax-ws.dev.java.net/articles/MessageContext.html
         MessageContext mc = wsc.getMessageContext();
@@ -113,8 +111,15 @@ public class JJ2000ViewerService implements CreateView {
             e.printStackTrace();
         }
         
+        return baseUrl;
+    }
+
+    /* (non-Javadoc)
+     * @see eu.planets_project.services.view.CreateView#createView(java.util.List)
+     */
+    public CreateViewResult createView(List<DigitalObject> digitalObjects) {
         // Instanciate the View:
-        return createViewerSession( digitalObjects, baseUrl );
+        return createViewerSession( digitalObjects, getBaseUrlFromWSContext(wsc) );
     }
 
     /**
@@ -164,12 +169,16 @@ public class JJ2000ViewerService implements CreateView {
                 new URL(defaultBaseUrl, "JJ2000ViewerService?wsdl"), JJ2000ViewerService.QNAME );
         CreateView jj2k = service.getPort(CreateView.class);
         
-//        URL testUrl = new URL("http","localhost",8080,CONTEXT_PATH+"/resources/world.jp2");
-        DigitalObject.Builder dob = new DigitalObject.Builder( Content.byReference( testUrl ));
+        // Test the description:
+        ServiceDescription sd = jj2k.describe();
+        log.info("Got: "+sd.toXmlFormatted());
 
+        // Construct a list of DOBs covering the given URL:
+        DigitalObject.Builder dob = new DigitalObject.Builder( Content.byReference( testUrl ));
         List<DigitalObject> digitalObjects = new ArrayList<DigitalObject>();
         digitalObjects.add(dob.build());
-        
+
+        // Invoke the service and create the view:
         CreateViewResult cvr = jj2k.createView(digitalObjects);
         return cvr;
     }
