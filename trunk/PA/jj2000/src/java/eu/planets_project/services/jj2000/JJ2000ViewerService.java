@@ -10,7 +10,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.jws.WebService;
@@ -54,14 +53,7 @@ public class JJ2000ViewerService implements CreateView {
 
     /** The default context path */
     private static final String CONTEXT_PATH = "/pserv-pa-jj2000/";
-    private static URL defaultBaseUrl;
-    static {
-       try {
-           defaultBaseUrl = new URL("http","localhost",8080,CONTEXT_PATH);
-       } catch (MalformedURLException e) {
-           e.printStackTrace();
-       }
-    }
+    private static final URI defaultBaseUrl = URI.create("http://localhost:8080"+CONTEXT_PATH);
 
     /** A logger */
     public static Log log = LogFactory.getLog(JJ2000ViewerService.class);
@@ -75,16 +67,14 @@ public class JJ2000ViewerService implements CreateView {
      */
     public ServiceDescription describe() {
         ServiceDescription.Builder mds = new ServiceDescription.Builder(NAME, CreateView.class.getCanonicalName());
-        mds.description("A JPEG 2000 viewer service. Uses the JJ2000 reference implementation. See http://jj2000.epfl.ch/ for copyright information.");
+        mds.description("A JPEG 2000 viewer service. Uses the JJ2000 reference implementation. See <a href=\"http://jj2000.epfl.ch/\">jj2000.epfl.ch</a> for copyright information.");
         mds.author("Andrew Jackson <Andrew.Jackson@bl.uk>");
         mds.classname(this.getClass().getCanonicalName());
         // Add a link to the JJ2000 homepage.
-        try {
-            mds.furtherInfo(new URI("http://jj2000.epfl.ch/"));
-            mds.logo( getBaseUrlFromWSContext(wsc).toURI().resolve("logos/jj2000_logo_150w.png") );
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+        mds.tool(URI.create("http://jj2000.epfl.ch/"));
+        // Add links to this service:
+        mds.furtherInfo( URI.create( getBaseUrlFromWSContext(wsc).toString() ) );
+        mds.logo( URI.create( getBaseUrlFromWSContext(wsc) + "logos/jj2000_logo_150w.png") );
         return mds.build();
     }
 
@@ -96,7 +86,7 @@ public class JJ2000ViewerService implements CreateView {
         return new CreateViewResult(null, null, rep);
     }
     
-    private static URL getBaseUrlFromWSContext( WebServiceContext wsc ) {
+    private static URI getBaseUrlFromWSContext( WebServiceContext wsc ) {
         // Lookup server config from message context:
         // @see https://jax-ws.dev.java.net/articles/MessageContext.html
         MessageContext mc = wsc.getMessageContext();
@@ -104,10 +94,12 @@ public class JJ2000ViewerService implements CreateView {
         ServletContext sc = (ServletContext) mc.get(MessageContext.SERVLET_CONTEXT);
 
         // Construct a base URL;
-        URL baseUrl = null;
+        URI baseUrl = null;
         try {
-            baseUrl = new URL( request.getScheme(), request.getServerName(), request.getServerPort(), sc.getContextPath()+"/" );
+            baseUrl = new URL( request.getScheme(), request.getServerName(), request.getServerPort(), sc.getContextPath()+"/" ).toURI();
         } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
             e.printStackTrace();
         }
         
@@ -127,7 +119,7 @@ public class JJ2000ViewerService implements CreateView {
      * @param digitalObjects
      * @return
      */
-    public static CreateViewResult createViewerSession(List<DigitalObject> digitalObjects, URL baseUrl ) {
+    public static CreateViewResult createViewerSession(List<DigitalObject> digitalObjects, URI baseUrl ) {
         // Store copies of the viewable digital objects:
         for( DigitalObject dob : digitalObjects ) {
             // Can only cope if the object is 'simple':
@@ -139,7 +131,7 @@ public class JJ2000ViewerService implements CreateView {
         String sessionID = DigitalObjectDiskCache.cacheDigitalObjects(digitalObjects);
         URL sessionURL;
         try {
-            sessionURL = new URL(baseUrl, "view.jsp?sid="+sessionID);
+            sessionURL = baseUrl.resolve("view.jsp?sid="+sessionID).toURL();
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return returnWithErrorMessage("Failed to construct session URL.");
@@ -164,9 +156,8 @@ public class JJ2000ViewerService implements CreateView {
         return createViewerSession(dobs, defaultBaseUrl);
     }
     
-    public static CreateViewResult createViewerSessionViaService( URL testUrl ) throws MalformedURLException {
-        Service service = Service.create( 
-                new URL(defaultBaseUrl, "JJ2000ViewerService?wsdl"), JJ2000ViewerService.QNAME );
+    public static CreateViewResult createViewerSessionViaService( URI testUrl ) throws MalformedURLException {
+        Service service = Service.create( defaultBaseUrl.resolve("JJ2000ViewerService?wsdl").toURL(), JJ2000ViewerService.QNAME );
         CreateView jj2k = service.getPort(CreateView.class);
         
         // Test the description:
@@ -174,7 +165,7 @@ public class JJ2000ViewerService implements CreateView {
         log.info("Got: "+sd.toXmlFormatted());
 
         // Construct a list of DOBs covering the given URL:
-        DigitalObject.Builder dob = new DigitalObject.Builder( Content.byReference( testUrl ));
+        DigitalObject.Builder dob = new DigitalObject.Builder( Content.byReference( testUrl.toURL() ));
         List<DigitalObject> digitalObjects = new ArrayList<DigitalObject>();
         digitalObjects.add(dob.build());
 
