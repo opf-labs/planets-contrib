@@ -38,6 +38,10 @@
 
 <endpoints xmlns='http://java.sun.com/xml/ns/jax-ws/ri/runtime' version='2.0'>
     <endpoint
+        name='JJ2000MigrateService'
+        implementation='eu.planets_project.services.jj2000.JJ2000MigrateService'
+        url-pattern='/JJ2000MigrateService'/>
+    <endpoint
         name='JJ2000ViewerService'
         implementation='eu.planets_project.services.jj2000.JJ2000ViewerService'
         url-pattern='/JJ2000ViewerService'/>

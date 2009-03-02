@@ -66,7 +66,7 @@ select, input, #footer {
   <img src="logos/jj2000_logo_22h.png"/>
 </td>
 <td>
-  <form method="GET">
+  <form method="get">
     <input type="hidden" name="sid" value="<%=sid %>"/>
     <select name="fid" onChange="this.form.submit();">
     <% for( int i=0; i < dobs.size(); i++ ) { 

@@ -73,8 +73,8 @@ public class JJ2000ViewerService implements CreateView {
         // Add a link to the JJ2000 homepage.
         mds.tool(URI.create("http://jj2000.epfl.ch/"));
         // Add links to this service:
-        mds.furtherInfo( URI.create( getBaseUrlFromWSContext(wsc).toString() ) );
-        mds.logo( URI.create( getBaseUrlFromWSContext(wsc) + "logos/jj2000_logo_150w.png") );
+        mds.furtherInfo( URI.create( getBaseURIFromWSContext(wsc).toString() ) );
+        mds.logo( URI.create( getBaseURIFromWSContext(wsc) + "logos/jj2000_logo_150w.png") );
         return mds.build();
     }
 
@@ -86,12 +86,15 @@ public class JJ2000ViewerService implements CreateView {
         return new CreateViewResult(null, null, rep);
     }
     
-    private static URI getBaseUrlFromWSContext( WebServiceContext wsc ) {
+    public static URI getBaseURIFromWSContext( WebServiceContext wsc ) {
+        if( wsc == null ) return null;
         // Lookup server config from message context:
         // @see https://jax-ws.dev.java.net/articles/MessageContext.html
         MessageContext mc = wsc.getMessageContext();
+        if( mc == null ) return null;
         ServletRequest request = (ServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
         ServletContext sc = (ServletContext) mc.get(MessageContext.SERVLET_CONTEXT);
+        if( request == null || sc == null ) return null;
 
         // Construct a base URL;
         URI baseUrl = null;
@@ -111,7 +114,7 @@ public class JJ2000ViewerService implements CreateView {
      */
     public CreateViewResult createView(List<DigitalObject> digitalObjects) {
         // Instanciate the View:
-        return createViewerSession( digitalObjects, getBaseUrlFromWSContext(wsc) );
+        return createViewerSession( digitalObjects, getBaseURIFromWSContext(wsc) );
     }
 
     /**

@@ -15,11 +15,30 @@ import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.jj2000.JJ2000ViewerService;
 
 /**
+ * 
  * @author <a href="mailto:Andrew.Jackson@bl.uk">Andy Jackson</a>
  *
  */
 public class DigitalObjectDiskCache {
 
+    /* FIXME Implement a Cache object, that serialised to XML, and that 
+     * re-maps any remote binaries into local ones on construction.
+     */
+    
+    public class CacheableDigitalObjects {
+        List<DigitalObject> digitalObjects;
+        
+        public CacheableDigitalObjects( List<DigitalObject> digitalObjects ) {
+            // Re-map into new DOs that embed/localise the binaries.
+            // Add getter and serialisation code.
+        }
+        
+    }
+    
+    /**
+     * @param sessionId
+     * @return
+     */
     public static File findCacheDir( String sessionId ) {
         // For security reasons, do not allow directory separators:
         if( sessionId.contains("/") ) return null;

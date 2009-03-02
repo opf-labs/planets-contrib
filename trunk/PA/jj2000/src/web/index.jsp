@@ -13,18 +13,18 @@ if( jp2str != null ) jp2url = new URI(jp2str);
 // If there is a JP2 to view, create the viewer:
 if( jp2url != null ) {
   view = JJ2000ViewerService.createViewerSessionViaService( jp2url );
+} else {
+  // Default to an example URI:
+  jp2url = new URI(request.getRequestURL().toString()).resolve("resources/world.jp2");
 }
-
-URI example = new URI(request.getRequestURL().toString()).resolve("resources/world.jp2");
 
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3c.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html 
-    xmlns="http://www.w3c.org/1999/xhtml" 
-    xmlns:jsp="http://java.sun.com/JSP/Page" 
-    xmlns:c="http://java.sun.com/jsp/jstl/core"
-    xml:lang="en" lang="en">
+<html xmlns="http://www.w3c.org/1999/xhtml" 
+      xmlns:jsp="http://java.sun.com/JSP/Page" 
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xml:lang="en" lang="en">
 <head>
 <title>JJ2000 Viewer Service</title>
 </head>
@@ -36,22 +36,21 @@ This is a JPEG2000 online image viewer service, based on the <a href="http://jj2
 It is intended to be used as a web service, but can also be tested directly using the form below.
 </p>
 
-<% if( jp2url == null || view.getViewURL() == null ) { %>
+<% if( view == null || view.getViewURL() == null ) { %>
 
 <p>
 Please specify the URL of a JP2 image you would like to view:
 </p>
 
 <form method="get">
-  <input type="text" name="jp2url" value="<%= example %>" size="60"/>
-  <br/>
+  <input type="text" name="jp2url" value="<%= jp2url %>" size="60"/>
   <input type="submit" value="View" />
 </form>
 
 <% } else { %>
 
 <p>
-<a href="<%= view.getViewURL() %>">Click here to view.</a>
+<a href="<%= view.getViewURL() %>">Success! Click here to view.</a>
 </p>
 
 <% } %>

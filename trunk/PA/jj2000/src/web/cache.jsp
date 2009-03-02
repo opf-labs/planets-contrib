@@ -19,10 +19,10 @@ if( f != null ) {
     response.setContentType( "image/jp2" );
 
     // Now stream out the data:
-    byte[] bbuf = new byte[2*1024];
     DataInputStream in = new DataInputStream(f.getContent().read());
-    int length = 0;
     ServletOutputStream op = response.getOutputStream();
+    byte[] bbuf = new byte[2*1024];
+    int length = 0;
 
     try {
         while ((in != null) && ((length = in.read(bbuf)) != -1))
