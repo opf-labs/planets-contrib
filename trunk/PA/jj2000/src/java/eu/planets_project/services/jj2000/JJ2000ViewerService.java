@@ -22,6 +22,7 @@ import javax.xml.ws.handler.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import eu.planets_project.ifr.core.techreg.api.formats.Format;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
@@ -67,14 +68,20 @@ public class JJ2000ViewerService implements CreateView {
      */
     public ServiceDescription describe() {
         ServiceDescription.Builder mds = new ServiceDescription.Builder(NAME, CreateView.class.getCanonicalName());
-        mds.description("A JPEG 2000 viewer service. Uses the JJ2000 reference implementation. See <a href=\"http://jj2000.epfl.ch/\">jj2000.epfl.ch</a> for copyright information.");
+        mds.description("A JPEG 2000 viewer service. Uses the JJ2000 reference implementation. See http://jj2000.epfl.ch/ for copyright information.");
         mds.author("Andrew Jackson <Andrew.Jackson@bl.uk>");
         mds.classname(this.getClass().getCanonicalName());
-        // Add a link to the JJ2000 homepage.
+        
+        // Add a link to the JJ2000 homepage as the 'tool' id.
         mds.tool(URI.create("http://jj2000.epfl.ch/"));
+        
         // Add links to this service:
         mds.furtherInfo( URI.create( getBaseURIFromWSContext(wsc).toString() ) );
         mds.logo( URI.create( getBaseURIFromWSContext(wsc) + "logos/jj2000_logo_150w.png") );
+        
+        // Add supported formats:
+        mds.inputFormats( Format.extensionToURI("JP2") );
+        
         return mds.build();
     }
 
