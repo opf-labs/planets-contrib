@@ -12,6 +12,7 @@ import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
+import eu.planets_project.services.utils.ServiceUtils;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -20,8 +21,8 @@ import javax.jws.WebService;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.URISyntaxException;
+import java.util.*;
 import java.util.Properties;
 
 
@@ -54,7 +55,7 @@ public final class Ps2PdfMigration implements Migrate, Serializable {
      * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameters)
      */
     public MigrateResult migrate( final DigitalObject digitalObject, URI inputFormat,
-            URI outputFormat, Parameters parameters) {
+                                  URI outputFormat, Parameters parameters) {
 
         Properties props = new Properties();
         try {
@@ -119,13 +120,21 @@ public final class Ps2PdfMigration implements Migrate, Serializable {
         builder.classname(this.getClass().getCanonicalName());
         builder.description("Simple ps2pdf wrapper for Ps (postscript) to PDF conversions.");
         FormatRegistry fm= FormatRegistryFactory.getFormatRegistry();
-        MigrationPath[] paths = MigrationPath.constructPaths(fm.getURIsForExtension("ps"),fm.getURIsForExtension("pdf"));
-        builder.paths(paths);
-        builder.version("0.1");
 
-        ServiceDescription mds =builder.build();
 
-        return mds;
+
+        try {
+            MigrationPath[] paths = MigrationPath.constructPaths(fm.getURIsForExtension("ps"), ServiceUtils.asSet(new URI("info:pronom/fmt/16")));
+            builder.paths(paths);
+            builder.version("0.1");
+
+            ServiceDescription mds =builder.build();
+
+            return mds;
+        } catch (URISyntaxException e) {
+            throw new Error("Hardcoded uri invalid, should not happen",e);
+        }
+
 
     }
 }
