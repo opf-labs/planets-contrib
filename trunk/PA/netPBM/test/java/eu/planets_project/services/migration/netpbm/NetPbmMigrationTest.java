@@ -45,7 +45,7 @@ public class NetPbmMigrationTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         dom = ServiceCreator.createTestService(Migrate.QNAME,
-                NetPbmMigration.class, wsdlLoc);
+                Ps2PdfMigration.class, wsdlLoc);
     }
 
     /*
