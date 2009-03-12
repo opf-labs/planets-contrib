@@ -1,21 +1,24 @@
 package eu.planets_project.services.migration.netpbm;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+
+import junit.framework.TestCase;
+
+import org.junit.Test;
+
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.migration.ps2pdf.Ps2PdfMigration;
 import eu.planets_project.services.utils.ByteString;
 import eu.planets_project.services.utils.Checksums;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
-import junit.framework.TestCase;
-import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
 
 /**
  * TODO abr forgot to document this class
