@@ -193,6 +193,9 @@ public class ImageMagickMigrate implements Migrate, Serializable {
 			
 			String outputExt = getFormatExtension(outputFormat);
 			INPUT_FILE_NAME = digitalObject.getTitle();
+			if( INPUT_FILE_NAME.contains("/") ) {
+			    INPUT_FILE_NAME.substring( INPUT_FILE_NAME.lastIndexOf("/") + 1 );
+			}
 			
 			if(!INPUT_FILE_NAME.contains(".")) {
 				INPUT_FILE_NAME = INPUT_FILE_NAME + "." + inputExt;
