@@ -235,12 +235,12 @@ import eu.planets_project.services.utils.ServiceUtils;
 
         try {
             plogger.info("Writing content to temp file.");
-            inputFile = File.createTempFile("DEFAULT_INPUT_FILE_NAME", inputExt, imageMagickTmpFolder );
+            inputFile = File.createTempFile( DEFAULT_INPUT_FILE_NAME, "."+inputExt, imageMagickTmpFolder );
             FileUtils.writeInputStreamToFile(inputStream, inputFile );
             plogger.info("Temp file created for input: " + inputFile.getAbsolutePath());
 
             // Also define the output file:
-            outputFile = File.createTempFile("DEFAULT_OUTPUT_FILE_NAME", outputExt, imageMagickTmpFolder );
+            outputFile = File.createTempFile( DEFAULT_OUTPUT_FILE_NAME, "."+outputExt, imageMagickTmpFolder );
         } catch (IOException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
