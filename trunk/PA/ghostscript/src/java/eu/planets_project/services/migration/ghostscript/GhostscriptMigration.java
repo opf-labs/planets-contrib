@@ -72,7 +72,6 @@ public class GhostscriptMigration implements Migrate, Serializable {
     /**
      * XML configuration file containing commands and pathways.
      */
-    //static final String configfile = "ghostscript.paths.xml";
     private final String configfile = "PA/ghostscript/src/resources"
         + "/ghostscript.paths.xml";
 
@@ -80,11 +79,6 @@ public class GhostscriptMigration implements Migrate, Serializable {
      * The migration paths of the service.
      */
     private CliMigrationPaths migrationPaths = null;
-
-    /**
-     * Temporary input file for the input stream.
-     */
-    private File tmpInFile;
 
     /**
      * Format extension of the input stream.
@@ -117,29 +111,58 @@ public class GhostscriptMigration implements Migrate, Serializable {
         final ServiceReport report = new ServiceReport();
 
         try {
-            init();
+            this.init();
         } catch (URISyntaxException e) {
             log.error("[GhostscriptMigration] "
                 + "Invalid URI in the paths file", e);
-            return fail(null);
+            return this.fail(null);
+        }
+
+        // Checking arguments.
+        if (digitalObject.equals(null)) {
+            report.setError("An empty (null) digital object was given");
+            return this.fail(report);
+        }
+
+        if (digitalObject.getContent().equals(null)) {
+            report.setError("The content of the digital object "
+                + "is empty (null)");
+            return this.fail(report);
+        }
+
+        if (outputFormat.equals(null)) {
+            report.setError("An empty (null) output format was given");
+            return this.fail(report);
         }
 
         this.getExtensions(inputFormat, outputFormat);
 
-        String command = migrationPaths.findMigrationCommand(
+        final String command = migrationPaths.findMigrationCommand(
                 inputFormat, outputFormat);
 
         if (command == null) {
             report.setError("Could not find the command associated with the "
                     + "migrationPath for the input and output formats");
-            return fail(report);
+            return this.fail(report);
         }
 
         InputStream inStream = digitalObject.getContent().read();
 
-        // write input stream to temporary file
-        tmpInFile = FileUtils.writeInputStreamToTmpFile(
+        // This should not be the way to do things, but this works.    
+        final File workfolder = FileUtils
+        .createWorkFolderInSysTemp("Temp_ghostscript");
+
+        final File tmpInFile = FileUtils.writeInputStreamToFile(
+                inStream, workfolder, "planets." + inputFmtExt);
+
+        /* This do not work, but should work.
+        // Write input stream to temporary file
+        final File tmpInFile = FileUtils.writeInputStreamToTmpFile(
                 inStream, "planets", inputFmtExt);
+        */
+
+        tmpInFile.deleteOnExit();
+
         if ( !(tmpInFile.exists() && tmpInFile.isFile()
                 && tmpInFile.canRead()) ) {
             log.error("[GhostscriptMigration] Unable to create/use "
@@ -148,7 +171,7 @@ public class GhostscriptMigration implements Migrate, Serializable {
         }
         log.info("[GhostscriptMigration] Temporary input file created: "
                 + tmpInFile.getAbsolutePath());
-
+       
         ProcessRunner runner = new ProcessRunner();
 
         runner.setCommand(Arrays.asList("cmd",
@@ -157,10 +180,10 @@ public class GhostscriptMigration implements Migrate, Serializable {
         log.info("[GhostscriptMigration] Executing command: "
                 + command.toString() + " ...");
 
-        //runner.setInputStream(inStream);
+        runner.setInputStream(inStream);
         runner.setCollection(true);
         runner.setOutputCollectionByteSize(-1);
-
+      
         runner.run();
 
         int return_code = runner.getReturnCode();
@@ -190,7 +213,7 @@ public class GhostscriptMigration implements Migrate, Serializable {
             new ServiceDescription.Builder(NAME,
                 Migrate.class.getName());
         try {
-            init();
+            this.init();
             builder.paths(migrationPaths.getAsPlanetsPaths());
         } catch (URISyntaxException e) {
             log.warn("[GhostscriptMigration] Invalid URI in the paths file", e);
@@ -250,6 +273,7 @@ public class GhostscriptMigration implements Migrate, Serializable {
      * @return MigrateResult.
      */
     private MigrateResult fail(final ServiceReport report) {
+        report.setErrorState(1);
         return new MigrateResult(null, report);
     }
 
@@ -260,15 +284,15 @@ public class GhostscriptMigration implements Migrate, Serializable {
      */
     private void getExtensions(final URI inputFormat, final URI outputFormat) {
         if (inputFormat != null && outputFormat != null) {
-            inputFmtExt = getFormatExt(inputFormat, false);
-            outputFmtExt = getFormatExt(outputFormat, true);
+            inputFmtExt = this.getFormatExt(inputFormat, false);
+            outputFmtExt = this.getFormatExt(outputFormat, true);
         }
     }
 
     /**
      * Gets one extension from a set of possible extensions for the incoming
      * request planets URI (e.g. planets:fmt/ext/jpeg) which matches with
-     * one format of the set of dvips's supported input/output formats. If
+     * one format of the set of Ghostscript's supported input/output formats. If
      * isOutput is false, it checks against the input formats ArrayList,
      * otherwise it checks against the output formats HashMap.
      *
@@ -298,7 +322,7 @@ public class GhostscriptMigration implements Migrate, Serializable {
             // Iterate over the different extensions of the planets:fmt/ext/jpg
             // format URI, note that the relation of Planets-format-URI to
             // extensions is 1 : n.
-            String reqFmtExt = normalizeExt((String) itrReq.next());
+            String reqFmtExt = this.normalizeExt((String) itrReq.next());
             while (itrGhostscript.hasNext()) {
                 // Iterate over the formats that Ghostscript
                 // offers either as input or as output format.

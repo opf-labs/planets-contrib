@@ -68,7 +68,7 @@ public class GhostscriptMigrationTest extends TestCase {
         dom = ServiceCreator.createTestService(Migrate.QNAME,
                 GhostscriptMigration.class, wsdlLoc);
         // Sets the removeTestFolder to clean up temporary files and folders.
-        //setRemoveTestFolder(true);
+        setRemoveTestFolder(true);
         }
 
     /*
@@ -132,7 +132,7 @@ public class GhostscriptMigrationTest extends TestCase {
 
             this.workfolder = FileUtils
                 .createWorkFolderInSysTemp("ghostscript_test");
-
+            
             final File resultText = FileUtils.writeInputStreamToFile(
                 content.read(), this.workfolder, "ps2pdf_result.pdf");
 
