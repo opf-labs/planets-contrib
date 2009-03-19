@@ -5,6 +5,7 @@ import eu.planets_project.ifr.core.techreg.impl.formats.FormatRegistryImpl;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.Parameters;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
@@ -64,6 +65,18 @@ public class GhostscriptMigration implements Migrate, Serializable {
     static final String NAME = "GhostscriptMigration";
 
     /**
+     * An additional parameter (one of migrate method parameters)
+     * that can be passed to the underlying tool.
+     */
+    private static final String NOPLATFONTS = "noPlatFonts";
+
+    /**
+     * An additional parameter (one of migrate method parameters)
+     * that can be passed to the underlying tool.
+     */
+    private static final String QUIET = "Quiet";
+
+    /**
      *  Used for logging in the Planets framework.
      */
     private final PlanetsLogger log = PlanetsLogger.getLogger(
@@ -118,22 +131,7 @@ public class GhostscriptMigration implements Migrate, Serializable {
             return this.fail(null);
         }
 
-        // Checking arguments.
-        if (digitalObject.equals(null)) {
-            report.setError("An empty (null) digital object was given");
-            return this.fail(report);
-        }
-
-        if (digitalObject.getContent().equals(null)) {
-            report.setError("The content of the digital object "
-                + "is empty (null)");
-            return this.fail(report);
-        }
-
-        if (outputFormat.equals(null)) {
-            report.setError("An empty (null) output format was given");
-            return this.fail(report);
-        }
+        checkMigrateArgs(digitalObject, inputFormat, outputFormat, report);
 
         this.getExtensions(inputFormat, outputFormat);
 
@@ -148,7 +146,7 @@ public class GhostscriptMigration implements Migrate, Serializable {
 
         InputStream inStream = digitalObject.getContent().read();
 
-        // This should not be the way to do things, but this works.    
+        // This should not be the way to do things, but this works.
         final File workfolder = FileUtils
         .createWorkFolderInSysTemp("Temp_ghostscript");
 
@@ -163,19 +161,20 @@ public class GhostscriptMigration implements Migrate, Serializable {
 
         tmpInFile.deleteOnExit();
 
-        if ( !(tmpInFile.exists() && tmpInFile.isFile()
-                && tmpInFile.canRead()) ) {
+        if (!(tmpInFile.exists() && tmpInFile.isFile()
+                && tmpInFile.canRead())) {
             log.error("[GhostscriptMigration] Unable to create/use "
                 + "temporary input file!");
             return null;
         }
         log.info("[GhostscriptMigration] Temporary input file created: "
                 + tmpInFile.getAbsolutePath());
-       
+
         ProcessRunner runner = new ProcessRunner();
 
         runner.setCommand(Arrays.asList("cmd",
-                "/c", command, tmpInFile.getAbsolutePath()));
+                "/c", command, this.anyParameters(parameters),
+                tmpInFile.getAbsolutePath()));
 
         log.info("[GhostscriptMigration] Executing command: "
                 + command.toString() + " ...");
@@ -183,7 +182,7 @@ public class GhostscriptMigration implements Migrate, Serializable {
         runner.setInputStream(inStream);
         runner.setCollection(true);
         runner.setOutputCollectionByteSize(-1);
-      
+
         runner.run();
 
         int return_code = runner.getReturnCode();
@@ -201,6 +200,84 @@ public class GhostscriptMigration implements Migrate, Serializable {
         DigitalObject outputFile = new DigitalObject.Builder(
                 Content.byValue(outbytes)).build();
         return new MigrateResult(outputFile, report);
+    }
+
+    /**
+     * Handles any parameters of the migrate method.
+     * @param parameters Parameters from the migrate method.
+     * @return If any parameters, the value of the parameters
+     * concatenated as a string or if no parameters an empty sting.
+     */
+    private String anyParameters(final Parameters parameters) {
+        String paravalue = "";
+
+        if (parameters != null) {
+            log.info("Got additional parameters:");
+
+            List<Parameter> parameterList = parameters.getParameters();
+            for (Iterator<Parameter> iterator = parameterList.iterator();
+                    iterator.hasNext();) {
+                Parameter parameter = (Parameter) iterator.next();
+                String name = parameter.name;
+                String value = parameter.value;
+
+                log.info("Got parameter: " + name + " with value: " + value);
+                if (!name.equalsIgnoreCase(NOPLATFONTS)) {
+                    log.info("Invalid parameter with name: "
+                        + parameter.name + "\n using DEFAULT values.");
+                }
+
+                if (name.equalsIgnoreCase(NOPLATFONTS)) {
+                    log.info("Enabling 'noPlatFonts' feature '-dNOPLATFONTS'.");
+                    paravalue = paravalue + value;
+                }
+            }
+        }
+        return paravalue;
+    }
+
+    /** Check the arguments of migrate method.
+     * @param digitalObject From the migrate method.
+     * @param inputFormat From the migrate method.
+     * @param outputFormat From the migrate method.
+     * @param report Planets ServiceReport.
+     */
+    private void checkMigrateArgs(final DigitalObject digitalObject,
+            final URI inputFormat, final URI outputFormat,
+            final ServiceReport report) {
+        // Checking arguments.
+        try {
+            digitalObject.equals(null);
+        } catch (NullPointerException e) {
+            report.setError("An empty (null) digital object was given");
+            report.setError(e.toString());
+            this.fail(report);
+        }
+
+        try {
+            digitalObject.getContent().equals(null);
+        } catch (NullPointerException e) {
+            report.setError("The content of the digital object "
+                + "is empty (null)");
+            report.setError(e.toString());
+            this.fail(report);
+        }
+
+        try {
+            inputFormat.equals(null);
+        } catch (NullPointerException e) {
+            report.setError("An empty (null) input object was given");
+            report.setError(e.toString());
+            this.fail(report);
+        }
+
+        try {
+            outputFormat.equals(null);
+        } catch (NullPointerException e) {
+            report.setError("An empty (null) output format was given");
+            report.setError(e.toString());
+            this.fail(report);
+        }
     }
 
     /**

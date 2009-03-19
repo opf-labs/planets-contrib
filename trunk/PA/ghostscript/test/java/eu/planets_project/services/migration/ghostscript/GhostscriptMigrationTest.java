@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -11,6 +13,8 @@ import org.junit.Test;
 
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.Parameter;
+import eu.planets_project.services.datatypes.Parameters;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
@@ -67,6 +71,7 @@ public class GhostscriptMigrationTest extends TestCase {
     protected final void setUp() throws Exception {
         dom = ServiceCreator.createTestService(Migrate.QNAME,
                 GhostscriptMigration.class, wsdlLoc);
+
         // Sets the removeTestFolder to clean up temporary files and folders.
         setRemoveTestFolder(true);
         }
@@ -121,7 +126,7 @@ public class GhostscriptMigrationTest extends TestCase {
             System.out.println("Input " + doInput);
 
             final MigrateResult mr = dom.migrate(doInput, formatPS,
-                formatPDF, null);
+                formatPDF, this.createParameters(true));
             final DigitalObject doOutput = mr.getDigitalObject();
 
             assertNotNull("Resulting digital object is null.", doOutput);
@@ -176,7 +181,7 @@ public class GhostscriptMigrationTest extends TestCase {
             System.out.println("Input " + doInput);
 
             final MigrateResult mr = dom.migrate(doInput, formatPDF,
-                formatPS, null);
+                formatPS, this.createParameters(true));
             final DigitalObject doOutput = mr.getDigitalObject();
 
             assertNotNull("Resulting digital object is null.", doOutput);
@@ -203,7 +208,25 @@ public class GhostscriptMigrationTest extends TestCase {
             e.printStackTrace();
         }
     }
+    
+    private Parameters createParameters(boolean noPlatFontsFlag) {
+        List<Parameter> parameterList = new ArrayList<Parameter>();
+        
+        if (noPlatFontsFlag==true) {
+            Parameter noPlatFonts = new Parameter("noPlatFonts", "-dNOPLATFONTS");
+            noPlatFonts.setDescription("Disables the use of fonts supplied by "
+            		+ "the underlying platform (for instance X Windows). "
+            		+ "This may be needed if the platform fonts look "
+            		+ "undesirably different from the scalable fonts.");
+            parameterList.add(noPlatFonts);
+        }
 
+        Parameters parameters = new Parameters();
+        parameters.setParameters(parameterList);
+        
+        return parameters;
+    }
+  
     /**
       * @param removeTestFolder the removeTestFolder to set
     */
