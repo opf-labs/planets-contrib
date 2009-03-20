@@ -33,7 +33,7 @@ public class GhostscriptMigrationTest extends TestCase {
      * The location of the GhostscriptMigration service when deployed.
      */
     private final String wsdlLoc = "/pserv-pa-ghostscript"
-    		+ "/GhostscriptMigration?wsdl";
+            + "/GhostscriptMigration?wsdl";
 
     /**
      * A holder for the object to be tested.
@@ -137,7 +137,7 @@ public class GhostscriptMigrationTest extends TestCase {
 
             this.workfolder = FileUtils
                 .createWorkFolderInSysTemp("ghostscript_test");
-            
+
             final File resultText = FileUtils.writeInputStreamToFile(
                 content.read(), this.workfolder, "ps2pdf_result.pdf");
 
@@ -208,25 +208,31 @@ public class GhostscriptMigrationTest extends TestCase {
             e.printStackTrace();
         }
     }
-    
-    private Parameters createParameters(boolean noPlatFontsFlag) {
+
+    /**
+     * Create test parameters for migrate method.
+     * @param noPlatFontsFlag Should noPlatFonts parameter be created.
+     * @return List of parameters.
+     */
+    private Parameters createParameters(final boolean noPlatFontsFlag) {
         List<Parameter> parameterList = new ArrayList<Parameter>();
-        
-        if (noPlatFontsFlag==true) {
-            Parameter noPlatFonts = new Parameter("noPlatFonts", "-dNOPLATFONTS");
+
+        if (noPlatFontsFlag) {
+            Parameter noPlatFonts = new Parameter("noPlatFonts",
+                    "-dNOPLATFONTS");
             noPlatFonts.setDescription("Disables the use of fonts supplied by "
-            		+ "the underlying platform (for instance X Windows). "
-            		+ "This may be needed if the platform fonts look "
-            		+ "undesirably different from the scalable fonts.");
+                    + "the underlying platform (for instance X Windows). "
+                    + "This may be needed if the platform fonts look "
+                    + "undesirably different from the scalable fonts.");
             parameterList.add(noPlatFonts);
         }
 
         Parameters parameters = new Parameters();
         parameters.setParameters(parameterList);
-        
+
         return parameters;
     }
-  
+
     /**
       * @param removeTestFolder the removeTestFolder to set
     */

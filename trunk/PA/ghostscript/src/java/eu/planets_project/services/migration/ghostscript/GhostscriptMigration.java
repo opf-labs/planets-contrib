@@ -71,12 +71,6 @@ public class GhostscriptMigration implements Migrate, Serializable {
     private static final String NOPLATFONTS = "noPlatFonts";
 
     /**
-     * An additional parameter (one of migrate method parameters)
-     * that can be passed to the underlying tool.
-     */
-    private static final String QUIET = "Quiet";
-
-    /**
      *  Used for logging in the Planets framework.
      */
     private final PlanetsLogger log = PlanetsLogger.getLogger(
@@ -135,15 +129,6 @@ public class GhostscriptMigration implements Migrate, Serializable {
 
         this.getExtensions(inputFormat, outputFormat);
 
-        final String command = migrationPaths.findMigrationCommand(
-                inputFormat, outputFormat);
-
-        if (command == null) {
-            report.setError("Could not find the command associated with the "
-                    + "migrationPath for the input and output formats");
-            return this.fail(report);
-        }
-
         InputStream inStream = digitalObject.getContent().read();
 
         // This should not be the way to do things, but this works.
@@ -172,9 +157,24 @@ public class GhostscriptMigration implements Migrate, Serializable {
 
         ProcessRunner runner = new ProcessRunner();
 
-        runner.setCommand(Arrays.asList("cmd",
-                "/c", command, this.anyParameters(parameters),
-                tmpInFile.getAbsolutePath()));
+        final String command = migrationPaths.findMigrationCommand(
+                inputFormat, outputFormat);
+
+        if (command == null) {
+            report.setError("Could not find the command associated with the "
+                    + "migrationPath for the input and output formats");
+            return this.fail(report);
+        }
+
+        ArrayList<String> commands = new ArrayList<String>();
+                
+        commands.add("cmd");
+        commands.add("/c");
+        commands.add(command);
+        commands.add(this.anyParameters(parameters));
+        commands.add(tmpInFile.getAbsolutePath());
+        
+        runner.setCommand(commands);
 
         log.info("[GhostscriptMigration] Executing command: "
                 + command.toString() + " ...");
@@ -245,37 +245,26 @@ public class GhostscriptMigration implements Migrate, Serializable {
     private void checkMigrateArgs(final DigitalObject digitalObject,
             final URI inputFormat, final URI outputFormat,
             final ServiceReport report) {
-        // Checking arguments.
-        try {
-            digitalObject.equals(null);
-        } catch (NullPointerException e) {
+
+        if (digitalObject == null) {
             report.setError("An empty (null) digital object was given");
-            report.setError(e.toString());
             this.fail(report);
         }
 
-        try {
-            digitalObject.getContent().equals(null);
-        } catch (NullPointerException e) {
+        if (digitalObject.getContent() == null) {
+            System.out.println("Content NULL");
             report.setError("The content of the digital object "
                 + "is empty (null)");
-            report.setError(e.toString());
             this.fail(report);
         }
 
-        try {
-            inputFormat.equals(null);
-        } catch (NullPointerException e) {
+        if (inputFormat == null) {
             report.setError("An empty (null) input object was given");
-            report.setError(e.toString());
             this.fail(report);
         }
 
-        try {
-            outputFormat.equals(null);
-        } catch (NullPointerException e) {
+        if (outputFormat == null) {
             report.setError("An empty (null) output format was given");
-            report.setError(e.toString());
             this.fail(report);
         }
     }
