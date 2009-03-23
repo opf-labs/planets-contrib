@@ -73,7 +73,7 @@ public class GhostscriptMigrationTest extends TestCase {
                 GhostscriptMigration.class, wsdlLoc);
 
         // Sets the removeTestFolder to clean up temporary files and folders.
-        setRemoveTestFolder(true);
+        setRemoveTestFolder(false);
         }
 
     /*
@@ -129,7 +129,7 @@ public class GhostscriptMigrationTest extends TestCase {
                 formatPDF, this.createParameters(true));
             final DigitalObject doOutput = mr.getDigitalObject();
 
-            assertNotNull("Resulting digital object is null.", doOutput);
+            assertNotNull("Resulting digital object is null, error was "+mr.getReport().error, doOutput);
 
             System.out.println("Output" + doOutput);
 

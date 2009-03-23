@@ -168,12 +168,10 @@ public class GhostscriptMigration implements Migrate, Serializable {
 
         ArrayList<String> commands = new ArrayList<String>();
                 
-        commands.add("cmd");
-        commands.add("/c");
-        commands.add(command);
-        commands.add(this.anyParameters(parameters));
-        commands.add(tmpInFile.getAbsolutePath());
-        
+        commands.add("/bin/sh");
+        commands.add("-c");
+        commands.add(command+" "+anyParameters(parameters)+" "+tmpInFile.getAbsolutePath());
+
         runner.setCommand(commands);
 
         log.info("[GhostscriptMigration] Executing command: "
