@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.ejb.Local;
@@ -24,6 +25,7 @@ import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.identify.Identify;
@@ -89,7 +91,7 @@ public class ImageMagickIdentify implements Identify, Serializable {
 	/* (non-Javadoc)
 	 * @see eu.planets_project.services.identify.Identify#identify(eu.planets_project.services.datatypes.DigitalObject)
 	 */
-	public IdentifyResult identify(DigitalObject digitalObject) {
+	public IdentifyResult identify(DigitalObject digitalObject, List<Parameter> parameters ) {
 		
 		if(digitalObject.getContent()==null) {
 			PLOGGER.error("The Content of the DigitalObject should NOT be NULL! Returning with ErrorReport");

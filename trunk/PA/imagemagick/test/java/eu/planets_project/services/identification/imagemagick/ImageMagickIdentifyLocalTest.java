@@ -94,7 +94,7 @@ public class ImageMagickIdentifyLocalTest {
 			.events(event)
 			.build();
 			System.out.println("Testing identification of " + ext.toUpperCase() + ": " + file.getName());
-			IdentifyResult ir = imIdentify.identify(digObj);
+			IdentifyResult ir = imIdentify.identify(digObj, null);
 			validateResult(ir);
 		}
 	}
