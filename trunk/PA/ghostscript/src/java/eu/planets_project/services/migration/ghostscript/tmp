@@ -49,7 +49,6 @@ import java.util.Set;
 @WebService(
         name = GhostscriptMigration.NAME,
         serviceName = Migrate.NAME,
-        targetNamespace = PlanetsServices.NS,
         endpointInterface = "eu.planets_project.services.migrate.Migrate")
 public class GhostscriptMigration implements Migrate, Serializable {
 
@@ -169,8 +168,7 @@ public class GhostscriptMigration implements Migrate, Serializable {
         }
 
         ArrayList<String> commands = new ArrayList<String>();
-                
-        
+               
         // Commands for Linux.
         //commands.add("/bin/sh");
         //commands.add("-c");
