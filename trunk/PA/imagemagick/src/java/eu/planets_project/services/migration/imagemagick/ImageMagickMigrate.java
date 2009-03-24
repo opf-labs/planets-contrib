@@ -354,7 +354,7 @@ import eu.planets_project.services.utils.ServiceUtils;
             END_TIME = System.currentTimeMillis();
             event.duration = ServiceUtils.calculateDuration(START_TIME, END_TIME);
 
-            newDigObj = DigitalObject.create(Content.byValue(outputFile))
+            newDigObj = new DigitalObject.Builder(Content.byValue(outputFile))
             .format(outputFormat)
             .title(outputFile.getName())
             .permanentUrl(new URL("http://planets.services.migration.ImageMagickMigrate"))

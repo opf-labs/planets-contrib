@@ -87,7 +87,7 @@ public class ImageMagickIdentifyLocalTest {
 		
 		for (File file : fileSet) {
 			String ext = files.get(file);
-			DigitalObject digObj = DigitalObject.create(Content.byValue(file))
+			DigitalObject digObj = new DigitalObject.Builder(Content.byValue(file))
 			.permanentUrl(new URL("http://planets-project.eu/services/pserv-pa-imagemagickidentify-test"))
 			.format(Format.extensionToURI(ext))
 			.title(file.getName())

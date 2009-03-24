@@ -521,7 +521,7 @@ public class ImageMagickMigrateLocalTest {
         	
         	File inputFile = getTestFile(srcExtension);
         	
-            DigitalObject input = DigitalObject.create(Content.byValue(inputFile))
+            DigitalObject input = new  DigitalObject.Builder(Content.byValue(inputFile))
             						.permanentUrl(new URL("http://imageMagickMigrationsTests"))
             						.format(Format.extensionToURI(srcExtension))
             						.title(inputFile.getName())
