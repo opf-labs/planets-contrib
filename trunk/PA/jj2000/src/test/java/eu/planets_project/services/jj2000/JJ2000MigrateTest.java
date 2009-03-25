@@ -96,12 +96,8 @@ public final class JJ2000MigrateTest extends TestCase {
 
         System.out.println("Output: " + doOut);
         System.out.println("Output.content: " + doOut.getContent());
-        System.out.println("Output.content.isByValue: "
-                + doOut.getContent().isByValue());
         System.out.println("Output.content.read().available(): "
                 + doOut.getContent().read().available());
-        System.out.println("Output.content.getReference: "
-                + doOut.getContent().getReference());
 
         File out = new File(outFile);
         writeInStreamToOutStream(doOut.getContent().read(), new FileOutputStream(out));

@@ -159,8 +159,6 @@ public class SoXTests {
 
 			System.out.println("Result: " + doOut);
 			System.out.println("Result.content: " + doOut.getContent());
-			System.out.println("Result.content.isByValue: " + doOut.getContent().isByValue());
-			System.out.println("Result.content.getReference: " + doOut.getContent().getReference());
 		}
 	}
 	

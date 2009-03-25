@@ -98,7 +98,7 @@ public class NetPbmMigrationTest extends TestCase {
 
             System.out.println("Output: " + doOut);
 
-            Content content = doOut.getContent();
+            DigitalObject.Content content = doOut.getContent();
 
             File workfolder = FileUtils.createWorkFolderInSysTemp("netpbm_test");
 

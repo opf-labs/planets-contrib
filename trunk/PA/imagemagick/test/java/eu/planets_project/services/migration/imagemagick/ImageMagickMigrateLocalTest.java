@@ -539,8 +539,6 @@ public class ImageMagickMigrateLocalTest {
 
             System.out.println("DigitalObject.getTitle(): " + doOut.getTitle());
             System.out.println("DigitalObject.getFormat(): " + doOut.getFormat().toASCIIString());
-            System.out.println("DigitalObject.content.isByValue: " + doOut.getContent().isByValue());
-            System.out.println("DigitalObject.content.getReference: " + doOut.getContent().getReference());
             System.out.println("Events: ");
             List<Event> events = doOut.getEvents();
             for (Event event : events) {

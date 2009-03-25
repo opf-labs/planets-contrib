@@ -31,6 +31,7 @@ import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
 import java.io.File;
@@ -263,7 +264,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	    fileInput = File.createTempFile("planets", sMDB_EXTENSION);
 	    /* make sure, it is at least deleted, when the Web Service is stopped */
 	    fileInput.deleteOnExit();
-			writeByteContentToFile(doInput.getContent(),fileInput);
+	        FileUtils.writeInputStreamToFile(doInput.getContent().read(), fileInput);
 			/* output file has same unique file name with different extension */
 			String sInputFile = fileInput.getAbsolutePath();
 			String sOutputFile = sInputFile.substring(0,sInputFile.lastIndexOf("."))+sSIARD_EXTENSION;

@@ -27,6 +27,7 @@ import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.migration.mdb2siard.Mdb2SiardMigrate;
+import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
 
 public class Mdb2SiardMigrateTester
@@ -145,7 +146,7 @@ public class Mdb2SiardMigrateTester
       assertTrue("Resulting digital object is null.", doOutput != null);
       if (mr.getReport().getErrorState() != ServiceReport.ERROR)
       {
-        Mdb2SiardMigrate.writeByteArrayToFile(doOutput.getContent().getValue(), fileOutput);
+        FileUtils.writeInputStreamToFile(doOutput.getContent().read(), fileOutput);
         if (mr.getReport().warn != null)
         	System.out.println("Warning: "+mr.getReport().warn);
         if (mr.getReport().info != null)

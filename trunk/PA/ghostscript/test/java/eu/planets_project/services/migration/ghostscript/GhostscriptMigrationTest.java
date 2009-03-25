@@ -133,7 +133,7 @@ public class GhostscriptMigrationTest extends TestCase {
 
             System.out.println("Output" + doOutput);
 
-            final Content content = doOutput.getContent();
+            final DigitalObject.Content content = doOutput.getContent();
 
             this.workfolder = FileUtils
                 .createWorkFolderInSysTemp("ghostscript_test");
@@ -188,7 +188,7 @@ public class GhostscriptMigrationTest extends TestCase {
 
             System.out.println("Output" + doOutput);
 
-            final Content content = doOutput.getContent();
+            final DigitalObject.Content content = doOutput.getContent();
 
             this.workfolder = FileUtils
                 .createWorkFolderInSysTemp("ghostscript_test");
