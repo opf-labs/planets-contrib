@@ -1,14 +1,16 @@
 package eu.planets_project.services.migration.gimp;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ejb.Local;
@@ -28,14 +30,9 @@ import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.ByteArrayHelper;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
-import java.lang.Exception;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Set;
 
 /**
  * The Gimp26Migration class migrates various image file formats. 
@@ -415,7 +412,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
 
             // read byte array from temporary file
             if (tmpOutFile.isFile() && tmpOutFile.canRead()) {
-                binary = ByteArrayHelper.read(tmpOutFile);
+                binary = FileUtils.readFileIntoByteArray(tmpOutFile);
             } else {
                 log.error("Error: Unable to read temporary file " + tmpInFile.getPath() + tmpInFile.getName());
             }

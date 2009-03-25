@@ -4,11 +4,10 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import eu.planets_project.services.utils.ByteArrayHelper;
+import eu.planets_project.services.datatypes.Parameters;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
-import eu.planets_project.services.datatypes.Parameters;
 
 /**
  * @deprecated Use {@link SoX} instead.
@@ -156,7 +155,7 @@ public class SoxMigrations {
         File inputFolder = FileUtils.createFolderInWorkFolder(workFolder, SoX_IN);
         
         String inputFilePath = inputFolder.getAbsolutePath() + File.separator + "SoX_INPUT_FILE" + srcSuffix;
-        File inputFile = ByteArrayHelper.writeToDestFile(input, inputFilePath);
+        File inputFile = FileUtils.writeByteArrayToFile(input, inputFilePath);
         
         
         try {
@@ -187,7 +186,7 @@ public class SoxMigrations {
         byte[] outputFileData = null;
         
         if(processOutputFile.canRead()) {
-        	outputFileData = ByteArrayHelper.read(new File(outputFilePath));
+        	outputFileData = FileUtils.readFileIntoByteArray(new File(outputFilePath));
             plogger.info(outputFileData.length);
         }
         else {

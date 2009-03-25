@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.xml.sax.SAXException;
+
 import com.sun.star.beans.PropertyValue;
 import com.sun.star.bridge.XUnoUrlResolver;
 import com.sun.star.frame.XComponentLoader;
@@ -23,7 +25,7 @@ import com.sun.star.frame.XStorable;
 import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.uno.UnoRuntime;
-import eu.planets_project.services.utils.ByteArrayHelper;
+
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 
@@ -392,7 +394,7 @@ public class XenaOOMigrations {
         File input = FileUtils.getTempFile("input", "0");
         input.deleteOnExit();
         
-        input = ByteArrayHelper.write(binary);
+        input = FileUtils.writeByteArrayToTempFile(binary);
 
         File output = FileUtils.getTempFile("output", "0");
         output.deleteOnExit();
@@ -410,7 +412,7 @@ public class XenaOOMigrations {
 
         byte[] result = null;
 
-        result = ByteArrayHelper.read(output);
+        result = FileUtils.readFileIntoByteArray(output);
 
         // Delete the temporaries:
         input.delete();

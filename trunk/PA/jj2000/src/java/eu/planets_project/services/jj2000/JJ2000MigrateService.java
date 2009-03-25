@@ -3,7 +3,6 @@
  */
 package eu.planets_project.services.jj2000;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -23,13 +22,12 @@ import eu.planets_project.ifr.core.techreg.api.formats.Format;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameters;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.datatypes.MigrationPath;
-import eu.planets_project.services.utils.ByteArrayHelper;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ServiceUtils;
 
@@ -123,7 +121,7 @@ public class JJ2000MigrateService implements Migrate {
         }
         
         // Grab the file and pass it back.
-        byte[] bytes = ByteArrayHelper.read(outFile);
+        byte[] bytes = FileUtils.readFileIntoByteArray(outFile);
         ServiceReport rep = new ServiceReport();
         rep.setErrorState(0);
         DigitalObject ndo = new DigitalObject.Builder(Content.byValue(bytes)).build();

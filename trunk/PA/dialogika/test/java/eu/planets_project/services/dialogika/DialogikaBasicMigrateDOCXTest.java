@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.planets_project.services.migrate.BasicMigrateOneBinary;
-import eu.planets_project.services.utils.ByteArrayHelper;
+import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
 
 /**
@@ -58,7 +58,7 @@ public class DialogikaBasicMigrateDOCXTest {
         System.out.println("The HTTP Proxy host is: "+System.getProperty("http.proxyHost"));
 */
         System.out.println("Reading in the input...");
-        byte[] input = ByteArrayHelper.read(new File("PA/dialogika/test/resources/test.doc"));
+        byte[] input = FileUtils.readFileIntoByteArray(new File("PA/dialogika/test/resources/test.doc"));
         System.out.println("Invoking the service...");
         byte[] output = bmob.basicMigrateOneBinary(input);
         System.out.println("Checking the result...");

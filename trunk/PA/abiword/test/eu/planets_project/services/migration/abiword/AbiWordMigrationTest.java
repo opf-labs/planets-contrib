@@ -1,29 +1,27 @@
 package eu.planets_project.services.migration.abiword;
 
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
+import junit.framework.TestCase;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
+import eu.planets_project.ifr.core.techreg.api.formats.Format;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameters;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.ByteArrayHelper;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.test.ServiceCreator;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import junit.framework.TestCase;
-import org.junit.After;
-import org.junit.Before;
-
-import static org.junit.Assert.*;
 
 /**
  * Local and client tests of the digital object migration functionality.
@@ -112,7 +110,7 @@ public final class AbiWordMigrationTest extends TestCase {
         //String outTestFileName = "PA/abiword/test/testfiles/generatedfiles/planetsMigrate"+origExt+"to"+destExt+String.valueOf(cycle)+"."+destExt.toLowerCase();
         String resFileDir = "PA/abiword/test/testfiles/generatedfiles/";
         String resFileName = "planetsMigrate"+origExt.toUpperCase()+"to"+destExt.toUpperCase()+"."+destExt.toLowerCase();
-        byte[] binary = ByteArrayHelper.read(new File(inTestFileName));
+        byte[] binary = FileUtils.readFileIntoByteArray(new File(inTestFileName));
         DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
         MigrateResult mr = dom.migrate(input, Format.extensionToURI(origExt), Format.extensionToURI(destExt), params);
         assertTrue("Migration result is null is null for planetsMigrate"+origExt+"to"+destExt+".", mr != null);
