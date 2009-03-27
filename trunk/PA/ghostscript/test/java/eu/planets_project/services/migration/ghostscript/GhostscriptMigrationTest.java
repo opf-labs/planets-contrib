@@ -118,13 +118,13 @@ public class GhostscriptMigrationTest extends TestCase {
             final URI formatPDF = new URI("planets:fmt/ext/pdf");
 
             final DigitalObject doInput =
-                new DigitalObject.Builder(Content.byValue(testps))
-                    .format(formatPS)
+                new DigitalObject.Builder(
+                    Content.byReference((testps).toURI().toURL()))
                     .permanentUrl(new URL("http://example.com/test.ps"))
                     .title("test.ps")
                     .build();
             System.out.println("Input " + doInput);
-
+            
             final MigrateResult mr = dom.migrate(doInput, formatPS,
                 formatPDF, this.createParameters(true));
             final DigitalObject doOutput = mr.getDigitalObject();
@@ -173,8 +173,8 @@ public class GhostscriptMigrationTest extends TestCase {
             final URI formatPDF = new URI("planets:fmt/ext/pdf");
 
             final DigitalObject doInput =
-                new DigitalObject.Builder(Content.byValue(testpdf))
-                    .format(formatPDF)
+                new DigitalObject.Builder(
+                        Content.byReference((testpdf).toURI().toURL()))
                     .permanentUrl(new URL("http://example.com/test.pdf"))
                     .title("test.pdf")
                     .build();
