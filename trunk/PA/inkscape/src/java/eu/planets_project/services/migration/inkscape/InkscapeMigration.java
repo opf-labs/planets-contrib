@@ -3,40 +3,36 @@
  */
 package eu.planets_project.services.migration.inkscape;
 
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
-import eu.planets_project.ifr.core.techreg.impl.formats.FormatRegistryImpl;
+import java.io.File;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 
+import eu.planets_project.ifr.core.techreg.api.formats.Format;
+import eu.planets_project.ifr.core.techreg.impl.formats.FormatRegistryImpl;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameters;
-import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.ByteArrayHelper;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-
-import java.util.Properties;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 
 
@@ -185,7 +181,7 @@ public final class InkscapeMigration implements Migrate, Serializable {
             tmpOutFile = new File(outFileStr);
             // read byte array from temporary file
             if( tmpOutFile.isFile() && tmpOutFile.canRead() )
-                binary = ByteArrayHelper.read(tmpOutFile);
+                binary = FileUtils.readFileIntoByteArray(tmpOutFile);
             else
                 log.error( "Error: Unable to read temporary file "+tmpOutFile.getAbsolutePath() );
 
