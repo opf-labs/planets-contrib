@@ -10,7 +10,7 @@ import eu.planets_project.services.datatypes.Parameters;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.ByteArrayHelper;
+import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.test.ServiceCreator;
@@ -102,7 +102,7 @@ public final class InkscapeMigrationTest extends TestCase {
             }
         }
     }
-
+ 
     private void doMigration(String origExt, String destExt, Parameters params) throws IOException
     {
         // Test file name
@@ -111,7 +111,7 @@ public final class InkscapeMigrationTest extends TestCase {
         //String outTestFileName = "PA/inkscape/test/testfiles/generatedfiles/planetsMigrate"+origExt+"to"+destExt+String.valueOf(cycle)+"."+destExt.toLowerCase();
         String resFileDir = "PA/inkscape/test/testfiles/generatedfiles/";
         String resFileName = "planetsMigrate"+origExt.toUpperCase()+"to"+destExt.toUpperCase()+"."+destExt.toLowerCase();
-        byte[] binary = ByteArrayHelper.read(new File(inTestFileName));
+        byte[] binary = FileUtils.readFileIntoByteArray(new File(inTestFileName));
         DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
         MigrateResult mr = dom.migrate(input, Format.extensionToURI(origExt), Format.extensionToURI(destExt), params);
         assertTrue("Migration result is null is null for planetsMigrate"+origExt+"to"+destExt+".", mr != null);
