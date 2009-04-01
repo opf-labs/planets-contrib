@@ -3,6 +3,7 @@ package eu.planets_project.services.migration.imagemagick;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -521,7 +522,9 @@ public class ImageMagickMigrateLocalTest {
         	
         	File inputFile = getTestFile(srcExtension);
         	
-            DigitalObject input = new  DigitalObject.Builder(Content.byValue(inputFile))
+        	FileInputStream is = new FileInputStream(inputFile);
+        	
+            DigitalObject input = new  DigitalObject.Builder(Content.byValue(is))
             						.permanentUrl(new URL("http://imageMagickMigrationsTests"))
             						.format(Format.extensionToURI(srcExtension))
             						.title(inputFile.getName())
