@@ -194,7 +194,6 @@ public class SoxMigrations {
         	plogger.error("SoX didn't create an output file!");
         }
         
-        FileUtils.deleteTempFiles(workFolder, plogger);
         
         return outputFileData;
     }

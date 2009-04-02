@@ -19,6 +19,9 @@ import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import magick.ImageInfo;
 import magick.MagickException;
 import magick.MagickImage;
@@ -56,13 +59,15 @@ import eu.planets_project.services.utils.ServiceUtils;
         serviceName = Migrate.NAME,
         targetNamespace = PlanetsServices.NS,
         endpointInterface = "eu.planets_project.services.migrate.Migrate")
-        public class ImageMagickMigrate implements Migrate, Serializable {
+public class ImageMagickMigrate implements Migrate, Serializable {
 
     /**
      * 
      */
     private static final long serialVersionUID = 1999759257332654952L;
 
+    private static Log plogger = LogFactory.getLog(ImageMagickMigrate.class);
+    
     /**
      * the service name
      */
@@ -70,7 +75,6 @@ import eu.planets_project.services.utils.ServiceUtils;
 
     /** Array of compression type strings */
     public static String[] compressionTypes = new String[11];
-    private PlanetsLogger plogger = PlanetsLogger.getLogger(this.getClass());
     private static final String COMPRESSION_TYPE = "compressionType";
     private static final int COMPRESSION_TYPE_PARAM_DEFAULT = 1; 
     private static final String COMPRESSION_QUALITY_LEVEL = "compressionQuality";
@@ -366,9 +370,6 @@ import eu.planets_project.services.utils.ServiceUtils;
             report = new ServiceReport();
             report.setErrorState(0);
             plogger.info("Created Service report...");
-
-            plogger.info("Deleting temp files...");
-            FileUtils.deleteTempFiles(imageMagickTmpFolder, plogger);
 
         } catch (MalformedURLException e) {
             return this.returnWithErrorMessage("ERROR: Malformed URL!", e);

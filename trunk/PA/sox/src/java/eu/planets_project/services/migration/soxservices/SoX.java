@@ -425,9 +425,6 @@ public class SoX implements Migrate, Serializable {
 			// and create a MigrateResult
 			MigrateResult migrateResult = new MigrateResult(resultDigObj, report);
 
-			// clean up all the now useless temp files 
-			FileUtils.deleteTempFiles(workFolder, plogger);
-			
 			// and return the result
 			return migrateResult;
         }
@@ -435,7 +432,6 @@ public class SoX implements Migrate, Serializable {
         // if no output file has been created, log out an error and return with an Error report!
         else {
         	plogger.error("No result file created. Maybe SoX is missing a required library for this migration?");
-        	FileUtils.deleteTempFiles(workFolder, plogger);
         	return this.returnWithErrorMessage("No result file created. Maybe SoX is missing a required library for this migration?", null);
         }
     }

@@ -169,8 +169,6 @@ public class ImageMagickIdentify implements Identify, Serializable {
 		
 		IdentifyResult identRes = new IdentifyResult(uriList, IdentifyResult.Method.PARTIAL_PARSE, sr);
 		
-		PLOGGER.info("Deleting temporary files and folders...");
-		FileUtils.deleteTempFiles(workFolder, PLOGGER);
 		PLOGGER.info("SUCCESS! Returning IdentifyResult. Goodbye!");
 		return identRes;
 	}
