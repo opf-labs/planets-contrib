@@ -89,17 +89,21 @@ public final class XenaServicesMigrationTest extends TestCase {
 
     }
 
-    private void migrate(String from, String to) {
+    private void migrate(String from, String to) throws IOException {
         byte[] binary = FileUtils.readFileIntoByteArray(new File("PA/xena/test/testfiles/testin." + from));
         DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
         MigrateResult mr = dom.migrate(input, Format.extensionToURI(from), Format.pronomIdToURI(to), null);
         DigitalObject doOut = mr.getDigitalObject();
         assertTrue("Resulting digital object is null.", doOut != null);
         InputStream inputStream_odf = doOut.getContent().read();
+        File outDir = new File("PA/xena/test/testfiles/out");
+        if (!outDir.exists()) {
+            outDir.mkdir();
+        }
         if (to.equals("fmt/18")) {
-            FileUtils.writeInputStreamToFile(inputStream_odf, new File("PA/xena/test/testfiles/out"), "testout_" + from + ".pdf");
+            FileUtils.writeInputStreamToFile(inputStream_odf, outDir, "testout_" + from + ".pdf");
         } else if (to.equals("fmt/95")) {
-            FileUtils.writeInputStreamToFile(inputStream_odf, new File("PA/xena/test/testfiles/out"), "testout_" + from + "A.pdf");
+            FileUtils.writeInputStreamToFile(inputStream_odf, outDir, "testout_" + from + "A.pdf");
         }
     }
 }

@@ -227,6 +227,7 @@ public class XenaOOMigrations {
         List<String> commandList = new ArrayList<String>();
         commandList.add(sofficeProgram.getAbsolutePath());
         commandList.add("-nologo");
+        commandList.add("-headless");
         commandList.add("-nodefault");
         commandList.add("-accept=socket,port=8100;urp;");
         String[] commandArr = commandList.toArray(new String[0]);
