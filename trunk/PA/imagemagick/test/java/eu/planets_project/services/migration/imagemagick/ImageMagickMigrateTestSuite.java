@@ -52,71 +52,7 @@ public class ImageMagickMigrateTestSuite {
      */
     @BeforeClass
     public static void setup() {
-        if ( ServiceCreator.testInServerMode() ) {
-            setupServer();
-        } else if( ServiceCreator.testInStandaloneMode() ) {
-            setupStandalone();
-        } else {
-            setupLocal();
-        }
-    }
-    
-    public static void setupLocal() {
-        System.out.println("Running ImageMagickMigrate LOCAL tests...");
-        System.out.println("********************************************");
-        
-        TEST_OUT = ImageMagickMigrateTestHelper.LOCAL_TEST_OUT;
-        
-        System.setProperty("pserv.test.context", "local");
-        
-        imageMagick = ServiceCreator.createTestService(Migrate.QNAME, ImageMagickMigrate.class, wsdlLocation);
-//      imageMagick = new ImageMagickMigrate();
-        
-        compressionTypes[0] = "Undefined Compression";
-        compressionTypes[1] = "No Compression";
-        compressionTypes[2] = "BZip Compression";
-        compressionTypes[3] = "Fax Compression";
-        compressionTypes[4] = "Group4 Compression";
-        compressionTypes[5] = "JPEG Compression";
-        compressionTypes[6] = "JPEG2000 Compression";
-        compressionTypes[7] = "LosslessJPEG Compression";
-        compressionTypes[8] = "LZW Compression";
-        compressionTypes[9] = "RLE Compression";
-        compressionTypes[10] = "Zip Compression";
-    }
-    
-    public static void setupStandalone() {
-        System.out.println("Running ImageMagickMigrate STANDALONE tests...");
-        System.out.println("*************************************************");
-        
-        TEST_OUT = ImageMagickMigrateTestHelper.STANDALONE_TEST_OUT;
-        
-        System.setProperty("pserv.test.context", "Standalone");
-
-        imageMagick = ServiceCreator.createTestService(Migrate.QNAME, ImageMagickMigrate.class, wsdlLocation);
-        compressionTypes[0] = "Undefined Compression";
-        compressionTypes[1] = "No Compression";
-        compressionTypes[2] = "BZip Compression";
-        compressionTypes[3] = "Fax Compression";
-        compressionTypes[4] = "Group4 Compression";
-        compressionTypes[5] = "JPEG Compression";
-        compressionTypes[6] = "JPEG2000 Compression";
-        compressionTypes[7] = "LosslessJPEG Compression";
-        compressionTypes[8] = "LZW Compression";
-        compressionTypes[9] = "RLE Compression";
-        compressionTypes[10] = "Zip Compression";       
-    }
-    
-    public static void setupServer() {
-        System.out.println("Running ImageMagickMigrate SERVER tests...");
-        System.out.println("*********************************************");
-        
-        TEST_OUT = ImageMagickMigrateTestHelper.SERVER_TEST_OUT;
-        
-        System.setProperty("pserv.test.context", "server");
-        System.setProperty("pserv.test.host", "localhost");
-        System.setProperty("pserv.test.port", "8080");
-        
+        // This method handles the local/standalone/server test context setup:
         imageMagick = ServiceCreator.createTestService(Migrate.QNAME, ImageMagickMigrate.class, wsdlLocation);
         
         compressionTypes[0] = "Undefined Compression";
@@ -131,8 +67,6 @@ public class ImageMagickMigrateTestSuite {
         compressionTypes[9] = "RLE Compression";
         compressionTypes[10] = "Zip Compression";
     }
-    
-    
     
     /**
      * Test the Description method.
