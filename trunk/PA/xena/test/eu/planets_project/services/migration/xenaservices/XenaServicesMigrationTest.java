@@ -7,9 +7,6 @@ import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-//import eu.planets_project.services.migration.xenaservices.XenaOOMigration.MSOfficeFormat;
-//import eu.planets_project.services.migration.xenaservices.XenaOOMigration.OdfFormat;
-import eu.planets_project.services.utils.ByteArrayHelper;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
 import java.io.File;
@@ -93,7 +90,7 @@ public final class XenaServicesMigrationTest extends TestCase {
     }
 
     private void migrate(String from, String to) {
-        byte[] binary = ByteArrayHelper.read(new File("PA/xena/test/testfiles/testin." + from));
+        byte[] binary = FileUtils.readFileIntoByteArray(new File("PA/xena/test/testfiles/testin." + from));
         DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
         MigrateResult mr = dom.migrate(input, Format.extensionToURI(from), Format.pronomIdToURI(to), null);
         DigitalObject doOut = mr.getDigitalObject();
@@ -101,7 +98,7 @@ public final class XenaServicesMigrationTest extends TestCase {
         InputStream inputStream_odf = doOut.getContent().read();
         if (to.equals("fmt/18")) {
             FileUtils.writeInputStreamToFile(inputStream_odf, new File("PA/xena/test/testfiles/out"), "testout_" + from + ".pdf");
-        } else if (to.equals("fmt/95")){
+        } else if (to.equals("fmt/95")) {
             FileUtils.writeInputStreamToFile(inputStream_odf, new File("PA/xena/test/testfiles/out"), "testout_" + from + "A.pdf");
         }
     }
