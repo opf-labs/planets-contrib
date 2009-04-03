@@ -152,6 +152,9 @@ public class Ps2PdfMigration implements Migrate, Serializable {
 
 
     private MigrateResult fail(ServiceReport report){
+        if (report.getErrorState() == 0){
+            report.setErrorState(1);
+        }
         return new MigrateResult(null,report);
     }
 }
