@@ -10,6 +10,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,7 +45,7 @@ public class ImageMagickMigrateTestSuite {
 	/**
 	 * test output
 	 */
-	public static String TEST_OUT = null;
+	public static String TEST_OUT = "ImageMagickTestOutput";
 	
 	static String[] compressionTypes = new String[11];
 	
@@ -52,6 +54,9 @@ public class ImageMagickMigrateTestSuite {
      */
     @BeforeClass
     public static void setup() {
+        // Config the logger:
+        Logger.getLogger("").setLevel( Level.FINE );
+        
         // This method handles the local/standalone/server test context setup:
         imageMagick = ServiceCreator.createTestService(Migrate.QNAME, ImageMagickMigrate.class, wsdlLocation);
         
