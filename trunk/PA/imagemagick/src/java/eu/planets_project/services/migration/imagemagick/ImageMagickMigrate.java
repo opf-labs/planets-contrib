@@ -233,14 +233,13 @@ public class ImageMagickMigrate implements Migrate, Serializable {
         }
 
         plogger.info("Getting content from DigitalObject as InputStream...");
-        InputStream inputStream = digitalObject.getContent().read();
         File inputFile;
         File outputFile;
 
         try {
             plogger.info("Writing content to temp file.");
             inputFile = File.createTempFile( DEFAULT_INPUT_FILE_NAME, "."+inputExt, imageMagickTmpFolder );
-            FileUtils.writeInputStreamToFile(inputStream, inputFile );
+            FileUtils.writeInputStreamToFile( digitalObject.getContent().read(), inputFile );
             plogger.info("Temp file created for input: " + inputFile.getAbsolutePath());
 
             // Also define the output file:
