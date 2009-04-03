@@ -3,7 +3,7 @@ package eu.planets_project.services.migration;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import eu.planets_project.services.migration.imagemagick.ImageMagickMigrateTestSuite;
+import eu.planets_project.services.migration.imagemagick.ImageMagickMigrateTests;
 
 /**
  * Suite to run all tests in the ImageMagickMigrate component.
@@ -11,7 +11,7 @@ import eu.planets_project.services.migration.imagemagick.ImageMagickMigrateTestS
  */
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses( { ImageMagickMigrateTestSuite.class })
+@Suite.SuiteClasses( { ImageMagickMigrateTests.class })
 public class AllImageMagickMigrationsSuite {}
 
 

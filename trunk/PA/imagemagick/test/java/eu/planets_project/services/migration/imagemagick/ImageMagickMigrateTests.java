@@ -35,7 +35,7 @@ import eu.planets_project.services.utils.test.ServiceCreator;
  * local tests for image magick migrations
  *
  */
-public class ImageMagickMigrateTestSuite {
+public class ImageMagickMigrateTests {
 	  
 	static Migrate imageMagick;
     /* The location of this service when deployed. */
