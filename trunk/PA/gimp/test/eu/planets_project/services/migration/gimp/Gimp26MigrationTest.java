@@ -34,7 +34,7 @@ import java.util.List;
 public final class Gimp26MigrationTest {
 
     /* The location of this service when deployed. */
-    String wsdlLoc = "/pserv-pa-gimp/Gimp26Migration?wsdl";
+    String wsdlLoc = "/pserv-pa-gimp26/Gimp26Migration?wsdl";
 
     /* A holder for the object to be tested */
     Migrate dom = null;
