@@ -190,9 +190,9 @@ public class ImageMagickIdentify implements Identify, Serializable {
 	
 	private IdentifyResult returnWithErrorMessage(String message, Exception e ) {
         if( e == null ) {
-            return new IdentifyResult(null, ServiceUtils.createErrorReport(message));
+            return new IdentifyResult(null, null, ServiceUtils.createErrorReport(message));
         } else {
-            return new IdentifyResult(null, ServiceUtils.createExceptionErrorReport(message, e));
+            return new IdentifyResult(null, null, ServiceUtils.createExceptionErrorReport(message, e));
         }
     }
 	
