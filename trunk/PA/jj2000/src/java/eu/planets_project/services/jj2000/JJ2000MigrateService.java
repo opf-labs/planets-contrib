@@ -26,6 +26,7 @@ import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameters;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -61,7 +62,8 @@ public class JJ2000MigrateService implements Migrate {
         sd.author("Andrew Jackson <Andrew.Jackson@bl.uk>");
         sd.classname(this.getClass().getCanonicalName());
         // Add a link to the JJ2000 homepage.
-        sd.tool(URI.create("http://jj2000.epfl.ch/"));
+        sd.tool( Tool.create(null, "JJ2000", null, null, "http://jj2000.epfl.ch/") );
+
         // Add links to this service:
         URI baseURI = JJ2000ViewerService.getBaseURIFromWSContext(wsc);
         if( baseURI != null ) {

@@ -31,6 +31,7 @@ import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.Parameters;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -161,12 +162,8 @@ public class SoX implements Migrate, Serializable {
         parameters.setParameters(parameterList);
         
         sd.parameters(parameters);
-        
-        try {
-			sd.tool(new URI(SoX_HOMEPAGE_URI));
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
+
+        sd.tool(Tool.create(null, "SoX", "14.1.0", null, SoX_HOMEPAGE_URI));
 		
 		List<String> inputFormats = new ArrayList<String> ();
 //		inputFormats.add("MP3");	// mp3 needs additional library, e.g. "lame"

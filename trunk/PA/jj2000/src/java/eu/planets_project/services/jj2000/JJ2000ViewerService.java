@@ -28,6 +28,7 @@ import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.utils.cache.DigitalObjectDiskCache;
 import eu.planets_project.services.view.CreateView;
 import eu.planets_project.services.view.CreateViewResult;
@@ -73,7 +74,7 @@ public class JJ2000ViewerService implements CreateView {
         mds.classname(this.getClass().getCanonicalName());
         
         // Add a link to the JJ2000 homepage as the 'tool' id.
-        mds.tool(URI.create("http://jj2000.epfl.ch/"));
+        mds.tool( Tool.create(null, "JJ2000", null, null, "http://jj2000.epfl.ch/") );
         
         // Add links to this service:
         mds.furtherInfo( URI.create( getBaseURIFromWSContext(wsc).toString() ) );

@@ -38,6 +38,7 @@ import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.Parameters;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -134,12 +135,8 @@ public class ImageMagickMigrate implements Migrate, Serializable {
         parameters.setParameters(parameterList);
 
         sd.parameters(parameters);
-
-        try {
-            sd.tool(new URI(IMAGE_MAGICK_URI));
-        } catch (URISyntaxException e) {
-            plogger.error("Erroneous URI: " + IMAGE_MAGICK_URI, e);
-        }
+        
+        sd.tool( Tool.create(null, "ImageMagick", "6.3.9-Q8", null, IMAGE_MAGICK_URI) );
 
         // Migration Paths: List all combinations:
         List<String> inputFormats = new ArrayList<String> ();
