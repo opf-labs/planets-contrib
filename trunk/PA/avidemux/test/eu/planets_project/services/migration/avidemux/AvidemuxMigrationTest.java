@@ -14,7 +14,7 @@ import org.junit.Test;
 import eu.planets_project.ifr.core.techreg.api.formats.Format;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.Parameters;
+import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
@@ -81,8 +81,8 @@ public final class AvidemuxMigrationTest extends TestCase {
     }
     
     public void tParameter(String paramName,String codecName) throws IOException {
-        Parameters parameters = new Parameters();
-        parameters.add(paramName, codecName);
+        List<Parameter> parameters = new ArrayList<Parameter>();
+        parameters.add(new Parameter(paramName, codecName) );
         doMigration("mpeg","avi", "2" , "2_TestParameter_"+paramName+"_"+codecName,parameters);
     }
     @Test
@@ -121,7 +121,7 @@ public final class AvidemuxMigrationTest extends TestCase {
         tParameter("fps","5"); // Should make the video "studdering" and desynchronize audio and video
     }
 
-    private void doMigration(String origExt, String destExt, String origSuffix, String destSuffix, Parameters params) throws IOException
+    private void doMigration(String origExt, String destExt, String origSuffix, String destSuffix, List<Parameter> params) throws IOException
     {
         // Test file name
         String inTestFileName = "PA/avidemux/test/testfiles/demonstration"+origSuffix+"." + origExt.toLowerCase();

@@ -6,7 +6,7 @@ import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.MigrationPath;
-import eu.planets_project.services.datatypes.Parameters;
+import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.migrate.Migrate;
@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -138,7 +139,7 @@ public class XenaOOMigration implements Migrate, Serializable {
      * @param parameters
      * @return
      */
-    public MigrateResult migrate(DigitalObject digitalObject, URI inputFormat, URI outputFormat, Parameters parameters) {
+    public MigrateResult migrate(DigitalObject digitalObject, URI inputFormat, URI outputFormat, List<Parameter> parameters) {
         InputStream inputStream = digitalObject.getContent().read();
         XenaOOMigrations xena = new XenaOOMigrations();
 

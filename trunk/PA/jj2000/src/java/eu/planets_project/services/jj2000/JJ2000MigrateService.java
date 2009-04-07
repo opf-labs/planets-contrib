@@ -23,7 +23,7 @@ import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.MigrationPath;
-import eu.planets_project.services.datatypes.Parameters;
+import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.Tool;
@@ -82,10 +82,10 @@ public class JJ2000MigrateService implements Migrate {
     }
     
     /**
-     * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameters)
+     * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameter)
      */
     public MigrateResult migrate(DigitalObject dob, URI inputFormat,
-            URI outputFormat, Parameters parameters) {
+            URI outputFormat, List<Parameter> parameters) {
         
         // Can only cope if the object is 'simple':
         if( dob.getContent() == null ) {

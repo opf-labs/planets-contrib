@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import eu.planets_project.services.datatypes.Parameters;
+import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
@@ -136,7 +136,7 @@ public class SoxMigrations {
      * @return the migrated byte[]
      */
     public byte[] genericTransformAudioSrcToAudioDest(byte[] input,
-            String srcSuffix, String destSuffix, Parameters parameters) {
+            String srcSuffix, String destSuffix, List<Parameter> parameters) {
     	
         if (!srcSuffix.startsWith("."))
             srcSuffix = "." + srcSuffix;

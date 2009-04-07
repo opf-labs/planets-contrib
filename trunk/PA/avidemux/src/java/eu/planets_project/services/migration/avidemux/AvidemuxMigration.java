@@ -26,7 +26,7 @@ import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.Parameters;
+import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.migrate.Migrate;
@@ -168,16 +168,16 @@ public final class AvidemuxMigration implements Migrate, Serializable {
         this.defaultParameters.put(fpsParamName, fpsParam);
 
         // Get list for the migration path parameter
-        parameterList = this.getParameters().getParameters();
+        parameterList = this.getParameters();
     }
 
     /**
      * {@inheritDoc}
      *
-     * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameters)
+     * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameter)
      */
     public MigrateResult migrate( final DigitalObject digitalObject, URI inputFormat,
-            URI outputFormat, Parameters parameters) {
+            URI outputFormat, List<Parameter> parameters) {
 
         Properties props = new Properties();
         try {
@@ -262,14 +262,13 @@ public final class AvidemuxMigration implements Migrate, Serializable {
         return new MigrateResult(newDO, report);
     }
 
-    private void overrideDefaultParamets(Parameters userParams)
+    private void overrideDefaultParamets(List<Parameter> userParams)
     {
         // Change default parameters according to the parameters defined by the
         // user
         if( userParams != null )
         {
-            List<Parameter> userParamList = userParams.getParameters(); // User parameters
-            Iterator<Parameter> userParmsItr = userParamList.iterator();
+            Iterator<Parameter> userParmsItr = userParams.iterator();
             while(userParmsItr.hasNext()) {
                 Parameter userParam = (Parameter) userParmsItr.next();
                 log.info("Set parameter: " + userParam.name + " with value: " + userParam.value);
@@ -358,9 +357,8 @@ public final class AvidemuxMigration implements Migrate, Serializable {
             (String)formatMapping.get(normExt):normExt);
     }
 
-    private Parameters getParameters()
+    private List<Parameter> getParameters()
     {
-        Parameters parameters = new Parameters();
         List<Parameter> paramList = new ArrayList<Parameter>();
         Iterator<String> itr = defaultParameters.keySet().iterator();
         while( itr.hasNext() )
@@ -370,8 +368,7 @@ public final class AvidemuxMigration implements Migrate, Serializable {
             Parameter param = (Parameter) defaultParameters.get(key);
             paramList.add(param);
         }
-        parameters.setParameters(paramList);
-        return parameters;
+        return paramList;
     }
 
     /**
@@ -381,7 +378,7 @@ public final class AvidemuxMigration implements Migrate, Serializable {
 
         this.initFormats();
         initParameters();
-        Parameters parameters = getParameters();
+        List<Parameter> parameters = getParameters();
         ServiceDescription.Builder builder = new ServiceDescription.Builder(NAME, Migrate.class.getName());
         builder.author("Sven Schlarb <shsschlarb-planets@yahoo.de>");
         builder.classname(this.getClass().getCanonicalName());

@@ -25,7 +25,7 @@ import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.Parameters;
+import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.migrate.Migrate;
@@ -292,14 +292,13 @@ public final class Gimp26Migration implements Migrate, Serializable {
         defaultParameters.put("BMP", bmpParameterList);
     }
     
-    private void overrideDefaultParamets(Parameters userParams)
+    private void overrideDefaultParamets(List<Parameter> userParams)
     {
         // Change default parameters according to the parameters defined by the
         // user
         if( userParams != null )
         {
-            List<Parameter> userParamList = userParams.getParameters(); // User parameters
-            Iterator<Parameter> userParmsItr = userParamList.iterator(); 
+            Iterator<Parameter> userParmsItr = userParams.iterator(); 
             while(userParmsItr.hasNext()) {
                 Parameter userParam = (Parameter) userParmsItr.next();
                 System.out.println("Set parameter: " + userParam.name + " with value: " + userParam.value);
@@ -326,10 +325,10 @@ public final class Gimp26Migration implements Migrate, Serializable {
     /**
      * {@inheritDoc}
      * 
-     * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameters)
+     * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameter)
      */
     public MigrateResult migrate(final DigitalObject digitalObject, URI inputFormat,
-            URI outputFormat, Parameters parameters) {
+            URI outputFormat, List<Parameter> parameters) {
         
         // read global gimp configuration parameters from properties file
         Properties props = new Properties();
@@ -425,9 +424,8 @@ public final class Gimp26Migration implements Migrate, Serializable {
         return new MigrateResult(newDO, report);
     }
    
-    private Parameters getParameters()
+    private List<Parameter> getParameters()
     {
-        Parameters parameters = new Parameters();
         List<Parameter> paramList = new ArrayList<Parameter>();
         Iterator<String> itr = defaultParameters.keySet().iterator();
         while( itr.hasNext() )
@@ -440,8 +438,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
                 paramList.add((Parameter) itr2.next());                
             }
         }
-        parameters.setParameters(paramList);
-        return parameters;
+        return paramList;
     }
     
     /**
@@ -450,7 +447,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
     public ServiceDescription describe() {
         init();
         initParameters();
-        Parameters parameters = getParameters();
+        List<Parameter> parameters = getParameters();
         ServiceDescription mds = new ServiceDescription.Builder(NAME, Migrate.class.getName())
                 .author("Sven Schlarb <shsschlarb-planets@yahoo.de>, Georg Petz <georg.petz@onb.ac.at>")
                 .classname(this.getClass().getCanonicalName())

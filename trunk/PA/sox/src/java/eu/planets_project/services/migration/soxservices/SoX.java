@@ -28,7 +28,7 @@ import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.Parameters;
+import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.Tool;
@@ -158,10 +158,7 @@ public class SoX implements Migrate, Serializable {
         		"specifying it immediately after the -V; e.g. -V0 sets it to 0. ");
         parameterList.add(verbosityLevel);
         
-        Parameters parameters = new Parameters();
-        parameters.setParameters(parameterList);
-        
-        sd.parameters(parameters);
+        sd.parameters(parameterList);
 
         sd.tool(Tool.create(null, "SoX", "14.1.0", null, SoX_HOMEPAGE_URI));
 		
@@ -187,10 +184,10 @@ public class SoX implements Migrate, Serializable {
 	}
 
 	/* (non-Javadoc)
-	 * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameters)
+	 * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameter)
 	 */
 	public MigrateResult migrate(DigitalObject digitalObject, URI inputFormat,
-			URI outputFormat, Parameters parameters) {
+			URI outputFormat, List<Parameter> parameters) {
 		
 		String inputError = null;
 		boolean inputErrDetected = false;
@@ -291,7 +288,7 @@ public class SoX implements Migrate, Serializable {
      * @return the migrated byte[]
      */
     public MigrateResult convertAudio(DigitalObject input,
-            URI inputFormat, URI outputFormat, Parameters parameters) {
+            URI inputFormat, URI outputFormat, List<Parameter> parameters) {
     	
     	String srcExt = getFormatExtension(inputFormat);
 		String destExt = getFormatExtension(outputFormat);
@@ -337,8 +334,7 @@ public class SoX implements Migrate, Serializable {
 			String noShowProgress;
 			String verbosityLevel;
 			
-			List<Parameter> parameterList = parameters.getParameters();
-			for (Iterator<Parameter> iterator = parameterList.iterator(); iterator.hasNext();) {
+			for (Iterator<Parameter> iterator = parameters.iterator(); iterator.hasNext();) {
 				Parameter parameter = (Parameter) iterator.next();
 				String name = parameter.name;
 				String value = parameter.value;

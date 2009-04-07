@@ -21,7 +21,7 @@ import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Event;
 import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.Parameters;
+import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.migrate.Migrate;
@@ -429,13 +429,12 @@ public class ImageMagickMigrateTests {
         testMigrate(inputFormatExt, outputFormatExt, null);
     }
     
-    private Parameters createParameters(String compressionType, String compressionQuality) {
+    private List<Parameter> createParameters(String compressionType, String compressionQuality) {
     	if(compressionType==null || compressionQuality==null) {
     		return null;
     	}
     	
     	List<Parameter> parameterList = new ArrayList<Parameter>();
-    	Parameters parameters = new Parameters();
     	
     	if((compressionType!=null) && (compressionQuality!=null)) {
             parameterList.add(new Parameter("compressionType", compressionType));
@@ -443,8 +442,7 @@ public class ImageMagickMigrateTests {
           
     	}
     	
-    	parameters.setParameters(parameterList);
-		return parameters;
+		return parameterList;
     }
 
     private File getTestFile(String srcExtension) {
@@ -509,7 +507,7 @@ public class ImageMagickMigrateTests {
      * @param parameters 
      * @throws IOException 
      */
-    public void testMigrate(String srcExtension, String targetExtension, Parameters parameters) throws IOException {
+    public void testMigrate(String srcExtension, String targetExtension, List<Parameter> parameters) throws IOException {
         try {
             /*
              * To test usability of the digital object instance in web services,
@@ -554,9 +552,8 @@ public class ImageMagickMigrateTests {
             String compressionTypeStr = "";
             
             if(parameters!=null) {
-	            List<Parameter> parameterList = parameters.getParameters();
 	            
-				for (Iterator<Parameter> iterator = parameterList.iterator(); iterator.hasNext();) {
+				for (Iterator<Parameter> iterator = parameters.iterator(); iterator.hasNext();) {
 					Parameter parameter = (Parameter) iterator.next();
 					String name = parameter.name;
 					if(name.equalsIgnoreCase("compressionType")) {

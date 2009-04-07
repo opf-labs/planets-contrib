@@ -22,7 +22,7 @@ import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.Parameters;
+import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.migrate.Migrate;
@@ -98,7 +98,7 @@ public class SoXTests {
 			
 			System.out.println("ShowProgress = TRUE, Verbosity level: 0");
 			System.out.println("------------------");
-			Parameters parameters = createParameters(true, false, "0");
+			List<Parameter> parameters = createParameters(true, false, "0");
 			testMigrate(inputFormat, outputFormat, parameters);
 			System.out.println("*******************");
 			
@@ -140,7 +140,7 @@ public class SoXTests {
 		}
 	}
 	
-	private void testMigrate(URI inputFormat, URI outputFormat, Parameters parameters) {
+	private void testMigrate(URI inputFormat, URI outputFormat, List<Parameter> parameters) {
 		DigitalObject digObj = createDigitalObject(getFormatExtension(inputFormat));
 		
 		MigrateResult mr = sox.migrate(digObj, inputFormat, outputFormat, parameters);
@@ -233,7 +233,7 @@ public class SoXTests {
     }
 	
 	
-	private Parameters createParameters(boolean showProgressFlag, boolean noShowProgressFlag, String verbosityLevelValue) {
+	private List<Parameter> createParameters(boolean showProgressFlag, boolean noShowProgressFlag, String verbosityLevelValue) {
     	List<Parameter> parameterList = new ArrayList<Parameter>();
     	
     	if(showProgressFlag==true) {
@@ -264,10 +264,7 @@ public class SoXTests {
         		"specifying it immediately after the -V; e.g. -V0 sets it to 0. ");
         parameterList.add(verbosityLevel);
         
-        Parameters parameters = new Parameters();
-        parameters.setParameters(parameterList);
-        
-		return parameters;
+		return parameterList;
     }
 	
 

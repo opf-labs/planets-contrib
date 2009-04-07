@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * The class migrates between a number of formats
@@ -52,10 +53,10 @@ public class FFMpegMigration implements Migrate, Serializable {
     /**
      * {@inheritDoc}
      *
-     * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameters)
+     * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameter)
      */
     public MigrateResult migrate(final DigitalObject digitalObject,
-                                 URI inputFormat, URI outputFormat, Parameters parameters) {
+                                 URI inputFormat, URI outputFormat, List<Parameter> parameters) {
 
 
         ServiceReport report = new ServiceReport();

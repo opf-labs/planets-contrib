@@ -15,7 +15,7 @@ import org.junit.Test;
 import eu.planets_project.ifr.core.techreg.api.formats.Format;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.Parameters;
+import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
@@ -102,7 +102,7 @@ public final class AbiWordMigrationTest extends TestCase {
         }
     }
 
-    private void doMigration(String origExt, String destExt, Parameters params) throws IOException
+    private void doMigration(String origExt, String destExt, List<Parameter> params) throws IOException
     {
         // Test file name
         String inTestFileName = "PA/abiword/test/testfiles/demonstration." + origExt.toLowerCase();

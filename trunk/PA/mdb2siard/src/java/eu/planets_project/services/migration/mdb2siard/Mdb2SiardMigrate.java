@@ -26,7 +26,7 @@ import javax.jws.WebService;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.Parameters;
+import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
@@ -249,7 +249,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	public MigrateResult migrate(
 			final DigitalObject doInput,
 	    URI inputFormat, URI outputFormat,
-	    Parameters parameters)
+	    List<Parameter> parameters)
 	{
 		/* empty doOutput in case of error ... */
 		DigitalObject doOutput = new DigitalObject.Builder(Content.byValue(new byte[] {})).build();

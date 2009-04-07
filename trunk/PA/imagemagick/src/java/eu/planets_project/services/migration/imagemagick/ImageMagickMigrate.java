@@ -35,7 +35,7 @@ import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Event;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.Parameters;
+import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.Tool;
@@ -131,10 +131,7 @@ public class ImageMagickMigrate implements Migrate, Serializable {
         compressionLevelParam.setDescription("This should be an int value between: 0 - 100, representing the compression quality in percent.");
         parameterList.add(compressionLevelParam);
 
-        Parameters parameters = new Parameters();
-        parameters.setParameters(parameterList);
-
-        sd.parameters(parameters);
+        sd.parameters(parameterList);
         
         sd.tool( Tool.create(null, "ImageMagick", "6.3.9-Q8", null, IMAGE_MAGICK_URI) );
 
@@ -171,10 +168,10 @@ public class ImageMagickMigrate implements Migrate, Serializable {
     }
 
     /**
-     * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameters)
+     * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameter)
      */
     public MigrateResult migrate(DigitalObject digitalObject, URI inputFormat,
-            URI outputFormat, Parameters parameters) {
+            URI outputFormat, List<Parameter> parameters) {
 
         plogger.info("...and ready! Checking input...");
         START_TIME = System.currentTimeMillis();
@@ -270,8 +267,7 @@ public class ImageMagickMigrate implements Migrate, Serializable {
                 plogger.info("Got additional parameters:");
                 int compressionType;
                 int compressionQuality; 
-                List<Parameter> parameterList = parameters.getParameters();
-                for (Iterator<Parameter> iterator = parameterList.iterator(); iterator.hasNext();) {
+                for (Iterator<Parameter> iterator = parameters.iterator(); iterator.hasNext();) {
                     Parameter parameter = (Parameter) iterator.next();
                     String name = parameter.name;
                     plogger.info("Got parameter: " + name + " with value: " + parameter.value);

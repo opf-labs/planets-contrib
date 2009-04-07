@@ -16,7 +16,7 @@ import org.junit.Test;
 
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.Parameters;
+import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
@@ -125,9 +125,9 @@ public final class Gimp26MigrationTest {
         String origExt = "TIFF";
         String destExt = "GIF";
         System.out.println("Do migration test from "+origExt+" to "+destExt);
-        Parameters parameters = new Parameters();
-        parameters.add("gif-interlace", "1");
-        parameters.add("gif-numcolors", "2"); // use 2 colours
+        List<Parameter> parameters = new ArrayList<Parameter>();
+        parameters.add( new Parameter("gif-interlace", "1"));
+        parameters.add(new Parameter("gif-numcolors", "2")); // use 2 colours
         doMigration(origExt,destExt, 4, parameters);
     }
     /**
@@ -155,7 +155,7 @@ public final class Gimp26MigrationTest {
         doMigration(origExt,destExt, 6, null);
     }
     */
-    private void doMigration(String origExt, String destExt, int cycle, Parameters params) throws IOException
+    private void doMigration(String origExt, String destExt, int cycle, List<Parameter> params) throws IOException
     {
         // Test file name
         String inTestFileName = "PA/gimp/test/testfiles/demonstration"+String.valueOf(cycle)+"." + origExt.toLowerCase();

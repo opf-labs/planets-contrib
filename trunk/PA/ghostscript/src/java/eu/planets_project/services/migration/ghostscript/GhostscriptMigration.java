@@ -6,7 +6,7 @@ import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.Parameters;
+import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.migrate.Migrate;
@@ -108,11 +108,11 @@ public class GhostscriptMigration implements Migrate, Serializable {
      *
      * @see eu.planets_project.services.migrate.Migrate#migrate(
      * eu.planets_project.services.datatypes.DigitalObject, java.net.URI,
-     * java.net.URI, eu.planets_project.services.datatypes.Parameters)
+     * java.net.URI, eu.planets_project.services.datatypes.Parameter)
      */
     public final MigrateResult migrate(final DigitalObject digitalObject,
             final URI inputFormat, final URI outputFormat,
-                final Parameters parameters) {
+                final List<Parameter> parameters) {
 
         final ServiceReport report = new ServiceReport();
 
@@ -215,14 +215,13 @@ public class GhostscriptMigration implements Migrate, Serializable {
      * @return If any parameters, the value of the parameters
      * concatenated as a string or if no parameters an empty sting.
      */
-    private String anyParameters(final Parameters parameters) {
+    private String anyParameters(final List<Parameter> parameters) {
         String paravalue = "";
 
         if (parameters != null) {
             log.info("Got additional parameters:");
 
-            List<Parameter> parameterList = parameters.getParameters();
-            for (Iterator<Parameter> iterator = parameterList.iterator();
+            for (Iterator<Parameter> iterator = parameters.iterator();
                     iterator.hasNext();) {
                 Parameter parameter = (Parameter) iterator.next();
                 String name = parameter.name;

@@ -14,7 +14,7 @@ import org.junit.Test;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.Parameters;
+import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
@@ -214,7 +214,7 @@ public class GhostscriptMigrationTest extends TestCase {
      * @param noPlatFontsFlag Should noPlatFonts parameter be created.
      * @return List of parameters.
      */
-    private Parameters createParameters(final boolean noPlatFontsFlag) {
+    private List<Parameter> createParameters(final boolean noPlatFontsFlag) {
         List<Parameter> parameterList = new ArrayList<Parameter>();
 
         if (noPlatFontsFlag) {
@@ -227,10 +227,7 @@ public class GhostscriptMigrationTest extends TestCase {
             parameterList.add(noPlatFonts);
         }
 
-        Parameters parameters = new Parameters();
-        parameters.setParameters(parameterList);
-
-        return parameters;
+        return parameterList;
     }
 
     /**
