@@ -26,12 +26,14 @@ import eu.planets_project.ifr.core.techreg.api.formats.Format;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.utils.cache.DigitalObjectDiskCache;
 import eu.planets_project.services.view.CreateView;
 import eu.planets_project.services.view.CreateViewResult;
+import eu.planets_project.services.view.ViewActionResult;
 import eu.planets_project.services.view.ViewStatus;
 
 /**
@@ -118,9 +120,10 @@ public class JJ2000ViewerService implements CreateView {
     }
 
     /* (non-Javadoc)
-     * @see eu.planets_project.services.view.CreateView#createView(java.util.List)
+     * @see eu.planets_project.services.view.CreateView#createView(java.util.List, java.util.List)
      */
-    public CreateViewResult createView(List<DigitalObject> digitalObjects) {
+    public CreateViewResult createView(List<DigitalObject> digitalObjects,
+            List<Parameter> parameters) {
         // Instanciate the View:
         return createViewerSession( digitalObjects, getBaseURIFromWSContext(wsc) );
     }
@@ -181,7 +184,7 @@ public class JJ2000ViewerService implements CreateView {
         digitalObjects.add(dob.build());
 
         // Invoke the service and create the view:
-        CreateViewResult cvr = jj2k.createView(digitalObjects);
+        CreateViewResult cvr = jj2k.createView(digitalObjects, null );
         return cvr;
     }
 
@@ -193,13 +196,21 @@ public class JJ2000ViewerService implements CreateView {
         File cache = DigitalObjectDiskCache.findCacheDir( sessionIdentifier );
         
         // Default to 'inactive'
-        ViewStatus vs = new ViewStatus( ViewStatus.INACTIVE, null );
+        ViewStatus vs = new ViewStatus( ViewStatus.Status.INACTIVE, null );
         
         // If it's active, return info:
         if( cache != null && cache.exists() && cache.isDirectory() ) {
-            vs = new ViewStatus( ViewStatus.ACTIVE, null );
+            vs = new ViewStatus( ViewStatus.Status.ACTIVE, null );
         }
         return vs;
     }
+
+    /* (non-Javadoc)
+     * @see eu.planets_project.services.view.CreateView#doAction(java.lang.String, java.lang.String)
+     */
+    public ViewActionResult doAction(String sessionIdentifier, String action) {
+        return null;
+    }
+
     
 }
