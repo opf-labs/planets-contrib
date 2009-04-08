@@ -99,7 +99,7 @@ public final class InkscapeMigration implements Migrate, Serializable {
      * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameter)
      */
     public MigrateResult migrate( final DigitalObject digitalObject, URI inputFormat,
-            URI outputFormat, Parameters parameters) {
+            URI outputFormat, List<Parameter> parameters) {
 
         Properties props = new Properties();
         try {

@@ -103,7 +103,7 @@ public final class InkscapeMigrationTest extends TestCase {
         }
     }
  
-    private void doMigration(String origExt, String destExt, Parameters params) throws IOException
+    private void doMigration(String origExt, String destExt, List<Parameter> params) throws IOException
     {
         // Test file name
         String inTestFileName = "PA/inkscape/test/testfiles/demonstration." + origExt.toLowerCase();
