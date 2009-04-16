@@ -180,13 +180,13 @@ public class ImageMagickMigrate implements Migrate, Serializable {
 
         if(inputFormatFromDigObj==null) {
             plogger.info("No file format specified for this DigitalObject, using interface inputFormat URI!");
-            inputExt = getFormatExtension(inputFormat);
+            inputExt = Format.getFirstMatchingFormatExtension(inputFormat);
         }
         else {
-            inputExt = getFormatExtension(inputFormatFromDigObj);
+            inputExt = Format.getFirstMatchingFormatExtension(inputFormatFromDigObj);
         }
 
-        String outputExt = getFormatExtension(outputFormat);
+        String outputExt = Format.getFirstMatchingFormatExtension(outputFormat);
 
         String inputError = null;
         String outputError = null;
@@ -389,28 +389,6 @@ public class ImageMagickMigrate implements Migrate, Serializable {
         return paths.toArray(new MigrationPath[]{});
     }
 
-    private String getFormatExtension (URI formatURI) {
-        plogger.info("Getting extension for given format URI: " + formatURI.toASCIIString());
-        Format f = new Format(formatURI);
-        String extension = null;
-        if(Format.isThisAnExtensionURI(formatURI)) {
-            plogger.info("URI is an Extension-URI.");
-            extension = f.getExtensions().iterator().next(); 
-            plogger.info("Got Extension for format URI: " + formatURI.toASCIIString() + "--> " + extension );
-        }
-        else {
-            plogger.info("URI is of another supported type.");
-            FormatRegistry formatRegistry = FormatRegistryFactory.getFormatRegistry();
-            Format fileFormat = formatRegistry.getFormatForURI(formatURI);
-            Set <String> extensions = fileFormat.getExtensions();
-            if(extensions != null){
-                Iterator <String> iterator = extensions.iterator();
-                extension = iterator.next();
-                plogger.info("Got Extension for format URI: " + formatURI.toASCIIString() + "--> " + extension );
-            }
-        }
-        return extension;
-    }
 
     private boolean compareExtensions(String extension1, String extension2) {
 

@@ -107,7 +107,7 @@ public class ImageMagickIdentify implements Identify, Serializable {
 		String extension = null;
 		
 		if(inputFormat!=null) {
-			extension = getFormatExtension(inputFormat);
+			extension = Format.getFirstMatchingFormatExtension(inputFormat);
 			PLOGGER.info("Found extension for input file: " + extension);
 		}
 		else {
@@ -196,22 +196,5 @@ public class ImageMagickIdentify implements Identify, Serializable {
         }
     }
 	
-	private String getFormatExtension (URI formatURI) {
-		Format f = new Format(formatURI);
-		String extension = null;
-		if(Format.isThisAnExtensionURI(formatURI)) {
-			extension = f.getExtensions().iterator().next(); 
-		}
-		else {
-			FormatRegistry formatRegistry = FormatRegistryFactory.getFormatRegistry();
-			Format fileFormat = formatRegistry.getFormatForURI(formatURI);
-			Set <String> extensions = fileFormat.getExtensions();
-			if(extensions != null){
-				Iterator <String> iterator = extensions.iterator();
-				extension = iterator.next();
-			}
-		}
-		return extension;
-	}
 
 }

@@ -290,8 +290,8 @@ public class SoX implements Migrate, Serializable {
     public MigrateResult convertAudio(DigitalObject input,
             URI inputFormat, URI outputFormat, List<Parameter> parameters) {
     	
-    	String srcExt = getFormatExtension(inputFormat);
-		String destExt = getFormatExtension(outputFormat);
+    	String srcExt = Format.getFirstMatchingFormatExtension(inputFormat);
+		String destExt = Format.getFirstMatchingFormatExtension(outputFormat);
     	
         if (!srcExt.startsWith("."))
         	srcExt = "." + srcExt;
@@ -487,27 +487,5 @@ public class SoX implements Migrate, Serializable {
 		return paths.toArray(new MigrationPath[]{});
 	}
 	
-	private String getFormatExtension (URI formatURI) {
-		plogger.info("Getting extension for given format URI: " + formatURI.toASCIIString());
-		Format f = new Format(formatURI);
-		String extension = null;
-		if(Format.isThisAnExtensionURI(formatURI)) {
-			plogger.info("URI is an Extension-URI.");
-			extension = f.getExtensions().iterator().next(); 
-			plogger.info("Got Extension for format URI: " + formatURI.toASCIIString() + "--> " + extension );
-		}
-		else {
-			plogger.info("URI is of another supported type.");
-			FormatRegistry formatRegistry = FormatRegistryFactory.getFormatRegistry();
-			Format fileFormat = formatRegistry.getFormatForURI(formatURI);
-			Set <String> extensions = fileFormat.getExtensions();
-			if(extensions != null){
-				Iterator <String> iterator = extensions.iterator();
-				extension = iterator.next();
-				plogger.info("Got Extension for format URI: " + formatURI.toASCIIString() + "--> " + extension );
-			}
-		}
-		return extension;
-	}
 
 }

@@ -141,7 +141,7 @@ public class SoXTests {
 	}
 	
 	private void testMigrate(URI inputFormat, URI outputFormat, List<Parameter> parameters) {
-		DigitalObject digObj = createDigitalObject(getFormatExtension(inputFormat));
+		DigitalObject digObj = createDigitalObject(Format.getFirstMatchingFormatExtension(inputFormat));
 		
 		MigrateResult mr = sox.migrate(digObj, inputFormat, outputFormat, parameters);
 
@@ -164,28 +164,6 @@ public class SoXTests {
 	
 	
 	
-	private String getFormatExtension (URI formatURI) {
-		Format f = new Format(formatURI);
-		String extension = null;
-		if(Format.isThisAnExtensionURI(formatURI)) {
-			extension = f.getExtensions().iterator().next(); 
-		}
-		else {
-			FormatRegistry formatRegistry = FormatRegistryFactory.getFormatRegistry();
-			Format fileFormat = formatRegistry.getFormatForURI(formatURI);
-			Set <String> extensions = fileFormat.getExtensions();
-			if(extensions != null){
-				Iterator <String> iterator = extensions.iterator();
-				extension = iterator.next();
-			}
-		}
-		return extension;
-	}
-	
-	private URI getURIForExtension(String extension) {
-		URI uri = Format.extensionToURI(extension);
-		return uri;
-	}
 	
 	private DigitalObject createDigitalObject(String srcExtension) {
 		
