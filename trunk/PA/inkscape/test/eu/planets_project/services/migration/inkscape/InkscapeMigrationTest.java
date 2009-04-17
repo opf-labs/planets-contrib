@@ -4,13 +4,12 @@ import eu.planets_project.ifr.core.techreg.api.formats.Format;
 
 import org.junit.Test;
 
-import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.test.ServiceCreator;
@@ -22,8 +21,6 @@ import java.util.List;
 import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
-
-import static org.junit.Assert.*;
 
 /**
  * Local and client tests of the digital object migration functionality.
@@ -112,7 +109,7 @@ public final class InkscapeMigrationTest extends TestCase {
         String resFileDir = "PA/inkscape/test/testfiles/generatedfiles/";
         String resFileName = "planetsMigrate"+origExt.toUpperCase()+"to"+destExt.toUpperCase()+"."+destExt.toLowerCase();
         byte[] binary = FileUtils.readFileIntoByteArray(new File(inTestFileName));
-        DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
+        DigitalObject input = new DigitalObject.Builder(ImmutableContent.byValue(binary)).build();
         MigrateResult mr = dom.migrate(input, Format.extensionToURI(origExt), Format.extensionToURI(destExt), params);
         assertTrue("Migration result is null is null for planetsMigrate"+origExt+"to"+destExt+".", mr != null);
         DigitalObject doOut = mr.getDigitalObject();

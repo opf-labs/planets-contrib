@@ -8,23 +8,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.planets_project.ifr.core.techreg.api.formats.Format;
-import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
-import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
-import eu.planets_project.services.datatypes.Content;
-import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.MigrationPath;
+import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.ServiceDescription;
-import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.*;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 
@@ -172,7 +164,7 @@ public class SoXTests {
         DigitalObject input = null;
         
 		try {
-			input = new DigitalObject.Builder(Content.byValue(inputFile)).permanentUrl(new URL("http://soxMigrationsTest.eu")).build();
+			input = new DigitalObject.Builder(ImmutableContent.byValue(inputFile)).permanentUrl(new URL("http://soxMigrationsTest.eu")).build();
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

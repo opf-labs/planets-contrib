@@ -1,26 +1,19 @@
 package eu.planets_project.services.migration.ghostscript;
 
+import eu.planets_project.services.datatypes.*;
+import eu.planets_project.services.migrate.Migrate;
+import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.test.ServiceCreator;
+import junit.framework.TestCase;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.TestCase;
-
-import org.junit.Test;
-
-import eu.planets_project.services.datatypes.Content;
-import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.ServiceDescription;
-import eu.planets_project.services.migrate.Migrate;
-import eu.planets_project.services.migrate.MigrateResult;
-
-import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.test.ServiceCreator;
 
 /**
  * Tests of the digital object migration functionality
@@ -119,7 +112,7 @@ public class GhostscriptMigrationTest extends TestCase {
 
             final DigitalObject doInput =
                 new DigitalObject.Builder(
-                    Content.byReference((testps).toURI().toURL()))
+                    ImmutableContent.byReference((testps).toURI().toURL()))
                     .permanentUrl(new URL("http://example.com/test.ps"))
                     .title("test.ps")
                     .build();
@@ -133,7 +126,7 @@ public class GhostscriptMigrationTest extends TestCase {
 
             System.out.println("Output" + doOutput);
 
-            final DigitalObject.Content content = doOutput.getContent();
+            final Content content = doOutput.getContent();
 
             this.workfolder = FileUtils
                 .createWorkFolderInSysTemp("ghostscript_test");
@@ -174,7 +167,7 @@ public class GhostscriptMigrationTest extends TestCase {
 
             final DigitalObject doInput =
                 new DigitalObject.Builder(
-                        Content.byReference((testpdf).toURI().toURL()))
+                        ImmutableContent.byReference((testpdf).toURI().toURL()))
                     .permanentUrl(new URL("http://example.com/test.pdf"))
                     .title("test.pdf")
                     .build();
@@ -188,7 +181,7 @@ public class GhostscriptMigrationTest extends TestCase {
 
             System.out.println("Output" + doOutput);
 
-            final DigitalObject.Content content = doOutput.getContent();
+            final Content content = doOutput.getContent();
 
             this.workfolder = FileUtils
                 .createWorkFolderInSysTemp("ghostscript_test");

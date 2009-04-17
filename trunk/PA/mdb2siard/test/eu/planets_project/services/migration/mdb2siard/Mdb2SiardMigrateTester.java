@@ -20,7 +20,7 @@ import java.io.IOException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.ServiceDescription;
@@ -139,7 +139,7 @@ public class Mdb2SiardMigrateTester
         fileOutput.delete();
       File fileInput = new File(sINPUT_FILE);
       DigitalObject doInput = new DigitalObject.Builder(
-      		Content.byValue(
+      		ImmutableContent.byValue(
       				Mdb2SiardMigrate.readByteArrayFromFile(fileInput))).build();
       MigrateResult mr = dom.migrate(doInput, null, null, null);
       DigitalObject doOutput = mr.getDigitalObject();

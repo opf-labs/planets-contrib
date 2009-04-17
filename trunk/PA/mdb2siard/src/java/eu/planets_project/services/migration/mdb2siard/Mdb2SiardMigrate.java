@@ -24,11 +24,8 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.Content;
-import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.ServiceReport;
-import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.*;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -252,7 +249,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	    List<Parameter> parameters)
 	{
 		/* empty doOutput in case of error ... */
-		DigitalObject doOutput = new DigitalObject.Builder(Content.byValue(new byte[] {})).build();
+		DigitalObject doOutput = new DigitalObject.Builder(ImmutableContent.byValue(new byte[] {})).build();
 		File fileInput = null;
 		File fileOutput = null;
 		ServiceReport sr = new ServiceReport();
@@ -277,7 +274,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 			sr = migrate(fileInput, fileOutput, sr);
 	    /* read do from temporary file */
 			if (sr.error_state == ServiceReport.SUCCESS)
-			  doOutput = new DigitalObject.Builder(Content.byValue(readByteArrayFromFile(fileOutput))).build();
+			  doOutput = new DigitalObject.Builder(ImmutableContent.byValue(readByteArrayFromFile(fileOutput))).build();
 		}
 		catch(Exception e)
 		{
@@ -293,7 +290,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 				fileOutput.delete();
 			/* if no output was generated, create a zero length byte array */
 			if (doOutput == null)
-				doOutput = new DigitalObject.Builder(Content.byValue(new byte[0])).build();
+				doOutput = new DigitalObject.Builder(ImmutableContent.byValue(new byte[0])).build();
 		}
 		/* display success */
 		if (sr.error_state == ServiceReport.SUCCESS)

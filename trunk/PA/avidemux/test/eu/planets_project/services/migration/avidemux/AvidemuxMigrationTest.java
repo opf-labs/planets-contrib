@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.planets_project.ifr.core.techreg.api.formats.Format;
-import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
@@ -130,7 +130,7 @@ public final class AvidemuxMigrationTest extends TestCase {
         String resFileDir = "PA/avidemux/test/testfiles/generatedfiles/";
         String resFileName = "planetsMigrate"+origExt.toUpperCase()+"to"+destExt.toUpperCase()+destSuffix+"."+destExt.toLowerCase();
         byte[] binary = FileUtils.readFileIntoByteArray(new File(inTestFileName));
-        DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
+        DigitalObject input = new DigitalObject.Builder(ImmutableContent.byValue(binary)).build();
         MigrateResult mr = dom.migrate(input, Format.extensionToURI(origExt), Format.extensionToURI(destExt), params);
         assertTrue("Migration result is null is null for planetsMigrate"+origExt+"to"+destExt+".", mr != null);
         DigitalObject doOut = mr.getDigitalObject();

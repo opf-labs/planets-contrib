@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.jj2000.JJ2000ViewerService;
 
@@ -79,9 +79,9 @@ public class DigitalObjectDiskCache {
         // Parse back into DigObjects:
         try {
             URL testurl1 = new URL("http://127.0.0.1:8080/pserv-pa-jj2000/resources/world.jp2");
-            dobs.add( new DigitalObject.Builder( Content.byReference(testurl1)).build() );
+            dobs.add( new DigitalObject.Builder( ImmutableContent.byReference(testurl1)).build() );
             URL testurl2 = new URL("http://127.0.0.1:8080/pserv-pa-jj2000/resources/Cevennes2.jp2");
-            dobs.add( new DigitalObject.Builder( Content.byReference(testurl2)).build() );
+            dobs.add( new DigitalObject.Builder( ImmutableContent.byReference(testurl2)).build() );
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }

@@ -108,7 +108,7 @@ public class Ps2PdfMigration implements Migrate, Serializable {
 
         DigitalObject pdfFile = new DigitalObject
                 .Builder(digitalObject)
-                .content(Content.byValue(outbytes))
+                .content(ImmutableContent.byValue(outbytes))
                 .format(outputFormat)
                 .build();
         return new MigrateResult(pdfFile,report);

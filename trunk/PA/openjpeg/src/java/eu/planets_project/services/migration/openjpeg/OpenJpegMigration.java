@@ -22,12 +22,8 @@ import javax.jws.WebService;
 import eu.planets_project.ifr.core.techreg.api.formats.Format;
 import eu.planets_project.ifr.core.techreg.impl.formats.FormatRegistryImpl;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.Content;
-import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.MigrationPath;
-import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.ServiceDescription;
-import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.*;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -178,7 +174,7 @@ public final class OpenJpegMigration implements Migrate, Serializable {
 
         ServiceReport report = new ServiceReport();
 
-        newDO = new DigitalObject.Builder(Content.byValue(binary)).build();
+        newDO = new DigitalObject.Builder(ImmutableContent.byValue(binary)).build();
 
         return new MigrateResult(newDO, report);
     }

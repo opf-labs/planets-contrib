@@ -14,7 +14,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
@@ -164,7 +164,7 @@ public final class Gimp26MigrationTest {
         String resFileDir = "PA/gimp/test/testfiles/generatedfiles/";
         String resFileName = "planetsMigrate"+origExt.toUpperCase()+"to"+destExt.toUpperCase()+String.valueOf(cycle)+"."+destExt.toLowerCase();
         byte[] binary = this.readByteArrayFromFile(inTestFileName);
-        DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
+        DigitalObject input = new DigitalObject.Builder(ImmutableContent.byValue(binary)).build();
         MigrateResult mr = dom.migrate(input, Format.extensionToURI(origExt), Format.extensionToURI(destExt), params);
         DigitalObject doOut = mr.getDigitalObject();
         assertTrue("Resulting digital object is null for planetsMigrate"+origExt+"to"+destExt+".", doOut != null);

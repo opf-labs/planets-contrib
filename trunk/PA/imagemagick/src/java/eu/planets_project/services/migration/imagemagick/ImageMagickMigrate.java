@@ -2,11 +2,9 @@ package eu.planets_project.services.migration.imagemagick;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,20 +27,11 @@ import eu.planets_project.ifr.core.techreg.api.formats.Format;
 import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.Agent;
-import eu.planets_project.services.datatypes.Content;
-import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.Event;
-import eu.planets_project.services.datatypes.MigrationPath;
-import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.ServiceDescription;
-import eu.planets_project.services.datatypes.ServiceReport;
-import eu.planets_project.services.datatypes.Tool;
+import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.*;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ServiceUtils;
 
 
@@ -338,19 +327,23 @@ public class ImageMagickMigrate implements Migrate, Serializable {
         ServiceReport report = null;
 
         try {
-            Agent agent = new Agent();
-            agent.id = Long.toString(serialVersionUID);
-            agent.name = ImageMagickMigrate.NAME;
-            agent.type = "Migrate";
 
-            Event event = new Event(); 
-            event.agent = agent;
-            event.datetime = ServiceUtils.getSystemDateAndTimeFormatted();
-            event.summary = "Image migration from " + inputExt.toUpperCase() + " to " + outputExt.toUpperCase() + ".\nUsed tool: ImageMagick.";
+            String id = Long.toString(serialVersionUID);
+            String name = ImageMagickMigrate.NAME;
+            String type = "Migrate";
+
+
+
+            String datetime = ServiceUtils.getSystemDateAndTimeFormatted();
+            String summary = "Image migration from " + inputExt.toUpperCase() + " to " + outputExt.toUpperCase() + ".\nUsed tool: ImageMagick.";
             END_TIME = System.currentTimeMillis();
-            event.duration = ServiceUtils.calculateDuration(START_TIME, END_TIME);
+            double duration = ServiceUtils.calculateDuration(START_TIME, END_TIME);
 
-            newDigObj = new DigitalObject.Builder(Content.byValue(outputFile))
+
+            Agent agent = new Agent(id,name,type);            
+                        Event event = new Event(summary,datetime,duration,agent,null);
+
+            newDigObj = new DigitalObject.Builder(ImmutableContent.byValue(outputFile))
             .format(outputFormat)
             .title(outputFile.getName())
             .permanentUrl(new URL("http://planets.services.migration.ImageMagickMigrate"))

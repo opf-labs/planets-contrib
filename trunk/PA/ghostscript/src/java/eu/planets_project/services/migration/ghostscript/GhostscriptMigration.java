@@ -3,12 +3,8 @@ package eu.planets_project.services.migration.ghostscript;
 import eu.planets_project.ifr.core.techreg.api.formats.Format;
 import eu.planets_project.ifr.core.techreg.impl.formats.FormatRegistryImpl;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.Content;
-import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.ServiceDescription;
-import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.*;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -205,7 +201,7 @@ public class GhostscriptMigration implements Migrate, Serializable {
         byte[] outbytes = FileUtils.writeInputStreamToBinary(newFileStream);
 
         DigitalObject outputFile = new DigitalObject.Builder(
-                Content.byValue(outbytes)).build();
+                ImmutableContent.byValue(outbytes)).build();
         return new MigrateResult(outputFile, report);
     }
 

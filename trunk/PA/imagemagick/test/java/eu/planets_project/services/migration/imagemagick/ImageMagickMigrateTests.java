@@ -1,6 +1,14 @@
 package eu.planets_project.services.migration.imagemagick;
 
+import eu.planets_project.ifr.core.techreg.api.formats.Format;
+import eu.planets_project.services.datatypes.*;
+import eu.planets_project.services.migrate.Migrate;
+import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.test.ServiceCreator;
 import static org.junit.Assert.assertTrue;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,21 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
-import eu.planets_project.services.datatypes.Content;
-import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.Event;
-import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.ServiceDescription;
-import eu.planets_project.services.datatypes.ServiceReport;
-import eu.planets_project.services.migrate.Migrate;
-import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.test.ServiceCreator;
 
 
 /**
@@ -516,7 +509,7 @@ public class ImageMagickMigrateTests {
         	
         	FileInputStream is = new FileInputStream(inputFile);
         	
-            DigitalObject input = new  DigitalObject.Builder(Content.byValue(is))
+            DigitalObject input = new  DigitalObject.Builder(ImmutableContent.byValue(is))
             						.permanentUrl(new URL("http://imageMagickMigrationsTests"))
             						.format(Format.extensionToURI(srcExtension))
             						.title(inputFile.getName())
@@ -537,12 +530,12 @@ public class ImageMagickMigrateTests {
             System.out.println("Events: ");
             List<Event> events = doOut.getEvents();
             for (Event event : events) {
-				System.out.println("Agent name: " + event.agent.name);
-				System.out.println("Agent type: " + event.agent.type);
-				System.out.println("Agent id: " + event.agent.id);
-				System.out.println("Event summary: " + event.summary);
-				System.out.println("Event datetime: " + event.datetime);
-				System.out.println("Event duration: " + event.duration);
+				System.out.println("Agent name: " + event.getAgent().getName());
+				System.out.println("Agent type: " + event.getAgent().getType());
+				System.out.println("Agent id: " + event.getAgent().getId());
+				System.out.println("Event summary: " + event.getSummary());
+				System.out.println("Event datetime: " + event.getDatetime());
+				System.out.println("Event duration: " + event.getDuration());
 			}
             
             int compressionType = 1;

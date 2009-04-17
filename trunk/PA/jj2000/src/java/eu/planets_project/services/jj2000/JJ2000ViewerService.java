@@ -24,12 +24,8 @@ import org.apache.commons.logging.LogFactory;
 
 import eu.planets_project.ifr.core.techreg.api.formats.Format;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.Content;
-import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.ServiceDescription;
-import eu.planets_project.services.datatypes.ServiceReport;
-import eu.planets_project.services.datatypes.Tool;
+import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.*;
 import eu.planets_project.services.utils.cache.DigitalObjectDiskCache;
 import eu.planets_project.services.view.CreateView;
 import eu.planets_project.services.view.CreateViewResult;
@@ -164,7 +160,7 @@ public class JJ2000ViewerService implements CreateView {
      * @return
      */
     public static CreateViewResult createViewerSession( URL jp2url ) {
-        DigitalObject dob = new DigitalObject.Builder( Content.byReference(jp2url) ).build();
+        DigitalObject dob = new DigitalObject.Builder( ImmutableContent.byReference(jp2url) ).build();
         List<DigitalObject> dobs = new ArrayList<DigitalObject>();
         dobs.add(dob);
         return createViewerSession(dobs, defaultBaseUrl);
@@ -179,7 +175,7 @@ public class JJ2000ViewerService implements CreateView {
         log.info("Got: "+sd.toXmlFormatted());
 
         // Construct a list of DOBs covering the given URL:
-        DigitalObject.Builder dob = new DigitalObject.Builder( Content.byReference( testUrl.toURL() ));
+        DigitalObject.Builder dob = new DigitalObject.Builder( ImmutableContent.byReference( testUrl.toURL() ));
         List<DigitalObject> digitalObjects = new ArrayList<DigitalObject>();
         digitalObjects.add(dob.build());
 

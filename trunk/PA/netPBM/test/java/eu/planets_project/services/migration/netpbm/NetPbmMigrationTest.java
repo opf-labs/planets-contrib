@@ -1,16 +1,8 @@
 package eu.planets_project.services.migration.netpbm;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-
-import junit.framework.TestCase;
-
-import org.junit.Test;
-
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
@@ -19,6 +11,13 @@ import eu.planets_project.services.utils.ByteString;
 import eu.planets_project.services.utils.Checksums;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
+import junit.framework.TestCase;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 
 /**
  * TODO abr forgot to document this class
@@ -85,7 +84,7 @@ public class NetPbmMigrationTest extends TestCase {
 */
 
             DigitalObject input =
-                    new DigitalObject.Builder(Content.byValue(testjpeg))
+                    new DigitalObject.Builder(ImmutableContent.byValue(testjpeg))
                             .format(new URI("planets:fmt/ext/jpeg"))
                             .title("test.jpeg").
                             build();
@@ -98,7 +97,7 @@ public class NetPbmMigrationTest extends TestCase {
 
             System.out.println("Output: " + doOut);
 
-            DigitalObject.Content content = doOut.getContent();
+            Content content = doOut.getContent();
 
             File workfolder = FileUtils.createWorkFolderInSysTemp("netpbm_test");
 
