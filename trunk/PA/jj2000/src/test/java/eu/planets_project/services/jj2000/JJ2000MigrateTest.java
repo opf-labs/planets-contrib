@@ -54,9 +54,9 @@ public final class JJ2000MigrateTest extends TestCase {
     public void testDescribe() {
         System.out.println("Asking for description:");
         ServiceDescription desc = dom.describe();
+        assertTrue("The ServiceDescription should not be NULL.", desc != null);
         System.out.println("Recieved service description: "
                 + desc.toXmlFormatted());
-        assertTrue("The ServiceDescription should not be NULL.", desc != null);
     }
 
     /**
@@ -114,7 +114,9 @@ public final class JJ2000MigrateTest extends TestCase {
                 op.write(bbuf,0,length);
                 }
         } finally {
-                in.close();
+                if (in != null) {
+                    in.close();
+                }
                 op.flush();
                 op.close();
         }

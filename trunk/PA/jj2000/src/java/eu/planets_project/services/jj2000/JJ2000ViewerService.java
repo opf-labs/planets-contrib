@@ -56,7 +56,7 @@ public class JJ2000ViewerService implements CreateView {
     private static final URI defaultBaseUrl = URI.create("http://localhost:8080"+CONTEXT_PATH);
 
     /** A logger */
-    public static Log log = LogFactory.getLog(JJ2000ViewerService.class);
+    public static final Log log = LogFactory.getLog(JJ2000ViewerService.class);
     
     /** A reference to the web service context. */
     @Resource 
