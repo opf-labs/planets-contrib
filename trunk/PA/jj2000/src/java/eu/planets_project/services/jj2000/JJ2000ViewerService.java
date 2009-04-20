@@ -87,7 +87,7 @@ public class JJ2000ViewerService implements CreateView {
     private static CreateViewResult returnWithErrorMessage(String message) {
         ServiceReport rep = new ServiceReport();
         log.error(message);
-        rep.setErrorState(ServiceReport.ERROR);
+        rep.setErrorState(ServiceReport.TOOL_ERROR);
         rep.setError("message");
         return new CreateViewResult(null, null, rep);
     }

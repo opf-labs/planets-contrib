@@ -120,7 +120,7 @@ public class Mdb2SiardMigrateTester
     File fileInput = new File(sINPUT_FILE);
 		ServiceReport sr = new ServiceReport();
 		sr = Mdb2SiardMigrate.migrate(fileInput, fileOutput, sr);
-		assertTrue((sr.getErrorState() == ServiceReport.ERROR) || fileOutput.exists());
+		assertTrue((sr.getErrorState() == ServiceReport.TOOL_ERROR) || fileOutput.exists());
 	} /* testMigrateFileFileServiceReport */
 
 	/*--------------------------------------------------------------------*/
@@ -144,7 +144,7 @@ public class Mdb2SiardMigrateTester
       MigrateResult mr = dom.migrate(doInput, null, null, null);
       DigitalObject doOutput = mr.getDigitalObject();
       assertTrue("Resulting digital object is null.", doOutput != null);
-      if (mr.getReport().getErrorState() != ServiceReport.ERROR)
+      if (mr.getReport().getErrorState() != ServiceReport.TOOL_ERROR)
       {
         FileUtils.writeInputStreamToFile(doOutput.getContent().read(), fileOutput);
         if (mr.getReport().warn != null)
@@ -154,7 +154,7 @@ public class Mdb2SiardMigrateTester
       }
       else
       	System.out.println("Error: "+mr.getReport().error);
-  		assertTrue((mr.getReport().getErrorState() == ServiceReport.ERROR) || fileOutput.exists());
+  		assertTrue((mr.getReport().getErrorState() == ServiceReport.TOOL_ERROR) || fileOutput.exists());
     }
     catch (Exception e) 
     {

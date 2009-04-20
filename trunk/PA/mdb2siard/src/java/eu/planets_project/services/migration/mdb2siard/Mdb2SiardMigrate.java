@@ -91,7 +91,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	private static void appendError(ServiceReport sr, String sError)
 	{
 		System.err.println(sError);
-		sr.setErrorState(ServiceReport.ERROR);
+		sr.setErrorState(ServiceReport.TOOL_ERROR);
 		/* append to previous error description */
 		String s = sr.getError();
 		if ((s != null) && (s.length() > 0))
@@ -186,7 +186,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	 */
 	static ServiceReport migrate(File fileInput, File fileOutput, ServiceReport sr)
 	{
-		sr.setErrorState(ServiceReport.ERROR);
+		sr.setErrorState(ServiceReport.TOOL_ERROR);
     Properties props = new Properties();
     try
     {
