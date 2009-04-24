@@ -22,10 +22,14 @@ import javax.xml.ws.handler.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ImmutableContent;
-import eu.planets_project.services.datatypes.*;
+import eu.planets_project.services.datatypes.Parameter;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.utils.cache.DigitalObjectDiskCache;
 import eu.planets_project.services.view.CreateView;
 import eu.planets_project.services.view.CreateViewResult;
@@ -79,7 +83,7 @@ public class JJ2000ViewerService implements CreateView {
         mds.logo( URI.create( getBaseURIFromWSContext(wsc) + "logos/jj2000_logo_150w.png") );
         
         // Add supported formats:
-        mds.inputFormats( Format.extensionToURI("JP2") );
+        mds.inputFormats( FormatRegistryFactory.getFormatRegistry().createExtensionUri("JP2") );
         
         return mds.build();
     }

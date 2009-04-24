@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -20,7 +19,6 @@ import javax.xml.ws.BindingType;
 import magick.ImageInfo;
 import magick.MagickException;
 import magick.MagickImage;
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
 import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
@@ -60,7 +58,7 @@ public class ImageMagickIdentify implements Identify, Serializable {
 	private static final String WORKFOLDER_NAME = "ImageMagickIdentify";
 	private static final String DEFAULT_INPUT_NAME = "ImageMagickIdentify_input";
 	private static final String DEFAULT_EXTENSION = "bin";
-	private static FormatRegistry fr = null;
+	private final FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 	
 	
 	
@@ -69,7 +67,6 @@ public class ImageMagickIdentify implements Identify, Serializable {
 	 */
 	public ImageMagickIdentify(){
 	    System.setProperty("jmagick.systemclassloader","no"); // Use the JBoss-Classloader, instead of the Systemclassloader.
-	    fr = FormatRegistryFactory.getFormatRegistry();
 	    PLOGGER.info("Hello! Initializing and starting ImageMagickIdentify service!");
 	}
 
@@ -107,7 +104,7 @@ public class ImageMagickIdentify implements Identify, Serializable {
 		String extension = null;
 		
 		if(inputFormat!=null) {
-			extension = Format.getFirstMatchingFormatExtension(inputFormat);
+			extension = format.getExtensions(inputFormat).iterator().next();
 			PLOGGER.info("Found extension for input file: " + extension);
 		}
 		else {
@@ -146,7 +143,7 @@ public class ImageMagickIdentify implements Identify, Serializable {
 			e.printStackTrace();
 		}
 		
-		Set<URI> uris = fr.getURIsForExtension(srcImageFormat);
+		Set<URI> uris = format.getUrisForExtension(srcImageFormat);
 //		List<URI> uris = fr.search(srcImageFormat);
 	    
 	    if(uris.size() <= 0) {
@@ -161,7 +158,7 @@ public class ImageMagickIdentify implements Identify, Serializable {
 	    ServiceReport sr = new ServiceReport();
 	    
 	    sr.setErrorState(ServiceReport.SUCCESS);
-	    URI formatURI = Format.extensionToURI(srcImageFormat);
+	    URI formatURI = format.createExtensionUri(srcImageFormat);
 	    uriList.add(0, formatURI);
 	    String infoString = createFormatInfoString(uris);
 	    sr.setInfo("Successfully identified Input file as: " + formatURI.toASCIIString() + "\n" + infoString);
@@ -177,11 +174,9 @@ public class ImageMagickIdentify implements Identify, Serializable {
 	
 	private String createFormatInfoString(Set<URI> uris) {
 		StringBuffer buf = new StringBuffer();
-		Format format = null;
 	    buf.append("Matching PRONOM IDs for this extension type: \n");
 	    for (URI uri : uris) {
-	    	format = fr.getFormatForURI(uri);
-	    	buf.append(uri.toASCIIString() + " (\"" + format.getSummaryAndVersion() + "\")\n");
+	    	buf.append(uri.toASCIIString() + " (\"" + format.getExtensions(uri) + "\")\n");
 		}
 		return buf.toString();
 	}

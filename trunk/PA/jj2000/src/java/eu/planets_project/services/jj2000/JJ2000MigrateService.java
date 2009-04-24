@@ -18,10 +18,16 @@ import jj2000.j2k.encoder.CmdLnEncoder;
 
 import org.apache.log4j.Logger;
 
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ImmutableContent;
-import eu.planets_project.services.datatypes.*;
+import eu.planets_project.services.datatypes.MigrationPath;
+import eu.planets_project.services.datatypes.Parameter;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -43,6 +49,8 @@ public class JJ2000MigrateService implements Migrate {
     public static final String NAME = "JJ2000 Migration Service";
     
     Logger log = Logger.getLogger(JJ2000MigrateService.class);
+    
+    private final static FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
     
     /** A reference to the web service context. */
     @Resource 
@@ -69,8 +77,8 @@ public class JJ2000MigrateService implements Migrate {
         
         // Migration Paths: List all combinations:
         List<MigrationPath> paths = new ArrayList<MigrationPath>();
-        paths.add( new MigrationPath( Format.extensionToURI("PPM"), Format.extensionToURI("JP2"), null) );
-        paths.add( new MigrationPath( Format.extensionToURI("JP2"), Format.extensionToURI("PPM"), null) );
+        paths.add( new MigrationPath( format.createExtensionUri("PPM"), format.createExtensionUri("JP2"), null) );
+        paths.add( new MigrationPath( format.createExtensionUri("JP2"), format.createExtensionUri("PPM"), null) );
         sd.paths(paths.toArray(new MigrationPath[]{}));
         
         return sd.build();
@@ -88,15 +96,15 @@ public class JJ2000MigrateService implements Migrate {
         }
         
         // Store DO in a temporary file.
-        Format inf = new Format(inputFormat);
-        File inFile = FileUtils.writeInputStreamToTmpFile(dob.getContent().read(), "jj2000-conv-in", "."+ inf.getExtensions().iterator().next() );
+        String extension = format.getFirstExtension(inputFormat);
+        File inFile = FileUtils.writeInputStreamToTmpFile(dob.getContent().read(), "jj2000-conv-in", "."+ extension );
         inFile.deleteOnExit();
         
         // Output file:
-        Format outf = new Format(outputFormat);
+        extension = format.getFirstExtension(outputFormat);
         File outFile = null;
         try {
-            outFile = File.createTempFile("jj2000-conv-out", "." + outf.getExtensions().iterator().next() );
+            outFile = File.createTempFile("jj2000-conv-out", "." + extension );
         } catch (IOException e) {
             e.printStackTrace();
             return this.returnWithErrorMessage("Could not open output file. "+e, null);
@@ -111,7 +119,7 @@ public class JJ2000MigrateService implements Migrate {
         argv[4] = "-verbose"; argv[5] = "on";
 
         // Invoke the 
-        if( "jp2".equalsIgnoreCase( outf.getExtensions().iterator().next() ) ) {
+        if( "jp2".equalsIgnoreCase( extension ) ) {
             CmdLnEncoder.main(argv);
         } else {
             CmdLnDecoder.main(argv);

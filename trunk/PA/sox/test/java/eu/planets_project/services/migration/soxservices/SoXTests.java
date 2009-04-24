@@ -13,10 +13,13 @@ import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.*;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 
@@ -133,7 +136,9 @@ public class SoXTests {
 	}
 	
 	private void testMigrate(URI inputFormat, URI outputFormat, List<Parameter> parameters) {
-		DigitalObject digObj = createDigitalObject(Format.getFirstMatchingFormatExtension(inputFormat));
+		String extension = FormatRegistryFactory.getFormatRegistry()
+                .getFirstExtension(inputFormat);
+        DigitalObject digObj = createDigitalObject(extension);
 		
 		MigrateResult mr = sox.migrate(digObj, inputFormat, outputFormat, parameters);
 

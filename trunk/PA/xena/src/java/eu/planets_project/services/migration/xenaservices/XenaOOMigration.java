@@ -1,24 +1,30 @@
 package eu.planets_project.services.migration.xenaservices;
 
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
-import eu.planets_project.ifr.core.techreg.impl.formats.FormatRegistryImpl;
-import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.ImmutableContent;
-import eu.planets_project.services.datatypes.*;
-import eu.planets_project.services.migrate.Migrate;
-import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.PlanetsLogger;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
+
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
+import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.MigrationPath;
+import eu.planets_project.services.datatypes.Parameter;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.migrate.Migrate;
+import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.PlanetsLogger;
 
 /**
  * @author Georg Petz <georg.petz@onb.ac.at> *
@@ -30,9 +36,11 @@ import javax.jws.WebService;
 targetNamespace = PlanetsServices.NS,
 endpointInterface = "eu.planets_project.services.migrate.Migrate")
 public class XenaOOMigration implements Migrate, Serializable {
-
-    private static final URI PRONOMPDFAID = Format.pronomIdToURI("fmt/95");
-    private static final URI PRONOMPDFID = Format.pronomIdToURI("fmt/18");
+    private static final FormatRegistry format = FormatRegistryFactory
+            .getFormatRegistry();
+    private static final URI PRONOMPDFAID = format.createPronomUri("fmt/95");
+    private static final URI PRONOMPDFID = format.createPronomUri("fmt/18");
+    
 
     /**
      * all suported odf file formats
@@ -75,9 +83,7 @@ public class XenaOOMigration implements Migrate, Serializable {
      * @return the odf format if it exists, else null
      */
     private OdfFormat getOdfFormatExt(URI formatUri) {
-        FormatRegistryImpl fmtRegImpl = new FormatRegistryImpl();
-        Format uriFormatObj = fmtRegImpl.getFormatForURI(formatUri);
-        Set<String> reqInputFormatExts = uriFormatObj.getExtensions();
+        Set<String> reqInputFormatExts = format.getExtensions(formatUri);
         OdfFormat ext = null;
 
         for (String inFormat : reqInputFormatExts) {
@@ -97,9 +103,7 @@ public class XenaOOMigration implements Migrate, Serializable {
      * @return the ms office format if it exists, else null
      */
     private MSOfficeFormat getMsOfficeFormatExt(URI formatUri) {
-        FormatRegistryImpl fmtRegImpl = new FormatRegistryImpl();
-        Format uriFormatObj = fmtRegImpl.getFormatForURI(formatUri);
-        Set<String> reqInputFormatExts = uriFormatObj.getExtensions();
+        Set<String> reqInputFormatExts = format.getExtensions(formatUri);
         MSOfficeFormat ext = null;
 
         for (String inFormat : reqInputFormatExts) {
@@ -206,22 +210,22 @@ public class XenaOOMigration implements Migrate, Serializable {
 
         //from supported odf formats -> PDF (1.4)
         for (OdfFormat odfExt : OdfFormat.values()) {
-            mPathsList.add(new MigrationPath(Format.extensionToURI(odfExt.toString()), Format.pronomIdToURI("fmt/18"), null));
+            mPathsList.add(new MigrationPath(format.createExtensionUri(odfExt.toString()), format.createPronomUri("fmt/18"), null));
         }
 
         //from supported odf formats -> Portable Document Format - Archival
         for (OdfFormat odfExt : OdfFormat.values()) {
-            mPathsList.add(new MigrationPath(Format.extensionToURI(odfExt.toString()), Format.pronomIdToURI("fmt/95"), null));
+            mPathsList.add(new MigrationPath(format.createExtensionUri(odfExt.toString()), format.createPronomUri("fmt/95"), null));
         }
 
         //from supported MS Office formats -> Portable Document Format - Archival
         for (MSOfficeFormat msOfficeExt : MSOfficeFormat.values()) {
-            mPathsList.add(new MigrationPath(Format.extensionToURI(msOfficeExt.toString()), Format.pronomIdToURI("fmt/95"), null));
+            mPathsList.add(new MigrationPath(format.createExtensionUri(msOfficeExt.toString()), format.createPronomUri("fmt/95"), null));
         }
 
         //from supported MS Office formats ->PDF (1.4)
         for (MSOfficeFormat msOfficeExt : MSOfficeFormat.values()) {
-            mPathsList.add(new MigrationPath(Format.extensionToURI(msOfficeExt.toString()), Format.pronomIdToURI("fmt/18"), null));
+            mPathsList.add(new MigrationPath(format.createExtensionUri(msOfficeExt.toString()), format.createPronomUri("fmt/18"), null));
         }
 
 //        mPathsList.add(new MigrationPath(Format.extensionToURI("doc"), Format.extensionToURI("odt"), null));

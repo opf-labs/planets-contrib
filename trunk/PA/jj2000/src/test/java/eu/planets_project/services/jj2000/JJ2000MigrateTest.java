@@ -11,14 +11,14 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
 import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.jj2000.JJ2000MigrateService;
 import eu.planets_project.services.utils.test.ServiceCreator;
 
 /**
@@ -84,8 +84,9 @@ public final class JJ2000MigrateTest extends TestCase {
                         new URL("http://some")).build();
         System.out.println("Input: " + input);
 
-        MigrateResult mr = dom.migrate(input, Format.extensionToURI( inExt ),
-                Format.extensionToURI(outExt), null);
+        FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
+        MigrateResult mr = dom.migrate(input, format.createExtensionUri( inExt ),
+                format.createExtensionUri(outExt), null);
 
         ServiceReport sr = mr.getReport();
         System.out.println("Got Report: " + sr);

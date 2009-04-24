@@ -12,9 +12,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
 import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
@@ -112,7 +113,8 @@ public final class AbiWordMigrationTest extends TestCase {
         String resFileName = "planetsMigrate"+origExt.toUpperCase()+"to"+destExt.toUpperCase()+"."+destExt.toLowerCase();
         byte[] binary = FileUtils.readFileIntoByteArray(new File(inTestFileName));
         DigitalObject input = new DigitalObject.Builder(ImmutableContent.byValue(binary)).build();
-        MigrateResult mr = dom.migrate(input, Format.extensionToURI(origExt), Format.extensionToURI(destExt), params);
+        FormatRegistry formatRegistry = FormatRegistryFactory.getFormatRegistry();
+        MigrateResult mr = dom.migrate(input, formatRegistry.createExtensionUri(origExt), formatRegistry.createExtensionUri(destExt), params);
         assertTrue("Migration result is null is null for planetsMigrate"+origExt+"to"+destExt+".", mr != null);
         DigitalObject doOut = mr.getDigitalObject();
         assertTrue("Resulting digital object is null for planetsMigrate"+origExt+"to"+destExt+".", doOut != null);

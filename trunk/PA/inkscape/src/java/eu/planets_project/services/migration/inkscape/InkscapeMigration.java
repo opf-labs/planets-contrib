@@ -19,11 +19,15 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
-import eu.planets_project.ifr.core.techreg.impl.formats.FormatRegistryImpl;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ImmutableContent;
-import eu.planets_project.services.datatypes.*;
+import eu.planets_project.services.datatypes.MigrationPath;
+import eu.planets_project.services.datatypes.Parameter;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -57,6 +61,7 @@ public final class InkscapeMigration implements Migrate, Serializable {
     //public String inkscape_outfile_ext;
     private File tmpInFile;
     private File tmpOutFile;
+    private final FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 
     String inputFmtExt = null;
     String outputFmtExt = null;
@@ -219,9 +224,7 @@ public final class InkscapeMigration implements Migrate, Serializable {
         // Extensions which correspond to the format
         // planets:fmt/ext/jpg -> { "JPEG", "JPG" }
         // or can be found in the list of supported formats
-        FormatRegistryImpl fmtRegImpl = new FormatRegistryImpl();
-        Format uriFormatObj = fmtRegImpl.getFormatForURI(formatUri);
-        Set<String> reqInputFormatExts = uriFormatObj.getExtensions();
+        Set<String> reqInputFormatExts = format.getExtensions(formatUri);
         Iterator<String> itrReq = reqInputFormatExts.iterator();
         // Iterate either over input formats ArrayList or over output formats
         // HasMap
@@ -278,10 +281,10 @@ public final class InkscapeMigration implements Migrate, Serializable {
         builder.description("Inkscape is an SVG (Scalable Vector Graphics) editing program. It provides migration from" +
                 "SVG to PS, EPS, PDF, and PNG.");
         MigrationPath[] mPaths = new MigrationPath []{
-            new MigrationPath(Format.extensionToURI("svg"), Format.extensionToURI("ps"),null),
-            new MigrationPath(Format.extensionToURI("svg"), Format.extensionToURI("eps"),null),
-            new MigrationPath(Format.extensionToURI("svg"), Format.extensionToURI("pdf"),null),
-            new MigrationPath(Format.extensionToURI("svg"), Format.extensionToURI("png"),null)
+            new MigrationPath(format.createExtensionUri("svg"), format.createExtensionUri("ps"),null),
+            new MigrationPath(format.createExtensionUri("svg"), format.createExtensionUri("eps"),null),
+            new MigrationPath(format.createExtensionUri("svg"), format.createExtensionUri("pdf"),null),
+            new MigrationPath(format.createExtensionUri("svg"), format.createExtensionUri("png"),null)
         };
         builder.paths(mPaths);
         builder.classname(this.getClass().getCanonicalName());

@@ -18,11 +18,16 @@ import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.*;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -281,8 +286,9 @@ public class SoX implements Migrate, Serializable {
     public MigrateResult convertAudio(DigitalObject input,
             URI inputFormat, URI outputFormat, List<Parameter> parameters) {
     	
-    	String srcExt = Format.getFirstMatchingFormatExtension(inputFormat);
-		String destExt = Format.getFirstMatchingFormatExtension(outputFormat);
+    	FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
+        String srcExt = format.getFirstExtension(inputFormat);
+		String destExt = format.getFirstExtension(outputFormat);
     	
         if (!srcExt.startsWith("."))
         	srcExt = "." + srcExt;
@@ -467,7 +473,8 @@ public class SoX implements Migrate, Serializable {
 			for (Iterator<String> iterator2 = outputFormats.iterator(); iterator2.hasNext();) {
 				String output = iterator2.next();
 				if(!input.equalsIgnoreCase(output)) {
-					MigrationPath path = new MigrationPath(Format.extensionToURI(input), Format.extensionToURI(output), null);
+					FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
+                    MigrationPath path = new MigrationPath(format.createExtensionUri(input), format.createExtensionUri(output), null);
 					paths.add(path);
 				}
 				// Debug...

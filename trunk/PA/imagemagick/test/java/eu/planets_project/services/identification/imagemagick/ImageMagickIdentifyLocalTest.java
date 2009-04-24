@@ -3,18 +3,7 @@
  */
 package eu.planets_project.services.identification.imagemagick;
 
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
-import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
-import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
-import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.*;
-import eu.planets_project.services.identify.Identify;
-import eu.planets_project.services.identify.IdentifyResult;
-import eu.planets_project.services.utils.ServiceUtils;
-import eu.planets_project.services.utils.test.ServiceCreator;
 import static org.junit.Assert.assertTrue;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -23,6 +12,23 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
+import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.datatypes.Agent;
+import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.Event;
+import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.identify.Identify;
+import eu.planets_project.services.identify.IdentifyResult;
+import eu.planets_project.services.utils.ServiceUtils;
+import eu.planets_project.services.utils.test.ServiceCreator;
 
 /**
  * @author melmsp
@@ -85,7 +91,7 @@ public class ImageMagickIdentifyLocalTest {
             String ext = files.get(file);
             DigitalObject digObj = new DigitalObject.Builder(ImmutableContent.byValue(file))
                     .permanentUrl(new URL(PlanetsServices.NS+"/pserv-pa-imagemagickidentify-test"))
-                    .format(Format.extensionToURI(ext))
+                    .format(fr.createExtensionUri(ext))
                     .title(file.getName())
                     .events(event)
                     .build();

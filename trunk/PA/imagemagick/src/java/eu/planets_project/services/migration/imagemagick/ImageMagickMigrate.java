@@ -17,18 +17,25 @@ import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import magick.ImageInfo;
 import magick.MagickException;
 import magick.MagickImage;
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.datatypes.Agent;
+import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.Event;
 import eu.planets_project.services.datatypes.ImmutableContent;
-import eu.planets_project.services.datatypes.*;
+import eu.planets_project.services.datatypes.MigrationPath;
+import eu.planets_project.services.datatypes.Parameter;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -169,13 +176,13 @@ public class ImageMagickMigrate implements Migrate, Serializable {
 
         if(inputFormatFromDigObj==null) {
             plogger.info("No file format specified for this DigitalObject, using interface inputFormat URI!");
-            inputExt = Format.getFirstMatchingFormatExtension(inputFormat);
+            inputExt = formatRegistry.getFirstExtension(inputFormat);
         }
         else {
-            inputExt = Format.getFirstMatchingFormatExtension(inputFormatFromDigObj);
+            inputExt = formatRegistry.getFirstExtension(inputFormatFromDigObj);
         }
 
-        String outputExt = Format.getFirstMatchingFormatExtension(outputFormat);
+        String outputExt = formatRegistry.getFirstExtension(outputFormat);
 
         String inputError = null;
         String outputError = null;
@@ -371,7 +378,7 @@ public class ImageMagickMigrate implements Migrate, Serializable {
 
             for (Iterator<String> iterator2 = outputFormats.iterator(); iterator2.hasNext();) {
                 String output = iterator2.next();
-                MigrationPath path = new MigrationPath(Format.extensionToURI(input), Format.extensionToURI(output), null);
+                MigrationPath path = new MigrationPath(formatRegistry.createExtensionUri(input), formatRegistry.createExtensionUri(output), null);
                 // Debug...
                 //				System.out.println(path.getInputFormat() + " --> " + path.getOutputFormat());
                 paths.add(path);
@@ -387,10 +394,10 @@ public class ImageMagickMigrate implements Migrate, Serializable {
 
         plogger.info("Starting to compare these two extensions: " + extension1 + " and " + extension2);
 
-        Set <URI> ext1FormatURIs = formatRegistry.getURIsForExtension(extension1.toLowerCase());
+        Set <URI> ext1FormatURIs = formatRegistry.getUrisForExtension(extension1.toLowerCase());
         plogger.info("Got list of URIs for " + extension1);
 
-        Set <URI> ext2FormatURIs = formatRegistry.getURIsForExtension(extension2.toLowerCase());
+        Set <URI> ext2FormatURIs = formatRegistry.getUrisForExtension(extension2.toLowerCase());
         plogger.info("Got list of URIs for " + extension2);
 
         boolean success = false;

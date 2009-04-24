@@ -19,12 +19,16 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
 import eu.planets_project.ifr.core.techreg.impl.formats.FormatRegistryImpl;
 import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.*;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -306,8 +310,8 @@ public final class AvidemuxMigration implements Migrate, Serializable {
         // planets:fmt/ext/jpg -> { "JPEG", "JPG" }
         // or can be found in the list of supported formats
         FormatRegistryImpl fmtRegImpl = new FormatRegistryImpl();
-        Format uriFormatObj = fmtRegImpl.getFormatForURI(formatUri);
-        Set<String> reqInputFormatExts = uriFormatObj.getExtensions();
+        Set<String> reqInputFormatExts = FormatRegistryFactory
+                .getFormatRegistry().getExtensions(formatUri);
         Iterator<String> itrReq = reqInputFormatExts.iterator();
         // Iterate either over input formats ArrayList or over output formats
         // HasMap
@@ -397,8 +401,11 @@ public final class AvidemuxMigration implements Migrate, Serializable {
             "program /usr/bin/avidemux2_cli is available. On most Linux distributions, the " +
             "symbolic link 'avidemux' points to the GUI version, like the Qt-GUI version " +
             "/usr/bin/avidemux2_qt4 for KDE-Linux-Desktops.");
+        FormatRegistry formatRegistry = FormatRegistryFactory.getFormatRegistry();
         MigrationPath[] mPaths = new MigrationPath []{
-            new MigrationPath(Format.extensionToURI("mpeg"), Format.extensionToURI("avi"),this.parameterList)
+            new MigrationPath(
+                formatRegistry.createExtensionUri("mpeg"), formatRegistry
+                        .createExtensionUri("avi"), this.parameterList)
         };
 
         builder.paths(mPaths);

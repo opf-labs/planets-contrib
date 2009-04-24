@@ -19,11 +19,15 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
-import eu.planets_project.ifr.core.techreg.impl.formats.FormatRegistryImpl;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ImmutableContent;
-import eu.planets_project.services.datatypes.*;
+import eu.planets_project.services.datatypes.MigrationPath;
+import eu.planets_project.services.datatypes.Parameter;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -215,9 +219,8 @@ public final class Jasper19Migration implements Migrate, Serializable {
         // Extensions which correspond to the format
         // planets:fmt/ext/jpg -> { "JPEG", "JPG" }
         // or can be found in the list of supported formats
-        FormatRegistryImpl fmtRegImpl = new FormatRegistryImpl();
-        Format uriFormatObj = fmtRegImpl.getFormatForURI(formatUri);
-        Set<String> reqInputFormatExts = uriFormatObj.getExtensions();
+        Set<String> reqInputFormatExts = FormatRegistryFactory
+                .getFormatRegistry().getExtensions(formatUri);
         Iterator<String> itrReq = reqInputFormatExts.iterator();
         // Iterate either over input formats ArrayList or over output formats
         // HasMap
@@ -281,9 +284,10 @@ public final class Jasper19Migration implements Migrate, Serializable {
                 "web sites/pages:"+
                 "http://www.ece.uvic.ca/~mdadams/jasper"+
                 "http://www.jpeg.org/software");
+        FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
         MigrationPath[] mPaths = new MigrationPath []{
-            new MigrationPath(Format.extensionToURI("jpg"), Format.extensionToURI("jp2"),null),
-            new MigrationPath(Format.extensionToURI("jp2"), Format.extensionToURI("jpg"),null)};
+            new MigrationPath(format.createExtensionUri("jpg"), format.createExtensionUri("jp2"),null),
+            new MigrationPath(format.createExtensionUri("jp2"), format.createExtensionUri("jpg"),null)};
         builder.paths(mPaths);
         builder.classname(this.getClass().getCanonicalName());
         builder.version("0.1");

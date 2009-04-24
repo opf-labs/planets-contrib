@@ -1,14 +1,6 @@
 package eu.planets_project.services.migration.imagemagick;
 
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
-import eu.planets_project.services.datatypes.*;
-import eu.planets_project.services.migrate.Migrate;
-import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.test.ServiceCreator;
 import static org.junit.Assert.assertTrue;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,6 +12,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
+import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.Event;
+import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Parameter;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.migrate.Migrate;
+import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.test.ServiceCreator;
 
 
 /**
@@ -509,14 +517,17 @@ public class ImageMagickMigrateTests {
         	
         	FileInputStream is = new FileInputStream(inputFile);
         	
+            FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
             DigitalObject input = new  DigitalObject.Builder(ImmutableContent.byValue(is))
             						.permanentUrl(new URL("http://imageMagickMigrationsTests"))
-            						.format(Format.extensionToURI(srcExtension))
+            						.format(format.createExtensionUri(srcExtension))
             						.title(inputFile.getName())
             						.build();
             System.out.println("Input: " + input);
             
-            MigrateResult mr = imageMagick.migrate(input, Format.extensionToURI(srcExtension), Format.extensionToURI(targetExtension), parameters);
+            MigrateResult mr = imageMagick.migrate(input, format
+                    .createExtensionUri(srcExtension), format
+                    .createExtensionUri(targetExtension), parameters);
             
             ServiceReport sr = mr.getReport();
             System.out.println("Got Report: "+sr);

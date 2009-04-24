@@ -1,29 +1,8 @@
 package eu.planets_project.services.migration.ghostscript;
 
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
-import eu.planets_project.ifr.core.techreg.impl.formats.FormatRegistryImpl;
-import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.ImmutableContent;
-import eu.planets_project.services.datatypes.*;
-import eu.planets_project.services.migrate.Migrate;
-import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.PlanetsLogger;
-import eu.planets_project.services.utils.ProcessRunner;
-import eu.planets_project.services.utils.cli.CliMigrationPaths;
-
-import org.xml.sax.SAXException;
-
-import javax.ejb.Local;
-import javax.ejb.Remote;
-import javax.ejb.Stateless;
-import javax.jws.WebService;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.ws.BindingType;
-
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -32,6 +11,30 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import javax.ejb.Local;
+import javax.ejb.Remote;
+import javax.ejb.Stateless;
+import javax.jws.WebService;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.ws.BindingType;
+
+import org.xml.sax.SAXException;
+
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
+import eu.planets_project.ifr.core.techreg.impl.formats.FormatRegistryImpl;
+import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Parameter;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.migrate.Migrate;
+import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.PlanetsLogger;
+import eu.planets_project.services.utils.ProcessRunner;
+import eu.planets_project.services.utils.cli.CliMigrationPaths;
 
 /**
  * The class GhostscriptMigration migrates from PostScript and PDF
@@ -377,8 +380,8 @@ public class GhostscriptMigration implements Migrate, Serializable {
         // planets:fmt/ext/jpg -> { "JPEG", "JPG" }
         // or can be found in the list of supported formats
         FormatRegistryImpl fmtRegImpl = new FormatRegistryImpl();
-        Format uriFormatObj = fmtRegImpl.getFormatForURI(formatUri);
-        Set<String> reqInputFormatExts = uriFormatObj.getExtensions();
+        Set<String> reqInputFormatExts = FormatRegistryFactory
+                .getFormatRegistry().getExtensions(formatUri);
         Iterator<String> itrReq = reqInputFormatExts.iterator();
         // Iterate either over input formats ArrayList or over output formats
         // HasMap

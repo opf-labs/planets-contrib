@@ -1,6 +1,5 @@
 package eu.planets_project.services.migration.gimp;
 
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -9,22 +8,24 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
 import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Local and client tests of the digital object migration functionality.
@@ -165,7 +166,8 @@ public final class Gimp26MigrationTest {
         String resFileName = "planetsMigrate"+origExt.toUpperCase()+"to"+destExt.toUpperCase()+String.valueOf(cycle)+"."+destExt.toLowerCase();
         byte[] binary = this.readByteArrayFromFile(inTestFileName);
         DigitalObject input = new DigitalObject.Builder(ImmutableContent.byValue(binary)).build();
-        MigrateResult mr = dom.migrate(input, Format.extensionToURI(origExt), Format.extensionToURI(destExt), params);
+        FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
+        MigrateResult mr = dom.migrate(input, format.createExtensionUri(origExt), format.createExtensionUri(destExt), params);
         DigitalObject doOut = mr.getDigitalObject();
         assertTrue("Resulting digital object is null for planetsMigrate"+origExt+"to"+destExt+".", doOut != null);
         FileUtils.writeInputStreamToFile(doOut.getContent().read(), new File( resFileDir), resFileName);
