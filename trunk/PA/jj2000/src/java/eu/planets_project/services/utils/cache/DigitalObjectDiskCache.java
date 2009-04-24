@@ -10,9 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.jj2000.JJ2000ViewerService;
+import eu.planets_project.services.utils.FileUtils;
 
 /**
  * 
@@ -25,12 +26,17 @@ public class DigitalObjectDiskCache {
      * re-maps any remote binaries into local ones on construction.
      */
     
-    public class CacheableDigitalObjects {
+    public static class CacheableDigitalObjects {
         List<DigitalObject> digitalObjects;
         
         public CacheableDigitalObjects( List<DigitalObject> digitalObjects ) {
             // Re-map into new DOs that embed/localise the binaries.
             // Add getter and serialisation code.
+            this.digitalObjects = digitalObjects;
+        }
+        
+        public List<DigitalObject> getDigitalObjects(){
+            return digitalObjects;
         }
         
     }
@@ -56,7 +62,7 @@ public class DigitalObjectDiskCache {
         
         // Create a directory in the temp space, and store the DOs in there.
         File cachedir = findCacheDir( sessionId );
-        cachedir.mkdir();
+        FileUtils.mkdir(cachedir);
         
         JJ2000ViewerService.log.info("Created cache dir: " + cachedir.getAbsolutePath() );
         
