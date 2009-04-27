@@ -4,13 +4,15 @@
 package eu.planets_project.services.migration.dioscuri;
 
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
-import java.net.URL;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.datatypes.ServiceDescription;
@@ -19,7 +21,6 @@ import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author melmsp
@@ -34,6 +35,8 @@ public class DioscuriPnmToPngMigrationTest {
 	public static File DIOSCURI_TEST_OUT = FileUtils.createWorkFolderInSysTemp("DIOSCURI_TEST_OUT");
 	
 	public static File TEST_FILE = new File("tests/test-files/images/bitmap/test_pnm/BASI0G02.PNM"); 
+	
+	public static FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 
 	/**
 	 * @throws java.lang.Exception
@@ -57,8 +60,8 @@ public class DioscuriPnmToPngMigrationTest {
 	
 	@Test
 	public void testMigrate() {
-		DigitalObject inputDigOb = new DigitalObject.Builder(ImmutableContent.asStream(TEST_FILE)).title(TEST_FILE.getName()).format(Format.extensionToURI(FileUtils.getExtensionFromFile(TEST_FILE))).build();
-		MigrateResult result = DIOSCURI_MIGRATE.migrate(inputDigOb, Format.extensionToURI(FileUtils.getExtensionFromFile(TEST_FILE)), Format.extensionToURI("PNG"), null);
+		DigitalObject inputDigOb = new DigitalObject.Builder(ImmutableContent.asStream(TEST_FILE)).title(TEST_FILE.getName()).format(format.createExtensionUri(FileUtils.getExtensionFromFile(TEST_FILE))).build();
+		MigrateResult result = DIOSCURI_MIGRATE.migrate(inputDigOb, format.createExtensionUri(FileUtils.getExtensionFromFile(TEST_FILE)), format.createExtensionUri("PNG"), null);
 		
 		assertTrue("MigrateResult should not be NULL", result!=null);
 		assertTrue("ServiceReport should be SUCCESS", result.getReport().getErrorState()==ServiceReport.SUCCESS);

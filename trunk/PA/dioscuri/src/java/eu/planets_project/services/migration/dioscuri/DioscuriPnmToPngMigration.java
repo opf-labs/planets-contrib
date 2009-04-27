@@ -7,14 +7,14 @@ import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
-//import java.util.HashMap;
 import java.util.List;
 
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.Checksum;
 import eu.planets_project.services.datatypes.Content;
@@ -85,6 +85,8 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 	
 	private static String OUTFILE_EXT = null;
 	
+	private static FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
+	
 //	private HashMap<URI, String> supportedFormats = new HashMap<URI, String>();
 	
 	public DioscuriPnmToPngMigration() {
@@ -131,7 +133,7 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
         sd.version("1.0");
         sd.tool( Tool.create(null, "pnm2png.exe", "version unknown", null, "http://www.schaik.com/png/pnmtopng.html"));
         List<MigrationPath> pathways = new ArrayList<MigrationPath>();
-        pathways.add(new MigrationPath(Format.extensionToURI("PNM"), Format.extensionToURI("PNG"), null));
+        pathways.add(new MigrationPath(format.createExtensionUri("PNM"), format.createExtensionUri("PNG"), null));
         
         sd.paths(pathways.toArray(new MigrationPath[] {}));
         return sd.build();
@@ -159,9 +161,9 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 		FLOPPY_RESULT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, "EXTRACTED_FILES");
 		
 		String fileName = digitalObject.getTitle();
-		String ext = "." + Format.getFirstMatchingFormatExtension(inputFormat);
+		String ext = "." + format.getFirstExtension(inputFormat);
 		
-		OUTFILE_EXT = "." + Format.getFirstMatchingFormatExtension(outputFormat);
+		OUTFILE_EXT = "." + format.getFirstExtension(outputFormat);
 		
 		if(fileName == null) {
 			fileName = DEFAULT_INPUT_NAME + ext;
@@ -194,10 +196,10 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 		
 		DigitalObject floppyInput = new DigitalObject.Builder(content)
 										.title(zip.getZipFile().getName())
-										.format(Format.extensionToURI("ZIP"))
+										.format(format.createExtensionUri("ZIP"))
 										.build();
 		
-		MigrateResult floppyHelperResult = floppyHelper.migrate(floppyInput, Format.extensionToURI("ZIP"), Format.extensionToURI("IMA"), null);
+		MigrateResult floppyHelperResult = floppyHelper.migrate(floppyInput, format.createExtensionUri("ZIP"), format.createExtensionUri("IMA"), null);
 		
 		if(floppyHelperResult.getReport().getErrorState()!= 0) {
 			return this.returnWithErrorMessage(floppyHelperResult.getReport().getError(), null);
@@ -225,10 +227,10 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 		
 		DigitalObject floppy = new DigitalObject.Builder(ImmutableContent.asStream(floppyImage))
 									.title(floppyImage.getName())
-									.format(Format.extensionToURI(FileUtils.getExtensionFromFile(floppyImage)))
+									.format(format.createExtensionUri(FileUtils.getExtensionFromFile(floppyImage)))
 									.build();
 		
-		MigrateResult mr = extract.migrate(floppy, Format.extensionToURI(FileUtils.getExtensionFromFile(floppyImage)), Format.extensionToURI("ZIP"), null);
+		MigrateResult mr = extract.migrate(floppy, format.createExtensionUri(FileUtils.getExtensionFromFile(floppyImage)), format.createExtensionUri("ZIP"), null);
 		
 		File resultZIP = new File(WORK_TEMP_FOLDER, mr.getDigitalObject().getTitle());
 		
@@ -251,7 +253,7 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 		
 		DigitalObject result = new DigitalObject.Builder(ImmutableContent.asStream(main_result))
 									.title(main_result.getName())
-									.format(Format.extensionToURI(FileUtils.getExtensionFromFile(main_result)))
+									.format(format.createExtensionUri(FileUtils.getExtensionFromFile(main_result)))
 									.build();
 		
 		ServiceReport sr = new ServiceReport();
