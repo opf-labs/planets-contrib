@@ -19,9 +19,8 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 
-import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistry;
-import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
-import eu.planets_project.ifr.core.techreg.impl.formats.FormatRegistryImpl;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ImmutableContent;
@@ -309,7 +308,6 @@ public final class AvidemuxMigration implements Migrate, Serializable {
         // Extensions which correspond to the format
         // planets:fmt/ext/jpg -> { "JPEG", "JPG" }
         // or can be found in the list of supported formats
-        FormatRegistryImpl fmtRegImpl = new FormatRegistryImpl();
         Set<String> reqInputFormatExts = FormatRegistryFactory
                 .getFormatRegistry().getExtensions(formatUri);
         Iterator<String> itrReq = reqInputFormatExts.iterator();

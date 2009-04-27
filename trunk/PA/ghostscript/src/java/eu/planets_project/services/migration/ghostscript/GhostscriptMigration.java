@@ -21,8 +21,7 @@ import javax.xml.ws.BindingType;
 
 import org.xml.sax.SAXException;
 
-import eu.planets_project.ifr.core.techreg.api.formats.FormatRegistryFactory;
-import eu.planets_project.ifr.core.techreg.impl.formats.FormatRegistryImpl;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ImmutableContent;
@@ -379,7 +378,6 @@ public class GhostscriptMigration implements Migrate, Serializable {
         // Extensions which correspond to the format
         // planets:fmt/ext/jpg -> { "JPEG", "JPG" }
         // or can be found in the list of supported formats
-        FormatRegistryImpl fmtRegImpl = new FormatRegistryImpl();
         Set<String> reqInputFormatExts = FormatRegistryFactory
                 .getFormatRegistry().getExtensions(formatUri);
         Iterator<String> itrReq = reqInputFormatExts.iterator();
