@@ -16,8 +16,6 @@ import javax.xml.ws.BindingType;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.Checksum;
-import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.datatypes.MigrationPath;
@@ -27,10 +25,8 @@ import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.migration.floppyImageHelper.FloppyImageHelperWin;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
-import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.utils.ServiceUtils;
 import eu.planets_project.services.utils.ZipResult;
 
@@ -51,40 +47,21 @@ import eu.planets_project.services.utils.ZipResult;
 public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 	
 	private PlanetsLogger log = PlanetsLogger.getLogger(this.getClass()); 
-	
 	private static final long serialVersionUID = 7520484154909390134L;
 
 	public static final String NAME = "DioscuriPnmToPngMigration";
-	
 	private static String DIOSCURI_HOME = System.getenv("DIOSCURI_HOME");
-	
 	private static File WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp("DIOSCURI_TMP");
-	
 	private static File FLOPPY_INPUT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, "FLOPPY_INPUT");
 	
-	
-	private static File FLOPPY_RESULT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, "EXTRACTED_FILES");
-	
 	private static String DEFAULT_INPUT_NAME = "input";
-	
 	private static String RUN_BAT = "RUN.BAT";
-	
-	private static String FLOPPY_NAME = "floppy.ima";
-	
 	private static String INPUT_ZIP_NAME = "input.zip";
 	
 //	private static String EMU_PICTVIEW_PATH = "c:\\pictview\\pictview.exe";
 	
 	private static String EMU_PNM_TO_PNG_PATH = "C:\\pngminus\\pnm2png.exe";
 	private static String EMU_PNG_TO_PNM_PATH = "C:\\pngminus\\png2pnm.exe";
-	
-	private static String DIOSCURI_CONFIG_FILE_PATH = "PA/dioscuri/resources/DioscuriConfig.xml";
-	
-//	private static String OUTFILE_NAME = "OUTPUT";
-	
-	private static String OUTFILE_NAME = null;
-	
-	private static String OUTFILE_EXT = null;
 	
 	private static FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 	
@@ -125,7 +102,7 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 	 * @see eu.planets_project.services.PlanetsService#describe()
 	 */
 	public ServiceDescription describe() {
-		ServiceDescription.Builder sd = new ServiceDescription.Builder(this.NAME, Migrate.class.getCanonicalName());
+		ServiceDescription.Builder sd = new ServiceDescription.Builder(NAME, Migrate.class.getCanonicalName());
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
         sd.description("This is a Prototype wrapper for the DIOSCURI-Emulator developed at KB-NL.\r\n" +
         		"This service converts images from \".PNM\"-format to \".PNG\", using \"pnm2png.exe\" running in a MS-DOS 5.0 environment\r\n" +
@@ -177,158 +154,219 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 		FileUtils.deleteTempFiles(WORK_TEMP_FOLDER);
 		WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp("DIOSCURI_TMP");
 		FLOPPY_INPUT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, "FLOPPY_INPUT");
-		FLOPPY_RESULT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, "EXTRACTED_FILES");
 		
-		String fileName = digitalObject.getTitle();
-		String inputExt = "." + format.getFirstExtension(inputFormat);
+		File inputFile = getInputFileFromDigitalObject(digitalObject, inputFormat, FLOPPY_INPUT_FOLDER);
+		String inFileName = inputFile.getName();
+		String outFileName = getOutputFileName(inputFile, outputFormat);
 		
-		OUTFILE_EXT = "." + format.getFirstExtension(outputFormat);
+		boolean runBatCreated = createRunBat(FLOPPY_INPUT_FOLDER, inFileName, outFileName, FileUtils.getExtensionFromFile(inputFile));	
 		
-		if(fileName == null) {
-			fileName = DEFAULT_INPUT_NAME + inputExt;
-		}
+		DioscuriWrapper dioscuri = new DioscuriWrapper();
 		
-		
-		
-		File inputFile = FileUtils.writeInputStreamToFile(digitalObject.getContent().read(), FLOPPY_INPUT_FOLDER, fileName);
-		
-		inputFile = FileUtils.truncateNameAndRenameFile(inputFile);
-		
-		OUTFILE_NAME = stripExtension(inputFile.getName());
-		
-//		String runScript = EMU_PICTVIEW_PATH + " " + "a:\\" + inputFile.getName() + " " + supportedFormats.get(outputFormat) + " " + "--o " + "a:\\output." + Format.getFirstMatchingFormatExtension(outputFormat);
-		
-		String runScript = null;
-			
-		if(inputExt.equalsIgnoreCase(".PNM")) {
-			runScript = EMU_PNM_TO_PNG_PATH + " " + "A:\\" + inputFile.getName() + " " + "A:\\" + OUTFILE_NAME + OUTFILE_EXT.toUpperCase() +
-				"\r\n" + "HALT.EXE";
+		if(runBatCreated) {
+			ZipResult zipResult = FileUtils.createZipFileWithChecksum(FLOPPY_INPUT_FOLDER, WORK_TEMP_FOLDER, INPUT_ZIP_NAME);
+			DioscuriResult result = dioscuri.createFloppyImageAndRunDioscuri(zipResult.getZipFile(), inFileName, outFileName, zipResult.getChecksum());
+			if(result.getState()==DioscuriResult.ERROR) {
+				return this.returnWithErrorMessage(result.getMessage(), null);
+			}
+			else {
+				return createMigrateResult(result.getResultFile(), inputFormat, outputFormat);
+			}
 		}
 		else {
-			runScript = EMU_PNG_TO_PNM_PATH + " " + "A:\\" + inputFile.getName() + " " + "A:\\" + OUTFILE_NAME + OUTFILE_EXT.toUpperCase() +
-				"\r\n" + "HALT.EXE";
+			return this.returnWithErrorMessage("ERROR when trying to write \"RUN.BAT\". Returning with error, nothing has been done, sorry!", null);
 		}
-		
-		log.info("run.bat: " + runScript);
-		
-		File runBat = new File(FLOPPY_INPUT_FOLDER, RUN_BAT);
-		
-		runBat = FileUtils.writeStringToFile(runScript, runBat);
-		
-		ZipResult zip = FileUtils.createZipFileWithChecksum(FLOPPY_INPUT_FOLDER, WORK_TEMP_FOLDER, INPUT_ZIP_NAME);
-		
-		Migrate floppyHelper = new FloppyImageHelperWin();
-		
-		Content content = ImmutableContent.asStream(zip.getZipFile()).withChecksum(zip.getChecksum());
-		
-		DigitalObject floppyInput = new DigitalObject.Builder(content)
-										.title(zip.getZipFile().getName())
-										.format(format.createExtensionUri("ZIP"))
-										.build();
-		
-		MigrateResult floppyHelperResult = floppyHelper.migrate(floppyInput, format.createExtensionUri("ZIP"), format.createExtensionUri("IMA"), null);
-		
-		if(floppyHelperResult.getReport().getErrorState()!= 0) {
-			return this.returnWithErrorMessage(floppyHelperResult.getReport().getError(), null);
+	}
+	
+	private File getInputFileFromDigitalObject(DigitalObject digObj, URI inputFormat, File destFolder) {
+		String inName = getFileNameFromDigitalObject(digObj, inputFormat);
+		File in = new File(destFolder, inName);
+		FileUtils.writeInputStreamToFile(digObj.getContent().read(), in);
+		in = FileUtils.truncateNameAndRenameFile(in);
+		return in;
+	}
+	
+	private String getFileNameFromDigitalObject(DigitalObject digObj, URI inputFormat) {
+		String fileName = digObj.getTitle();
+		if(fileName==null) {
+			String ext = "." + format.getFirstExtension(inputFormat);
+			fileName = DEFAULT_INPUT_NAME + ext;
 		}
-		
-		log.info("FloppyImageHelperWin report: Successfull created floppy image!");
-		
-		DigitalObject dioscuriInput = floppyHelperResult.getDigitalObject();
-		
-		File floppyImage = new File(WORK_TEMP_FOLDER, FLOPPY_NAME) ;
-			
-		FileUtils.writeInputStreamToFile(dioscuriInput.getContent().read(), floppyImage);
-		
-		ProcessRunner dioscuriCmd = new ProcessRunner(); 
-		
-		dioscuriCmd.setCommand(getDioscuriCommandline(createConfigFile(floppyImage)));
-		
-		dioscuriCmd.setStartingDir(new File(DIOSCURI_HOME));
-		
-		dioscuriCmd.run();
-		
-		log.info("And...back again ;-)");
-		
-		Migrate extract = new FloppyImageHelperWin();
-		
-		DigitalObject floppy = new DigitalObject.Builder(ImmutableContent.asStream(floppyImage))
-									.title(floppyImage.getName())
-									.format(format.createExtensionUri(FileUtils.getExtensionFromFile(floppyImage)))
-									.build();
-		
-		MigrateResult mr = extract.migrate(floppy, format.createExtensionUri(FileUtils.getExtensionFromFile(floppyImage)), format.createExtensionUri("ZIP"), null);
-		
-		File resultZIP = new File(WORK_TEMP_FOLDER, mr.getDigitalObject().getTitle());
-		
-		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().read(), resultZIP);
-		
-		Checksum check = mr.getDigitalObject().getContent().getChecksum();
-		
-		List<File> extractedFiles = FileUtils.extractFilesFromZipAndCheck(resultZIP, FLOPPY_RESULT_FOLDER, check);
-		
-		int index = extractedFiles.indexOf(new File(FLOPPY_RESULT_FOLDER, OUTFILE_NAME + OUTFILE_EXT));
-		
-		File main_result = null;
-		
-		if(index!=-1) {
-			main_result = extractedFiles.get(index);
+		return fileName;
+	}
+	
+	private String getOutputFileName(File inputFile, URI outputFormat) {
+		String inName = inputFile.getName();
+		String outName = null;
+		String outExt = "." + format.getFirstExtension(outputFormat);
+		if(inName.contains(".")) {
+			outName = inName.substring(0, inName.lastIndexOf(".")) + outExt;
 		}
 		else {
-			return this.returnWithErrorMessage("An unidentified error occured! No result file created! ", null);
+			outName = inName + outExt;
 		}
+		return outName;
 		
-		DigitalObject result = new DigitalObject.Builder(ImmutableContent.asStream(main_result))
-									.title(main_result.getName())
-									.format(format.createExtensionUri(FileUtils.getExtensionFromFile(main_result)))
-									.build();
-		
+	}
+	
+	private MigrateResult createMigrateResult(File resultFile, URI inputFormat, URI outputFormat) {
+		DigitalObject result = new DigitalObject.Builder(ImmutableContent.asStream(resultFile))
+								.title(resultFile.getName())
+								.format(format.createExtensionUri(FileUtils.getExtensionFromFile(resultFile)))
+								.build();
+
 		ServiceReport sr = new ServiceReport();
-		
-		sr.setInfo("Successfully converted file: \"" + inputFile.getName() + "\" to \"" + main_result.getName() + "\".");
+
+		sr.setInfo("Successfully converted input from: \"" + format.getFirstExtension(inputFormat) + "\" to \"" + format.getFirstExtension(outputFormat) + "\".");
 		sr.setErrorState(ServiceReport.SUCCESS);
 		
 		MigrateResult mainMigrateResult = new MigrateResult(result, sr);
 		
 		return mainMigrateResult;
 	}
-
-	private File createConfigFile(File floppyImage) {
-		String configString = FileUtils.readTxtFileIntoString(new File(DIOSCURI_CONFIG_FILE_PATH));
-		String floppyPath = floppyImage.getAbsolutePath();
-		if(floppyPath.contains("\\")) {
-			floppyPath = floppyPath.replace("\\", "/");
-		}
-		configString = configString.replace("INSERT_FLOPPY_PATH_HERE", floppyPath);
-		File tmpConfigFile = new File(WORK_TEMP_FOLDER, "dioscuri_config.xml"); 
-		FileUtils.writeStringToFile(configString, tmpConfigFile);
-		return tmpConfigFile;
-	}
 	
-	private ArrayList<String> getDioscuriCommandline(File configFile) {
-		ArrayList<String> commands = new ArrayList<String> ();
-		commands.add("java");
-		commands.add("-jar");
-		commands.add("dioscuri.jar");
-		commands.add("-c");
-		commands.add("\"" + configFile.getAbsolutePath()+ "\"");
-		commands.add("-h");
-		commands.add("autorun");
-		commands.add("autoshutdown");
-		
-		return commands;
-	}
 	
-	private String stripExtension(String fileName) {
-		String result = null;
-		if(fileName.contains(".")) {
-			result = fileName.substring(0, fileName.lastIndexOf("."));
-			return result;
+//	private File createFloppyImage(DigitalObject digObj, URI inputFormat, URI outputFormat) {
+//		String inputExt = "." + format.getFirstExtension(inputFormat);
+//		String outputExt = "." + format.getFirstExtension(outputFormat);
+//		
+//		String inputFileName = digObj.getTitle();
+//		
+//		if(inputFileName==null) {
+//			inputFileName = DEFAULT_INPUT_NAME + inputExt;
+//		}
+//		
+//		File inputFile = new File(WORK_TEMP_FOLDER, inputFileName);
+//		FileUtils.writeInputStreamToFile(digObj.getContent().read(), inputFile);
+//		
+//		inputFile = FileUtils.truncateNameAndRenameFile(inputFile);
+//		
+//		String outputFileName = this.stripExtension(inputFile.getName()) + outputExt;
+//		
+//		boolean run_bat_created = createRunBat(FLOPPY_INPUT_FOLDER, inputFile.getName(), outputFileName, inputExt);
+//		
+//		if(run_bat_created) {
+//			ZipResult zip = FileUtils.createZipFileWithChecksum(FLOPPY_INPUT_FOLDER, WORK_TEMP_FOLDER, INPUT_ZIP_NAME);
+//			
+//			Migrate floppyHelper = new FloppyImageHelperWin();
+//			
+//			Content content = ImmutableContent.asStream(zip.getZipFile()).withChecksum(zip.getChecksum());
+//			
+//			DigitalObject floppyInput = new DigitalObject.Builder(content)
+//											.title(zip.getZipFile().getName())
+//											.format(format.createExtensionUri("ZIP"))
+//											.build();
+//			
+//			MigrateResult floppyHelperResult = floppyHelper.migrate(floppyInput, format.createExtensionUri("ZIP"), format.createExtensionUri("IMA"), null);
+//			
+//			if(floppyHelperResult.getReport().getErrorState()!= 0) {
+//				ERROR_OUT = floppyHelperResult.getReport().getError();
+//				return null;
+//			}
+//			
+//			log.info("FloppyImageHelperWin report: Successfull created floppy image!");
+//			
+//			DigitalObject floppyImageDigObj = floppyHelperResult.getDigitalObject();
+//			
+//			File floppyImage = new File(WORK_TEMP_FOLDER, FLOPPY_NAME) ;
+//				
+//			FileUtils.writeInputStreamToFile(floppyImageDigObj.getContent().read(), floppyImage);
+//			
+//			return floppyImage;
+//		}
+//		else {
+//			ERROR_OUT = "Error writing run.bat, therefore no floppyImage will be created!";
+//			return null;
+//		}
+//	}
+	
+	private boolean createRunBat(File destFolder, String inputFileName, String outputFileName, String inputExt) {
+		String runScript = null;
+		if(inputExt.equalsIgnoreCase("PNM")) {
+			runScript = EMU_PNM_TO_PNG_PATH + " " + "A:\\" + inputFileName.toUpperCase() + " " + "A:\\" + outputFileName.toUpperCase() +
+				"\r\n" + "HALT.EXE";
 		}
 		else {
-			return fileName;
+			runScript = EMU_PNG_TO_PNM_PATH + " " + "A:\\" + inputFileName.toUpperCase() + " " + "A:\\" + outputFileName.toUpperCase() +
+				"\r\n" + "HALT.EXE";
 		}
+		
+		File runBat = new File(destFolder, RUN_BAT);
+		runBat = FileUtils.writeStringToFile(runScript, runBat);
+		log.info("run.bat created: " + runScript);
+		
+		return runBat.exists();
 	}
+	
+//	private File extractResultFileFromFloppyImage(File floppyImage) {
+//		Migrate extract = new FloppyImageHelperWin();
+//		
+//		DigitalObject floppy = new DigitalObject.Builder(ImmutableContent.asStream(floppyImage))
+//									.title(floppyImage.getName())
+//									.format(format.createExtensionUri(FileUtils.getExtensionFromFile(floppyImage)))
+//									.build();
+//		
+//		MigrateResult mr = extract.migrate(floppy, format.createExtensionUri(FileUtils.getExtensionFromFile(floppyImage)), format.createExtensionUri("ZIP"), null);
+//		
+//		File resultZIP = new File(WORK_TEMP_FOLDER, mr.getDigitalObject().getTitle());
+//		
+//		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().read(), resultZIP);
+//		
+//		Checksum check = mr.getDigitalObject().getContent().getChecksum();
+//		
+//		List<File> extractedFiles = FileUtils.extractFilesFromZipAndCheck(resultZIP, FLOPPY_RESULT_FOLDER, check);
+//		
+//		int index = extractedFiles.indexOf(new File(FLOPPY_RESULT_FOLDER, OUTFILE_NAME + OUTFILE_EXT));
+//		
+//		File main_result = null;
+//		
+//		if(index!=-1) {
+//			main_result = extractedFiles.get(index);
+//		}
+//		else {
+//			ERROR_OUT = "An unidentified error occured! No result file created! ";
+//		}
+//		return main_result;
+//	}
+
+//	private File createConfigFile(File floppyImage) {
+//		String configString = FileUtils.readTxtFileIntoString(new File(DIOSCURI_CONFIG_FILE_PATH));
+//		String floppyPath = floppyImage.getAbsolutePath();
+//		if(floppyPath.contains("\\")) {
+//			floppyPath = floppyPath.replace("\\", "/");
+//		}
+//		configString = configString.replace("INSERT_FLOPPY_PATH_HERE", floppyPath);
+//		File tmpConfigFile = new File(WORK_TEMP_FOLDER, "dioscuri_config.xml"); 
+//		FileUtils.writeStringToFile(configString, tmpConfigFile);
+//		return tmpConfigFile;
+//	}
+	
+	
+	
+//	private ArrayList<String> getDioscuriCommandline(File configFile) {
+//		ArrayList<String> commands = new ArrayList<String> ();
+//		commands.add("java");
+//		commands.add("-jar");
+//		commands.add("dioscuri.jar");
+//		commands.add("-c");
+//		commands.add("\"" + configFile.getAbsolutePath()+ "\"");
+//		commands.add("-h");
+//		commands.add("autorun");
+//		commands.add("autoshutdown");
+//		
+//		return commands;
+//	}
+	
+//	private String stripExtension(String fileName) {
+//		String result = null;
+//		if(fileName.contains(".")) {
+//			result = fileName.substring(0, fileName.lastIndexOf("."));
+//			return result;
+//		}
+//		else {
+//			return fileName;
+//		}
+//	}
 	
 	
 	/**
