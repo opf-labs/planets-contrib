@@ -1,4 +1,4 @@
-package eu.planets_project.services.migration.dioscuri;
+package eu.planets_project.services.migration.dioscuri.utils;
 
 import java.io.File;
 import java.util.ArrayList;

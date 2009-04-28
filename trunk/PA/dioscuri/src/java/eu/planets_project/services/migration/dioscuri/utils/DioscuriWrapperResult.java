@@ -1,4 +1,4 @@
-package eu.planets_project.services.migration.dioscuri;
+package eu.planets_project.services.migration.dioscuri.utils;
 
 import java.io.File;
 
@@ -8,8 +8,8 @@ public class DioscuriWrapperResult {
 	private String message = null;
 	private File resultFile = null;
 	
-	static final int SUCCESS = 0;
-	static final int ERROR = -1;
+	public static final int SUCCESS = 0;
+	public static final int ERROR = -1;
 	
 	public int getState() {
 		return status;
