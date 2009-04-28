@@ -24,30 +24,59 @@ public class DioscuriWrapper {
 		FileUtils.deleteTempFiles(WORK_TEMP_FOLDER);
 		WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp("DIOSCURI_WRAPPER_TMP");
 		FLOPPY_RESULT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, "EXTRACTED_FILES");
+		log.info("Installed OS: " + OS_NAME + "\nVersion: " + OS_VERSION + "\nArchitecture: " + OS_ARCHITECTURE);
 	}
 	
 	private PlanetsLogger log = PlanetsLogger.getLogger(this.getClass());
 	
 	private static String DIOSCURI_HOME = System.getenv("DIOSCURI_HOME");
+	private static String OS_NAME = System.getProperty("os.name");
+	private static String OS_VERSION = System.getProperty("os.version");
+	private static String OS_ARCHITECTURE = System.getProperty("os.arch");
 	private static File WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp("DIOSCURI_WRAPPER_TMP");
 	private static File FLOPPY_RESULT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, "EXTRACTED_FILES");
 	
 	private static String FLOPPY_NAME = "floppy.ima";
 	
-//	private static String EMU_PICTVIEW_PATH = "c:\\pictview\\pictview.exe";
-	
 	private static String DIOSCURI_CONFIG_FILE_PATH = "PA/dioscuri/resources/DioscuriConfig.xml";
-	
-//	private static String OUTFILE_NAME = "OUTPUT";
 	
 	private static FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 	
 	private static String ERROR_OUT = null;
 	private static String PROCESS_OUT = null;
 
-	public DioscuriResult createFloppyImageAndRunDioscuri(File allFilesAsZIP, String inputFileName, String outputFileName, Checksum checksum) {
+	/**
+	 * This method takes all files in the passed zip file, extracts them and creates a floppy image containing all these files.
+	 * TO create the floppy image, the FloppyImageHelperWin service is used (at the moment). 
+	 * <br/>
+	 * <br/>ATTENTION: If you are running a Non-Windows machine, this service will not work.
+	 * 
+	 * @param allFilesAsZIP all files that should be written to a floppy image and passed to Dioscuri
+	 * @param inputFileName the name of the file (which should be inside the passed ZIP) to specify which file to use as input file for the migration.
+	 * @param outputFileName the name of the output file to be returned as result.
+	 * @param checksum the checksum of the ZIP file, if there is one, if not, please pass "null".
+	 * @return
+	 */
+	public DioscuriWrapperResult createFloppyImageAndRunDioscuri(File allFilesAsZIP, String inputFileName, String outputFileName, Checksum checksum) {
+		if(DIOSCURI_HOME==null) {
+			ERROR_OUT = 
+					"Dioscuri is NOT properly installed on your system!\n" +
+					"Please install it and point a Systemvariable called DIOSCURI_HOME to the installation folder!\n" +
+					"Otherwise this service will continously refuse to work ;-)";
+			DioscuriWrapperResult result = new DioscuriWrapperResult();
+			result.setMessage(ERROR_OUT);
+			result.setState(DioscuriWrapperResult.ERROR);
+			return result;
+		}
+		else {
+			log.info("DIOSCURI_HOME is set: " + DIOSCURI_HOME);
+		}
 		
-		Migrate floppyHelper = new FloppyImageHelperWin();
+		Migrate floppyHelper = checkOperatingSystemAndCreateService();
+		
+		if(floppyHelper==null) {
+			return this.createErrorResult(ERROR_OUT);
+		}
 		
 		Content content = null;
 		
@@ -67,7 +96,7 @@ public class DioscuriWrapper {
 		
 		if(floppyHelperResult.getReport().getErrorState()!= 0) {
 			log.error(floppyHelperResult.getReport().getError());
-			return null;
+			return createErrorResult(floppyHelperResult.getReport().getError());
 		}
 		
 		log.info("FloppyImageHelperWin report: Successfull created floppy image!");
@@ -82,36 +111,25 @@ public class DioscuriWrapper {
 		
 		log.info("And...back again ;-)");
 		
-		File resultFile = this.extractResultFileFromFloppyImage(floppyImage, outputFileName);
-		
-		DioscuriResult dioscuriResult = new DioscuriResult();
-		
-		dioscuriResult.setResultFile(resultFile);
-		
-		if(resultFile!=null) {
-			dioscuriResult.setState(DioscuriResult.SUCCESS);
-			dioscuriResult.setMessage(PROCESS_OUT);
-		}
-		else {
-			dioscuriResult.setState(DioscuriResult.ERROR);
-			dioscuriResult.setMessage(ERROR_OUT);
-		}
-		
-		return dioscuriResult;
+		return this.extractResultFileFromFloppyImage(floppyImage, outputFileName);
 	}
 	
-	private void run(File floppyImage) {
-		ProcessRunner dioscuriCmd = new ProcessRunner(); 
+	
+	/**
+	 * Extracts all files from a floppy image and gets the result file of the migration process carried out inside the emulator.
+	 * <br/>This methods uses the FloppyImageHelperWin service again to extract files from a floppy image.
+	 * <br/>ATTENTION: As this service requires Windows, this method will (for now) fail, if you are running a Non-Windows platform. 
+	 * 
+	 * @param floppyImage the floppy image to extract the result file from.
+	 * @param outputFileName the name of the result file to pick it up between all other files which might be on this image.
+	 * @return the DioscuriWrapperResult object containing the file specified by outputFileName
+	 */
+	private DioscuriWrapperResult extractResultFileFromFloppyImage(File floppyImage, String outputFileName) {
+		Migrate extract = checkOperatingSystemAndCreateService();
 		
-		dioscuriCmd.setCommand(getDioscuriCommandline(createConfigFile(floppyImage)));
-		
-		dioscuriCmd.setStartingDir(new File(DIOSCURI_HOME));
-		
-		dioscuriCmd.run();
-	}
-
-	private File extractResultFileFromFloppyImage(File floppyImage, String outputFileName) {
-		Migrate extract = new FloppyImageHelperWin();
+		if(extract==null) {
+			this.createErrorResult(ERROR_OUT);
+		}
 		
 		DigitalObject floppy = new DigitalObject.Builder(ImmutableContent.asStream(floppyImage))
 									.title(floppyImage.getName())
@@ -136,12 +154,62 @@ public class DioscuriWrapper {
 			main_result = extractedFiles.get(index);
 		}
 		else {
-			ERROR_OUT = "An unidentified error occured! No result file created! ";
+			return this.createErrorResult("An unidentified error occured! No result file created!");
 		}
-		return main_result;
+		
+		DioscuriWrapperResult dr = new DioscuriWrapperResult();
+		dr.setMessage(PROCESS_OUT);
+		dr.setResultFile(main_result);
+		dr.setState(DioscuriWrapperResult.SUCCESS);
+		return dr;
 	}
 
-	public File createConfigFile(File floppyImage) {
+
+	private Migrate checkOperatingSystemAndCreateService() {
+		Migrate floppyHelper = null;
+		if(OS_NAME.toLowerCase().contains("windows")) {
+			floppyHelper = new FloppyImageHelperWin();
+		}
+		else {
+			ERROR_OUT = "You are running this service on a Non-Windows machine. The used tool is not available for different platforms (at the moment).";
+		}
+		return floppyHelper;
+	}
+	
+	private DioscuriWrapperResult createErrorResult(String errorMessage) {
+		DioscuriWrapperResult result = new DioscuriWrapperResult();
+		result.setMessage(errorMessage);
+		result.setState(DioscuriWrapperResult.ERROR);
+		return result;
+	}
+	
+	
+	/**
+	 * This method runs Dioscuri while using the passed floppyImage.
+	 * 
+	 * @param floppyImage the floppyImage with all files on it needed by Dioscuri
+	 */
+	private void run(File floppyImage) {
+		ProcessRunner dioscuriCmd = new ProcessRunner(); 
+		
+		dioscuriCmd.setCommand(getDioscuriCommandline(createConfigFile(floppyImage)));
+		
+		dioscuriCmd.setStartingDir(new File(DIOSCURI_HOME));
+		
+		dioscuriCmd.run();
+	}
+	
+	
+
+	/**
+	 * Generates the configuration file needed by Dioscuri by adding the path to the floppy image that should be used by Dioscuri.
+	 * Further modifications to the DioscuriConfig.xml can be made in "PA/dioscuri/resources/DioscuriConfig.xml", 
+	 * <br/><strong>BUT</strong> be careful if you are not knowing exactly what you are doing!
+	 * 
+	 * @param floppyImage the floppyImage to be used, containing all files that should be passed to the emulator
+	 * @return the configuration file
+	 */
+	private File createConfigFile(File floppyImage) {
 		String configString = FileUtils.readTxtFileIntoString(new File(DIOSCURI_CONFIG_FILE_PATH));
 		String floppyPath = floppyImage.getAbsolutePath();
 		if(floppyPath.contains("\\")) {
@@ -153,7 +221,15 @@ public class DioscuriWrapper {
 		return tmpConfigFile;
 	}
 
-	public ArrayList<String> getDioscuriCommandline(File configFile) {
+	
+	
+	/**
+	 * Creates the command line used by the ProcessRunner to run Dioscuri. 
+	 * 
+	 * @param configFile the configFile that should be used to configure Dioscuri.
+	 * @return
+	 */
+	private ArrayList<String> getDioscuriCommandline(File configFile) {
 		ArrayList<String> commands = new ArrayList<String> ();
 		commands.add("java");
 		commands.add("-jar");

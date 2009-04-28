@@ -2,7 +2,7 @@ package eu.planets_project.services.migration.dioscuri;
 
 import java.io.File;
 
-public class DioscuriResult {
+public class DioscuriWrapperResult {
 	
 	private int status = -1;
 	private String message = null;
