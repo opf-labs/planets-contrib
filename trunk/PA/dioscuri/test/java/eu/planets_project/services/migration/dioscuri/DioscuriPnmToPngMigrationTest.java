@@ -34,7 +34,8 @@ public class DioscuriPnmToPngMigrationTest {
 	
 	public static File DIOSCURI_TEST_OUT = FileUtils.createWorkFolderInSysTemp("DIOSCURI_TEST_OUT");
 	
-	public static File TEST_FILE = new File("tests/test-files/images/bitmap/test_pnm/BASI0G02.PNM"); 
+	public static File PNM_TEST_FILE = new File("tests/test-files/images/bitmap/test_pnm/BASI0G02.PNM"); 
+	public static File PNG_TEST_FILE = null;
 	
 	public static FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 
@@ -60,8 +61,8 @@ public class DioscuriPnmToPngMigrationTest {
 	
 	@Test
 	public void testMigrate() {
-		DigitalObject inputDigOb = new DigitalObject.Builder(ImmutableContent.asStream(TEST_FILE)).title(TEST_FILE.getName()).format(format.createExtensionUri(FileUtils.getExtensionFromFile(TEST_FILE))).build();
-		MigrateResult result = DIOSCURI_MIGRATE.migrate(inputDigOb, format.createExtensionUri(FileUtils.getExtensionFromFile(TEST_FILE)), format.createExtensionUri("PNG"), null);
+		DigitalObject inputDigOb = new DigitalObject.Builder(ImmutableContent.asStream(PNM_TEST_FILE)).title(PNM_TEST_FILE.getName()).format(format.createExtensionUri(FileUtils.getExtensionFromFile(PNM_TEST_FILE))).build();
+		MigrateResult result = DIOSCURI_MIGRATE.migrate(inputDigOb, format.createExtensionUri(FileUtils.getExtensionFromFile(PNM_TEST_FILE)), format.createExtensionUri("PNG"), null);
 		
 		assertTrue("MigrateResult should not be NULL", result!=null);
 		assertTrue("ServiceReport should be SUCCESS", result.getReport().getErrorState()==ServiceReport.SUCCESS);
@@ -69,6 +70,21 @@ public class DioscuriPnmToPngMigrationTest {
 		System.out.println(result.getReport());
 		
 		File resultFile = new File(DIOSCURI_TEST_OUT, result.getDigitalObject().getTitle());
+		FileUtils.writeInputStreamToFile(result.getDigitalObject().getContent().read(), resultFile);
+		
+		System.out.println("Please find the converted file here: " + resultFile.getAbsolutePath());
+		
+		PNG_TEST_FILE = resultFile;
+		
+		inputDigOb = new DigitalObject.Builder(ImmutableContent.asStream(PNG_TEST_FILE)).title(PNG_TEST_FILE.getName()).format(format.createExtensionUri(FileUtils.getExtensionFromFile(PNG_TEST_FILE))).build();
+		result = DIOSCURI_MIGRATE.migrate(inputDigOb, format.createExtensionUri(FileUtils.getExtensionFromFile(PNG_TEST_FILE)), format.createExtensionUri("PNM"), null);
+		
+		assertTrue("MigrateResult should not be NULL", result!=null);
+		assertTrue("ServiceReport should be SUCCESS", result.getReport().getErrorState()==ServiceReport.SUCCESS);
+		
+		System.out.println(result.getReport());
+		
+		resultFile = new File(DIOSCURI_TEST_OUT, result.getDigitalObject().getTitle());
 		FileUtils.writeInputStreamToFile(result.getDigitalObject().getContent().read(), resultFile);
 		
 		System.out.println("Please find the converted file here: " + resultFile.getAbsolutePath());

@@ -76,6 +76,7 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 //	private static String EMU_PICTVIEW_PATH = "c:\\pictview\\pictview.exe";
 	
 	private static String EMU_PNM_TO_PNG_PATH = "C:\\pngminus\\pnm2png.exe";
+	private static String EMU_PNG_TO_PNM_PATH = "C:\\pngminus\\png2pnm.exe";
 	
 	private static String DIOSCURI_CONFIG_FILE_PATH = "PA/dioscuri/resources/DioscuriConfig.xml";
 	
@@ -131,9 +132,27 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
         		"emulated by DIOSCURI (16-Bit mode).");
         sd.classname(this.getClass().getCanonicalName());
         sd.version("1.0");
-        sd.tool( Tool.create(null, "pnm2png.exe", "version unknown", null, "http://www.schaik.com/png/pnmtopng.html"));
+        sd.tool( Tool.create(null, 
+        		"PngMinus (MS-DOS)", 
+        		"unknown", 
+        		"Pnm2png / Png2pnm\n" +
+        		"As said, pnmtopng requires PbmPlus / netpbm to be built. And not everybody wants to or is able " +
+        		"to get that library in shape. Also, libpng and zlib are available on more platforms than netpbm. " +
+        		"Therefore I wrote PngMinus, with the pnm2png and png2pnm converter utilities, that has built-in " +
+        		"functions to read ppm/pgm/pbm files. But it is also more limited related to the size of the files " +
+        		"it can handle. \n" +
+        		"The package comes with build scripts to compile PngMinus on Linux using gcc or on MS-DOS using " +
+        		"Borland's Turbo-C 3.0. Which doesn't mean that it is limited to that, for example I also " +
+        		"compiled it successfully using Visual-C. You can download the sources from this site, " +
+        		"but the package is also included with libpng, where you will find it in the \"contrib\" folder." +
+        		"For those who just want some MS-DOS binaries, this zip-file contains two executables that also " +
+        		"run fine in a Windows DOS-box. I have also included two libpng and zlib library files, precompiled " +
+        		"for the MS-DOS platform. With the two zip-files together, you are all set to go without the need " +
+        		"for any other packages. ", 
+        		"http://www.schaik.com/png/pnmtopng.html#pngminus"));
         List<MigrationPath> pathways = new ArrayList<MigrationPath>();
         pathways.add(new MigrationPath(format.createExtensionUri("PNM"), format.createExtensionUri("PNG"), null));
+        pathways.add(new MigrationPath(format.createExtensionUri("PNG"), format.createExtensionUri("PNM"), null));
         
         sd.paths(pathways.toArray(new MigrationPath[] {}));
         return sd.build();
@@ -161,12 +180,12 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 		FLOPPY_RESULT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, "EXTRACTED_FILES");
 		
 		String fileName = digitalObject.getTitle();
-		String ext = "." + format.getFirstExtension(inputFormat);
+		String inputExt = "." + format.getFirstExtension(inputFormat);
 		
 		OUTFILE_EXT = "." + format.getFirstExtension(outputFormat);
 		
 		if(fileName == null) {
-			fileName = DEFAULT_INPUT_NAME + ext;
+			fileName = DEFAULT_INPUT_NAME + inputExt;
 		}
 		
 		
@@ -178,9 +197,17 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 		OUTFILE_NAME = stripExtension(inputFile.getName());
 		
 //		String runScript = EMU_PICTVIEW_PATH + " " + "a:\\" + inputFile.getName() + " " + supportedFormats.get(outputFormat) + " " + "--o " + "a:\\output." + Format.getFirstMatchingFormatExtension(outputFormat);
-		String runScript = EMU_PNM_TO_PNG_PATH + " " + "A:\\" + inputFile.getName() + " " + "A:\\" + OUTFILE_NAME + OUTFILE_EXT.toUpperCase() + 
-		"\r\n" +
-		"HALT.EXE";
+		
+		String runScript = null;
+			
+		if(inputExt.equalsIgnoreCase(".PNM")) {
+			runScript = EMU_PNM_TO_PNG_PATH + " " + "A:\\" + inputFile.getName() + " " + "A:\\" + OUTFILE_NAME + OUTFILE_EXT.toUpperCase() +
+				"\r\n" + "HALT.EXE";
+		}
+		else {
+			runScript = EMU_PNG_TO_PNM_PATH + " " + "A:\\" + inputFile.getName() + " " + "A:\\" + OUTFILE_NAME + OUTFILE_EXT.toUpperCase() +
+				"\r\n" + "HALT.EXE";
+		}
 		
 		log.info("run.bat: " + runScript);
 		
