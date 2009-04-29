@@ -22,7 +22,7 @@ public class DioscuriWrapper {
 	
 	public DioscuriWrapper() {
 		FileUtils.deleteTempFiles(WORK_TEMP_FOLDER);
-		WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp("DIOSCURI_WRAPPER_TMP");
+		WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp(WORK_TEMP_NAME);
 		FLOPPY_RESULT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, "EXTRACTED_FILES");
 		log.info("Installed OS: " + OS_NAME + "\nVersion: " + OS_VERSION + "\nArchitecture: " + OS_ARCHITECTURE);
 	}
@@ -33,8 +33,10 @@ public class DioscuriWrapper {
 	private static String OS_NAME = System.getProperty("os.name");
 	private static String OS_VERSION = System.getProperty("os.version");
 	private static String OS_ARCHITECTURE = System.getProperty("os.arch");
-	private static File WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp("DIOSCURI_WRAPPER_TMP");
-	private static File FLOPPY_RESULT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, "EXTRACTED_FILES");
+	private static String WORK_TEMP_NAME = "DIOSCURI_WRAPPER_TMP";
+	private static File WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp(WORK_TEMP_NAME);
+	private static String FLOPPY_RESULT_NAME = "EXTRACTED_FILES";
+	private static File FLOPPY_RESULT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, FLOPPY_RESULT_NAME);
 	
 	private static String FLOPPY_NAME = "floppy.ima";
 	
@@ -176,14 +178,6 @@ public class DioscuriWrapper {
 		return floppyHelper;
 	}
 	
-	private DioscuriWrapperResult createErrorResult(String errorMessage) {
-		DioscuriWrapperResult result = new DioscuriWrapperResult();
-		result.setMessage(errorMessage);
-		result.setState(DioscuriWrapperResult.ERROR);
-		return result;
-	}
-	
-	
 	/**
 	 * This method runs Dioscuri while using the passed floppyImage.
 	 * 
@@ -198,8 +192,7 @@ public class DioscuriWrapper {
 		
 		dioscuriCmd.run();
 	}
-	
-	
+
 
 	/**
 	 * Generates the configuration file needed by Dioscuri by adding the path to the floppy image that should be used by Dioscuri.
@@ -221,8 +214,7 @@ public class DioscuriWrapper {
 		return tmpConfigFile;
 	}
 
-	
-	
+
 	/**
 	 * Creates the command line used by the ProcessRunner to run Dioscuri. 
 	 * 
@@ -241,6 +233,14 @@ public class DioscuriWrapper {
 		commands.add("autoshutdown");
 		
 		return commands;
+	}
+
+
+	private DioscuriWrapperResult createErrorResult(String errorMessage) {
+		DioscuriWrapperResult result = new DioscuriWrapperResult();
+		result.setMessage(errorMessage);
+		result.setState(DioscuriWrapperResult.ERROR);
+		return result;
 	}
 	
 	

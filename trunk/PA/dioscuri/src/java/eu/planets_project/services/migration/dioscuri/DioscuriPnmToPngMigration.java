@@ -53,8 +53,10 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 
 	public static final String NAME = "DioscuriPnmToPngMigration";
 	private static String DIOSCURI_HOME = System.getenv("DIOSCURI_HOME");
-	private static File WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp("DIOSCURI_TMP");
-	private static File FLOPPY_INPUT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, "FLOPPY_INPUT");
+	private static String WORK_TEMP_NAME = "DIOSCURI_PNM2PNG_TMP";
+	private static String FLOPPY_INPUT_NAME = "FLOPPY_INPUT";
+	private static File WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp(WORK_TEMP_NAME);
+	private static File FLOPPY_INPUT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, FLOPPY_INPUT_NAME);
 	
 	private static String DEFAULT_INPUT_NAME = "input";
 	private static String RUN_BAT = "RUN.BAT";
@@ -95,8 +97,6 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 //		supportedFormats.put(Format.extensionToURI("BMP"), "-w");
 //		supportedFormats.put(Format.extensionToURI("ICO"), "-i");
 		FileUtils.deleteTempFiles(WORK_TEMP_FOLDER);
-		WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp("DIOSCURI_TMP");
-		FLOPPY_INPUT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, "FLOPPY_INPUT");
 	}
 	
 
@@ -145,8 +145,8 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 			URI outputFormat, List<Parameter> parameters) {
 		
 		FileUtils.deleteTempFiles(WORK_TEMP_FOLDER);
-		WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp("DIOSCURI_TMP");
-		FLOPPY_INPUT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, "FLOPPY_INPUT");
+		WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp(WORK_TEMP_NAME);
+		FLOPPY_INPUT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, FLOPPY_INPUT_NAME);
 		
 		File inputFile = getInputFileFromDigitalObject(digitalObject, inputFormat, FLOPPY_INPUT_FOLDER);
 		String inFileName = inputFile.getName();
@@ -231,6 +231,37 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 	}
 	
 	/**
+		 * This method creates a "RUN.BAT" script needed by Dioscuri to execute a certain application.<br/>
+		 * This RUN.BAT will be placed on the floppy image needed for Dioscuri, along with (the/all other) input file(s)
+		 * 
+		 * @param destFolder the folder where the "RUN.BAT" should be created
+		 * @param inputFileName the name of the input file for this migration
+		 * @param outputFileName the name of the output file for this migration
+		 * @param inputExt 
+		 * @return
+		 */
+		private boolean createRunBat(File destFolder, File inputFile, String outputFileName) {
+			String runScript = null;
+			String inputFileName = inputFile.getName();
+			String inputExt = FileUtils.getExtensionFromFile(inputFile);
+			if(inputExt.equalsIgnoreCase("PNM")) {
+				runScript = EMU_PNM_TO_PNG_PATH + " " + "A:\\" + inputFileName.toUpperCase() + " " + "A:\\" + outputFileName.toUpperCase() +
+					"\r\n" + "HALT.EXE";
+			}
+			else {
+				runScript = EMU_PNG_TO_PNM_PATH + " " + "A:\\" + inputFileName.toUpperCase() + " " + "A:\\" + outputFileName.toUpperCase() +
+					"\r\n" + "HALT.EXE";
+			}
+			
+			File runBat = new File(destFolder, RUN_BAT);
+			runBat = FileUtils.writeStringToFile(runScript, runBat);
+			log.info(RUN_BAT + " created: " + runScript);
+			
+			return runBat.exists();
+		}
+
+
+	/**
 	 * This methods creates the MigrateResult to be returned by this service.
 	 * 
 	 * @param resultFile the result file that should be wrapped in a DigitalObject
@@ -254,37 +285,6 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 		return mainMigrateResult;
 	}
 	
-	
-	
-	/**
-	 * This method creates a "RUN.BAT" script needed by Dioscuri to execute a certain application.<br/>
-	 * This RUN.BAT will be placed on the floppy image needed for Dioscuri, along with (the/all other) input file(s)
-	 * 
-	 * @param destFolder the folder where the "RUN.BAT" should be created
-	 * @param inputFileName the name of the input file for this migration
-	 * @param outputFileName the name of the output file for this migration
-	 * @param inputExt 
-	 * @return
-	 */
-	private boolean createRunBat(File destFolder, File inputFile, String outputFileName) {
-		String runScript = null;
-		String inputFileName = inputFile.getName();
-		String inputExt = FileUtils.getExtensionFromFile(inputFile);
-		if(inputExt.equalsIgnoreCase("PNM")) {
-			runScript = EMU_PNM_TO_PNG_PATH + " " + "A:\\" + inputFileName.toUpperCase() + " " + "A:\\" + outputFileName.toUpperCase() +
-				"\r\n" + "HALT.EXE";
-		}
-		else {
-			runScript = EMU_PNG_TO_PNM_PATH + " " + "A:\\" + inputFileName.toUpperCase() + " " + "A:\\" + outputFileName.toUpperCase() +
-				"\r\n" + "HALT.EXE";
-		}
-		
-		File runBat = new File(destFolder, RUN_BAT);
-		runBat = FileUtils.writeStringToFile(runScript, runBat);
-		log.info(RUN_BAT + " created: " + runScript);
-		
-		return runBat.exists();
-	}
 	
 	
 	/**
