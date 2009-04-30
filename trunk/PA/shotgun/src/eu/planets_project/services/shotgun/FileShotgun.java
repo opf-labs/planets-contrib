@@ -27,8 +27,9 @@ public final class FileShotgun {
      * @return The modified file
      */
     public File shoot(File file, int seqCount, int seqLength, Action action) {
-        List<Integer> start = start(file, seqCount, seqLength);
-        for (Integer startOffset : start) {
+        List<Integer> startOffsets = randomStartOffsets(file, seqCount,
+                seqLength);
+        for (Integer startOffset : startOffsets) {
             file = action.modify(file, startOffset, seqLength);
         }
         return file;
@@ -95,7 +96,8 @@ public final class FileShotgun {
         SEQ_COUNT, SEQ_LENGTH, ACTION
     }
 
-    private List<Integer> start(File file, int seqCount, int seqLength) {
+    private List<Integer> randomStartOffsets(File file, int seqCount,
+            int seqLength) {
         List<Integer> result = new ArrayList<Integer>();
         for (int i = 0; i < seqCount; i++) {
             result.add(randomStartOffset(file, seqLength));

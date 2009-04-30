@@ -17,7 +17,7 @@ import eu.planets_project.services.modify.Modify;
 import eu.planets_project.services.modify.ModifyResult;
 import eu.planets_project.services.shotgun.FileShotgun.Action;
 import eu.planets_project.services.shotgun.FileShotgun.Key;
-import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 
 /**
  * Planets service Java re-implementation of the C++ shotgun file modification
@@ -76,12 +76,10 @@ public final class ShotgunModify implements Modify {
 
     private DigitalObject modify(DigitalObject digitalObject, int seqCount,
             int seqLength, String action) {
-        File inputFile = FileUtils.getTempFile("shotgun-modify", "bin");
-        FileUtils.writeInputStreamToFile(digitalObject.getContent().read(),
-                inputFile);
+        File inputFile = DigitalObjectUtils.getContentAsTempFile(digitalObject);
         File outputFile = new FileShotgun().shoot(inputFile, seqCount,
                 seqLength, Action.valueOf(action));
-        return new DigitalObject.Builder(ImmutableContent
-                .byReference(outputFile)).build();
+        return new DigitalObject.Builder(ImmutableContent.byValue(outputFile))
+                .build();
     }
 }
