@@ -170,11 +170,11 @@ public class GhostscriptMigration implements Migrate, Serializable {
                 
         
         // Commands for Linux.
-        //commands.add("/bin/sh");
-        //commands.add("-c");
+        commands.add("/bin/sh");
+        commands.add("-c");
 
         // Commands for Windows
-        commands.add("cmd");
+        //commands.add("cmd");
         //commands.add("/c");
         commands.add(command + " " + anyParameters(parameters) + " " 
             + tmpInFile.getAbsolutePath());

@@ -40,12 +40,6 @@ public class GhostscriptMigrationTest extends TestCase {
         new File("PA/ghostscript/test/resources/test.ps");
 
     /**
-     * A test PDF file object.
-     */
-    private final File testpdf =
-        new File("PA/ghostscript/test/resources/test.pdf");
-
-    /**
      * Set up test folder.
      */
     private File workfolder = FileUtils
@@ -122,7 +116,7 @@ public class GhostscriptMigrationTest extends TestCase {
                 formatPDF, this.createParameters(true));
             final DigitalObject doOutput = mr.getDigitalObject();
 
-            assertNotNull("Resulting digital object is null, error was "+mr.getReport().error, doOutput);
+            assertNotNull("Resulting digital object is null, error was " + mr.getReport().error, doOutput);
 
             System.out.println("Output" + doOutput);
 
@@ -134,60 +128,7 @@ public class GhostscriptMigrationTest extends TestCase {
             final File resultText = FileUtils.writeInputStreamToFile(
                 content.read(), this.workfolder, "ps2pdf_result.pdf");
 
-            if (!isRemoveTestFolder()) {
-                System.out.println("Please find the result text file here: \n"
-                    + resultText.getAbsolutePath());
-            }
-
-            assertFalse("Resulting digital object equal to the original.",
-                    doInput.equals(doOutput));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Test PDF to PS migration.
-     * Testing the web services by calling it with
-     * a digital object instance containing a PDF
-     * and expect the service to return a PS file.
-     * @throws IOException Throws java.io.IOException.
-     */
-    @Test
-    public final void testPDF2PSMigration() throws IOException {
-        System.out.println(testps.getCanonicalPath());
-
-        try {
-            //final URI formatPS = new URI("info:pronom/x-fmt/408");
-            //final URI formatPDF = new URI("info:pronom/fmt/18");
-
-            final URI formatPS = new URI("planets:fmt/ext/ps");
-            final URI formatPDF = new URI("planets:fmt/ext/pdf");
-
-            final DigitalObject doInput =
-                new DigitalObject.Builder(
-                        ImmutableContent.byReference((testpdf).toURI().toURL()))
-                    .permanentUrl(new URL("http://example.com/test.pdf"))
-                    .title("test.pdf")
-                    .build();
-            System.out.println("Input " + doInput);
-
-            final MigrateResult mr = dom.migrate(doInput, formatPDF,
-                formatPS, this.createParameters(true));
-            final DigitalObject doOutput = mr.getDigitalObject();
-
-            assertNotNull("Resulting digital object is null.", doOutput);
-
-            System.out.println("Output" + doOutput);
-
-            final Content content = doOutput.getContent();
-
-            this.workfolder = FileUtils
-                .createWorkFolderInSysTemp("ghostscript_test");
-
-            final File resultText = FileUtils.writeInputStreamToFile(
-                content.read(), this.workfolder, "pdf2ps_result.ps");
+            assertTrue("Result file was not created successfully!", resultText.exists());
 
             if (!isRemoveTestFolder()) {
                 System.out.println("Please find the result text file here: \n"
