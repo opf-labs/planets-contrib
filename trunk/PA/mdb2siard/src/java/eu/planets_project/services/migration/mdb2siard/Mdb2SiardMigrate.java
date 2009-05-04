@@ -93,8 +93,8 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	{
 		System.err.println(sError);
 		/* append to previous error description */
-		String s = sr.getError();
-		if ((s != null) && (s.length() > 0))
+		String s = sr.getMessage();
+		if (sr.getType()==Type.ERROR)
 			sError = s + "\n" + sError;
 		return new ServiceReport(Type.ERROR, Status.TOOL_ERROR, sError);
 	} /* appendError */
@@ -108,8 +108,8 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	{
 		System.out.println(sWarn);
 		/* append to previous warning description */
-		String s = sr.getWarn();
-		if ((s != null) && (s.length() > 0))
+		String s = sr.getMessage();
+		if (sr.getType()==Type.WARN)
 			sWarn = s + "\n" + sWarn;
 		return new ServiceReport(Type.WARN, Status.SUCCESS, sWarn);
 	} /* appendWarn */
@@ -122,8 +122,8 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	{
 		System.out.println(sInfo);
 		/* append to previous info description */
-		String s = sr.getInfo();
-		if ((s != null) && (s.length() > 0))
+		String s = sr.getMessage();
+		if (sr.getType()==Type.INFO)
 			sInfo = s + "\n" + sInfo;
 		return new ServiceReport(Type.INFO, Status.SUCCESS, sInfo);
 	} /* appendInfo */
@@ -270,7 +270,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 			/* convert files, noting results in the service report */
 			sr = migrate(fileInput, fileOutput, sr);
 	    /* read do from temporary file */
-			if (sr.getErrorState() == ServiceReport.SUCCESS)
+			if (sr.getStatus() == Status.SUCCESS)
 			  doOutput = new DigitalObject.Builder(ImmutableContent.byValue(readByteArrayFromFile(fileOutput))).build();
 		}
 		catch(Exception e)
@@ -290,7 +290,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 				doOutput = new DigitalObject.Builder(ImmutableContent.byValue(new byte[0])).build();
 		}
 		/* display success */
-		if (sr.getErrorState() == ServiceReport.SUCCESS)
+		if (sr.getStatus() == Status.SUCCESS)
 		  log.info("Mdb2Siard migrate succeeded");
 		else
 		  log.info("Mdb2Siard migrate failed!");

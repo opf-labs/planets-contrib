@@ -122,7 +122,7 @@ public class Mdb2SiardMigrateTester
     File fileInput = new File(sINPUT_FILE);
 		ServiceReport sr = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
 		sr = Mdb2SiardMigrate.migrate(fileInput, fileOutput, sr);
-		assertTrue((sr.getErrorState() == ServiceReport.TOOL_ERROR) || fileOutput.exists());
+		assertTrue((sr.getStatus() == Status.TOOL_ERROR) || fileOutput.exists());
 	} /* testMigrateFileFileServiceReport */
 
 	/*--------------------------------------------------------------------*/
@@ -146,17 +146,17 @@ public class Mdb2SiardMigrateTester
       MigrateResult mr = dom.migrate(doInput, null, null, null);
       DigitalObject doOutput = mr.getDigitalObject();
       assertTrue("Resulting digital object is null.", doOutput != null);
-      if (mr.getReport().getErrorState() != ServiceReport.TOOL_ERROR)
+      if (mr.getReport().getStatus() != Status.TOOL_ERROR)
       {
         FileUtils.writeInputStreamToFile(doOutput.getContent().read(), fileOutput);
-        if (mr.getReport().getWarn() != null)
-        	System.out.println("Warning: "+mr.getReport().getWarn());
-        if (mr.getReport().getInfo() != null)
-        	System.out.println("Information: "+mr.getReport().getInfo());
+        if (mr.getReport().getType() == Type.WARN)
+        	System.out.println("Warning: "+mr.getReport().getMessage());
+        if (mr.getReport().getType() == Type.INFO)
+        	System.out.println("Information: "+mr.getReport().getMessage());
       }
       else
-      	System.out.println("Error: "+mr.getReport().getError());
-  		assertTrue((mr.getReport().getErrorState() == ServiceReport.TOOL_ERROR) || fileOutput.exists());
+      	System.out.println("Error: "+mr.getReport().getMessage());
+  		assertTrue((mr.getReport().getStatus() == Status.TOOL_ERROR) || fileOutput.exists());
     }
     catch (Exception e) 
     {

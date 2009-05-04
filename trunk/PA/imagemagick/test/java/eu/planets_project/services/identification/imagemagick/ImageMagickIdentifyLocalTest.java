@@ -25,6 +25,7 @@ import eu.planets_project.services.datatypes.Event;
 import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.identify.Identify;
 import eu.planets_project.services.identify.IdentifyResult;
 import eu.planets_project.services.utils.ServiceUtils;
@@ -104,7 +105,7 @@ public class ImageMagickIdentifyLocalTest {
     private void validateResult(IdentifyResult identifyResult) {
         ServiceReport sr = identifyResult.getReport();
 
-        if(sr.getErrorState()==1) {
+        if(sr.getType() == Type.ERROR) {
             System.err.println("FAILED: " + sr);
         }
         else {
