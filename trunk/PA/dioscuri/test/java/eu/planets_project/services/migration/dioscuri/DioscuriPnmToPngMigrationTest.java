@@ -16,7 +16,7 @@ import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.datatypes.ServiceDescription;
-import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -68,7 +68,7 @@ public class DioscuriPnmToPngMigrationTest {
 		MigrateResult result = DIOSCURI_MIGRATE.migrate(inputDigOb, format.createExtensionUri(FileUtils.getExtensionFromFile(PNM_TEST_FILE)), format.createExtensionUri("PNG"), null);
 		
 		assertTrue("MigrateResult should not be NULL", result!=null);
-		assertTrue("ServiceReport should be SUCCESS", result.getReport().getErrorState()==ServiceReport.SUCCESS);
+		assertTrue("ServiceReport should be SUCCESS", result.getReport().getStatus()==Status.SUCCESS);
 		
 		System.out.println(result.getReport());
 		
@@ -83,7 +83,7 @@ public class DioscuriPnmToPngMigrationTest {
 		result = DIOSCURI_MIGRATE.migrate(inputDigOb, format.createExtensionUri(FileUtils.getExtensionFromFile(PNG_TEST_FILE)), format.createExtensionUri("PNM"), null);
 		
 		assertTrue("MigrateResult should not be NULL", result!=null);
-		assertTrue("ServiceReport should be SUCCESS", result.getReport().getErrorState()==ServiceReport.SUCCESS);
+		assertTrue("ServiceReport should be SUCCESS", result.getReport().getStatus()==Status.SUCCESS);
 		
 		System.out.println(result.getReport());
 		

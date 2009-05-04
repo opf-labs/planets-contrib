@@ -12,6 +12,7 @@ import eu.planets_project.services.datatypes.Checksum;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelper;
@@ -100,9 +101,9 @@ public class DioscuriWrapper {
 		
 		MigrateResult floppyHelperResult = floppyHelper.migrate(floppyInput, format.createExtensionUri("ZIP"), format.createExtensionUri("IMA"), null);
 		
-		if(floppyHelperResult.getReport().getErrorState()!= 0) {
-			log.error(floppyHelperResult.getReport().getError());
-			return createErrorResult(floppyHelperResult.getReport().getError());
+		if(floppyHelperResult.getReport().getType() == Type.ERROR) {
+			log.error(floppyHelperResult.getReport().getMessage());
+			return createErrorResult(floppyHelperResult.getReport().getMessage());
 		}
 		
 		log.info("FloppyImageHelperWin report: Successfull created floppy image!");
@@ -145,9 +146,9 @@ public class DioscuriWrapper {
 		
 		MigrateResult mr = extract.migrate(floppy, format.createExtensionUri(FileUtils.getExtensionFromFile(floppyImage)), format.createExtensionUri("ZIP"), null);
 		
-		if(mr.getReport().getErrorState()!=0) {
-			log.error("No Result received from FloppyImageHelperWin. Returning with ERROR: " + mr.getReport().getError());
-			return this.createErrorResult("No Result received from FloppyImageHelperWin. Returning with ERROR: " + mr.getReport().getError());
+		if(mr.getReport().getType() == Type.ERROR) {
+			log.error("No Result received from FloppyImageHelperWin. Returning with ERROR: " + mr.getReport().getMessage());
+			return this.createErrorResult("No Result received from FloppyImageHelperWin. Returning with ERROR: " + mr.getReport().getMessage());
 		}
 		
 		String resultName = mr.getDigitalObject().getTitle();
