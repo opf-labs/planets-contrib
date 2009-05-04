@@ -111,12 +111,13 @@ public class GhostscriptMigrationTest extends TestCase {
                     .title("test.ps")
                     .build();
             System.out.println("Input " + doInput);
-            
+
             final MigrateResult mr = dom.migrate(doInput, formatPS,
                 formatPDF, this.createParameters(true));
             final DigitalObject doOutput = mr.getDigitalObject();
 
-            assertNotNull("Resulting digital object is null, error was " + mr.getReport().error, doOutput);
+            assertNotNull("Resulting digital object is null, error was "
+                          + mr.getReport().error, doOutput);
 
             System.out.println("Output" + doOutput);
 
@@ -128,11 +129,12 @@ public class GhostscriptMigrationTest extends TestCase {
             final File resultText = FileUtils.writeInputStreamToFile(
                 content.read(), this.workfolder, "ps2pdf_result.pdf");
 
-            assertTrue("Result file was not created successfully!", resultText.exists());
+            assertTrue("Result file was not created successfully!",
+                        resultText.exists());
 
             if (!isRemoveTestFolder()) {
                 System.out.println("Please find the result text file here: \n"
-                    + resultText.getAbsolutePath());
+                                   + resultText.getAbsolutePath());
             }
 
             assertFalse("Resulting digital object equal to the original.",

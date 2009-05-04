@@ -145,7 +145,7 @@ public class GhostscriptMigration implements Migrate, Serializable {
 
         if (!(tmpInFile.exists() && tmpInFile.isFile()
                 && tmpInFile.canRead())) {
-        	String tmpError = "[GhostscriptMigration] Unable to create/use "
+            String tmpError = "[GhostscriptMigration] Unable to create/use "
                 + "temporary input file!";
             log.error(tmpError);
             report.setError(tmpError);
@@ -157,7 +157,7 @@ public class GhostscriptMigration implements Migrate, Serializable {
 
         ProcessRunner runner = new ProcessRunner();
 
-        final String command = migrationPaths.findMigrationCommand(
+        String command = migrationPaths.findMigrationCommand(
                 inputFormat, outputFormat);
 
         if (command == null) {
@@ -167,16 +167,26 @@ public class GhostscriptMigration implements Migrate, Serializable {
         }
 
         ArrayList<String> commands = new ArrayList<String>();
-                
-        
+
         // Commands for Linux.
         commands.add("/bin/sh");
         commands.add("-c");
+        // This because the configuration file approach
+        // does not work in server testing yet.
+        command = "gs -dBATCH -dNOPAUSE -dSAFER "
+                    + "-sDEVICE=pdfwrite -sOutputFile=- ";
 
         // Commands for Windows
         //commands.add("cmd");
         //commands.add("/c");
-        commands.add(command + " " + anyParameters(parameters) + " " 
+        // This because the configuration file approach
+        // does not work in server testing yet.
+        //command = "c:/gs/gs8.64/bin/gswin32.exe "
+        //            + "-Ic:/gs/gs8.64;c:/gs/gs8.64/fonts "
+        //            + "-dBATCH -dNOPAUSE -dSAFER "
+        //            + "-sDEVICE=pdfwrite -sOutputFile=- ";
+
+        commands.add(command + " " + anyParameters(parameters) + " "
             + tmpInFile.getAbsolutePath());
 
         runner.setCommand(commands);
@@ -308,11 +318,10 @@ public class GhostscriptMigration implements Migrate, Serializable {
         // Input formats.
         inputFormats = new ArrayList<String>();
         inputFormats.add("ps");
-        inputFormats.add("pdf");
+ 
 
         // Output formats and associated output parameters.
         outputFormats = new ArrayList<String>();
-        outputFormats.add("ps");
         outputFormats.add("pdf");
 
         // Disambiguation of extensions, e.g. {"JPG","JPEG"} to {"JPEG"}
