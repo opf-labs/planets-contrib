@@ -28,7 +28,7 @@ import eu.planets_project.services.utils.test.ServiceCreator;
  */
 public class DioscuriPnmToPngMigrationTest {
 	
-	public static String wsdlLoc = "/pserv-pa-dioscuri-pictview-migrate/DioscuriPnmToPngMigration?wsdl"; 
+	public static String wsdlLoc = "/pserv-pa-dioscuri-migrate/DioscuriPnmToPngMigration?wsdl"; 
 	
 	public static Migrate DIOSCURI_MIGRATE = null;
 	
@@ -44,6 +44,9 @@ public class DioscuriPnmToPngMigrationTest {
 	 */
 	@BeforeClass
 	public static void setUp() throws Exception {
+		System.setProperty("pserv.test.context", "server");
+        System.setProperty("pserv.test.host", "localhost");
+        System.setProperty("pserv.test.port", "8080");
 		DIOSCURI_MIGRATE = ServiceCreator.createTestService(Migrate.QNAME, DioscuriPnmToPngMigration.class, wsdlLoc);
 	}
 	

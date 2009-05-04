@@ -28,7 +28,7 @@ import eu.planets_project.services.utils.test.ServiceCreator;
  */
 public class DioscuriArjMigrationTest {
 	
-	public static String wsdlLoc = "/pserv-pa-dioscuri-pictview-migrate/DioscuriArjMigration?wsdl";
+	public static String wsdlLoc = "/pserv-pa-dioscuri-migrate/DioscuriArjMigration?wsdl";
 	
 	public static Migrate DIOSCURI_MIGRATE = null;
 	
@@ -43,9 +43,9 @@ public class DioscuriArjMigrationTest {
 	 */
 	@BeforeClass
 	public static void setUp() throws Exception {
-//		System.setProperty("pserv.test.context", "server");
-//        System.setProperty("pserv.test.host", "localhost");
-//        System.setProperty("pserv.test.port", "8080");
+		System.setProperty("pserv.test.context", "server");
+        System.setProperty("pserv.test.host", "localhost");
+        System.setProperty("pserv.test.port", "8080");
 		DIOSCURI_MIGRATE = ServiceCreator.createTestService(Migrate.QNAME, DioscuriArjMigration.class, wsdlLoc);
 	}
 	

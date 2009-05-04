@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jboss.annotation.ejb.TransactionTimeout;
+
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.datatypes.Checksum;
@@ -12,40 +14,42 @@ import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.migration.floppyImageHelper.FloppyImageHelperWin;
+import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelper;
+import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelperFactory;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
 
 
+@TransactionTimeout(1500)
 public class DioscuriWrapper {
 	
 	public DioscuriWrapper() {
 		FileUtils.deleteTempFiles(WORK_TEMP_FOLDER);
 		WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp(WORK_TEMP_NAME);
 		FLOPPY_RESULT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, "EXTRACTED_FILES");
-		log.info("Installed OS: " + OS_NAME + "\nVersion: " + OS_VERSION + "\nArchitecture: " + OS_ARCHITECTURE);
+		log.info("Installed OS: " + OS_NAME + ", Version: " + OS_VERSION + ", Architecture: " + OS_ARCHITECTURE);
 	}
 	
 	private PlanetsLogger log = PlanetsLogger.getLogger(this.getClass());
 	
-	private static String DIOSCURI_HOME = System.getenv("DIOSCURI_HOME");
-	private static String OS_NAME = System.getProperty("os.name");
-	private static String OS_VERSION = System.getProperty("os.version");
-	private static String OS_ARCHITECTURE = System.getProperty("os.arch");
-	private static String WORK_TEMP_NAME = "DIOSCURI_WRAPPER_TMP";
-	private static File WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp(WORK_TEMP_NAME);
-	private static String FLOPPY_RESULT_NAME = "EXTRACTED_FILES";
-	private static File FLOPPY_RESULT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, FLOPPY_RESULT_NAME);
+	private String DIOSCURI_HOME = System.getenv("DIOSCURI_HOME");
+	private String OS_NAME = System.getProperty("os.name");
+	private String OS_VERSION = System.getProperty("os.version");
+	private String OS_ARCHITECTURE = System.getProperty("os.arch");
+	private String WORK_TEMP_NAME = "DIOSCURI_WRAPPER_TMP";
+	private File WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp(WORK_TEMP_NAME);
+	private String FLOPPY_RESULT_NAME = "EXTRACTED_FILES";
+	private File FLOPPY_RESULT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, FLOPPY_RESULT_NAME);
 	
-	private static String FLOPPY_NAME = "floppy.ima";
+	private String FLOPPY_NAME = "floppy.ima";
 	
-	private static String DIOSCURI_CONFIG_FILE_PATH = "PA/dioscuri/resources/DioscuriConfig.xml";
+	private String DIOSCURI_CONFIG_FILE_PATH = "DioscuriConfig.xml";
 	
 	private static FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 	
-	private static String ERROR_OUT = null;
-	private static String PROCESS_OUT = null;
+	private String ERROR_OUT = null;
+	private String PROCESS_OUT = null;
 
 	/**
 	 * This method takes all files in the passed zip file, extracts them and creates a floppy image containing all these files.
@@ -63,7 +67,7 @@ public class DioscuriWrapper {
 		if(DIOSCURI_HOME==null) {
 			ERROR_OUT = 
 					"Dioscuri is NOT properly installed on your system!\n" +
-					"Please install it and point a Systemvariable called DIOSCURI_HOME to the installation folder!\n" +
+					"Please install it and point a System variable called DIOSCURI_HOME to the installation folder!\n" +
 					"Otherwise this service will continously refuse to work ;-)";
 			DioscuriWrapperResult result = new DioscuriWrapperResult();
 			result.setMessage(ERROR_OUT);
@@ -74,7 +78,7 @@ public class DioscuriWrapper {
 			log.info("DIOSCURI_HOME is set: " + DIOSCURI_HOME);
 		}
 		
-		Migrate floppyHelper = checkOperatingSystemAndCreateService();
+		FloppyImageHelper floppyHelper = checkOperatingSystemAndCreateService();
 		
 		if(floppyHelper==null) {
 			return this.createErrorResult(ERROR_OUT);
@@ -127,12 +131,13 @@ public class DioscuriWrapper {
 	 * @return the DioscuriWrapperResult object containing the file specified by outputFileName
 	 */
 	private DioscuriWrapperResult extractResultFileFromFloppyImage(File floppyImage, String outputFileName) {
-		Migrate extract = checkOperatingSystemAndCreateService();
+		FloppyImageHelper extract = checkOperatingSystemAndCreateService();
 		
 		if(extract==null) {
-			this.createErrorResult(ERROR_OUT);
+			return this.createErrorResult(ERROR_OUT);
 		}
 		
+		log.info("FloppyImageHelper instance created...");
 		DigitalObject floppy = new DigitalObject.Builder(ImmutableContent.asStream(floppyImage))
 									.title(floppyImage.getName())
 									.format(format.createExtensionUri(FileUtils.getExtensionFromFile(floppyImage)))
@@ -140,13 +145,38 @@ public class DioscuriWrapper {
 		
 		MigrateResult mr = extract.migrate(floppy, format.createExtensionUri(FileUtils.getExtensionFromFile(floppyImage)), format.createExtensionUri("ZIP"), null);
 		
-		File resultZIP = new File(WORK_TEMP_FOLDER, mr.getDigitalObject().getTitle());
+		if(mr.getReport().getErrorState()!=0) {
+			log.error("No Result received from FloppyImageHelperWin. Returning with ERROR: " + mr.getReport().getError());
+			return this.createErrorResult("No Result received from FloppyImageHelperWin. Returning with ERROR: " + mr.getReport().getError());
+		}
+		
+		String resultName = mr.getDigitalObject().getTitle();
+		
+		if(resultName==null) {
+			resultName = "FIH_result.zip";
+		}
+		
+		File resultZIP = new File(WORK_TEMP_FOLDER, resultName);
+		
+		Content resultContent = mr.getDigitalObject().getContent();
+		
+		if(resultContent==null) {
+			log.error("There is no result file! Returning with ERROR! ");
+			return this.createErrorResult("There is no result file! Returning with ERROR! ");
+		}
 		
 		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().read(), resultZIP);
 		
 		Checksum check = mr.getDigitalObject().getContent().getChecksum();
 		
-		List<File> extractedFiles = FileUtils.extractFilesFromZipAndCheck(resultZIP, FLOPPY_RESULT_FOLDER, check);
+		List<File> extractedFiles = null;
+		
+		if(check==null) {
+			extractedFiles = FileUtils.extractFilesFromZip(resultZIP, FLOPPY_RESULT_FOLDER);
+		}
+		else {
+			extractedFiles = FileUtils.extractFilesFromZipAndCheck(resultZIP, FLOPPY_RESULT_FOLDER, check);
+		}
 		
 		int index = extractedFiles.indexOf(new File(FLOPPY_RESULT_FOLDER, outputFileName));
 		
@@ -167,10 +197,10 @@ public class DioscuriWrapper {
 	}
 
 
-	private Migrate checkOperatingSystemAndCreateService() {
-		Migrate floppyHelper = null;
+	private FloppyImageHelper checkOperatingSystemAndCreateService() {
+		FloppyImageHelper floppyHelper = null;
 		if(OS_NAME.toLowerCase().contains("windows")) {
-			floppyHelper = new FloppyImageHelperWin();
+			floppyHelper = FloppyImageHelperFactory.getFloppyImageHelper();
 		}
 		else {
 			ERROR_OUT = "You are running this service on a Non-Windows machine. The used tool is not available for different platforms (at the moment).";
@@ -186,11 +216,18 @@ public class DioscuriWrapper {
 	private void run(File floppyImage) {
 		ProcessRunner dioscuriCmd = new ProcessRunner(); 
 		
-		dioscuriCmd.setCommand(getDioscuriCommandline(createConfigFile(floppyImage)));
+		File config = createConfigFile(floppyImage);
+		
+		dioscuriCmd.setCommand(getDioscuriCommandline(config));
 		
 		dioscuriCmd.setStartingDir(new File(DIOSCURI_HOME));
 		
+		log.info("ATTENTION: Running DIOSCURI Emulator...this might take a while, so please be patient and hang on ;-)");
+		
 		dioscuriCmd.run();
+		
+		PROCESS_OUT = dioscuriCmd.getProcessOutputAsString();
+		ERROR_OUT = dioscuriCmd.getProcessErrorAsString();
 	}
 
 
@@ -203,7 +240,16 @@ public class DioscuriWrapper {
 	 * @return the configuration file
 	 */
 	private File createConfigFile(File floppyImage) {
-		String configString = FileUtils.readTxtFileIntoString(new File(DIOSCURI_CONFIG_FILE_PATH));
+		log.info("Looking up DioscuriConfig.xml template to create config file...");
+		String configString = new String(FileUtils.writeInputStreamToBinary(this.getClass().getResourceAsStream(DIOSCURI_CONFIG_FILE_PATH)));
+		if(configString!=null) {
+			log.info("Success! Template found.");
+		}
+		else {
+			log.error("ERROR: Config file-template not found, unable to run Dioscuri without that!");
+			ERROR_OUT = "ERROR: Config file-template not found, unable to run Dioscuri without that!";
+			return null;
+		}
 		String floppyPath = floppyImage.getAbsolutePath();
 		if(floppyPath.contains("\\")) {
 			floppyPath = floppyPath.replace("\\", "/");
@@ -211,6 +257,7 @@ public class DioscuriWrapper {
 		configString = configString.replace("INSERT_FLOPPY_PATH_HERE", floppyPath);
 		File tmpConfigFile = new File(WORK_TEMP_FOLDER, "dioscuri_config.xml"); 
 		FileUtils.writeStringToFile(configString, tmpConfigFile);
+		log.info("Created config file for Dioscuri");
 		return tmpConfigFile;
 	}
 
