@@ -28,6 +28,8 @@ import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.Tool;
+import eu.planets_project.services.datatypes.ServiceReport.Status;
+import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -401,13 +403,9 @@ public class SoX implements Migrate, Serializable {
 			}
             plogger.info("Output file lenght: " + processOutputFile.length());
          // create a ServiceReport...
-			ServiceReport report = new ServiceReport();
-			report.setErrorState(0);
-			report.setInfo("Output and error logs:\n"
-						+  "--------------------------\n"
-						+  processOutput
-						+ "\n"
-						+ processError);
+            ServiceReport report = new ServiceReport(Type.INFO, Status.SUCCESS,
+                    "Output and error logs:\n" + "--------------------------\n"
+                            + processOutput + "\n" + processError);
 			
 			plogger.info("Created Service report...");
 			

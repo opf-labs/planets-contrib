@@ -28,6 +28,8 @@ import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.Tool;
+import eu.planets_project.services.datatypes.ServiceReport.Status;
+import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -127,8 +129,7 @@ public class JJ2000MigrateService implements Migrate {
         
         // Grab the file and pass it back.
         byte[] bytes = FileUtils.readFileIntoByteArray(outFile);
-        ServiceReport rep = new ServiceReport();
-        rep.setErrorState(0);
+        ServiceReport rep = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
         DigitalObject ndo = new DigitalObject.Builder(ImmutableContent.byValue(bytes)).build();
         return new MigrateResult( ndo, rep );
     }

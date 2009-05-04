@@ -28,6 +28,8 @@ import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.ServiceReport.Status;
+import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -173,16 +175,21 @@ public final class AbiWordMigration implements Migrate, Serializable {
         }
 
         tmpOutFile = new File(outFileStr);
+        ServiceReport report;
         // read byte array from temporary file
-        if (tmpOutFile.isFile() && tmpOutFile.canRead())
+        if (tmpOutFile.isFile() && tmpOutFile.canRead()) {
             binary = FileUtils.readFileIntoByteArray(tmpOutFile);
-        else
-            log.error("Error: Unable to read temporary file "
-                    + tmpOutFile.getAbsolutePath());
+            report = new ServiceReport(Type.INFO, Status.SUCCESS, "Wrote: "
+                    + tmpOutFile);
+        } else {
+            String message = "Error: Unable to read temporary file "
+                    + tmpOutFile.getAbsolutePath();
+            log.error(message);
+            report = new ServiceReport(Type.ERROR, Status.INSTALLATION_ERROR,
+                    message);
+        }
 
         DigitalObject newDO = null;
-
-        ServiceReport report = new ServiceReport();
 
         newDO = new DigitalObject.Builder(ImmutableContent.byValue(binary))
                 .build();

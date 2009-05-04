@@ -2,6 +2,8 @@ package eu.planets_project.services.migration.ffmpeg;
 
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.*;
+import eu.planets_project.services.datatypes.ServiceReport.Status;
+import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -59,7 +61,7 @@ public class FFMpegMigration implements Migrate, Serializable {
                                  URI inputFormat, URI outputFormat, List<Parameter> parameters) {
 
 
-        ServiceReport report = new ServiceReport();
+        ServiceReport report = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
         try {
             init();
         } catch (URISyntaxException e) {
@@ -68,10 +70,11 @@ public class FFMpegMigration implements Migrate, Serializable {
         }
 
 
-        String command = migrationPaths.findMigrationCommand(inputFormat,outputFormat);
+        String command = migrationPaths.findMigrationCommand(inputFormat, outputFormat);
 
         if (command == null){
-            report.setError("Could not find a migrationPath for the input and output formats");
+            report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR,
+                    "Could not find a migrationPath for the input and output formats");
             return fail(report);
         }
 
@@ -105,8 +108,9 @@ public class FFMpegMigration implements Migrate, Serializable {
 
 
         if (return_code != 0){
-            report.setErrorState(return_code);
-            report.setError(runner.getProcessOutputAsString()+"\n"+runner.getProcessErrorAsString());
+            report = new ServiceReport(Type.ERROR, Status.INSTALLATION_ERROR,
+                    runner.getProcessOutputAsString() + "\n"
+                            + runner.getProcessErrorAsString());
             return fail(report);
         }
         InputStream newFileStream = runner.getProcessOutput();

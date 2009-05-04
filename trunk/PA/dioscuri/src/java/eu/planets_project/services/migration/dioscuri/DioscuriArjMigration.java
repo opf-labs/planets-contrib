@@ -23,6 +23,8 @@ import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.Tool;
+import eu.planets_project.services.datatypes.ServiceReport.Status;
+import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.migration.dioscuri.utils.DioscuriWrapper;
@@ -265,10 +267,12 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 								.format(format.createExtensionUri(FileUtils.getExtensionFromFile(resultFile)))
 								.build();
 
-		ServiceReport sr = new ServiceReport();
+		
 
-		sr.setInfo("Successfully converted input from: \"" + format.getFirstExtension(inputFormat) + "\" to \"" + format.getFirstExtension(outputFormat) + "\".");
-		sr.setErrorState(ServiceReport.SUCCESS);
+		String message = "Successfully converted input from: \""
+                + format.getFirstExtension(inputFormat) + "\" to \""
+                + format.getFirstExtension(outputFormat) + "\".";
+        ServiceReport sr = new ServiceReport(Type.INFO, Status.SUCCESS, message);
 		
 		MigrateResult mainMigrateResult = new MigrateResult(result, sr);
 		

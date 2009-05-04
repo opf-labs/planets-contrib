@@ -27,6 +27,8 @@ import org.apache.commons.logging.LogFactory;
 
 import eu.planets_project.services.*;
 import eu.planets_project.services.datatypes.*;
+import eu.planets_project.services.datatypes.ServiceReport.Status;
+import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.view.*;
 
 /**
@@ -72,10 +74,8 @@ public class GrateViewService implements CreateView {
 
 	private static CreateViewResult returnWithErrorMessage(String message) 
 	{
-		ServiceReport rep = new ServiceReport();
+		ServiceReport rep = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, message);
 		log.error(message);
-		rep.setErrorState(ServiceReport.TOOL_ERROR);
-		rep.setError(message);
 		return new CreateViewResult(null, null, rep);
 	}
 
@@ -146,8 +146,7 @@ public class GrateViewService implements CreateView {
 		{
 			return returnWithErrorMessage("Failed creating sessionURL");
 		}
-		ServiceReport rep = new ServiceReport();
-		rep.setErrorState(ServiceReport.SUCCESS);
+		ServiceReport rep = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
 
 		// Return the view id:
 		return new CreateViewResult(sessionURL, sessionID, rep);

@@ -36,6 +36,8 @@ import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.Tool;
+import eu.planets_project.services.datatypes.ServiceReport.Status;
+import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -359,8 +361,7 @@ public class ImageMagickMigrate implements Migrate, Serializable {
 
             plogger.info("Created new DigitalObject for result file...");
 
-            report = new ServiceReport();
-            report.setErrorState(0);
+            report = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
             plogger.info("Created Service report...");
 
         } catch (MalformedURLException e) {

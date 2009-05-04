@@ -13,6 +13,8 @@ import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.ServiceReport.Status;
+import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.modify.Modify;
 import eu.planets_project.services.modify.ModifyResult;
 import eu.planets_project.services.shotgun.FileShotgun.Action;
@@ -38,7 +40,8 @@ public final class ShotgunModify implements Modify {
     public ModifyResult modify(DigitalObject digitalObject, URI inputFormat,
             URI actionURI, List<Parameter> parameters) {
         DigitalObject modified = modify(digitalObject, parameters);
-        ModifyResult result = new ModifyResult(modified, new ServiceReport());
+        ModifyResult result = new ModifyResult(modified, new ServiceReport(
+                Type.INFO, Status.SUCCESS, "OK"));
         return result;
     }
 

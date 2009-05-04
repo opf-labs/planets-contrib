@@ -30,6 +30,8 @@ import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.Tool;
+import eu.planets_project.services.datatypes.ServiceReport.Status;
+import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.utils.cache.DigitalObjectDiskCache;
 import eu.planets_project.services.view.CreateView;
 import eu.planets_project.services.view.CreateViewResult;
@@ -89,10 +91,8 @@ public class JJ2000ViewerService implements CreateView {
     }
 
     private static CreateViewResult returnWithErrorMessage(String message) {
-        ServiceReport rep = new ServiceReport();
+        ServiceReport rep = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, message);
         log.error(message);
-        rep.setErrorState(ServiceReport.TOOL_ERROR);
-        rep.setError("message");
         return new CreateViewResult(null, null, rep);
     }
     
@@ -152,8 +152,7 @@ public class JJ2000ViewerService implements CreateView {
         }
         
         // Create a service report:
-        ServiceReport rep = new ServiceReport();
-        rep.setErrorState(ServiceReport.SUCCESS);
+        ServiceReport rep = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
 
         // Return the view id:
         return new CreateViewResult(sessionURL, sessionID, rep);

@@ -24,8 +24,9 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.datatypes.*;
+import eu.planets_project.services.datatypes.ServiceReport.Status;
+import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -88,15 +89,14 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	/* (non-Javadoc)
 	 * add error string to ServiceReport 
 	 */
-	private static void appendError(ServiceReport sr, String sError)
+	private static ServiceReport appendError(ServiceReport sr, String sError)
 	{
 		System.err.println(sError);
-		sr.setErrorState(ServiceReport.TOOL_ERROR);
 		/* append to previous error description */
 		String s = sr.getError();
 		if ((s != null) && (s.length() > 0))
 			sError = s + "\n" + sError;
-		sr.setError(sError);
+		return new ServiceReport(Type.ERROR, Status.TOOL_ERROR, sError);
 	} /* appendError */
 	
 	/*--------------------------------------------------------------------*/
@@ -104,28 +104,28 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	 * add warning string to ServiceReport 
 	 */
 	@SuppressWarnings("unused")
-  private static void appendWarn(ServiceReport sr, String sWarn)
+  private static ServiceReport appendWarn(ServiceReport sr, String sWarn)
 	{
 		System.out.println(sWarn);
 		/* append to previous warning description */
 		String s = sr.getWarn();
 		if ((s != null) && (s.length() > 0))
 			sWarn = s + "\n" + sWarn;
-		sr.setWarn(sWarn);
+		return new ServiceReport(Type.WARN, Status.SUCCESS, sWarn);
 	} /* appendWarn */
 	
 	/*--------------------------------------------------------------------*/
 	/* (non-Javadoc)
 	 * add info string to ServiceReport 
 	 */
-	private static void appendInfo(ServiceReport sr, String sInfo)
+	private static ServiceReport appendInfo(ServiceReport sr, String sInfo)
 	{
 		System.out.println(sInfo);
 		/* append to previous info description */
 		String s = sr.getInfo();
 		if ((s != null) && (s.length() > 0))
 			sInfo = s + "\n" + sInfo;
-		sr.setInfo(sInfo);
+		return new ServiceReport(Type.INFO, Status.SUCCESS, sInfo);
 	} /* appendInfo */
 	
 	/*--------------------------------------------------------------------*/
@@ -186,7 +186,6 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	 */
 	static ServiceReport migrate(File fileInput, File fileOutput, ServiceReport sr)
 	{
-		sr.setErrorState(ServiceReport.TOOL_ERROR);
     Properties props = new Properties();
     try
     {
@@ -198,7 +197,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
       if (sConvMdbDir.endsWith("/"))
       {
         /* report in ServiceReport */
-        appendInfo(sr,"Using ConvMdb directory: "+sConvMdbDir);
+        sr = appendInfo(sr,"Using ConvMdb directory: "+sConvMdbDir);
     		/* ODBC DSN must be as unique as the temporary file name to support concurrent
     		 * execution of several service calls (and must be removed in the end) */
         String sOdbcDsn = fileInput.getName();
@@ -218,20 +217,18 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
         int iResult = pr.getReturnCode();
         if (iResult == 0)
         {
-        	appendInfo(sr,"ConvMdb conversion output:\n"+pr.getProcessOutputAsString());
-    			/* signal success */
-      		sr.setErrorState(ServiceReport.SUCCESS);
+        	sr = appendInfo(sr,"ConvMdb conversion output:\n"+pr.getProcessOutputAsString());
         }
         else
-        	appendError(sr,"ConvMdb conversion error code: " + Integer.toString(iResult)+"\n"+
+        	sr = appendError(sr,"ConvMdb conversion error code: " + Integer.toString(iResult)+"\n"+
         			pr.getProcessErrorAsString());
       }
       else
-      	appendError(sr,"Invalid value for "+sKEY_CONVMDB_DIR+" in "+sPROPERTIES_RESOURCE+":\n"+sConvMdbDir+" must terminate with '/'!");
+      	sr = appendError(sr,"Invalid value for "+sKEY_CONVMDB_DIR+" in "+sPROPERTIES_RESOURCE+":\n"+sConvMdbDir+" must terminate with '/'!");
     }
     catch(Exception e)
     {
-    	appendError(sr,e.getClass().getName()+": "+e.getMessage());
+    	sr = appendError(sr,e.getClass().getName()+": "+e.getMessage());
     	e.printStackTrace();
     }
 		return sr;
@@ -252,7 +249,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 		DigitalObject doOutput = new DigitalObject.Builder(ImmutableContent.byValue(new byte[] {})).build();
 		File fileInput = null;
 		File fileOutput = null;
-		ServiceReport sr = new ServiceReport();
+		ServiceReport sr = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
 		/* display banner */
 		log.info("Mdb2Siard migrate starts");
 		try
@@ -273,12 +270,12 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 			/* convert files, noting results in the service report */
 			sr = migrate(fileInput, fileOutput, sr);
 	    /* read do from temporary file */
-			if (sr.error_state == ServiceReport.SUCCESS)
+			if (sr.getErrorState() == ServiceReport.SUCCESS)
 			  doOutput = new DigitalObject.Builder(ImmutableContent.byValue(readByteArrayFromFile(fileOutput))).build();
 		}
 		catch(Exception e)
 		{
-			appendError(sr,e.getClass().getName()+": "+e.getMessage());
+			sr = appendError(sr,e.getClass().getName()+": "+e.getMessage());
 			e.printStackTrace();
 		}
 		finally
@@ -293,7 +290,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 				doOutput = new DigitalObject.Builder(ImmutableContent.byValue(new byte[0])).build();
 		}
 		/* display success */
-		if (sr.error_state == ServiceReport.SUCCESS)
+		if (sr.getErrorState() == ServiceReport.SUCCESS)
 		  log.info("Mdb2Siard migrate succeeded");
 		else
 		  log.info("Mdb2Siard migrate failed!");

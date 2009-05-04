@@ -28,6 +28,8 @@ import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.ServiceReport.Status;
+import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -112,7 +114,7 @@ public class GhostscriptMigration implements Migrate, Serializable {
             final URI inputFormat, final URI outputFormat,
                 final List<Parameter> parameters) {
 
-        final ServiceReport report = new ServiceReport();
+        ServiceReport report = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
 
         try {
             this.init();
@@ -148,7 +150,7 @@ public class GhostscriptMigration implements Migrate, Serializable {
             String tmpError = "[GhostscriptMigration] Unable to create/use "
                 + "temporary input file!";
             log.error(tmpError);
-            report.setError(tmpError);
+            report = new ServiceReport(Type.ERROR, Status.INSTALLATION_ERROR, tmpError);
             return this.fail(report);
         }
 
@@ -161,8 +163,9 @@ public class GhostscriptMigration implements Migrate, Serializable {
                 inputFormat, outputFormat);
 
         if (command == null) {
-            report.setError("Could not find the command associated with the "
-                    + "migrationPath for the input and output formats");
+            report = new ServiceReport(Type.ERROR, Status.INSTALLATION_ERROR,
+                    "Could not find the command associated with the "
+                            + "migrationPath for the input and output formats");
             return this.fail(report);
         }
 
@@ -203,10 +206,10 @@ public class GhostscriptMigration implements Migrate, Serializable {
         int return_code = runner.getReturnCode();
 
         if (return_code != 0) {
-            report.setErrorState(return_code);
-            report.setError(runner.getProcessOutputAsString() + "\n"
-                    + runner.getProcessErrorAsString());
-            return fail(report);
+            return fail(new ServiceReport(Type.ERROR,
+                    Status.INSTALLATION_ERROR, runner
+                            .getProcessOutputAsString()
+                            + "\n" + runner.getProcessErrorAsString()));
         }
 
         InputStream newFileStream = runner.getProcessOutput();
@@ -261,25 +264,24 @@ public class GhostscriptMigration implements Migrate, Serializable {
             final ServiceReport report) {
 
         if (digitalObject == null) {
-            report.setError("An empty (null) digital object was given");
-            this.fail(report);
+            this.fail(new ServiceReport(Type.ERROR, Status.TOOL_ERROR,
+                    "An empty (null) digital object was given"));
         }
 
         if (digitalObject.getContent() == null) {
-            System.out.println("Content NULL");
-            report.setError("The content of the digital object "
-                + "is empty (null)");
+            this.fail(new ServiceReport(Type.ERROR, Status.TOOL_ERROR,
+                    "The content of the digital object " + "is empty (null)"));
             this.fail(report);
         }
 
         if (inputFormat == null) {
-            report.setError("An empty (null) input object was given");
-            this.fail(report);
+            this.fail(new ServiceReport(Type.ERROR, Status.TOOL_ERROR,
+                    "An empty (null) digital object was given"));
         }
 
         if (outputFormat == null) {
-            report.setError("An empty (null) output format was given");
-            this.fail(report);
+            this.fail(new ServiceReport(Type.ERROR, Status.TOOL_ERROR,
+                    "An empty (null) digital object was given"));
         }
     }
 
@@ -352,7 +354,6 @@ public class GhostscriptMigration implements Migrate, Serializable {
      * @return MigrateResult.
      */
     private MigrateResult fail(final ServiceReport report) {
-        report.setErrorState(1);
         return new MigrateResult(null, report);
     }
 

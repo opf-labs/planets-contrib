@@ -2,6 +2,8 @@ package eu.planets_project.services.migration.ps2pdf;
 
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.*;
+import eu.planets_project.services.datatypes.ServiceReport.Status;
+import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -59,14 +61,11 @@ public class Ps2PdfMigration implements Migrate, Serializable {
                                  URI inputFormat, URI outputFormat, List<Parameter> parameters) {
 
 
-        ServiceReport report = new ServiceReport();
-
-
         String command = migrationPaths.findMigrationCommand(inputFormat,outputFormat);
 
         if (command == null){
-            report.setError("Could not find a migrationPath for the input and output formats");
-            return fail(report);
+            return returnWith(new ServiceReport(Type.ERROR, Status.TOOL_ERROR,
+                    "Could not find a migrationPath for the input and output formats"));
         }
 
 
@@ -99,9 +98,8 @@ public class Ps2PdfMigration implements Migrate, Serializable {
 
 
         if (return_code != 0){
-            report.setErrorState(return_code);
-            report.setError(runner.getProcessOutputAsString()+"\n"+runner.getProcessErrorAsString());
-            return fail(report);
+            return returnWith(new ServiceReport(Type.ERROR, Status.INSTALLATION_ERROR,
+                    runner.getProcessOutputAsString()+"\n"+runner.getProcessErrorAsString()));
         }
         InputStream newFileStream = runner.getProcessOutput();
         byte[] outbytes = FileUtils.writeInputStreamToBinary(newFileStream);
@@ -111,7 +109,8 @@ public class Ps2PdfMigration implements Migrate, Serializable {
                 .content(ImmutableContent.byValue(outbytes))
                 .format(outputFormat)
                 .build();
-        return new MigrateResult(pdfFile,report);
+        return new MigrateResult(pdfFile, new ServiceReport(Type.INFO,
+                Status.SUCCESS, runner.getProcessOutputAsString()));
 
     }
 
@@ -152,10 +151,7 @@ public class Ps2PdfMigration implements Migrate, Serializable {
     }
 
 
-    private MigrateResult fail(ServiceReport report){
-        if (report.getErrorState() == 0){
-            report.setErrorState(1);
-        }
+    private MigrateResult returnWith(ServiceReport report){
         return new MigrateResult(null,report);
     }
 }

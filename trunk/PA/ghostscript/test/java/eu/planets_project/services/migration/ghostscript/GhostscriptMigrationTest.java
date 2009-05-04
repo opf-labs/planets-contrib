@@ -117,7 +117,7 @@ public class GhostscriptMigrationTest extends TestCase {
             final DigitalObject doOutput = mr.getDigitalObject();
 
             assertNotNull("Resulting digital object is null, error was "
-                          + mr.getReport().error, doOutput);
+                          + mr.getReport().getError(), doOutput);
 
             System.out.println("Output" + doOutput);
 

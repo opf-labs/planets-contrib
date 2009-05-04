@@ -24,6 +24,8 @@ import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport.Status;
+import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.migration.mdb2siard.Mdb2SiardMigrate;
@@ -118,7 +120,7 @@ public class Mdb2SiardMigrateTester
     if (fileOutput.exists())
       fileOutput.delete();
     File fileInput = new File(sINPUT_FILE);
-		ServiceReport sr = new ServiceReport();
+		ServiceReport sr = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
 		sr = Mdb2SiardMigrate.migrate(fileInput, fileOutput, sr);
 		assertTrue((sr.getErrorState() == ServiceReport.TOOL_ERROR) || fileOutput.exists());
 	} /* testMigrateFileFileServiceReport */
@@ -147,13 +149,13 @@ public class Mdb2SiardMigrateTester
       if (mr.getReport().getErrorState() != ServiceReport.TOOL_ERROR)
       {
         FileUtils.writeInputStreamToFile(doOutput.getContent().read(), fileOutput);
-        if (mr.getReport().warn != null)
-        	System.out.println("Warning: "+mr.getReport().warn);
-        if (mr.getReport().info != null)
-        	System.out.println("Information: "+mr.getReport().info);
+        if (mr.getReport().getWarn() != null)
+        	System.out.println("Warning: "+mr.getReport().getWarn());
+        if (mr.getReport().getInfo() != null)
+        	System.out.println("Information: "+mr.getReport().getInfo());
       }
       else
-      	System.out.println("Error: "+mr.getReport().error);
+      	System.out.println("Error: "+mr.getReport().getError());
   		assertTrue((mr.getReport().getErrorState() == ServiceReport.TOOL_ERROR) || fileOutput.exists());
     }
     catch (Exception e) 

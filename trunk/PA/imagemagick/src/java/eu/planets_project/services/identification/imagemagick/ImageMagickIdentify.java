@@ -26,6 +26,8 @@ import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.ServiceReport.Status;
+import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.identify.Identify;
 import eu.planets_project.services.identify.IdentifyResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -155,15 +157,13 @@ public class ImageMagickIdentify implements Identify, Serializable {
 	    
 	    uriList = new ArrayList <URI> (uris);
 	    
-	    ServiceReport sr = new ServiceReport();
-	    
-	    sr.setErrorState(ServiceReport.SUCCESS);
 	    URI formatURI = format.createExtensionUri(srcImageFormat);
 	    uriList.add(0, formatURI);
 	    String infoString = createFormatInfoString(uris);
-	    sr.setInfo("Successfully identified Input file as: " + formatURI.toASCIIString() + "\n" + infoString);
 	    PLOGGER.info("Successfully identified Input file as: " + formatURI.toASCIIString() + "\n" + infoString);
-		
+	    ServiceReport sr = new ServiceReport(Type.INFO, Status.SUCCESS,
+                "Successfully identified Input file as: "
+                        + formatURI.toASCIIString() + "\n" + infoString);
 		IdentifyResult identRes = new IdentifyResult(uriList, IdentifyResult.Method.PARTIAL_PARSE, sr);
 		
 		PLOGGER.info("SUCCESS! Returning IdentifyResult. Goodbye!");
