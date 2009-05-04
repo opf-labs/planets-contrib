@@ -85,7 +85,7 @@ public class ImageMagickIdentifyLocalTest {
 
 
         Agent agent = new Agent(id,name,type);
-        Event event = new Event(summary,datetime,0,agent,null);
+        Event event = new Event(summary,datetime,0d,agent,null);
 
         for (File file : fileSet) {
             String ext = files.get(file);
