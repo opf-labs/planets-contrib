@@ -201,7 +201,7 @@ public class DioscuriWrapper {
 	private FloppyImageHelper checkOperatingSystemAndCreateService() {
 		FloppyImageHelper floppyHelper = null;
 		if(OS_NAME.toLowerCase().contains("windows")) {
-			floppyHelper = FloppyImageHelperFactory.getFloppyImageHelper();
+			floppyHelper = FloppyImageHelperFactory.getWindowsFloppyImageHelper();
 		}
 		else {
 			ERROR_OUT = "You are running this service on a Non-Windows machine. The used tool is not available for different platforms (at the moment).";
