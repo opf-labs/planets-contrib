@@ -78,8 +78,7 @@ public class GhostscriptMigration implements Migrate, Serializable {
     /**
      * XML configuration file containing commands and pathways.
      */
-    private final String configfile = "PA/ghostscript/src/resources"
-        + "/ghostscript.paths.xml";
+    private final String configfile = "ghostscript.paths.xml";
 
     /**
      * The migration paths of the service.
@@ -174,20 +173,10 @@ public class GhostscriptMigration implements Migrate, Serializable {
         // Commands for Linux.
         commands.add("/bin/sh");
         commands.add("-c");
-        // This because the configuration file approach
-        // does not work in server testing yet.
-        command = "gs -dBATCH -dNOPAUSE -dSAFER "
-                    + "-sDEVICE=pdfwrite -sOutputFile=- ";
 
         // Commands for Windows
         //commands.add("cmd");
         //commands.add("/c");
-        // This because the configuration file approach
-        // does not work in server testing yet.
-        //command = "c:/gs/gs8.64/bin/gswin32.exe "
-        //            + "-Ic:/gs/gs8.64;c:/gs/gs8.64/fonts "
-        //            + "-dBATCH -dNOPAUSE -dSAFER "
-        //            + "-sDEVICE=pdfwrite -sOutputFile=- ";
 
         commands.add(command + " " + anyParameters(parameters) + " "
             + tmpInFile.getAbsolutePath());

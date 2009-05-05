@@ -60,7 +60,7 @@ public class GhostscriptMigrationTest extends TestCase {
                 GhostscriptMigration.class, wsdlLoc);
 
         // Sets the removeTestFolder to clean up temporary files and folders.
-        setRemoveTestFolder(false);
+        setRemoveTestFolder(true);
         }
 
     /*
