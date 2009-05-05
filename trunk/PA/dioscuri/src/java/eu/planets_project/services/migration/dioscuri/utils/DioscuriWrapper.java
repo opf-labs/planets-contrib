@@ -79,7 +79,7 @@ public class DioscuriWrapper {
 			log.info("DIOSCURI_HOME is set: " + DIOSCURI_HOME);
 		}
 		
-		FloppyImageHelper floppyHelper = checkOperatingSystemAndCreateService();
+		FloppyImageHelper floppyHelper = FloppyImageHelperFactory.getFloppyImageHelperInstance();
 		
 		if(floppyHelper==null) {
 			return this.createErrorResult(ERROR_OUT);
@@ -132,7 +132,7 @@ public class DioscuriWrapper {
 	 * @return the DioscuriWrapperResult object containing the file specified by outputFileName
 	 */
 	private DioscuriWrapperResult extractResultFileFromFloppyImage(File floppyImage, String outputFileName) {
-		FloppyImageHelper extract = checkOperatingSystemAndCreateService();
+		FloppyImageHelper extract = FloppyImageHelperFactory.getFloppyImageHelperInstance();
 		
 		if(extract==null) {
 			return this.createErrorResult(ERROR_OUT);
@@ -198,17 +198,6 @@ public class DioscuriWrapper {
 	}
 
 
-	private FloppyImageHelper checkOperatingSystemAndCreateService() {
-		FloppyImageHelper floppyHelper = null;
-		if(OS_NAME.toLowerCase().contains("windows")) {
-			floppyHelper = FloppyImageHelperFactory.getWindowsFloppyImageHelper();
-		}
-		else {
-			ERROR_OUT = "You are running this service on a Non-Windows machine. The used tool is not available for different platforms (at the moment).";
-		}
-		return floppyHelper;
-	}
-	
 	/**
 	 * This method runs Dioscuri while using the passed floppyImage.
 	 * 
