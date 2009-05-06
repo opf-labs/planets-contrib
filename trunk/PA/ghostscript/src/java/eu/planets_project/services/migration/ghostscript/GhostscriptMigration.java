@@ -78,7 +78,12 @@ public class GhostscriptMigration implements Migrate, Serializable {
     /**
      * XML configuration file containing commands and pathways.
      */
+    // Path for Linux
     private final String configfile = "ghostscript.paths.xml";
+
+    // Path for Windows
+    //private final String configfile = "PA/ghostscript/src/"
+    //                   + "resources/ghostscript.paths.xml";
 
     /**
      * The migration paths of the service.
