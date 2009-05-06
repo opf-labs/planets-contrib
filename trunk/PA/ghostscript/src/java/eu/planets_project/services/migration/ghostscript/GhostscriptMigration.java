@@ -78,10 +78,13 @@ public class GhostscriptMigration implements Migrate, Serializable {
     /**
      * XML configuration file containing commands and pathways.
      */
-    // Path for Linux
+    // Path for outside Eclipse.
     private final String configfile = "ghostscript.paths.xml";
 
-    // Path for Windows
+    // Path for Eclipse, the above path do not work in Eclipse
+    // so this path has to be use when running tests in Eclipse
+    // Please be aware that this path work for test:local and
+    // test:standalone tests but not for test:server!
     //private final String configfile = "PA/ghostscript/src/"
     //                   + "resources/ghostscript.paths.xml";
 
