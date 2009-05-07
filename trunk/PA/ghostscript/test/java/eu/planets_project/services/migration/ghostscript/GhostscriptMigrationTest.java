@@ -154,11 +154,14 @@ public class GhostscriptMigrationTest extends TestCase {
         List<Parameter> parameterList = new ArrayList<Parameter>();
 
         if (noPlatFontsFlag) {
-            Parameter noPlatFonts = new Parameter("noPlatFonts",
-                    "-dNOPLATFONTS", null,"Disables the use of fonts supplied by "
-                    + "the underlying platform (for instance X Windows). "
-                    + "This may be needed if the platform fonts look "
-                    + "undesirably different from the scalable fonts.");
+            Parameter noPlatFonts = new Parameter.Builder("noPlatFonts",
+                    "-dNOPLATFONTS")
+                    .description(
+                            "Disables the use of fonts supplied by "
+                                    + "the underlying platform (for instance X Windows). "
+                                    + "This may be needed if the platform fonts look "
+                                    + "undesirably different from the scalable fonts.")
+                    .build();
             parameterList.add(noPlatFonts);
         }
 

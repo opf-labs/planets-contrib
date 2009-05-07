@@ -121,12 +121,12 @@ public class ImageMagickMigrate implements Migrate, Serializable {
         sd.version("0.1");
 
         List<Parameter> parameterList = new ArrayList<Parameter>();
-        Parameter compressionTypeParam = new Parameter("compressionType", "0-10", null, 
-                "Allowed int values: 0 - 10");
+        Parameter compressionTypeParam = new Parameter.Builder("compressionType", "0-10").description( 
+                "Allowed int values: 0 - 10").build();
         parameterList.add(compressionTypeParam);
 
-        Parameter compressionLevelParam = new Parameter("compressionQuality", "0-100", null,
-                "This should be an int value between: 0 - 100, representing the compression quality in percent.");
+        Parameter compressionLevelParam = new Parameter.Builder("compressionQuality", "0-100").description(
+                "This should be an int value between: 0 - 100, representing the compression quality in percent.").build();
         parameterList.add(compressionLevelParam);
 
         sd.parameters(parameterList);

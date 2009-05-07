@@ -51,7 +51,7 @@ import eu.planets_project.services.utils.ServiceUtils;
         serviceName = Migrate.NAME,
         targetNamespace = PlanetsServices.NS,
         endpointInterface = "eu.planets_project.services.migrate.Migrate" )
-public final class AvidemuxMigration implements Migrate, Serializable {
+public final class AvidemuxMigration implements Migrate {
 
     PlanetsLogger log = PlanetsLogger.getLogger(AvidemuxMigration.class);
 
@@ -148,19 +148,22 @@ public final class AvidemuxMigration implements Migrate, Serializable {
         // Define parameters and default values
         // AVI
         String audioCodecParamName = "audio-codec";
-        Parameter audioCodecParam = new Parameter(
-                audioCodecParamName,
-                "NONE",
-                null,
-                "Choose one of MP2, MP3, AC3, NONE, TWOLAME, COPY. The audio track will be encoded using the selected encoder (COPY leaves the audio-track unchanged).");
+        Parameter audioCodecParam = new Parameter.Builder(audioCodecParamName,
+                "NONE").description(
+                "Choose one of MP2, MP3, AC3, NONE, TWOLAME, COPY. "
+                        + "The audio track will be encoded using the selected "
+                        + "encoder (COPY leaves the audio-track unchanged).")
+                .build();
         this.defaultParameters.put(audioCodecParamName, audioCodecParam);
 
         String videoCodecParamName = "video-codec";
-        Parameter videoCodecParam = new Parameter(
-                videoCodecParamName,
-                "XVID4",
-                null,
-                "Choose one of XVID4, X264, FFMPEG4 (LavCodec), COPY (one argument). The video track will be encoded using the selected encoder (COPY leaves the video-track unchanged)");
+        Parameter videoCodecParam = new Parameter.Builder(videoCodecParamName,
+                "XVID4")
+                .description(
+                        "Choose one of XVID4, X264, FFMPEG4 (LavCodec), "
+                                + "COPY (one argument). The video track will be encoded using "
+                                + "the selected encoder (COPY leaves the video-track unchanged)")
+                .build();
         this.defaultParameters.put(videoCodecParamName, videoCodecParam);
 
         /* FIXME Audio bitrate has been deactivated - Correct input has to be checked, otherwise crash in libc! */
@@ -170,8 +173,8 @@ public final class AvidemuxMigration implements Migrate, Serializable {
 //        this.defaultParameters.put(audioBitrateParamName, audioBitrateParam);
 
         String fpsParamName = "fps";
-        Parameter fpsParam = new Parameter(fpsParamName, "30", null,
-                "Positive integer for the frames per second of the video.");
+        Parameter fpsParam = new Parameter.Builder(fpsParamName, "30").description(
+                "Positive integer for the frames per second of the video.").build();
         this.defaultParameters.put(fpsParamName, fpsParam);
 
         // Get list for the migration path parameter

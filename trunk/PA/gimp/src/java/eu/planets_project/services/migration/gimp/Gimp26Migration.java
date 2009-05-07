@@ -168,125 +168,125 @@ public final class Gimp26Migration implements Migrate {
         // Define parameters and default values
         // GIF - 6 parameters
         List<Parameter> gifParameterList = new ArrayList<Parameter>();
-        Parameter gifInterlaceParam = new Parameter("gif-interlace", "1", null, 
-                "GIF-Parameter: Boolean integer 0/1 indicating if interlacing should be used.");
+        Parameter gifInterlaceParam = new Parameter.Builder("gif-interlace", "1").description( 
+                "GIF-Parameter: Boolean integer 0/1 indicating if interlacing should be used.").build();
         gifParameterList.add(gifInterlaceParam);
-        Parameter gifDitherParam = new Parameter("gif-dither", "1", null, 
-                "GIF-Parameter: Boolean integer 0/1 indicating if interlacing should be used.");
+        Parameter gifDitherParam = new Parameter.Builder("gif-dither", "1").description( 
+                "GIF-Parameter: Boolean integer 0/1 indicating if interlacing should be used.").build();
         gifParameterList.add(gifDitherParam);
-        Parameter gifPaletteParam = new Parameter("gif-palette", "0", null, 
-                "GIF-Parameter: Integer indicating the palette to be used (MAKE-PALETTE (0), WEB-PALETTE (2), MONO-PALETTE (3), CUSTOM-PALETTE (4)).");
+        Parameter gifPaletteParam = new Parameter.Builder("gif-palette", "0").description( 
+                "GIF-Parameter: Integer indicating the palette to be used (MAKE-PALETTE (0), WEB-PALETTE (2), MONO-PALETTE (3), CUSTOM-PALETTE (4)).").build();
         gifParameterList.add(gifPaletteParam);
-        Parameter gifNumcolorsParam = new Parameter("gif-numcolors", "256", null, 
-                "GIF-Parameter: Integer between 0 and 256 indicating how many colors should be used.");
+        Parameter gifNumcolorsParam = new Parameter.Builder("gif-numcolors", "256").description( 
+                "GIF-Parameter: Integer between 0 and 256 indicating how many colors should be used.").build();
         gifParameterList.add(gifNumcolorsParam);
-        Parameter gifAlphaditherParam = new Parameter("gif-alphadither", "1", null, 
-                "GIF-Parameter: Boolean integer 0/1 indicating if alpha dither should be used.");
+        Parameter gifAlphaditherParam = new Parameter.Builder("gif-alphadither", "1").description( 
+                "GIF-Parameter: Boolean integer 0/1 indicating if alpha dither should be used.").build();
         gifParameterList.add(gifAlphaditherParam);
-        Parameter gifRemoveunusedParam = new Parameter("gif-removeunused", "1", null, 
-                "GIF-Parameter: Boolean integer 0/1 indicating if unused colors should be removed.");
+        Parameter gifRemoveunusedParam = new Parameter.Builder("gif-removeunused", "1").description( 
+                "GIF-Parameter: Boolean integer 0/1 indicating if unused colors should be removed.").build();
         gifParameterList.add(gifRemoveunusedParam);
         defaultParameters.put("GIF", gifParameterList);
         
         // EPS - 9 parameters
         List<Parameter> epsParameterList = new ArrayList<Parameter>();
-        Parameter epsInterlaceParam = new Parameter("eps-width", "0", null, 
-                "EPS-Parameter: Positive integer value indicating the width.");
+        Parameter epsInterlaceParam = new Parameter.Builder("eps-width", "0").description( 
+                "EPS-Parameter: Positive integer value indicating the width.").build();
         epsParameterList.add(epsInterlaceParam);
-        Parameter epsDitherParam = new Parameter("eps-height", "0", null, 
-                "EPS-Parameter: Positive integer value indicating the height.");
+        Parameter epsDitherParam = new Parameter.Builder("eps-height", "0").description( 
+                "EPS-Parameter: Positive integer value indicating the height.").build();
         epsParameterList.add(epsDitherParam);
-        Parameter epsNumcolorsParam = new Parameter("eps-xoffset", "0", null, 
-                "EPS-Parameter: Positive integer value indicating the x-offset.");
+        Parameter epsNumcolorsParam = new Parameter.Builder("eps-xoffset", "0").description( 
+                "EPS-Parameter: Positive integer value indicating the x-offset.").build();
         epsParameterList.add(epsNumcolorsParam);
-        Parameter epsAlphaditherParam = new Parameter("eps-yoffset", "0", null, 
-                "EPS-Parameter: Positive integer value indicating the y-offset.");
+        Parameter epsAlphaditherParam = new Parameter.Builder("eps-yoffset", "0").description( 
+                "EPS-Parameter: Positive integer value indicating the y-offset.").build();
         epsParameterList.add(epsAlphaditherParam);
-        Parameter epsRemoveunusedParam = new Parameter("eps-unit", "0", null, 
-                "EPS-Parameter: Unit parameter.");
+        Parameter epsRemoveunusedParam = new Parameter.Builder("eps-unit", "0").description( 
+                "EPS-Parameter: Unit parameter.").build();
         epsParameterList.add(epsRemoveunusedParam);
-        Parameter epsKeepratioParam = new Parameter("eps-keepratio", "1", null, 
-                "EPS-Parameter: Boolean integer 0/1 indicating if the ratio should be maintained.");
+        Parameter epsKeepratioParam = new Parameter.Builder("eps-keepratio", "1").description( 
+                "EPS-Parameter: Boolean integer 0/1 indicating if the ratio should be maintained.").build();
         epsParameterList.add(epsKeepratioParam);
-        Parameter epsRotationParam = new Parameter("eps-rotation", "0", null, 
-                "EPS-Parameter: Boolean integer 0/1 indicating if the image should be rotated.");
+        Parameter epsRotationParam = new Parameter.Builder("eps-rotation", "0").description( 
+                "EPS-Parameter: Boolean integer 0/1 indicating if the image should be rotated.").build();
         epsParameterList.add(epsRotationParam);
-        Parameter epsPreviewParam = new Parameter("eps-preview", "0", null, 
-                "EPS-Parameter: Boolean integer 0/1 indicating if a preview image should be created.");
+        Parameter epsPreviewParam = new Parameter.Builder("eps-preview", "0").description( 
+                "EPS-Parameter: Boolean integer 0/1 indicating if a preview image should be created.").build();
         epsParameterList.add(epsPreviewParam);
-        Parameter epsLevelParam = new Parameter("eps-level", "2", null, 
-                "EPS-Parameter: Positive integer value 1 or 2 indicating the postscript level.");
+        Parameter epsLevelParam = new Parameter.Builder("eps-level", "2").description( 
+                "EPS-Parameter: Positive integer value 1 or 2 indicating the postscript level.").build();
         epsParameterList.add(epsLevelParam);
         defaultParameters.put("EPS", epsParameterList);
         
         // JPEG - 4 parameters
         List<Parameter> jpegParameterList = new ArrayList<Parameter>();
-        Parameter jpegQualityParam = new Parameter("quality-width", "0.1", null, 
-                "JPEG-Parameter: Float value in the range from 0 to 1 (step size 0.1) indicating the image quality. 0.1 low quality, 1 high quality.");
+        Parameter jpegQualityParam = new Parameter.Builder("quality-width", "0.1").description( 
+                "JPEG-Parameter: Float value in the range from 0 to 1 (step size 0.1) indicating the image quality. 0.1 low quality, 1 high quality.").build();
         jpegParameterList.add(jpegQualityParam);
-        Parameter jpegSmoothingParam = new Parameter("quality-smoothing", "0.1", null, 
-                "JPEG-Parameter: Float value in the range from 0 to 1 (step size 0.1) indicating the smoothing intensity. 0 no smoothing, 1 strong smoothing.");
+        Parameter jpegSmoothingParam = new Parameter.Builder("quality-smoothing", "0.1").description( 
+                "JPEG-Parameter: Float value in the range from 0 to 1 (step size 0.1) indicating the smoothing intensity. 0 no smoothing, 1 strong smoothing.").build();
         jpegParameterList.add(jpegSmoothingParam);
-        Parameter jpegOptimizeParam = new Parameter("quality-optimize", "0", null, 
-                "JPEG-Parameter: Boolean integer 0/1 indicating if the image should be optimized.");
+        Parameter jpegOptimizeParam = new Parameter.Builder("quality-optimize", "0").description( 
+                "JPEG-Parameter: Boolean integer 0/1 indicating if the image should be optimized.").build();
         jpegParameterList.add(jpegOptimizeParam);
-        Parameter jpegProgressiveParam = new Parameter("quality-progressive", "0", null, 
-                "JPEG-Parameter: Boolean integer 0/1 indicating if progressive storage should be used.");
+        Parameter jpegProgressiveParam = new Parameter.Builder("quality-progressive", "0").description( 
+                "JPEG-Parameter: Boolean integer 0/1 indicating if progressive storage should be used.").build();
         jpegParameterList.add(jpegProgressiveParam);
         defaultParameters.put("JPEG", jpegParameterList);
         
         // PNG - 2 parameters
         List<Parameter> pngParameterList = new ArrayList<Parameter>();
-        Parameter pngInterlaceParam = new Parameter("png-interlace", "1", null, 
-                "PNG-Parameter:  Boolean integer 0/1 indicating if interlacing should be used.");
+        Parameter pngInterlaceParam = new Parameter.Builder("png-interlace", "1").description( 
+                "PNG-Parameter:  Boolean integer 0/1 indicating if interlacing should be used.").build();
         pngParameterList.add(pngInterlaceParam);
-        Parameter pngCompressionParam = new Parameter("png-compression", "1", null, 
-                "PNG-Parameter: Positive integer in the range 0 to 9 (step size 1) indicating the compression grade.");
+        Parameter pngCompressionParam = new Parameter.Builder("png-compression", "1").description( 
+                "PNG-Parameter: Positive integer in the range 0 to 9 (step size 1) indicating the compression grade.").build();
         pngParameterList.add(pngCompressionParam);
         defaultParameters.put("PNG", pngParameterList);
         
         // PS - 9 parameters
         List<Parameter> psParameterList = new ArrayList<Parameter>();
-        Parameter psInterlaceParam = new Parameter("ps-width", "0", null, 
-                "PS-Parameter: Positive integer value indicating the width. 0 indicates to take the size from the original.");
+        Parameter psInterlaceParam = new Parameter.Builder("ps-width", "0").description( 
+                "PS-Parameter: Positive integer value indicating the width. 0 indicates to take the size from the original.").build();
         psParameterList.add(psInterlaceParam);
-        Parameter psDitherParam = new Parameter("ps-height", "0", null, 
-                "PS-Parameter: Positive integer value indicating the height. 0 indicates to take the size from the original.");
+        Parameter psDitherParam = new Parameter.Builder("ps-height", "0").description( 
+                "PS-Parameter: Positive integer value indicating the height. 0 indicates to take the size from the original.").build();
         psParameterList.add(psDitherParam);
-        Parameter psNumcolorsParam = new Parameter("ps-xoffset", "0", null, 
-                "PS-Parameter: Positive integer value indicating the x-offset.");
+        Parameter psNumcolorsParam = new Parameter.Builder("ps-xoffset", "0").description( 
+                "PS-Parameter: Positive integer value indicating the x-offset.").build();
         psParameterList.add(psNumcolorsParam);
-        Parameter psAlphaditherParam = new Parameter("ps-yoffset", "0", null, 
-                "PS-Parameter: Positive integer value indicating the y-offset.");
+        Parameter psAlphaditherParam = new Parameter.Builder("ps-yoffset", "0").description( 
+                "PS-Parameter: Positive integer value indicating the y-offset.").build();
         psParameterList.add(psAlphaditherParam);
-        Parameter psRemoveunusedParam = new Parameter("ps-unit", "0", null, 
-                "PS-Parameter: Unit parameter.");
+        Parameter psRemoveunusedParam = new Parameter.Builder("ps-unit", "0").description( 
+                "PS-Parameter: Unit parameter.").build();
         psParameterList.add(psRemoveunusedParam);
-        Parameter psKeepratioParam = new Parameter("ps-keepratio", "1", null, 
-                "PS-Parameter: Boolean integer 0/1 indicating if the ratio should be maintained.");
+        Parameter psKeepratioParam = new Parameter.Builder("ps-keepratio", "1").description( 
+                "PS-Parameter: Boolean integer 0/1 indicating if the ratio should be maintained.").build();
         psParameterList.add(psKeepratioParam);
-        Parameter psRotationParam = new Parameter("ps-rotation", "0", null, 
-                "PS-Parameter: Boolean integer 0/1 indicating if the image should be rotated.");
+        Parameter psRotationParam = new Parameter.Builder("ps-rotation", "0").description( 
+                "PS-Parameter: Boolean integer 0/1 indicating if the image should be rotated.").build();
         psParameterList.add(psRotationParam);
-        Parameter psPreviewParam = new Parameter("ps-preview", "0", null, 
-                "PS-Parameter: Boolean integer 0/1 indicating if a preview image should be created.");
+        Parameter psPreviewParam = new Parameter.Builder("ps-preview", "0").description( 
+                "PS-Parameter: Boolean integer 0/1 indicating if a preview image should be created.").build();
         psParameterList.add(psPreviewParam);
-        Parameter psLevelParam = new Parameter("ps-level", "2", null, 
-                "PS-Parameter: Positive integer value 1 or 2 indicating the postscript level.");
+        Parameter psLevelParam = new Parameter.Builder("ps-level", "2").description( 
+                "PS-Parameter: Positive integer value 1 or 2 indicating the postscript level.").build();
         psParameterList.add(psLevelParam);
         defaultParameters.put("PS", psParameterList);
         
         // TIFF - 1 parameter
         List<Parameter> tiffParameterList = new ArrayList<Parameter>();
-        Parameter tiffCompressiontypeParam = new Parameter("tiff-compressiontype", "0", null,
-                "TIFF-Parameter: Positive integer for the compression type to be used. Possible compression types: {None (0), LZW (1), PACKBITS(2), DEFLATE (3), JPEG (4), CCITT G3 Fax (5), CCITT G4 Fax (6)}");
+        Parameter tiffCompressiontypeParam = new Parameter.Builder("tiff-compressiontype", "0").description(
+                "TIFF-Parameter: Positive integer for the compression type to be used. Possible compression types: {None (0), LZW (1), PACKBITS(2), DEFLATE (3), JPEG (4), CCITT G3 Fax (5), CCITT G4 Fax (6)}").build();
         tiffParameterList.add(tiffCompressiontypeParam);
         defaultParameters.put("TIFF", tiffParameterList);
         
         
         // BMP
         List<Parameter> bmpParameterList = new ArrayList<Parameter>();
-        Parameter pngDummyParam = new Parameter("bmp-dummy", "", null, "BMP-Parameter: BMP Conversion has no parameters");
+        Parameter pngDummyParam = new Parameter.Builder("bmp-dummy", "").description("BMP-Parameter: BMP Conversion has no parameters").build();
         bmpParameterList.add(pngDummyParam);
         defaultParameters.put("BMP", bmpParameterList);
     }
