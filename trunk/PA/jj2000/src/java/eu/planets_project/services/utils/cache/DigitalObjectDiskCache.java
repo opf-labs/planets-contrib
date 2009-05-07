@@ -60,9 +60,12 @@ public class DigitalObjectDiskCache {
         // Generate a UUID to act as the session ID:
         String sessionId = UUID.randomUUID().toString();
         
-        // Create a directory in the temp space, and store the DOs in there.
+        // FIXME Create a directory in the temp space, and store the DOs in there.
+        /*
         File cachedir = findCacheDir( sessionId );
-        FileUtils.mkdir(cachedir);
+        if( ! cachedir.exists() ) {
+            cachedir.mkdirs();
+        }
         
         JJ2000ViewerService.log.info("Created cache dir: " + cachedir.getAbsolutePath() );
         
@@ -70,6 +73,7 @@ public class DigitalObjectDiskCache {
         for( DigitalObject dob : digitalObjects ) {
             dob.toXml();
         }
+        */
         
         return sessionId;
     }
