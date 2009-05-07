@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.jboss.logging.Logger;
+
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ImmutableContent;
 import eu.planets_project.services.jj2000.JJ2000ViewerService;
@@ -21,7 +23,8 @@ import eu.planets_project.services.utils.FileUtils;
  *
  */
 public class DigitalObjectDiskCache {
-
+    private static Logger log = Logger.getLogger(DigitalObjectDiskCache.class);
+    
     /* FIXME Implement a Cache object, that serialised to XML, and that 
      * re-maps any remote binaries into local ones on construction.
      */
@@ -61,6 +64,7 @@ public class DigitalObjectDiskCache {
         String sessionId = UUID.randomUUID().toString();
         
         // FIXME Create a directory in the temp space, and store the DOs in there.
+        log.error("The DigitalObjectDiskCache is not implemented! Caching failed!");
         /*
         File cachedir = findCacheDir( sessionId );
         if( ! cachedir.exists() ) {
