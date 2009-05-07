@@ -15,6 +15,7 @@ DigitalObject f = DigitalObjectDiskCache.findCachedDigitalObject( sid, fid );
 // Does this DOB exist?
 if( f != null ) {
     response.setContentType( "application/octet-stream" );
+  response.setHeader("Content-Disposition","attachment;filename=atari.jpg");
 
     // Now stream out the data:
     DataInputStream in = new DataInputStream(f.getContent().read());

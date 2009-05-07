@@ -23,7 +23,7 @@ if( view == null ) { %>
 <p>FAILED!</p>
 <% } else { %>
 <p>
-<%= view.getViewURL() %> Success!
+<a href="<%= view.getViewURL() %>">Success!</a>
 </p>
 <% } %>
 
