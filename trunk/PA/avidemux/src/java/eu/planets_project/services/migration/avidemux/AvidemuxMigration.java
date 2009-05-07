@@ -100,11 +100,11 @@ public final class AvidemuxMigration implements Migrate, Serializable {
 //        commands.add("--audio-bitrate");
 //        commands.add(this.defaultParameters.get("audio-bitrate").value);
         commands.add("--fps");
-        commands.add(this.defaultParameters.get("fps").value);
+        commands.add(this.defaultParameters.get("fps").getValue());
         commands.add("--audio-codec");
-        commands.add(this.defaultParameters.get("audio-codec").value);
+        commands.add(this.defaultParameters.get("audio-codec").getValue());
         commands.add("--video-codec");
-        String vidCod = this.defaultParameters.get("video-codec").value;
+        String vidCod = this.defaultParameters.get("video-codec").getValue();
         commands.add(vidCod);
         commands.add("--output-format");
         commands.add("AVI");
@@ -148,13 +148,19 @@ public final class AvidemuxMigration implements Migrate, Serializable {
         // Define parameters and default values
         // AVI
         String audioCodecParamName = "audio-codec";
-        Parameter audioCodecParam = new Parameter(audioCodecParamName, "NONE");
-        audioCodecParam.setDescription("Choose one of MP2, MP3, AC3, NONE, TWOLAME, COPY. The audio track will be encoded using the selected encoder (COPY leaves the audio-track unchanged).");
+        Parameter audioCodecParam = new Parameter(
+                audioCodecParamName,
+                "NONE",
+                null,
+                "Choose one of MP2, MP3, AC3, NONE, TWOLAME, COPY. The audio track will be encoded using the selected encoder (COPY leaves the audio-track unchanged).");
         this.defaultParameters.put(audioCodecParamName, audioCodecParam);
 
         String videoCodecParamName = "video-codec";
-        Parameter videoCodecParam = new Parameter(videoCodecParamName, "XVID4");
-        videoCodecParam.setDescription("Choose one of XVID4, X264, FFMPEG4 (LavCodec), COPY (one argument). The video track will be encoded using the selected encoder (COPY leaves the video-track unchanged)");
+        Parameter videoCodecParam = new Parameter(
+                videoCodecParamName,
+                "XVID4",
+                null,
+                "Choose one of XVID4, X264, FFMPEG4 (LavCodec), COPY (one argument). The video track will be encoded using the selected encoder (COPY leaves the video-track unchanged)");
         this.defaultParameters.put(videoCodecParamName, videoCodecParam);
 
         /* FIXME Audio bitrate has been deactivated - Correct input has to be checked, otherwise crash in libc! */
@@ -164,8 +170,8 @@ public final class AvidemuxMigration implements Migrate, Serializable {
 //        this.defaultParameters.put(audioBitrateParamName, audioBitrateParam);
 
         String fpsParamName = "fps";
-        Parameter fpsParam = new Parameter(fpsParamName, "30");
-        fpsParam.setDescription("Positive integer for the frames per second of the video.");
+        Parameter fpsParam = new Parameter(fpsParamName, "30", null,
+                "Positive integer for the frames per second of the video.");
         this.defaultParameters.put(fpsParamName, fpsParam);
 
         // Get list for the migration path parameter
@@ -273,11 +279,11 @@ public final class AvidemuxMigration implements Migrate, Serializable {
             Iterator<Parameter> userParmsItr = userParams.iterator();
             while(userParmsItr.hasNext()) {
                 Parameter userParam = (Parameter) userParmsItr.next();
-                log.info("Set parameter: " + userParam.name + " with value: " + userParam.value);
-                if( defaultParameters.containsKey(userParam.name))
-                    this.defaultParameters.put(userParam.name, userParam);
+                log.info("Set parameter: " + userParam.getName() + " with value: " + userParam.getValue());
+                if( defaultParameters.containsKey(userParam.getName()))
+                    this.defaultParameters.put(userParam.getName(), userParam);
                 else
-                    log.info("[AvidemuxMigration] Warning: Parameter ignored: " + userParam.name + " with value: " + userParam.value);
+                    log.info("[AvidemuxMigration] Warning: Parameter ignored: " + userParam.getName() + " with value: " + userParam.getValue());
             }
         }
     }

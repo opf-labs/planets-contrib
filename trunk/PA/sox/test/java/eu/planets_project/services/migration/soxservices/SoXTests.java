@@ -213,31 +213,40 @@ public class SoXTests {
     	List<Parameter> parameterList = new ArrayList<Parameter>();
     	
     	if(showProgressFlag==true) {
-    		Parameter showProgress = new Parameter("showProgress", "-S");
-            showProgress.setDescription("Display input file format/header information, and processing " +
-            		"progress as input file(s) percentage complete, elapsed time, and remaining time " +
-            		"(if known; shown in brackets), and the number of samples written to the output file. " +
-            		"Also shown is a VU meter, and an indication if clipping has occurred.");
+    		Parameter showProgress = new Parameter(
+                    "showProgress",
+                    "-S",
+                    null,
+                    "Display input file format/header information, and processing "
+                            + "progress as input file(s) percentage complete, elapsed time, and remaining time "
+                            + "(if known; shown in brackets), and the number of samples written to the output file. "
+                            + "Also shown is a VU meter, and an indication if clipping has occurred.");
             parameterList.add(showProgress);
     	}
     	
         if(noShowProgressFlag==true) {
-        	Parameter noShowProgress = new Parameter("noShowProgress", "-q");
-            noShowProgress.setDescription("Run in quiet mode when SoX wouldn't otherwise do so; this is the opposite of the -S option.");
+        	Parameter noShowProgress = new Parameter(
+                    "noShowProgress",
+                    "-q",
+                    null,
+                    "Run in quiet mode when SoX wouldn't otherwise do so; this is the opposite of the -S option.");
             parameterList.add(noShowProgress);
         }
         
-        Parameter verbosityLevel = new Parameter("verbosityLevel", verbosityLevelValue);
-        verbosityLevel.setDescription("This should be an int value between: 0 - 4.\n" +
-        		"0: No messages are shown at all; use the exit status to determine if an error has occurred.\n" +
-        		"1: Only error messages are shown. These are generated if SoX cannot complete the requested commands.\n" +
-        		"2: Warning messages are also shown. These are generated if SoX can complete the requested commands, but not exactly according to the requested command parameters, or if clipping occurs.\n" +
-        		"3: Descriptions of SoX's processing phases are also shown. Useful for seeing exactly how SoX is processing your audio.\n" +
-        		"4: and above: Messages to help with debugging SoX are also shown.\n" +
-        		"By default, the verbosity level is set to 2; " +
-        		"each occurrence of the -V option increases the verbosity level by 1. " +
-        		"Alternatively, the verbosity level can be set to an absolute number by " +
-        		"specifying it immediately after the -V; e.g. -V0 sets it to 0. ");
+        Parameter verbosityLevel = new Parameter(
+                "verbosityLevel",
+                verbosityLevelValue,
+                null,
+                "This should be an int value between: 0 - 4.\n"
+                        + "0: No messages are shown at all; use the exit status to determine if an error has occurred.\n"
+                        + "1: Only error messages are shown. These are generated if SoX cannot complete the requested commands.\n"
+                        + "2: Warning messages are also shown. These are generated if SoX can complete the requested commands, but not exactly according to the requested command parameters, or if clipping occurs.\n"
+                        + "3: Descriptions of SoX's processing phases are also shown. Useful for seeing exactly how SoX is processing your audio.\n"
+                        + "4: and above: Messages to help with debugging SoX are also shown.\n"
+                        + "By default, the verbosity level is set to 2; "
+                        + "each occurrence of the -V option increases the verbosity level by 1. "
+                        + "Alternatively, the verbosity level can be set to an absolute number by "
+                        + "specifying it immediately after the -V; e.g. -V0 sets it to 0. ");
         parameterList.add(verbosityLevel);
         
 		return parameterList;

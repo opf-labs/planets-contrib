@@ -557,12 +557,12 @@ public class ImageMagickMigrateTests {
 	            
 				for (Iterator<Parameter> iterator = parameters.iterator(); iterator.hasNext();) {
 					Parameter parameter = (Parameter) iterator.next();
-					String name = parameter.name;
+					String name = parameter.getName();
 					if(name.equalsIgnoreCase("compressionType")) {
-						compressionType = Integer.parseInt(parameter.value);
+						compressionType = Integer.parseInt(parameter.getValue());
 					}
 					if(name.equalsIgnoreCase("compressionQuality")) {
-						compressionQuality = parameter.value;
+						compressionQuality = parameter.getValue();
 					}
 				}
 				compressionTypeStr = "-" + compressionTypes[compressionType].replace(" ", "_");

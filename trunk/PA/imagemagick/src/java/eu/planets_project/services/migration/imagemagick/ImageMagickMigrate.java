@@ -121,12 +121,12 @@ public class ImageMagickMigrate implements Migrate, Serializable {
         sd.version("0.1");
 
         List<Parameter> parameterList = new ArrayList<Parameter>();
-        Parameter compressionTypeParam = new Parameter("compressionType", "0-10");
-        compressionTypeParam.setDescription("Allowed int values: 0 - 10");
+        Parameter compressionTypeParam = new Parameter("compressionType", "0-10", null, 
+                "Allowed int values: 0 - 10");
         parameterList.add(compressionTypeParam);
 
-        Parameter compressionLevelParam = new Parameter("compressionQuality", "0-100");
-        compressionLevelParam.setDescription("This should be an int value between: 0 - 100, representing the compression quality in percent.");
+        Parameter compressionLevelParam = new Parameter("compressionQuality", "0-100", null,
+                "This should be an int value between: 0 - 100, representing the compression quality in percent.");
         parameterList.add(compressionLevelParam);
 
         sd.parameters(parameterList);
@@ -267,10 +267,10 @@ public class ImageMagickMigrate implements Migrate, Serializable {
                 int compressionQuality; 
                 for (Iterator<Parameter> iterator = parameters.iterator(); iterator.hasNext();) {
                     Parameter parameter = (Parameter) iterator.next();
-                    String name = parameter.name;
-                    plogger.info("Got parameter: " + name + " with value: " + parameter.value);
+                    String name = parameter.getName();
+                    plogger.info("Got parameter: " + name + " with value: " + parameter.getValue());
                     if(!name.equalsIgnoreCase(COMPRESSION_QUALITY_LEVEL) && !name.equalsIgnoreCase(COMPRESSION_TYPE)) {
-                        plogger.info("Invalid parameter with name: " + parameter.name);
+                        plogger.info("Invalid parameter with name: " + parameter.getName());
 
                         plogger.info("Setting compressionQualilty to Default value: " + COMPRESSION_QUALITY_LEVEL_DEFAULT);
                         imageInfo.setQuality(COMPRESSION_QUALITY_LEVEL_DEFAULT);
@@ -281,13 +281,13 @@ public class ImageMagickMigrate implements Migrate, Serializable {
 
 
                     if(name.equalsIgnoreCase(COMPRESSION_QUALITY_LEVEL)) {
-                        compressionQuality = Integer.parseInt(parameter.value);
+                        compressionQuality = Integer.parseInt(parameter.getValue());
                         if(compressionQuality >=0 && compressionQuality <=100) {
                             plogger.info("Setting compressionQualilty to: " + compressionQuality);
                             imageInfo.setQuality(compressionQuality);
                         }
                         else {
-                            plogger.info("Invalid value for compressionQualilty: " + parameter.value);
+                            plogger.info("Invalid value for compressionQualilty: " + parameter.getValue());
                             plogger.info("Setting compressionQualilty to Default value: " + COMPRESSION_QUALITY_LEVEL_DEFAULT);
                             imageInfo.setQuality(COMPRESSION_QUALITY_LEVEL_DEFAULT);
                         }
@@ -295,13 +295,13 @@ public class ImageMagickMigrate implements Migrate, Serializable {
                     }
 
                     if(name.equalsIgnoreCase(COMPRESSION_TYPE)) {
-                        compressionType = Integer.parseInt(parameter.value);
+                        compressionType = Integer.parseInt(parameter.getValue());
                         if(compressionType >= 0 && compressionType <= 10) {
                             plogger.info("Trying to set Compression type to: " + compressionTypes[compressionType]);
                             image.setCompression(compressionType);
                         }
                         else {
-                            plogger.info("Invalid value for Compression type: " + parameter.value);
+                            plogger.info("Invalid value for Compression type: " + parameter.getValue());
                             plogger.info("Setting Compression Type to Default value: " + COMPRESSION_TYPE_PARAM_DEFAULT + compressionTypes[COMPRESSION_TYPE_PARAM_DEFAULT]);
                             image.setCompression(COMPRESSION_TYPE_PARAM_DEFAULT);
                         }

@@ -2,7 +2,6 @@ package eu.planets_project.services.migration.gimp;
 
 import java.io.File;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,9 +46,9 @@ import eu.planets_project.services.utils.ProcessRunner;
 @WebService(name = Gimp26Migration.NAME ,serviceName = Migrate.NAME,
 targetNamespace = PlanetsServices.NS,
 endpointInterface = "eu.planets_project.services.migrate.Migrate")
-public final class Gimp26Migration implements Migrate, Serializable {
+public final class Gimp26Migration implements Migrate {
 
-    PlanetsLogger log = PlanetsLogger.getLogger(Gimp26Migration.class);
+    private PlanetsLogger log = PlanetsLogger.getLogger(Gimp26Migration.class);
     @SuppressWarnings("unused")
 	private static Logger logger = Logger.getLogger(Gimp26Migration.class.getName());
     /** The GIMP install directory */
@@ -142,10 +141,10 @@ public final class Gimp26Migration implements Migrate, Serializable {
         Iterator<Parameter> itr = fmtParameterList.iterator();
         while(itr.hasNext()) {
             Parameter param = (Parameter) itr.next();
-            if( param.value != null )
+            if( param.getValue() != null )
             {
                 paramStrBuff.append(" ");
-                paramStrBuff.append(param.value);
+                paramStrBuff.append(param.getValue());
             }
         }
         return paramStrBuff.toString();
@@ -169,126 +168,125 @@ public final class Gimp26Migration implements Migrate, Serializable {
         // Define parameters and default values
         // GIF - 6 parameters
         List<Parameter> gifParameterList = new ArrayList<Parameter>();
-        Parameter gifInterlaceParam = new Parameter("gif-interlace", "1");
-        gifInterlaceParam.setDescription("GIF-Parameter: Boolean integer 0/1 indicating if interlacing should be used.");
+        Parameter gifInterlaceParam = new Parameter("gif-interlace", "1", null, 
+                "GIF-Parameter: Boolean integer 0/1 indicating if interlacing should be used.");
         gifParameterList.add(gifInterlaceParam);
-        Parameter gifDitherParam = new Parameter("gif-dither", "1");
-        gifDitherParam.setDescription("GIF-Parameter: Boolean integer 0/1 indicating if interlacing should be used.");
+        Parameter gifDitherParam = new Parameter("gif-dither", "1", null, 
+                "GIF-Parameter: Boolean integer 0/1 indicating if interlacing should be used.");
         gifParameterList.add(gifDitherParam);
-        Parameter gifPaletteParam = new Parameter("gif-palette", "0");
-        gifPaletteParam.setDescription("GIF-Parameter: Integer indicating the palette to be used (MAKE-PALETTE (0), WEB-PALETTE (2), MONO-PALETTE (3), CUSTOM-PALETTE (4)).");
+        Parameter gifPaletteParam = new Parameter("gif-palette", "0", null, 
+                "GIF-Parameter: Integer indicating the palette to be used (MAKE-PALETTE (0), WEB-PALETTE (2), MONO-PALETTE (3), CUSTOM-PALETTE (4)).");
         gifParameterList.add(gifPaletteParam);
-        Parameter gifNumcolorsParam = new Parameter("gif-numcolors", "256");
-        gifNumcolorsParam.setDescription("GIF-Parameter: Integer between 0 and 256 indicating how many colors should be used.");
+        Parameter gifNumcolorsParam = new Parameter("gif-numcolors", "256", null, 
+                "GIF-Parameter: Integer between 0 and 256 indicating how many colors should be used.");
         gifParameterList.add(gifNumcolorsParam);
-        Parameter gifAlphaditherParam = new Parameter("gif-alphadither", "1");
-        gifAlphaditherParam.setDescription("GIF-Parameter: Boolean integer 0/1 indicating if alpha dither should be used.");
+        Parameter gifAlphaditherParam = new Parameter("gif-alphadither", "1", null, 
+                "GIF-Parameter: Boolean integer 0/1 indicating if alpha dither should be used.");
         gifParameterList.add(gifAlphaditherParam);
-        Parameter gifRemoveunusedParam = new Parameter("gif-removeunused", "1");
-        gifRemoveunusedParam.setDescription("GIF-Parameter: Boolean integer 0/1 indicating if unused colors should be removed.");
+        Parameter gifRemoveunusedParam = new Parameter("gif-removeunused", "1", null, 
+                "GIF-Parameter: Boolean integer 0/1 indicating if unused colors should be removed.");
         gifParameterList.add(gifRemoveunusedParam);
         defaultParameters.put("GIF", gifParameterList);
         
         // EPS - 9 parameters
         List<Parameter> epsParameterList = new ArrayList<Parameter>();
-        Parameter epsInterlaceParam = new Parameter("eps-width", "0");
-        epsInterlaceParam.setDescription("EPS-Parameter: Positive integer value indicating the width.");
+        Parameter epsInterlaceParam = new Parameter("eps-width", "0", null, 
+                "EPS-Parameter: Positive integer value indicating the width.");
         epsParameterList.add(epsInterlaceParam);
-        Parameter epsDitherParam = new Parameter("eps-height", "0");
-        epsDitherParam.setDescription("EPS-Parameter: Positive integer value indicating the height.");
+        Parameter epsDitherParam = new Parameter("eps-height", "0", null, 
+                "EPS-Parameter: Positive integer value indicating the height.");
         epsParameterList.add(epsDitherParam);
-        Parameter epsNumcolorsParam = new Parameter("eps-xoffset", "0");
-        epsNumcolorsParam.setDescription("EPS-Parameter: Positive integer value indicating the x-offset.");
+        Parameter epsNumcolorsParam = new Parameter("eps-xoffset", "0", null, 
+                "EPS-Parameter: Positive integer value indicating the x-offset.");
         epsParameterList.add(epsNumcolorsParam);
-        Parameter epsAlphaditherParam = new Parameter("eps-yoffset", "0");
-        epsAlphaditherParam.setDescription("EPS-Parameter: Positive integer value indicating the y-offset.");
+        Parameter epsAlphaditherParam = new Parameter("eps-yoffset", "0", null, 
+                "EPS-Parameter: Positive integer value indicating the y-offset.");
         epsParameterList.add(epsAlphaditherParam);
-        Parameter epsRemoveunusedParam = new Parameter("eps-unit", "0");
-        epsRemoveunusedParam.setDescription("EPS-Parameter: Unit parameter.");
+        Parameter epsRemoveunusedParam = new Parameter("eps-unit", "0", null, 
+                "EPS-Parameter: Unit parameter.");
         epsParameterList.add(epsRemoveunusedParam);
-        Parameter epsKeepratioParam = new Parameter("eps-keepratio", "1");
-        epsKeepratioParam.setDescription("EPS-Parameter: Boolean integer 0/1 indicating if the ratio should be maintained.");
+        Parameter epsKeepratioParam = new Parameter("eps-keepratio", "1", null, 
+                "EPS-Parameter: Boolean integer 0/1 indicating if the ratio should be maintained.");
         epsParameterList.add(epsKeepratioParam);
-        Parameter epsRotationParam = new Parameter("eps-rotation", "0");
-        epsRotationParam.setDescription("EPS-Parameter: Boolean integer 0/1 indicating if the image should be rotated.");
+        Parameter epsRotationParam = new Parameter("eps-rotation", "0", null, 
+                "EPS-Parameter: Boolean integer 0/1 indicating if the image should be rotated.");
         epsParameterList.add(epsRotationParam);
-        Parameter epsPreviewParam = new Parameter("eps-preview", "0");
-        epsPreviewParam.setDescription("EPS-Parameter: Boolean integer 0/1 indicating if a preview image should be created.");
+        Parameter epsPreviewParam = new Parameter("eps-preview", "0", null, 
+                "EPS-Parameter: Boolean integer 0/1 indicating if a preview image should be created.");
         epsParameterList.add(epsPreviewParam);
-        Parameter epsLevelParam = new Parameter("eps-level", "2");
-        epsLevelParam.setDescription("EPS-Parameter: Positive integer value 1 or 2 indicating the postscript level.");
+        Parameter epsLevelParam = new Parameter("eps-level", "2", null, 
+                "EPS-Parameter: Positive integer value 1 or 2 indicating the postscript level.");
         epsParameterList.add(epsLevelParam);
         defaultParameters.put("EPS", epsParameterList);
         
         // JPEG - 4 parameters
         List<Parameter> jpegParameterList = new ArrayList<Parameter>();
-        Parameter jpegQualityParam = new Parameter("quality-width", "0.1");
-        jpegQualityParam.setDescription("JPEG-Parameter: Float value in the range from 0 to 1 (step size 0.1) indicating the image quality. 0.1 low quality, 1 high quality.");
+        Parameter jpegQualityParam = new Parameter("quality-width", "0.1", null, 
+                "JPEG-Parameter: Float value in the range from 0 to 1 (step size 0.1) indicating the image quality. 0.1 low quality, 1 high quality.");
         jpegParameterList.add(jpegQualityParam);
-        Parameter jpegSmoothingParam = new Parameter("quality-smoothing", "0.1");
-        jpegSmoothingParam.setDescription("JPEG-Parameter: Float value in the range from 0 to 1 (step size 0.1) indicating the smoothing intensity. 0 no smoothing, 1 strong smoothing.");
+        Parameter jpegSmoothingParam = new Parameter("quality-smoothing", "0.1", null, 
+                "JPEG-Parameter: Float value in the range from 0 to 1 (step size 0.1) indicating the smoothing intensity. 0 no smoothing, 1 strong smoothing.");
         jpegParameterList.add(jpegSmoothingParam);
-        Parameter jpegOptimizeParam = new Parameter("quality-optimize", "0");
-        jpegOptimizeParam.setDescription("JPEG-Parameter: Boolean integer 0/1 indicating if the image should be optimized.");
+        Parameter jpegOptimizeParam = new Parameter("quality-optimize", "0", null, 
+                "JPEG-Parameter: Boolean integer 0/1 indicating if the image should be optimized.");
         jpegParameterList.add(jpegOptimizeParam);
-        Parameter jpegProgressiveParam = new Parameter("quality-progressive", "0");
-        jpegProgressiveParam.setDescription("JPEG-Parameter: Boolean integer 0/1 indicating if progressive storage should be used.");
+        Parameter jpegProgressiveParam = new Parameter("quality-progressive", "0", null, 
+                "JPEG-Parameter: Boolean integer 0/1 indicating if progressive storage should be used.");
         jpegParameterList.add(jpegProgressiveParam);
         defaultParameters.put("JPEG", jpegParameterList);
         
         // PNG - 2 parameters
         List<Parameter> pngParameterList = new ArrayList<Parameter>();
-        Parameter pngInterlaceParam = new Parameter("png-interlace", "1");
-        pngInterlaceParam.setDescription("PNG-Parameter:  Boolean integer 0/1 indicating if interlacing should be used.");
+        Parameter pngInterlaceParam = new Parameter("png-interlace", "1", null, 
+                "PNG-Parameter:  Boolean integer 0/1 indicating if interlacing should be used.");
         pngParameterList.add(pngInterlaceParam);
-        Parameter pngCompressionParam = new Parameter("png-compression", "1");
-        pngCompressionParam.setDescription("PNG-Parameter: Positive integer in the range 0 to 9 (step size 1) indicating the compression grade.");
+        Parameter pngCompressionParam = new Parameter("png-compression", "1", null, 
+                "PNG-Parameter: Positive integer in the range 0 to 9 (step size 1) indicating the compression grade.");
         pngParameterList.add(pngCompressionParam);
         defaultParameters.put("PNG", pngParameterList);
         
         // PS - 9 parameters
         List<Parameter> psParameterList = new ArrayList<Parameter>();
-        Parameter psInterlaceParam = new Parameter("ps-width", "0");
-        psInterlaceParam.setDescription("PS-Parameter: Positive integer value indicating the width. 0 indicates to take the size from the original.");
+        Parameter psInterlaceParam = new Parameter("ps-width", "0", null, 
+                "PS-Parameter: Positive integer value indicating the width. 0 indicates to take the size from the original.");
         psParameterList.add(psInterlaceParam);
-        Parameter psDitherParam = new Parameter("ps-height", "0");
-        psDitherParam.setDescription("PS-Parameter: Positive integer value indicating the height. 0 indicates to take the size from the original.");
+        Parameter psDitherParam = new Parameter("ps-height", "0", null, 
+                "PS-Parameter: Positive integer value indicating the height. 0 indicates to take the size from the original.");
         psParameterList.add(psDitherParam);
-        Parameter psNumcolorsParam = new Parameter("ps-xoffset", "0");
-        psNumcolorsParam.setDescription("PS-Parameter: Positive integer value indicating the x-offset.");
+        Parameter psNumcolorsParam = new Parameter("ps-xoffset", "0", null, 
+                "PS-Parameter: Positive integer value indicating the x-offset.");
         psParameterList.add(psNumcolorsParam);
-        Parameter psAlphaditherParam = new Parameter("ps-yoffset", "0");
-        psAlphaditherParam.setDescription("PS-Parameter: Positive integer value indicating the y-offset.");
+        Parameter psAlphaditherParam = new Parameter("ps-yoffset", "0", null, 
+                "PS-Parameter: Positive integer value indicating the y-offset.");
         psParameterList.add(psAlphaditherParam);
-        Parameter psRemoveunusedParam = new Parameter("ps-unit", "0");
-        psRemoveunusedParam.setDescription("PS-Parameter: Unit parameter.");
+        Parameter psRemoveunusedParam = new Parameter("ps-unit", "0", null, 
+                "PS-Parameter: Unit parameter.");
         psParameterList.add(psRemoveunusedParam);
-        Parameter psKeepratioParam = new Parameter("ps-keepratio", "1");
-        psKeepratioParam.setDescription("PS-Parameter: Boolean integer 0/1 indicating if the ratio should be maintained.");
+        Parameter psKeepratioParam = new Parameter("ps-keepratio", "1", null, 
+                "PS-Parameter: Boolean integer 0/1 indicating if the ratio should be maintained.");
         psParameterList.add(psKeepratioParam);
-        Parameter psRotationParam = new Parameter("ps-rotation", "0");
-        psRotationParam.setDescription("PS-Parameter: Boolean integer 0/1 indicating if the image should be rotated.");
+        Parameter psRotationParam = new Parameter("ps-rotation", "0", null, 
+                "PS-Parameter: Boolean integer 0/1 indicating if the image should be rotated.");
         psParameterList.add(psRotationParam);
-        Parameter psPreviewParam = new Parameter("ps-preview", "0");
-        psPreviewParam.setDescription("PS-Parameter: Boolean integer 0/1 indicating if a preview image should be created.");
+        Parameter psPreviewParam = new Parameter("ps-preview", "0", null, 
+                "PS-Parameter: Boolean integer 0/1 indicating if a preview image should be created.");
         psParameterList.add(psPreviewParam);
-        Parameter psLevelParam = new Parameter("ps-level", "2");
-        psLevelParam.setDescription("PS-Parameter: Positive integer value 1 or 2 indicating the postscript level.");
+        Parameter psLevelParam = new Parameter("ps-level", "2", null, 
+                "PS-Parameter: Positive integer value 1 or 2 indicating the postscript level.");
         psParameterList.add(psLevelParam);
         defaultParameters.put("PS", psParameterList);
         
         // TIFF - 1 parameter
         List<Parameter> tiffParameterList = new ArrayList<Parameter>();
-        Parameter tiffCompressiontypeParam = new Parameter("tiff-compressiontype", "0");
-        tiffCompressiontypeParam.setDescription("TIFF-Parameter: Positive integer for the compression type to be used. Possible compression types: {None (0), LZW (1), PACKBITS(2), DEFLATE (3), JPEG (4), CCITT G3 Fax (5), CCITT G4 Fax (6)}");
+        Parameter tiffCompressiontypeParam = new Parameter("tiff-compressiontype", "0", null,
+                "TIFF-Parameter: Positive integer for the compression type to be used. Possible compression types: {None (0), LZW (1), PACKBITS(2), DEFLATE (3), JPEG (4), CCITT G3 Fax (5), CCITT G4 Fax (6)}");
         tiffParameterList.add(tiffCompressiontypeParam);
         defaultParameters.put("TIFF", tiffParameterList);
         
         
         // BMP
         List<Parameter> bmpParameterList = new ArrayList<Parameter>();
-        Parameter pngDummyParam = new Parameter("bmp-dummy", "");
-        pngDummyParam.setDescription("BMP-Parameter: BMP Conversion has no parameters");
+        Parameter pngDummyParam = new Parameter("bmp-dummy", "", null, "BMP-Parameter: BMP Conversion has no parameters");
         bmpParameterList.add(pngDummyParam);
         defaultParameters.put("BMP", bmpParameterList);
     }
@@ -302,7 +300,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
             Iterator<Parameter> userParmsItr = userParams.iterator(); 
             while(userParmsItr.hasNext()) {
                 Parameter userParam = (Parameter) userParmsItr.next();
-                System.out.println("Set parameter: " + userParam.name + " with value: " + userParam.value);
+                System.out.println("Set parameter: " + userParam.getName() + " with value: " + userParam.getValue());
                 // get hashmap of the desired output format
                 List<Parameter> defaultParamList = (List<Parameter>)defaultParameters.get(outputFmtExt);
                 Iterator<Parameter> defParmsItr = defaultParamList.iterator();
@@ -310,7 +308,7 @@ public final class Gimp26Migration implements Migrate, Serializable {
                 while( defParmsItr.hasNext() )
                 {
                     Parameter defParam = (Parameter) defParmsItr.next();
-                    if( userParam.name.equalsIgnoreCase(defParam.name) )
+                    if( userParam.getName().equalsIgnoreCase(defParam.getName()) )
                     {
                         defaultParamList.set(index, userParam);
                         break;

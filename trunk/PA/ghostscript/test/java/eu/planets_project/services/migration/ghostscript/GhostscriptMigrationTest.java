@@ -155,8 +155,7 @@ public class GhostscriptMigrationTest extends TestCase {
 
         if (noPlatFontsFlag) {
             Parameter noPlatFonts = new Parameter("noPlatFonts",
-                    "-dNOPLATFONTS");
-            noPlatFonts.setDescription("Disables the use of fonts supplied by "
+                    "-dNOPLATFONTS", null,"Disables the use of fonts supplied by "
                     + "the underlying platform (for instance X Windows). "
                     + "This may be needed if the platform fonts look "
                     + "undesirably different from the scalable fonts.");

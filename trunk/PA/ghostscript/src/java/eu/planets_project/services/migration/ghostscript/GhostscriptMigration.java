@@ -232,13 +232,13 @@ public class GhostscriptMigration implements Migrate, Serializable {
             for (Iterator<Parameter> iterator = parameters.iterator();
                     iterator.hasNext();) {
                 Parameter parameter = (Parameter) iterator.next();
-                String name = parameter.name;
-                String value = parameter.value;
+                String name = parameter.getName();
+                String value = parameter.getValue();
 
                 log.info("Got parameter: " + name + " with value: " + value);
                 if (!name.equalsIgnoreCase(NOPLATFONTS)) {
                     log.info("Invalid parameter with name: "
-                        + parameter.name + "\n using DEFAULT values.");
+                        + parameter.getName() + "\n using DEFAULT values.");
                 }
 
                 if (name.equalsIgnoreCase(NOPLATFONTS)) {
