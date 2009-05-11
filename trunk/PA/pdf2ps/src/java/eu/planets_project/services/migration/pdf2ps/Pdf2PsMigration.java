@@ -269,8 +269,8 @@ public final class Pdf2PsMigration implements Migrate, Serializable {
                             "Usage: pdf2ps file.pdf file.ps");
         FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
         MigrationPath[] mPaths = new MigrationPath []{
-            new MigrationPath(format.createExtensionUri("jpg"), format.createExtensionUri("jp2"),null),
-            new MigrationPath(format.createExtensionUri("jp2"), format.createExtensionUri("jpg"),null)};
+            new MigrationPath(format.createExtensionUri("pdf"), format.createExtensionUri("ps"),null),
+            new MigrationPath(format.createExtensionUri("ps"), format.createExtensionUri("pdf"),null)};
         builder.paths(mPaths);
         builder.classname(this.getClass().getCanonicalName());
         builder.version("0.1");
