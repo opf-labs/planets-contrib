@@ -70,9 +70,9 @@ public class ConvertedFileNames {
      */
     public ConvertedFileNames()
     {
-        this.input = new String("");
-        this.output = new String("");
-        this.actual = new String("");
+        this.input = "";
+        this.output = "";
+        this.actual = "";
     }
     /**
      * @param inputVal
@@ -80,9 +80,9 @@ public class ConvertedFileNames {
      * @param actualVal
      */
     public ConvertedFileNames(String inputVal, String outputVal, String actualVal) {
-        this.input = new String(inputVal);
-        this.output = new String(outputVal);
-        this.actual = new String(actualVal);
+        this.input = inputVal;
+        this.output = outputVal;
+        this.actual = actualVal;
     }
 
     /**
@@ -90,9 +90,9 @@ public class ConvertedFileNames {
      * @param outputVal
      */
     public ConvertedFileNames(String inputVal, String outputVal) {
-        this.input = new String(inputVal);
-        this.output = new String(outputVal);
-        this.actual = new String(outputVal);
+        this.input = inputVal;
+        this.output = outputVal;
+        this.actual = outputVal;
     }
     
     /**

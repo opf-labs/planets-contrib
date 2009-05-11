@@ -5,7 +5,6 @@ package eu.planets_project.services.migration.avidemux;
 
 import java.io.File;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -193,11 +192,12 @@ public final class AvidemuxMigration implements Migrate {
         try {
 
             String strRsc = "/eu/planets_project/services/migration/avidemux/avidemux.properties";
-            props.load( this.getClass().getResourceAsStream(strRsc));
+            InputStream stream = this.getClass().getResourceAsStream(strRsc);
+            props.load( stream);
             // config vars
             this.avidemux_install_dir = props.getProperty("avidemux.install.dir");
             this.avidemux_app_name = props.getProperty("avidemux.app.name");
-
+            FileUtils.close(stream);
         } catch( Exception e ) {
             // // config vars
             this.avidemux_install_dir  = "/usr/bin";

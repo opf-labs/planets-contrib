@@ -78,7 +78,7 @@ public class Mdb2SiardMigrateTester
 	{
     File fileOutput = new File(sOUTPUT_FILE);
     if (fileOutput.exists())
-    	fileOutput.delete();
+        FileUtils.delete(fileOutput);
     try
     {
       byte[] buffer = new byte[] { 0, 1, 2, 3};
@@ -118,7 +118,7 @@ public class Mdb2SiardMigrateTester
 	{
     File fileOutput = new File(sOUTPUT_FILE);
     if (fileOutput.exists())
-      fileOutput.delete();
+        FileUtils.delete(fileOutput);
     File fileInput = new File(sINPUT_FILE);
 		ServiceReport sr = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
 		sr = Mdb2SiardMigrate.migrate(fileInput, fileOutput, sr);
@@ -138,7 +138,7 @@ public class Mdb2SiardMigrateTester
 			 */
       File fileOutput = new File(sOUTPUT_FILE);
       if (fileOutput.exists())
-        fileOutput.delete();
+          FileUtils.delete(fileOutput);
       File fileInput = new File(sINPUT_FILE);
       DigitalObject doInput = new DigitalObject.Builder(
       		ImmutableContent.byValue(

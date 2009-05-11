@@ -264,7 +264,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 			String sOutputFile = sInputFile.substring(0,sInputFile.lastIndexOf("."))+sSIARD_EXTENSION;
 			fileOutput = new File(sOutputFile);
 			if (fileOutput.exists())
-				fileOutput.delete();
+				FileUtils.delete(fileOutput);
 			/* make sure it is at least deleted when Web Service is stopped */
 			fileOutput.deleteOnExit();
 			/* convert files, noting results in the service report */
@@ -282,9 +282,9 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 		{
 			/* clean up temporary files in any case */
 			if ((fileInput != null) && (fileInput.exists()))
-				fileInput.delete();
+			    FileUtils.delete(fileInput);
 			if ((fileOutput != null) && (fileOutput.exists()))
-				fileOutput.delete();
+			    FileUtils.delete(fileOutput);
 			/* if no output was generated, create a zero length byte array */
 			if (doOutput == null)
 				doOutput = new DigitalObject.Builder(ImmutableContent.byValue(new byte[0])).build();

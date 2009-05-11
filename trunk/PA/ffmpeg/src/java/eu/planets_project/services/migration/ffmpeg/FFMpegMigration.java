@@ -1,7 +1,27 @@
 package eu.planets_project.services.migration.ffmpeg;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.ejb.Local;
+import javax.ejb.Remote;
+import javax.ejb.Stateless;
+import javax.jws.WebService;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.ws.BindingType;
+
+import org.xml.sax.SAXException;
+
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.*;
+import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Parameter;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
@@ -10,21 +30,6 @@ import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.utils.cli.CliMigrationPaths;
-import org.xml.sax.SAXException;
-
-import javax.ejb.Local;
-import javax.ejb.Remote;
-import javax.ejb.Stateless;
-import javax.jws.WebService;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.ws.BindingType;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * The class migrates between a number of formats
@@ -39,7 +44,7 @@ import java.util.List;
         serviceName = Migrate.NAME,
         targetNamespace = PlanetsServices.NS,
         endpointInterface = "eu.planets_project.services.migrate.Migrate")
-public class FFMpegMigration implements Migrate, Serializable {
+public class FFMpegMigration implements Migrate {
 
     PlanetsLogger log = PlanetsLogger.getLogger(FFMpegMigration.class);
 

@@ -334,9 +334,11 @@ public final class Gimp26Migration implements Migrate {
         try {
             // @FIXIT Does not load the properties 
             String strRsc = "/eu/planets_project/services/migration/gimp/gimp26.properties";
-            props.load(this.getClass().getResourceAsStream(strRsc));
+            InputStream stream = this.getClass().getResourceAsStream(strRsc);
+            props.load(stream);
             this.gimp_install_dir = props.getProperty("gimp.install.dir");
             this.gimp_app_name = props.getProperty("gimp.app.name");
+            FileUtils.close(stream);
         } catch (Exception e) {
             this.gimp_install_dir = "/home/georg/Projects/PLANETS/";
             this.gimp_app_name = "gimp";

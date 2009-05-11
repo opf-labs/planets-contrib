@@ -5,7 +5,6 @@ package eu.planets_project.services.migration.abiword;
 
 import java.io.File;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +43,7 @@ import eu.planets_project.services.utils.ProcessRunner;
 @Remote(Migrate.class)
 @Stateless
 @WebService(name = AbiWordMigration.NAME, serviceName = Migrate.NAME, targetNamespace = PlanetsServices.NS, endpointInterface = "eu.planets_project.services.migrate.Migrate")
-public final class AbiWordMigration implements Migrate, Serializable {
+public final class AbiWordMigration implements Migrate {
 
     PlanetsLogger log = PlanetsLogger.getLogger(AbiWordMigration.class);
 

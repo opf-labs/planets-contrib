@@ -61,7 +61,7 @@ public class ConversionResult {
      */
     public ConversionResult() {
        code = 0;
-       desc = new String("Success");
+       desc = "Success";
     }
     
     /**
@@ -72,7 +72,7 @@ public class ConversionResult {
     public ConversionResult(int codeVal, String descVal)
     {
         code = codeVal;
-        desc = new String(descVal);
+        desc = descVal;
     }
     /**
      * Gets the value of the code property.

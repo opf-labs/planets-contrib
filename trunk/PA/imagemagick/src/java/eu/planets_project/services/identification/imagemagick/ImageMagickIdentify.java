@@ -4,7 +4,6 @@
 package eu.planets_project.services.identification.imagemagick;
 
 import java.io.File;
-import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +48,7 @@ import eu.planets_project.services.utils.ServiceUtils;
         endpointInterface = "eu.planets_project.services.identify.Identify" )
         
 @BindingType(value = "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")        
-public class ImageMagickIdentify implements Identify, Serializable {
+public class ImageMagickIdentify implements Identify {
 	
 	public static final String NAME = "ImageMagickIdentify";
 	
@@ -60,7 +59,7 @@ public class ImageMagickIdentify implements Identify, Serializable {
 	private static final String WORKFOLDER_NAME = "ImageMagickIdentify";
 	private static final String DEFAULT_INPUT_NAME = "ImageMagickIdentify_input";
 	private static final String DEFAULT_EXTENSION = "bin";
-	private final FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
+	private static final FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 	
 	
 	

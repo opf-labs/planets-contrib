@@ -1,12 +1,3 @@
-/*
- * configException.java
- *
- * Created on 03 July 2007, 08:10
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
-
 package eu.planets_project.ifr.core.services.migration.odf.impl;
 
 /**

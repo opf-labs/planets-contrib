@@ -3,10 +3,8 @@ package eu.planets_project.services.migration.gimp;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -39,7 +37,7 @@ public final class Gimp26MigrationTest {
 
     /* A holder for the object to be tested */
     Migrate dom = null;
-    private File fTmpInFile;
+//    private File fTmpInFile;
     private File fTmpOutFile;
     // Input and output formats are based on the same set
     List<String> formats = null;
@@ -79,8 +77,8 @@ public final class Gimp26MigrationTest {
         System.out.println("Test description");
         ServiceDescription desc = dom.describe();
         System.out.println("Received service description: ");
-        System.out.println(desc.toXmlFormatted());
         assertTrue("The ServiceDescription should not be NULL.", desc != null);
+        System.out.println(desc.toXmlFormatted());
     }
     
     
@@ -194,21 +192,5 @@ public final class Gimp26MigrationTest {
             fail("IO Error: " + ex.toString());
         }
         return binary;
-    }
-
-    private synchronized void writeByteArrayToFile(byte[] binary, String strOutFile)
-            throws IOException {
-        try {
-            this.fTmpInFile = new File(strOutFile);
-            System.out.println();
-            BufferedOutputStream fos =
-                    new BufferedOutputStream(
-                    new FileOutputStream(fTmpInFile));
-            fos.write(binary);
-            fos.close();
-            assertTrue("Output file has not been created correctly. ", fTmpInFile.exists() && fTmpInFile.length() > 0);
-        } catch (IOException ex) {
-            fail("IO Error: " + ex.toString());
-        }
     }
 }

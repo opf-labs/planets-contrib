@@ -67,8 +67,8 @@ public final class AvidemuxMigrationTest extends TestCase {
     @Test
     public void testDescribe() {
         ServiceDescription desc = dom.describe();
-        log.info("Recieved service description: \n\n" + desc.toXmlFormatted());
         assertTrue("The ServiceDescription should not be NULL.", desc != null );
+        log.info("Recieved service description: \n\n" + desc.toXmlFormatted());
     }
 
     /**

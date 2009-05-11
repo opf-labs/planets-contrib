@@ -3,7 +3,6 @@ package eu.planets_project.services.migration.ghostscript;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -51,7 +50,7 @@ import eu.planets_project.services.utils.cli.CliMigrationPaths;
         serviceName = Migrate.NAME,
         targetNamespace = PlanetsServices.NS,
         endpointInterface = "eu.planets_project.services.migrate.Migrate")
-public class GhostscriptMigration implements Migrate, Serializable {
+public class GhostscriptMigration implements Migrate {
 
     /**
      *  Used for serialization.
@@ -101,7 +100,7 @@ public class GhostscriptMigration implements Migrate, Serializable {
     /**
      * Format extension of the output stream.
      */
-    private String outputFmtExt = null;
+//    private String outputFmtExt = null;
 
     /**
      * Formats of the input and output streams.
@@ -263,9 +262,7 @@ public class GhostscriptMigration implements Migrate, Serializable {
         if (digitalObject == null) {
             this.fail(new ServiceReport(Type.ERROR, Status.TOOL_ERROR,
                     "An empty (null) digital object was given"));
-        }
-
-        if (digitalObject.getContent() == null) {
+        } else if (digitalObject.getContent() == null) {
             this.fail(new ServiceReport(Type.ERROR, Status.TOOL_ERROR,
                     "The content of the digital object " + "is empty (null)"));
             this.fail(report);
@@ -362,7 +359,7 @@ public class GhostscriptMigration implements Migrate, Serializable {
     private void getExtensions(final URI inputFormat, final URI outputFormat) {
         if (inputFormat != null && outputFormat != null) {
             inputFmtExt = this.getFormatExt(inputFormat, false);
-            outputFmtExt = this.getFormatExt(outputFormat, true);
+//            outputFmtExt = this.getFormatExt(outputFormat, true);
         }
     }
 

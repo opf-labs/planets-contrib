@@ -65,8 +65,8 @@ public final class Jasper19MigrationTest extends TestCase {
     @Test
     public void testDescribe() {
         ServiceDescription desc = dom.describe();
-        System.out.println("Recieved service description: \n\n" + desc.toXmlFormatted());
         assertTrue("The ServiceDescription should not be NULL.", desc != null );
+        System.out.println("Recieved service description: \n\n" + desc.toXmlFormatted());
     }
 
     /**

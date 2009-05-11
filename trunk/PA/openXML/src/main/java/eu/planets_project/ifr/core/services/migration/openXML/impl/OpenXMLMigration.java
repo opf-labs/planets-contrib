@@ -15,6 +15,7 @@ import eu.planets_project.ifr.core.services.migration.openXML.common.ConversionR
 import eu.planets_project.ifr.core.services.migration.openXML.common.ConvertedFile;
 import eu.planets_project.ifr.core.services.migration.openXML.common.ConvertedFileNames;
 import eu.planets_project.ifr.core.services.migration.openXML.api.PlanetsServiceException;
+import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 
 import java.io.File;
@@ -154,7 +155,7 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
 
         // We have a real file, let's copy it to the OpenXML conversion directory.
         // At first we'll add the $TMP$ extension to stop clashes, so lets sort the name out
-        String toConvertTempName = new String (config.getConversionDir() + "/" + toConvert_.getName() + TEMP_EXTENSION);
+        String toConvertTempName = config.getConversionDir() + "/" + toConvert_.getName() + TEMP_EXTENSION;
         // Now to create the file object and check if it already exists
         File toConvertTempCopy = new File(toConvertTempName);
         if (toConvertTempCopy.exists()) {
@@ -177,8 +178,8 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
 
         // We've now copied the file so we can rename it and get rid of the temp extension & make a file
         String toConvertName = 
-                new String(toConvertTempCopy.getAbsolutePath().substring(0,
-                                                                         toConvertTempCopy.getAbsolutePath().lastIndexOf(TEMP_EXTENSION)));
+                toConvertTempCopy.getAbsolutePath().substring(0,
+                                                                         toConvertTempCopy.getAbsolutePath().lastIndexOf(TEMP_EXTENSION));
         File toConvertCopy = new File(toConvertName);
 
         // Do the rename, under control, have to throw a stupid exception since reason for a rename
@@ -191,9 +192,9 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
         }
         // We need to collect the returned file, the trigger is the XML report file
         // that corresponds to the file name so let's make it
-        String reportFileName = new String(config.getConvertedDir() + "/" + 
+        String reportFileName = config.getConvertedDir() + "/" + 
                                   toConvertCopy.getName().substring(0, toConvertCopy.getName().lastIndexOf(".")) +
-                                  XML_EXTENSION);
+                                  XML_EXTENSION;
         
         // Get the returned conversion report object
         getConversionReport(reportFileName);
@@ -291,7 +292,7 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
             obj = unmarshaller.unmarshal(foundReportFiles[0]);
             
             //Delete the report
-            foundReportFiles[0].delete();
+            FileUtils.delete(foundReportFiles[0]);
         }
         catch (JAXBException jxbe) {
             throw new PlanetsServiceException("OpenXMLService::getReportFile: JAXB Problem deserializing from file " +
@@ -335,7 +336,7 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
             File outputFile = new File(convPath_.getAbsolutePath() + "/" + convFileNames.getOutput());
             
             if (originalCopy.isFile() && originalCopy.exists()) {
-                originalCopy.delete();
+                FileUtils.delete(originalCopy);
             }
 
             if (!currentFile.isFile()) {
@@ -370,8 +371,8 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
     // Method to add an index to a file name before the extension where the file already exists, i.e. if test.txt exists will return test[1].txt
     protected String createIndexedName(String nameToIndex_) {
         // Strip the extension from the name
-        String pathPart = new String(nameToIndex_.substring(0, nameToIndex_.lastIndexOf(".")));
-        String extPart = new String(nameToIndex_.substring(nameToIndex_.lastIndexOf(".")));
+        String pathPart = nameToIndex_.substring(0, nameToIndex_.lastIndexOf("."));
+        String extPart = nameToIndex_.substring(nameToIndex_.lastIndexOf("."));
         String indexedName = null;
 
         PlanetsLogger.getLogger(this.getClass(), logConfigFile).debug("createIndexName:: nameToIndex_: " + nameToIndex_);
@@ -380,11 +381,11 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
 
         for (int indexer = 0; indexer < 1000; indexer++) {
             // Create a new file name
-            String newName = new String(pathPart + "[" + indexer + "]" + extPart);
+            String newName = pathPart + "[" + indexer + "]" + extPart;
             // See if the file exists
             File checkName = new File(newName);
             if (!checkName.exists()) {
-                indexedName = new String(checkName.getAbsolutePath());
+                indexedName = checkName.getAbsolutePath();
                 break;
             }
         }

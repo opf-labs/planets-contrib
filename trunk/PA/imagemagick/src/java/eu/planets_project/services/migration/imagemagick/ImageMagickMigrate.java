@@ -83,8 +83,8 @@ public class ImageMagickMigrate implements Migrate, Serializable {
     private static final String DEFAULT_OUTPUT_FILE_NAME = "imageMagickOutput";
     private static final String IMAGE_MAGICK_URI = "http://www.imagemagick.org";
     private static final FormatRegistry formatRegistry = FormatRegistryFactory.getFormatRegistry();
-    private static long START_TIME = 0;
-    private static long END_TIME = 0;
+    private long startTime = 0;
+    private long endTime = 0;
 
     /**
      * default no arg constructor
@@ -172,7 +172,7 @@ public class ImageMagickMigrate implements Migrate, Serializable {
             URI outputFormat, List<Parameter> parameters) {
 
         plogger.info("...and ready! Checking input...");
-        START_TIME = System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
         URI inputFormatFromDigObj = digitalObject.getFormat();
         String inputExt = null;
 
@@ -345,8 +345,8 @@ public class ImageMagickMigrate implements Migrate, Serializable {
 
             String datetime = ServiceUtils.getSystemDateAndTimeFormatted();
             String summary = "Image migration from " + inputExt.toUpperCase() + " to " + outputExt.toUpperCase() + ".\nUsed tool: ImageMagick.";
-            END_TIME = System.currentTimeMillis();
-            double duration = ServiceUtils.calculateDuration(START_TIME, END_TIME);
+            endTime = System.currentTimeMillis();
+            double duration = ServiceUtils.calculateDuration(startTime, endTime);
 
 
             Agent agent = new Agent(id,name,type);            

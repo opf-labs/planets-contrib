@@ -1,7 +1,6 @@
 package eu.planets_project.services.identification.imagemagick;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ImageMagickIdentifyTestHelper {

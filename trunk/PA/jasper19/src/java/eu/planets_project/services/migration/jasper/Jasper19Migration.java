@@ -5,7 +5,6 @@ package eu.planets_project.services.migration.jasper;
 
 import java.io.File;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,7 +49,7 @@ import eu.planets_project.services.utils.ProcessRunner;
         serviceName = Migrate.NAME, 
         targetNamespace = PlanetsServices.NS,
         endpointInterface = "eu.planets_project.services.migrate.Migrate" )
-public final class Jasper19Migration implements Migrate, Serializable {
+public final class Jasper19Migration implements Migrate {
     
     PlanetsLogger log = PlanetsLogger.getLogger(Jasper19Migration.class);
     

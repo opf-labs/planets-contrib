@@ -25,7 +25,7 @@ public class GhostscriptMigrationTest extends TestCase {
     /**
      * The location of the GhostscriptMigration service when deployed.
      */
-    private final String wsdlLoc = "/pserv-pa-ghostscript"
+    private static final String wsdlLoc = "/pserv-pa-ghostscript"
             + "/GhostscriptMigration?wsdl";
 
     /**

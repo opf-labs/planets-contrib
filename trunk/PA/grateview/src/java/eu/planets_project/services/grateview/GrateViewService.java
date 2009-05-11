@@ -3,14 +3,11 @@
  */
 package eu.planets_project.services.grateview;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.io.UnsupportedEncodingException;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,11 +22,18 @@ import javax.xml.ws.handler.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import eu.planets_project.services.*;
-import eu.planets_project.services.datatypes.*;
+import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Parameter;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
-import eu.planets_project.services.view.*;
+import eu.planets_project.services.view.CreateView;
+import eu.planets_project.services.view.CreateViewResult;
+import eu.planets_project.services.view.ViewActionResult;
+import eu.planets_project.services.view.ViewStatus;
 
 /**
  * A GRATE Viewer service. 
@@ -53,10 +57,10 @@ public class GrateViewService implements CreateView {
 
 	/** context */
 	private static final String CONTEXT_PATH = "/pserv-pa-grateview/";
-	private static final URI defaultBaseUrl = URI.create("http://132.230.4.14:8080"+CONTEXT_PATH);
+	private static final URI DEFAULT_BASE_URL = URI.create("http://132.230.4.14:8080"+CONTEXT_PATH);
 
 	/** A logger */
-	public static Log log = LogFactory.getLog(GrateViewService.class);
+	public static final Log LOG = LogFactory.getLog(GrateViewService.class);
 
 	/** A reference to the web service context. */
 	@Resource 
@@ -75,7 +79,7 @@ public class GrateViewService implements CreateView {
 	private static CreateViewResult returnWithErrorMessage(String message) 
 	{
 		ServiceReport rep = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, message);
-		log.error(message);
+		LOG.error(message);
 		return new CreateViewResult(null, null, rep);
 	}
 
@@ -154,7 +158,7 @@ public class GrateViewService implements CreateView {
 
 	public static CreateViewResult createViewerSessionViaService(URI _url) throws MalformedURLException 
 	{
-		Service service = Service.create(defaultBaseUrl.resolve("GrateViewService?wsdl").toURL(), GrateViewService.QNAME );
+		Service service = Service.create(DEFAULT_BASE_URL.resolve("GrateViewService?wsdl").toURL(), GrateViewService.QNAME );
 		CreateView grate = service.getPort(CreateView.class);
 
 		// Construct a list of DOBs covering the given URL:

@@ -78,7 +78,7 @@ public class OpenXMLMigrationConfig {
      */
     public OpenXMLMigrationConfig(String path) throws PlanetsServiceException {
         // Set the path member and parse the config file
-        confFilePath = new String(path);
+        confFilePath = path;
         parseFile(path);
     }
 

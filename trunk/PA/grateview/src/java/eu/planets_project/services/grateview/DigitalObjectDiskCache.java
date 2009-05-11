@@ -1,21 +1,18 @@
 package eu.planets_project.services.grateview;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import eu.planets_project.services.utils.FileUtils;
-
-import eu.planets_project.services.datatypes.Content;
-import eu.planets_project.services.datatypes.ImmutableContent;
-import eu.planets_project.services.datatypes.DigitalObject;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.utils.FileUtils;
 
 /**
  * 

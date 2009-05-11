@@ -68,7 +68,7 @@ public class ConversionReport {
      */
     public ConversionReport () {
         conversionSummary = new ConversionSummary();
-        reportFileName = new String("");
+        reportFileName = "";
     }
 
     /**
@@ -76,7 +76,7 @@ public class ConversionReport {
      */
     public ConversionReport (String reportFileNameVal) {
         conversionSummary = new ConversionSummary();
-        reportFileName = new String(reportFileNameVal);
+        reportFileName = reportFileNameVal;
     }
     /**
      * Gets the value of the convsummary property.
