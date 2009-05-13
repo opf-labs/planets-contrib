@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URL;
 
 import junit.framework.TestCase;
@@ -80,8 +81,8 @@ public final class JJ2000MigrateTest extends TestCase {
         DigitalObject input = new DigitalObject.Builder(
                 ImmutableContent
                 .byReference(new File( inFile )
-                .toURI().toURL())).permanentUrl(
-                        new URL("http://some")).build();
+                .toURI().toURL())).permanentUri(
+                        URI.create("http://some")).build();
         System.out.println("Input: " + input);
 
         FormatRegistry format = FormatRegistryFactory.getFormatRegistry();

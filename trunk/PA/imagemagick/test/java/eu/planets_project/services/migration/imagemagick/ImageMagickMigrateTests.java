@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -507,98 +508,93 @@ public class ImageMagickMigrateTests {
      * @throws IOException 
      */
     public void testMigrate(String srcExtension, String targetExtension, List<Parameter> parameters) throws IOException {
-        try {
-            /*
-             * To test usability of the digital object instance in web services,
-             * we simply pass one into the service and expect one back:
-             */
-        	
-        	File inputFile = getTestFile(srcExtension);
-        	
-        	FileInputStream is = new FileInputStream(inputFile);
-        	
-            FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
-            DigitalObject input = new  DigitalObject.Builder(ImmutableContent.byValue(is))
-            						.permanentUrl(new URL("http://imageMagickMigrationsTests"))
-            						.format(format.createExtensionUri(srcExtension))
-            						.title(inputFile.getName())
-            						.build();
-            System.out.println("Input: " + input);
-            
-            MigrateResult mr = imageMagick.migrate(input, format
-                    .createExtensionUri(srcExtension), format
-                    .createExtensionUri(targetExtension), parameters);
-            
-            ServiceReport sr = mr.getReport();
-            System.out.println("Got Report: "+sr);
-            
-            DigitalObject doOut = mr.getDigitalObject();
+        /*
+         * To test usability of the digital object instance in web services,
+         * we simply pass one into the service and expect one back:
+         */
 
-            assertTrue("Resulting digital object is null.", doOut != null);
+        File inputFile = getTestFile(srcExtension);
 
-            System.out.println("DigitalObject.getTitle(): " + doOut.getTitle());
-            System.out.println("DigitalObject.getFormat(): " + doOut.getFormat().toASCIIString());
-            System.out.println("Events: ");
-            List<Event> events = doOut.getEvents();
-            for (Event event : events) {
-				System.out.println("Agent name: " + event.getAgent().getName());
-				System.out.println("Agent type: " + event.getAgent().getType());
-				System.out.println("Agent id: " + event.getAgent().getId());
-				System.out.println("Event summary: " + event.getSummary());
-				System.out.println("Event datetime: " + event.getDatetime());
-				System.out.println("Event duration: " + event.getDuration());
-			}
-            
-            int compressionType = 1;
-            String compressionQuality= "";
-            String compressionTypeStr = "";
-            
-            if(parameters!=null) {
-	            
-				for (Iterator<Parameter> iterator = parameters.iterator(); iterator.hasNext();) {
-					Parameter parameter = (Parameter) iterator.next();
-					String name = parameter.getName();
-					if(name.equalsIgnoreCase("compressionType")) {
-						compressionType = Integer.parseInt(parameter.getValue());
-					}
-					if(name.equalsIgnoreCase("compressionQuality")) {
-						compressionQuality = parameter.getValue();
-					}
-				}
-				compressionTypeStr = "-" + compressionTypes[compressionType].replace(" ", "_");
-            }
-            else {
-            	compressionType = 1;		// Setting compressionType to default value = No compression
-            	compressionQuality = "100";	// Setting compressionQuality to default value = 100%
-            	compressionTypeStr = "-" + "DEFAULT_NO_COMP";
-            }      
-			
-            File outFolder = FileUtils.createWorkFolderInSysTemp(TEST_OUT + File.separator + srcExtension.toUpperCase() + "-" + targetExtension.toUpperCase());
-            String outFileName = 
-            	
-            		srcExtension 
-            		+ "_To_" 
-            		+ targetExtension 
-            		+ compressionTypeStr
-            		+ "_"
-            		+ compressionQuality
-            		+ "."
-            		+ targetExtension;
-            
-//            ByteArrayHelper.writeToDestFile(doOut.getContent().getValue(), outFile.getAbsolutePath());
-            File outFile = new File(outFolder, outFileName);
-            if(outFile.exists()) {
-            	outFile.delete();
-            }
-            outFile = FileUtils.writeInputStreamToFile(doOut.getContent().read(), outFolder, outFileName);
-            
-            System.out.println("Please find the result file here: " + outFile.getAbsolutePath() + "\n\n");
-            assertTrue("Result file created?", outFile.canRead());
-            
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+        FileInputStream is = new FileInputStream(inputFile);
+
+        FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
+        DigitalObject input = new  DigitalObject.Builder(ImmutableContent.byValue(is))
+        .permanentUri(URI.create("http://imageMagickMigrationsTests"))
+        .format(format.createExtensionUri(srcExtension))
+        .title(inputFile.getName())
+        .build();
+        System.out.println("Input: " + input);
+
+        MigrateResult mr = imageMagick.migrate(input, format
+                .createExtensionUri(srcExtension), format
+                .createExtensionUri(targetExtension), parameters);
+
+        ServiceReport sr = mr.getReport();
+        System.out.println("Got Report: "+sr);
+
+        DigitalObject doOut = mr.getDigitalObject();
+
+        assertTrue("Resulting digital object is null.", doOut != null);
+
+        System.out.println("DigitalObject.getTitle(): " + doOut.getTitle());
+        System.out.println("DigitalObject.getFormat(): " + doOut.getFormat().toASCIIString());
+        System.out.println("Events: ");
+        List<Event> events = doOut.getEvents();
+        for (Event event : events) {
+            System.out.println("Agent name: " + event.getAgent().getName());
+            System.out.println("Agent type: " + event.getAgent().getType());
+            System.out.println("Agent id: " + event.getAgent().getId());
+            System.out.println("Event summary: " + event.getSummary());
+            System.out.println("Event datetime: " + event.getDatetime());
+            System.out.println("Event duration: " + event.getDuration());
         }
 
+        int compressionType = 1;
+        String compressionQuality= "";
+        String compressionTypeStr = "";
+
+        if(parameters!=null) {
+
+            for (Iterator<Parameter> iterator = parameters.iterator(); iterator.hasNext();) {
+                Parameter parameter = (Parameter) iterator.next();
+                String name = parameter.getName();
+                if(name.equalsIgnoreCase("compressionType")) {
+                    compressionType = Integer.parseInt(parameter.getValue());
+                }
+                if(name.equalsIgnoreCase("compressionQuality")) {
+                    compressionQuality = parameter.getValue();
+                }
+            }
+            compressionTypeStr = "-" + compressionTypes[compressionType].replace(" ", "_");
+        }
+        else {
+            compressionType = 1;		// Setting compressionType to default value = No compression
+            compressionQuality = "100";	// Setting compressionQuality to default value = 100%
+            compressionTypeStr = "-" + "DEFAULT_NO_COMP";
+        }      
+
+        File outFolder = FileUtils.createWorkFolderInSysTemp(TEST_OUT + File.separator + srcExtension.toUpperCase() + "-" + targetExtension.toUpperCase());
+        String outFileName = 
+
+            srcExtension 
+            + "_To_" 
+            + targetExtension 
+            + compressionTypeStr
+            + "_"
+            + compressionQuality
+            + "."
+            + targetExtension;
+
+        //            ByteArrayHelper.writeToDestFile(doOut.getContent().getValue(), outFile.getAbsolutePath());
+        File outFile = new File(outFolder, outFileName);
+        if(outFile.exists()) {
+            outFile.delete();
+        }
+        outFile = FileUtils.writeInputStreamToFile(doOut.getContent().read(), outFolder, outFileName);
+
+        System.out.println("Please find the result file here: " + outFile.getAbsolutePath() + "\n\n");
+        assertTrue("Result file created?", outFile.canRead());
+            
     }
 
 }

@@ -107,7 +107,7 @@ public class GhostscriptMigrationTest extends TestCase {
             final DigitalObject doInput =
                 new DigitalObject.Builder(
                     ImmutableContent.byReference((testps).toURI().toURL()))
-                    .permanentUrl(new URL("http://example.com/test.ps"))
+                    .permanentUri(URI.create("http://example.com/test.ps"))
                     .title("test.ps")
                     .build();
             System.out.println("Input " + doInput);

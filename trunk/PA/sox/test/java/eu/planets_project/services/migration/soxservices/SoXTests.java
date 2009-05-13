@@ -169,12 +169,7 @@ public class SoXTests {
     	
         DigitalObject input = null;
         
-		try {
-			input = new DigitalObject.Builder(ImmutableContent.byValue(inputFile)).permanentUrl(new URL("http://soxMigrationsTest.eu")).build();
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        input = new DigitalObject.Builder(ImmutableContent.byValue(inputFile)).permanentUri(URI.create("http://soxMigrationsTest.eu")).build();
         
         return input;
 	}

@@ -35,6 +35,7 @@ import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.utils.cache.DigitalObjectDiskCache;
 import eu.planets_project.services.view.CreateView;
 import eu.planets_project.services.view.CreateViewResult;
+import eu.planets_project.services.view.ViewAction;
 import eu.planets_project.services.view.ViewActionResult;
 import eu.planets_project.services.view.ViewStatus;
 
@@ -201,6 +202,8 @@ public class JJ2000ViewerService implements CreateView {
         if( cache != null && cache.exists() && cache.isDirectory() ) {
             vs = new ViewStatus( ViewStatus.Status.ACTIVE, null );
         }
+        // TODO Override with UNKNOWN for now.
+        vs = new ViewStatus( ViewStatus.Status.UNKNOWN, null );
         return vs;
     }
 
@@ -208,6 +211,9 @@ public class JJ2000ViewerService implements CreateView {
      * @see eu.planets_project.services.view.CreateView#doAction(java.lang.String, java.lang.String)
      */
     public ViewActionResult doAction(String sessionIdentifier, String action) {
+        if( ViewAction.SHUTDOWN.equals(action)) {
+            // TODO find the session and kill the cache
+        }
         return null;
     }
 

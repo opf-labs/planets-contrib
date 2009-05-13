@@ -335,38 +335,33 @@ public class ImageMagickMigrate implements Migrate, Serializable {
         DigitalObject newDigObj = null;
         ServiceReport report = null;
 
-        try {
-
-            String id = Long.toString(serialVersionUID);
-            String name = ImageMagickMigrate.NAME;
-            String type = "Migrate";
+        String id = Long.toString(serialVersionUID);
+        String name = ImageMagickMigrate.NAME;
+        String type = "Migrate";
 
 
 
-            String datetime = ServiceUtils.getSystemDateAndTimeFormatted();
-            String summary = "Image migration from " + inputExt.toUpperCase() + " to " + outputExt.toUpperCase() + ".\nUsed tool: ImageMagick.";
-            endTime = System.currentTimeMillis();
-            double duration = ServiceUtils.calculateDuration(startTime, endTime);
+        String datetime = ServiceUtils.getSystemDateAndTimeFormatted();
+        String summary = "Image migration from " + inputExt.toUpperCase() + " to " + outputExt.toUpperCase() + ".\nUsed tool: ImageMagick.";
+        endTime = System.currentTimeMillis();
+        double duration = ServiceUtils.calculateDuration(startTime, endTime);
 
 
-            Agent agent = new Agent(id,name,type);            
-                        Event event = new Event(summary,datetime,duration,agent,null);
+        Agent agent = new Agent(id,name,type);            
+        Event event = new Event(summary,datetime,duration,agent,null);
 
-            newDigObj = new DigitalObject.Builder(ImmutableContent.byValue(outputFile))
-            .format(outputFormat)
-            .title(outputFile.getName())
-            .permanentUrl(new URL("http://planets.services.migration.ImageMagickMigrate"))
-            .events(event)
-            .build();
+        newDigObj = new DigitalObject.Builder(ImmutableContent.byValue(outputFile))
+        .format(outputFormat)
+        .title(outputFile.getName())
+        .permanentUri(URI.create("http://planets.services.migration.ImageMagickMigrate"))
+        .events(event)
+        .build();
 
-            plogger.info("Created new DigitalObject for result file...");
+        plogger.info("Created new DigitalObject for result file...");
 
-            report = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
-            plogger.info("Created Service report...");
+        report = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
+        plogger.info("Created Service report...");
 
-        } catch (MalformedURLException e) {
-            return this.returnWithErrorMessage("ERROR: Malformed URL!", e);
-        }
         plogger.info("Success!! Returning results! Goodbye!");
         return new MigrateResult(newDigObj, report);
     }
