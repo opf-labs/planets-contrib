@@ -9,9 +9,9 @@ import org.jboss.annotation.ejb.TransactionTimeout;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.datatypes.Checksum;
-import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObjectContent;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
@@ -85,13 +85,13 @@ public class DioscuriWrapper {
 			return this.createErrorResult(ERROR_OUT);
 		}
 		
-		Content content = null;
+		DigitalObjectContent content = null;
 		
 		if(checksum==null) {
-			content = ImmutableContent.asStream(allFilesAsZIP);
+			content = Content.asStream(allFilesAsZIP);
 		}
 		else {
-			content = ImmutableContent.asStream(allFilesAsZIP).withChecksum(checksum);
+			content = Content.asStream(allFilesAsZIP).withChecksum(checksum);
 		}
 		
 		DigitalObject floppyInput = new DigitalObject.Builder(content)
@@ -139,7 +139,7 @@ public class DioscuriWrapper {
 		}
 		
 		log.info("FloppyImageHelper instance created...");
-		DigitalObject floppy = new DigitalObject.Builder(ImmutableContent.asStream(floppyImage))
+		DigitalObject floppy = new DigitalObject.Builder(Content.asStream(floppyImage))
 									.title(floppyImage.getName())
 									.format(format.createExtensionUri(FileUtils.getExtensionFromFile(floppyImage)))
 									.build();
@@ -159,7 +159,7 @@ public class DioscuriWrapper {
 		
 		File resultZIP = new File(WORK_TEMP_FOLDER, resultName);
 		
-		Content resultContent = mr.getDigitalObject().getContent();
+		DigitalObjectContent resultContent = mr.getDigitalObject().getContent();
 		
 		if(resultContent==null) {
 			log.error("There is no result file! Returning with ERROR! ");

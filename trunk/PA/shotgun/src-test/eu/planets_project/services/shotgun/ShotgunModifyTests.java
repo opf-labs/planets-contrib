@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.modify.ModifyResult;
 import eu.planets_project.services.shotgun.FileShotgun.Action;
@@ -22,7 +22,7 @@ public class ShotgunModifyTests {
     private static final File INPUT_FILE = new File(
             "tests/test-files/images/bitmap/test_tiff/2274192346_4a0a03c5d6.tif");
     private static final DigitalObject INPUT_DIGITAL_OBJECT = new DigitalObject.Builder(
-            ImmutableContent.byReference(INPUT_FILE)).build();
+            Content.byReference(INPUT_FILE)).build();
     private static final byte[] INPUT_BYTES = FileUtils
             .readFileIntoByteArray(INPUT_FILE);
     private static final byte[] WRITE_RESULT = shotgun(Action.CORRUPT);

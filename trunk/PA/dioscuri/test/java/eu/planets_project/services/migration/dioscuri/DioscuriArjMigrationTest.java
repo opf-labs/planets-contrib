@@ -14,7 +14,7 @@ import org.junit.Test;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.migrate.Migrate;
@@ -63,7 +63,7 @@ public class DioscuriArjMigrationTest {
 	
 	@Test
 	public void testMigrate() {
-		DigitalObject inputDigOb = new DigitalObject.Builder(ImmutableContent.asStream(ARJ_TEST_FILE)).title(ARJ_TEST_FILE.getName()).format(format.createExtensionUri(FileUtils.getExtensionFromFile(ARJ_TEST_FILE))).build();
+		DigitalObject inputDigOb = new DigitalObject.Builder(Content.asStream(ARJ_TEST_FILE)).title(ARJ_TEST_FILE.getName()).format(format.createExtensionUri(FileUtils.getExtensionFromFile(ARJ_TEST_FILE))).build();
 		MigrateResult result = DIOSCURI_MIGRATE.migrate(inputDigOb, format.createExtensionUri(FileUtils.getExtensionFromFile(ARJ_TEST_FILE)), format.createExtensionUri("EXE"), null);
 		
 		assertTrue("MigrateResult should not be NULL", result!=null);

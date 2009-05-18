@@ -1,8 +1,8 @@
 package eu.planets_project.services.migration.netpbm;
 
-import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObjectContent;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
@@ -84,7 +84,7 @@ public class NetPbmMigrationTest extends TestCase {
 */
 
             DigitalObject input =
-                    new DigitalObject.Builder(ImmutableContent.byValue(testjpeg))
+                    new DigitalObject.Builder(Content.byValue(testjpeg))
                             .format(new URI("planets:fmt/ext/jpeg"))
                             .title("test.jpeg").
                             build();
@@ -97,7 +97,7 @@ public class NetPbmMigrationTest extends TestCase {
 
             System.out.println("Output: " + doOut);
 
-            Content content = doOut.getContent();
+            DigitalObjectContent content = doOut.getContent();
 
             File workfolder = FileUtils.createWorkFolderInSysTemp("netpbm_test");
 

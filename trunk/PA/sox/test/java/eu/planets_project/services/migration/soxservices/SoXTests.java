@@ -15,7 +15,7 @@ import org.junit.Test;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
@@ -169,7 +169,7 @@ public class SoXTests {
     	
         DigitalObject input = null;
         
-        input = new DigitalObject.Builder(ImmutableContent.byValue(inputFile)).permanentUri(URI.create("http://soxMigrationsTest.eu")).build();
+        input = new DigitalObject.Builder(Content.byValue(inputFile)).permanentUri(URI.create("http://soxMigrationsTest.eu")).build();
         
         return input;
 	}

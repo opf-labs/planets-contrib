@@ -23,7 +23,7 @@ import org.xml.sax.SAXException;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
@@ -212,7 +212,7 @@ public class GhostscriptMigration implements Migrate {
         byte[] outbytes = FileUtils.writeInputStreamToBinary(newFileStream);
 
         DigitalObject outputFile = new DigitalObject.Builder(
-                ImmutableContent.byValue(outbytes)).build();
+                Content.byValue(outbytes)).build();
         return new MigrateResult(outputFile, report);
     }
 

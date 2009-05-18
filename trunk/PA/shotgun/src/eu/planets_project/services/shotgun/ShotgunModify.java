@@ -9,7 +9,7 @@ import javax.jws.WebService;
 
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
@@ -82,7 +82,7 @@ public final class ShotgunModify implements Modify {
         File inputFile = DigitalObjectUtils.getContentAsTempFile(digitalObject);
         File outputFile = new FileShotgun().shoot(inputFile, seqCount,
                 seqLength, Action.valueOf(action));
-        return new DigitalObject.Builder(ImmutableContent.byValue(outputFile))
+        return new DigitalObject.Builder(Content.byValue(outputFile))
                 .build();
     }
 }

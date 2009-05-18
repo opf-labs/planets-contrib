@@ -15,7 +15,7 @@ import org.junit.Test;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.migrate.Migrate;
@@ -79,7 +79,7 @@ public final class JJ2000MigrateTest extends TestCase {
      */
     private void doMigrate(String inFile, String outFile, String inExt, String outExt) throws IOException {
         DigitalObject input = new DigitalObject.Builder(
-                ImmutableContent
+                Content
                 .byReference(new File( inFile )
                 .toURI().toURL())).permanentUri(
                         URI.create("http://some")).build();

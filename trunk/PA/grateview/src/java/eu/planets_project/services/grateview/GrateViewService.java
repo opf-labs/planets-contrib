@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
@@ -162,7 +162,7 @@ public class GrateViewService implements CreateView {
 		CreateView grate = service.getPort(CreateView.class);
 
 		// Construct a list of DOBs covering the given URL:
-		DigitalObject.Builder dob = new DigitalObject.Builder(ImmutableContent.byReference( _url.toURL() ));
+		DigitalObject.Builder dob = new DigitalObject.Builder(Content.byReference( _url.toURL() ));
 		List<DigitalObject> digitalObjects = new ArrayList<DigitalObject>();
 		digitalObjects.add(dob.build());
 

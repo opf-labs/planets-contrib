@@ -15,7 +15,7 @@ import org.junit.Test;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
@@ -105,7 +105,7 @@ public final class Jasper19MigrationTest extends TestCase {
         String resFileDir = "PA/jasper19/test/testfiles/generatedfiles/";
         String resFileName = "planetsMigrate"+origExt.toUpperCase()+"to"+destExt.toUpperCase()+"."+destExt.toLowerCase();
         byte[] binary = FileUtils.readFileIntoByteArray(new File(inTestFileName));
-        DigitalObject input = new DigitalObject.Builder(ImmutableContent.byValue(binary)).build();
+        DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
         FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
         MigrateResult mr = dom.migrate(input, format.createExtensionUri(origExt), format.createExtensionUri(destExt), params);
         DigitalObject doOut = mr.getDigitalObject();

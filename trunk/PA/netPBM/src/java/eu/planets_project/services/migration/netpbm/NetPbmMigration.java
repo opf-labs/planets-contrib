@@ -114,7 +114,7 @@ public class NetPbmMigration implements Migrate, Serializable {
         InputStream newFileStream = runner.getProcessOutput();
         byte[] outbytes = FileUtils.writeInputStreamToBinary(newFileStream);
 
-        DigitalObject pdfFile = new DigitalObject.Builder(ImmutableContent.byValue(outbytes)).build();
+        DigitalObject pdfFile = new DigitalObject.Builder(Content.byValue(outbytes)).build();
         return new MigrateResult(pdfFile, new ServiceReport(Type.INFO,
                 Status.SUCCESS, runner.getProcessOutputAsString()));
 

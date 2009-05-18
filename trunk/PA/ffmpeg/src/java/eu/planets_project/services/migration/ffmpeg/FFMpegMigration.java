@@ -18,7 +18,7 @@ import org.xml.sax.SAXException;
 
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
@@ -121,7 +121,7 @@ public class FFMpegMigration implements Migrate {
         InputStream newFileStream = runner.getProcessOutput();
         byte[] outbytes = FileUtils.writeInputStreamToBinary(newFileStream);
 
-        DigitalObject pdfFile = new DigitalObject.Builder(ImmutableContent.byValue(outbytes)).build();
+        DigitalObject pdfFile = new DigitalObject.Builder(Content.byValue(outbytes)).build();
         return new MigrateResult(pdfFile,report);
 
     }

@@ -106,7 +106,7 @@ public class GhostscriptMigrationTest extends TestCase {
 
             final DigitalObject doInput =
                 new DigitalObject.Builder(
-                    ImmutableContent.byReference((testps).toURI().toURL()))
+                    Content.byReference((testps).toURI().toURL()))
                     .permanentUri(URI.create("http://example.com/test.ps"))
                     .title("test.ps")
                     .build();
@@ -121,7 +121,7 @@ public class GhostscriptMigrationTest extends TestCase {
 
             System.out.println("Output" + doOutput);
 
-            final Content content = doOutput.getContent();
+            final DigitalObjectContent content = doOutput.getContent();
 
             this.workfolder = FileUtils
                 .createWorkFolderInSysTemp("ghostscript_test");

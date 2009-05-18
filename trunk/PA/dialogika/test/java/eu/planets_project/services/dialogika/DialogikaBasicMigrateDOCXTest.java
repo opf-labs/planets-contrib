@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -62,7 +62,7 @@ public class DialogikaBasicMigrateDOCXTest {
         System.out.println("Reading in the input...");
         byte[] input = FileUtils.readFileIntoByteArray(new File("PA/dialogika/test/resources/test.doc"));
         System.out.println("Invoking the service...");
-        DigitalObject inputObject = new DigitalObject.Builder(ImmutableContent.byValue(input)).build();
+        DigitalObject inputObject = new DigitalObject.Builder(Content.byValue(input)).build();
         MigrateResult output = bmob.migrate(inputObject,null,null,null);
         System.out.println("Checking the result...");
         assertTrue("The byte[] output should not be NULL.", output != null );

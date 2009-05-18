@@ -22,7 +22,7 @@ import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
@@ -130,7 +130,7 @@ public class JJ2000MigrateService implements Migrate {
         // Grab the file and pass it back.
         byte[] bytes = FileUtils.readFileIntoByteArray(outFile);
         ServiceReport rep = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
-        DigitalObject ndo = new DigitalObject.Builder(ImmutableContent.byValue(bytes)).build();
+        DigitalObject ndo = new DigitalObject.Builder(Content.byValue(bytes)).build();
         return new MigrateResult( ndo, rep );
     }
 

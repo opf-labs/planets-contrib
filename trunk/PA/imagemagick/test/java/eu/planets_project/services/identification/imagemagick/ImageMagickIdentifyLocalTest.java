@@ -22,7 +22,7 @@ import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.Agent;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Event;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
@@ -90,7 +90,7 @@ public class ImageMagickIdentifyLocalTest {
 
         for (File file : fileSet) {
             String ext = files.get(file);
-            DigitalObject digObj = new DigitalObject.Builder(ImmutableContent.byValue(file))
+            DigitalObject digObj = new DigitalObject.Builder(Content.byValue(file))
                     .permanentUri(URI.create(PlanetsServices.NS+"/pserv-pa-imagemagickidentify-test"))
                     .format(fr.createExtensionUri(ext))
                     .title(file.getName())

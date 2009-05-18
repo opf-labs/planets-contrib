@@ -30,7 +30,7 @@ import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.Agent;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Event;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
@@ -350,7 +350,7 @@ public class ImageMagickMigrate implements Migrate, Serializable {
         Agent agent = new Agent(id,name,type);            
         Event event = new Event(summary,datetime,duration,agent,null);
 
-        newDigObj = new DigitalObject.Builder(ImmutableContent.byValue(outputFile))
+        newDigObj = new DigitalObject.Builder(Content.byValue(outputFile))
         .format(outputFormat)
         .title(outputFile.getName())
         .permanentUri(URI.create("http://planets.services.migration.ImageMagickMigrate"))

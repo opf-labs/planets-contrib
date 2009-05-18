@@ -17,7 +17,7 @@ import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
@@ -262,7 +262,7 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 	 * @return a MigrateResult containing everything it should contain...(--> DigObj, ServiceReport)
 	 */
 	private MigrateResult createMigrateResult(File resultFile, URI inputFormat, URI outputFormat) {
-		DigitalObject result = new DigitalObject.Builder(ImmutableContent.asStream(resultFile))
+		DigitalObject result = new DigitalObject.Builder(Content.asStream(resultFile))
 								.title(resultFile.getName())
 								.format(format.createExtensionUri(FileUtils.getExtensionFromFile(resultFile)))
 								.build();

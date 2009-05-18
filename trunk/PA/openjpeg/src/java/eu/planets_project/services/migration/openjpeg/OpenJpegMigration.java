@@ -22,7 +22,7 @@ import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
@@ -179,7 +179,7 @@ public final class OpenJpegMigration implements Migrate {
 
         ServiceReport report = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
 
-        newDO = new DigitalObject.Builder(ImmutableContent.byValue(binary)).build();
+        newDO = new DigitalObject.Builder(Content.byValue(binary)).build();
 
         return new MigrateResult(newDO, report);
     }

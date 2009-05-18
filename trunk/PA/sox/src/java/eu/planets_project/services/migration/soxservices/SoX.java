@@ -22,7 +22,7 @@ import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
@@ -451,19 +451,19 @@ public class SoX implements Migrate, Serializable {
 	
 	// Convenience method to create a DigitalObject byValue (byte[])
 	private DigitalObject createDigitalObjectByValue(URL permanentURL, byte[] resultFileBlob) {
-		DigitalObject digObj =  new DigitalObject.Builder(ImmutableContent.byValue(resultFileBlob)).build();
+		DigitalObject digObj =  new DigitalObject.Builder(Content.byValue(resultFileBlob)).build();
 		return digObj;
 	}
 	
 	// Convenience method to create a DigitalObject byValue (File)
 	private DigitalObject createDigitalObjectByValue(URL permanentURL, File resultFile) {
-		DigitalObject digObj =  new DigitalObject.Builder(ImmutableContent.byValue(resultFile)).build();
+		DigitalObject digObj =  new DigitalObject.Builder(Content.byValue(resultFile)).build();
 		return digObj;
 	}
 	
 	// Convenience method to create a DigitalObject byReference
 	private DigitalObject createDigitalObjectByReference(URL permanentURL, URL fileLocation) {
-		DigitalObject digObj =  new DigitalObject.Builder(ImmutableContent.byReference(fileLocation)).build();
+		DigitalObject digObj =  new DigitalObject.Builder(Content.byReference(fileLocation)).build();
 		return digObj;
 	}
 	

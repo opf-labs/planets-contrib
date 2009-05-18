@@ -20,7 +20,7 @@ import de.dialogika.planets.planets_webservice.genericmigration.GenericMigration
 import de.dialogika.planets.planets_webservice.genericmigration.MigrateOneBinaryResult;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
@@ -51,7 +51,7 @@ public class DialogikaBasicMigrateDOCX implements Migrate {
         byte[] binary = FileUtils.writeInputStreamToBinary(digitalObject
                 .getContent().read());
         byte[] result = basicMigrateOneBinary(binary);
-        DigitalObject resultObject = new DigitalObject.Builder(ImmutableContent
+        DigitalObject resultObject = new DigitalObject.Builder(Content
                 .byValue(result)).build();
         return new MigrateResult(resultObject, new ServiceReport(Type.INFO,
                 Status.SUCCESS, "OK"));

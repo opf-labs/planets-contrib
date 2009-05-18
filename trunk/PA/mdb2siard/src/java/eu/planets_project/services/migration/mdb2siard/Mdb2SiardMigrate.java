@@ -145,7 +145,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	/* (non-Javadoc)
 	 * write the bytes to the given file.
 	 */
-	static void writeByteContentToFile(Content content, File file)
+	static void writeByteContentToFile(DigitalObjectContent content, File file)
     throws IOException
 	{
     BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
@@ -246,7 +246,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	    List<Parameter> parameters)
 	{
 		/* empty doOutput in case of error ... */
-		DigitalObject doOutput = new DigitalObject.Builder(ImmutableContent.byValue(new byte[] {})).build();
+		DigitalObject doOutput = new DigitalObject.Builder(Content.byValue(new byte[] {})).build();
 		File fileInput = null;
 		File fileOutput = null;
 		ServiceReport sr = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
@@ -271,7 +271,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 			sr = migrate(fileInput, fileOutput, sr);
 	    /* read do from temporary file */
 			if (sr.getStatus() == Status.SUCCESS)
-			  doOutput = new DigitalObject.Builder(ImmutableContent.byValue(readByteArrayFromFile(fileOutput))).build();
+			  doOutput = new DigitalObject.Builder(Content.byValue(readByteArrayFromFile(fileOutput))).build();
 		}
 		catch(Exception e)
 		{
@@ -287,7 +287,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 			    FileUtils.delete(fileOutput);
 			/* if no output was generated, create a zero length byte array */
 			if (doOutput == null)
-				doOutput = new DigitalObject.Builder(ImmutableContent.byValue(new byte[0])).build();
+				doOutput = new DigitalObject.Builder(Content.byValue(new byte[0])).build();
 		}
 		/* display success */
 		if (sr.getStatus() == Status.SUCCESS)

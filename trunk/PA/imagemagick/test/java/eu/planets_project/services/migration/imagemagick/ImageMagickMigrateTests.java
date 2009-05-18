@@ -21,7 +21,7 @@ import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Event;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
@@ -518,7 +518,7 @@ public class ImageMagickMigrateTests {
         FileInputStream is = new FileInputStream(inputFile);
 
         FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
-        DigitalObject input = new  DigitalObject.Builder(ImmutableContent.byValue(is))
+        DigitalObject input = new  DigitalObject.Builder(Content.byValue(is))
         .permanentUri(URI.create("http://imageMagickMigrationsTests"))
         .format(format.createExtensionUri(srcExtension))
         .title(inputFile.getName())

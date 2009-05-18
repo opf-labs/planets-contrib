@@ -19,7 +19,7 @@ import org.xml.sax.SAXException;
 
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
@@ -112,7 +112,7 @@ public class Ps2PdfMigration implements Migrate, Serializable {
 
         DigitalObject pdfFile = new DigitalObject
                 .Builder(digitalObject)
-                .content(ImmutableContent.byValue(outbytes))
+                .content(Content.byValue(outbytes))
                 .format(outputFormat)
                 .build();
         return new MigrateResult(pdfFile, new ServiceReport(Type.INFO,

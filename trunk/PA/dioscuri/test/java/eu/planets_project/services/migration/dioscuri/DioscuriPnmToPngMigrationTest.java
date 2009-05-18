@@ -14,7 +14,7 @@ import org.junit.Test;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.migrate.Migrate;
@@ -64,7 +64,7 @@ public class DioscuriPnmToPngMigrationTest {
 	
 	@Test
 	public void testMigrate() {
-		DigitalObject inputDigOb = new DigitalObject.Builder(ImmutableContent.asStream(PNM_TEST_FILE)).title(PNM_TEST_FILE.getName()).format(format.createExtensionUri(FileUtils.getExtensionFromFile(PNM_TEST_FILE))).build();
+		DigitalObject inputDigOb = new DigitalObject.Builder(Content.asStream(PNM_TEST_FILE)).title(PNM_TEST_FILE.getName()).format(format.createExtensionUri(FileUtils.getExtensionFromFile(PNM_TEST_FILE))).build();
 		MigrateResult result = DIOSCURI_MIGRATE.migrate(inputDigOb, format.createExtensionUri(FileUtils.getExtensionFromFile(PNM_TEST_FILE)), format.createExtensionUri("PNG"), null);
 		
 		assertTrue("MigrateResult should not be NULL", result!=null);
@@ -79,7 +79,7 @@ public class DioscuriPnmToPngMigrationTest {
 		
 		PNG_TEST_FILE = resultFile;
 		
-		inputDigOb = new DigitalObject.Builder(ImmutableContent.asStream(PNG_TEST_FILE)).title(PNG_TEST_FILE.getName()).format(format.createExtensionUri(FileUtils.getExtensionFromFile(PNG_TEST_FILE))).build();
+		inputDigOb = new DigitalObject.Builder(Content.asStream(PNG_TEST_FILE)).title(PNG_TEST_FILE.getName()).format(format.createExtensionUri(FileUtils.getExtensionFromFile(PNG_TEST_FILE))).build();
 		result = DIOSCURI_MIGRATE.migrate(inputDigOb, format.createExtensionUri(FileUtils.getExtensionFromFile(PNG_TEST_FILE)), format.createExtensionUri("PNM"), null);
 		
 		assertTrue("MigrateResult should not be NULL", result!=null);

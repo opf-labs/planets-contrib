@@ -17,7 +17,7 @@ import org.junit.Test;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
@@ -163,7 +163,7 @@ public final class Gimp26MigrationTest {
         String resFileDir = "PA/gimp/test/testfiles/generatedfiles/";
         String resFileName = "planetsMigrate"+origExt.toUpperCase()+"to"+destExt.toUpperCase()+String.valueOf(cycle)+"."+destExt.toLowerCase();
         byte[] binary = this.readByteArrayFromFile(inTestFileName);
-        DigitalObject input = new DigitalObject.Builder(ImmutableContent.byValue(binary)).build();
+        DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
         FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
         MigrateResult mr = dom.migrate(input, format.createExtensionUri(origExt), format.createExtensionUri(destExt), params);
         DigitalObject doOut = mr.getDigitalObject();

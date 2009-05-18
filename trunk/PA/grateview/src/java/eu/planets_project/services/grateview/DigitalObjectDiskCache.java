@@ -9,9 +9,9 @@ import java.util.UUID;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObjectContent;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.ImmutableContent;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.utils.FileUtils;
 
 /**
@@ -78,7 +78,7 @@ public class DigitalObjectDiskCache {
 		File[] filelist = cachedir.listFiles();
 		try {
 			for (File f : filelist) {
-				Content c = ImmutableContent.byReference(f.toURL());
+				DigitalObjectContent c = Content.byReference(f.toURL());
 				dobs.add(new DigitalObject.Builder(c).build());
 			}
 		}
