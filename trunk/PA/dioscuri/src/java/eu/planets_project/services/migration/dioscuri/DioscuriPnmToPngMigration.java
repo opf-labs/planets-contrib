@@ -272,7 +272,7 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 	 * @return a MigrateResult containing everything it should contain...(--> DigObj, ServiceReport)
 	 */
 	private MigrateResult createMigrateResult(File resultFile, URI inputFormat, URI outputFormat) {
-		DigitalObject result = new DigitalObject.Builder(Content.asStream(resultFile))
+		DigitalObject result = new DigitalObject.Builder(Content.byReference(resultFile))
 								.title(resultFile.getName())
 								.format(format.createExtensionUri(FileUtils.getExtensionFromFile(resultFile)))
 								.build();

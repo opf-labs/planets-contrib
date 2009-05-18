@@ -88,10 +88,10 @@ public class DioscuriWrapper {
 		DigitalObjectContent content = null;
 		
 		if(checksum==null) {
-			content = Content.asStream(allFilesAsZIP);
+			content = Content.byReference(allFilesAsZIP);
 		}
 		else {
-			content = Content.asStream(allFilesAsZIP).withChecksum(checksum);
+			content = Content.byReference(allFilesAsZIP).withChecksum(checksum);
 		}
 		
 		DigitalObject floppyInput = new DigitalObject.Builder(content)
@@ -139,7 +139,7 @@ public class DioscuriWrapper {
 		}
 		
 		log.info("FloppyImageHelper instance created...");
-		DigitalObject floppy = new DigitalObject.Builder(Content.asStream(floppyImage))
+		DigitalObject floppy = new DigitalObject.Builder(Content.byReference(floppyImage))
 									.title(floppyImage.getName())
 									.format(format.createExtensionUri(FileUtils.getExtensionFromFile(floppyImage)))
 									.build();
