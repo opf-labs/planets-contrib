@@ -6,7 +6,6 @@ package eu.planets_project.services.modification.imagemagick;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +21,7 @@ import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.modify.Modify;
 import eu.planets_project.services.modify.ModifyResult;
 import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.test.ServiceCreator;
 
 /**
  * @author melmsp
@@ -29,21 +29,20 @@ import eu.planets_project.services.utils.FileUtils;
  */
 public class ImageMagickCropTest {
 	
+	String WSDL = "/pserv-pa-imagemagick/ImageMagickCrop?wsdl";
+	
 	File test_tmp_folder = FileUtils.createWorkFolderInSysTemp("ImageMagickCrop_test_tmp".toUpperCase()); 
 	File testFile = new File("tests/test-files/images/bitmap/test_tiff/2326378356_65c3b81dfd.tif");
 	
-	Modify im_crop = new ImageMagickCrop();
+	Modify im_crop = ServiceCreator.createTestService(Modify.QNAME, ImageMagickCrop.class, WSDL);
 	
 	static FormatRegistry formatReg = FormatRegistryFactory.getFormatRegistry();
 	
-	static URI actionURI = null;
-
-	/**
-	 * @throws java.lang.Exception
-	 */
 	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		actionURI = new URI("planets:mod/crop");
+	public static void setup() {
+//		System.setProperty("pserv.test.context", "server");
+//        System.setProperty("pserv.test.host", "localhost");
+//        System.setProperty("pserv.test.port", "8080");
 	}
 
 	/**
