@@ -3,9 +3,7 @@ package eu.planets_project.services.migration.imagemagick;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -27,9 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.Agent;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.Event;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
@@ -83,8 +79,8 @@ public class ImageMagickMigrate implements Migrate, Serializable {
     private static final String DEFAULT_OUTPUT_FILE_NAME = "imageMagickOutput";
     private static final String IMAGE_MAGICK_URI = "http://www.imagemagick.org";
     private static final FormatRegistry formatRegistry = FormatRegistryFactory.getFormatRegistry();
-    private long startTime = 0;
-    private long endTime = 0;
+//    private long startTime = 0;
+//    private long endTime = 0;
 
     /**
      * default no arg constructor
@@ -172,7 +168,7 @@ public class ImageMagickMigrate implements Migrate, Serializable {
             URI outputFormat, List<Parameter> parameters) {
 
         plogger.info("...and ready! Checking input...");
-        startTime = System.currentTimeMillis();
+//        startTime = System.currentTimeMillis();
         URI inputFormatFromDigObj = digitalObject.getFormat();
         String inputExt = null;
 
@@ -252,7 +248,7 @@ public class ImageMagickMigrate implements Migrate, Serializable {
             String actualSrcFormat = image.getMagick();
             plogger.info("ImageMagickMigrate: Given src file format extension is: " + inputExt);
             plogger.info("ImageMagickMigrate: Actual src format is: " + actualSrcFormat);
-
+            
             // Has the input file the format it claims it has?
             if(compareExtensions(inputExt, actualSrcFormat) == false) {
                 // if NOT just return without doing anything...
@@ -335,12 +331,14 @@ public class ImageMagickMigrate implements Migrate, Serializable {
         DigitalObject newDigObj = null;
         ServiceReport report = null;
 
-        String id = Long.toString(serialVersionUID);
+        //*******************************************************************************************************
+        // commented out the event handling, as this should be handled by L2 workflows and not by services themselves.
+        /*String id = Long.toString(serialVersionUID);
         String name = ImageMagickMigrate.NAME;
         String type = "Migrate";
 
 
-
+        
         String datetime = ServiceUtils.getSystemDateAndTimeFormatted();
         String summary = "Image migration from " + inputExt.toUpperCase() + " to " + outputExt.toUpperCase() + ".\nUsed tool: ImageMagick.";
         endTime = System.currentTimeMillis();
@@ -348,13 +346,14 @@ public class ImageMagickMigrate implements Migrate, Serializable {
 
 
         Agent agent = new Agent(id,name,type);            
-        Event event = new Event(summary,datetime,duration,agent,null);
+        Event event = new Event(summary,datetime,duration,agent,null);*/
+        //*******************************************************************************************************
 
         newDigObj = new DigitalObject.Builder(Content.byValue(outputFile))
         .format(outputFormat)
         .title(outputFile.getName())
         .permanentUri(URI.create("http://planets.services.migration.ImageMagickMigrate"))
-        .events(event)
+//        .events(event)
         .build();
 
         plogger.info("Created new DigitalObject for result file...");

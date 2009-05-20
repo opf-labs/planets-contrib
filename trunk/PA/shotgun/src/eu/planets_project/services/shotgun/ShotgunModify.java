@@ -35,10 +35,10 @@ public final class ShotgunModify implements Modify {
     /**
      * {@inheritDoc}
      * @see eu.planets_project.services.modify.Modify#modify(eu.planets_project.services.datatypes.DigitalObject,
-     *      java.net.URI, java.net.URI, java.util.List)
+     *      java.net.URI, java.util.List)
      */
     public ModifyResult modify(DigitalObject digitalObject, URI inputFormat,
-            URI actionURI, List<Parameter> parameters) {
+            List<Parameter> parameters) {
         DigitalObject modified = modify(digitalObject, parameters);
         ModifyResult result = new ModifyResult(modified, new ServiceReport(
                 Type.INFO, Status.SUCCESS, "OK"));

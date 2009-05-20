@@ -41,7 +41,7 @@ public class ShotgunModifyTests {
                 .toString());
         /* Instantiate the shotgun and modify the file: */
         ModifyResult modify = new ShotgunModify().modify(INPUT_DIGITAL_OBJECT,
-                null, null, Arrays.asList(count, length, action));
+                null, Arrays.asList(count, length, action));
         return modify;
     }
 

@@ -13,7 +13,6 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
-import javax.xml.ws.BindingType;
 
 import magick.ImageInfo;
 import magick.MagickException;
@@ -47,7 +46,6 @@ import eu.planets_project.services.utils.ServiceUtils;
         targetNamespace = PlanetsServices.NS,
         endpointInterface = "eu.planets_project.services.identify.Identify" )
         
-@BindingType(value = "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")        
 public class ImageMagickIdentify implements Identify {
 	
 	public static final String NAME = "ImageMagickIdentify";
