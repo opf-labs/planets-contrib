@@ -23,40 +23,25 @@ import eu.planets_project.services.utils.FileUtils;
 public class DigitalObjectDiskCache {
 
 	public static Log log = LogFactory.getLog(DigitalObjectDiskCache.class);
-
-	/**
-	* @param sessionId
-	* @return
-	*/
-	public static File findCacheDir( String sessionId ) {
-		// For security reasons, do not allow directory separators:
-		if( sessionId.contains("/") ) 
-			return null;
-		if( sessionId.contains("\\") ) 
-			return null;
-		return new File(System.getProperty("java.io.tmpdir"), "pserv-pa-grateview/"+sessionId);
-	}
+	private static File cachedir = new File(System.getProperty("java.io.tmpdir"), "pserv-pa-grateview/");
 
 	/**
 	* @param digitalObjects
 	* @return
 	*/
-	public static String cacheDigitalObjects( List<DigitalObject> digitalObjects ) 
+	public static String cacheDigitalObject(DigitalObject dob) 
 	{       
 		String sessionId = UUID.randomUUID().toString();
-		File cachedir = findCacheDir( sessionId );
-		if(!cachedir.mkdirs())
-		{
-			log.error("failed to create caching dir: " + cachedir);
-			return null;
+		if(!cachedir.exists()) {
+			if(!cachedir.mkdirs())
+			{
+				log.error("failed to create caching dir: " + cachedir);
+				return null;
+			}
 		}
 
-		// Store Digital Objects:
-		for( DigitalObject dob : digitalObjects ) 
-		{
-			String filename = UUID.randomUUID().toString();
-			FileUtils.writeInputStreamToFile(dob.getContent().read(), cachedir, filename);
-		}
+		log.info("write " + dob.getTitle());
+		FileUtils.writeInputStreamToFile(dob.getContent().read(), cachedir, sessionId);
 		return sessionId;
 	}
 
@@ -64,10 +49,8 @@ public class DigitalObjectDiskCache {
 	* @param sessionId
 	* @return
 	*/
-	public static List<DigitalObject> recoverDigitalObjects( String sessionId ) {
-		List<DigitalObject> dobs = new ArrayList<DigitalObject>();
-
-		File cachedir = findCacheDir(sessionId);
+	public static DigitalObject recoverDigitalObject(String sessionId) 
+	{
 		if(!cachedir.isDirectory())
 		{
 			log.error("recovering failed: " + cachedir);
@@ -75,35 +58,23 @@ public class DigitalObjectDiskCache {
 			return null;
 		}
 
-		File[] filelist = cachedir.listFiles();
+		File f = new File(cachedir, sessionId);
+		if(!f.exists())
+		{
+			log.error("no such file or directory: " + f);
+			return null;
+		}
+		
+		DigitalObject dob = null;
 		try {
-			for (File f : filelist) {
-				DigitalObjectContent c = Content.byReference(f.toURL());
-				dobs.add(new DigitalObject.Builder(c).build());
-			}
+			DigitalObjectContent c = Content.byReference(f.toURL());
+			dob = new DigitalObject.Builder(c).build();
 		}
 		catch(MalformedURLException e)
 		{
 			e.printStackTrace();
 		}
-		return dobs;
-	}
-
-	/**
-	* @param sessionId
-	* @param i index 
-	* @return
-	*/
-	public static DigitalObject findCachedDigitalObject( String sessionId, int i ) 
-	{
-		List<DigitalObject> digitalObjects = recoverDigitalObjects(sessionId);
-		if( digitalObjects == null || digitalObjects.size() == 0) 
-			return null;
-
-		if( i < 0 || i >= digitalObjects.size())
-			i = 0;
-
-		return digitalObjects.get(i);
+		return dob;
 	}
 }
 

@@ -4,18 +4,17 @@
 
 // Pick up the parameters:
 String sid = request.getParameter("sid");
-int fid = 0;// Integer.parseInt(request.getParameter("fid"));
 
 // Decode the file name (might contain spaces and on) and prepare file object.
 sid = URLDecoder.decode(sid, "UTF-8");
 
 // Open the file:
-DigitalObject f = DigitalObjectDiskCache.findCachedDigitalObject( sid, fid );
+DigitalObject f = DigitalObjectDiskCache.recoverDigitalObject(sid);
 
 // Does this DOB exist?
 if( f != null ) {
     response.setContentType( "application/octet-stream" );
-  response.setHeader("Content-Disposition","attachment;filename=atari.jpg");
+  response.setHeader("Content-Disposition","attachment;filename=floppy.img");
 
     // Now stream out the data:
     DataInputStream in = new DataInputStream(f.getContent().read());

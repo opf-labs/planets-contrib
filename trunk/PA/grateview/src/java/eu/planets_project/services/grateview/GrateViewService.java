@@ -10,6 +10,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.File;
 
 import javax.annotation.Resource;
 import javax.jws.WebService;
@@ -24,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.DigitalObjectContent;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
@@ -34,6 +36,17 @@ import eu.planets_project.services.view.CreateView;
 import eu.planets_project.services.view.CreateViewResult;
 import eu.planets_project.services.view.ViewActionResult;
 import eu.planets_project.services.view.ViewStatus;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
+import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.ZipResult;
+
+
+import eu.planets_project.services.migrate.Migrate;
+import eu.planets_project.services.migrate.MigrateResult;
+
+import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelperFactory;
+import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelper;
 
 /**
  * A GRATE Viewer service. 
@@ -61,6 +74,9 @@ public class GrateViewService implements CreateView {
 
 	/** A logger */
 	public static final Log LOG = LogFactory.getLog(GrateViewService.class);
+
+	private static final String FLOPPY_PATH =  "grate-floppy-content";
+	private static final String TMP_PATH = "grate-tmp";
 
 	/** A reference to the web service context. */
 	@Resource 
@@ -123,8 +139,9 @@ public class GrateViewService implements CreateView {
 	* @param digitalObjects
 	* @return
 	*/
-	public static CreateViewResult createViewerSession(List<DigitalObject> digitalObjects, 
-		URI baseUrl){
+	public static CreateViewResult createViewerSession(List<DigitalObject> digitalObjects, URI baseUrl)
+	{	
+		FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 		
 		for( DigitalObject dob : digitalObjects ) {
 		    if( dob.getContent() == null ) {
@@ -132,7 +149,45 @@ public class GrateViewService implements CreateView {
 		    }
 		}
 
-		String sessionID = DigitalObjectDiskCache.cacheDigitalObjects(digitalObjects);
+		
+		FileUtils.deleteTempFiles(new File(FileUtils.getSystemTempFolder(), TMP_PATH)); 
+		File temp_dir = FileUtils.createFolderInWorkFolder(FileUtils.getSystemTempFolder(), TMP_PATH);
+		if(temp_dir == null)
+			return returnWithErrorMessage("Failed to create temp folder.");
+
+		FileUtils.deleteTempFiles(new File(FileUtils.getSystemTempFolder(), FLOPPY_PATH));
+		File content_dir = FileUtils.createFolderInWorkFolder(FileUtils.getSystemTempFolder(), FLOPPY_PATH);
+		if(content_dir == null)
+			return returnWithErrorMessage("Failed to create temp folder.");
+
+		int i = 0;
+		for( DigitalObject dob : digitalObjects ) 
+		{
+			String filename = dob.getTitle();
+			if(filename == null)
+				filename = "no_file_name" + i++;
+			FileUtils.writeInputStreamToFile(dob.getContent().read(), content_dir, filename);
+		}
+		ZipResult zip_result = FileUtils.createZipFileWithChecksum(content_dir, temp_dir, "floppy.zip");
+		if(zip_result == null)
+			return returnWithErrorMessage("Failed to create zip file.");
+
+		DigitalObjectContent doc = Content.byReference(zip_result.getZipFile());
+		DigitalObject doz =  new DigitalObject.Builder(doc).format(format.createExtensionUri("zip"))
+				.title(zip_result.getZipFile().getName()).build();
+
+		FloppyImageHelper helper = FloppyImageHelperFactory.getFloppyImageHelperInstance();
+
+		List<Parameter> __unused__ = new ArrayList<Parameter>();
+		MigrateResult mr = helper.migrate(doz, 
+				format.createExtensionUri("zip"), 
+				format.createExtensionUri("IMG"), 
+				__unused__);
+	
+		if(mr.getReport().getStatus() != Status.SUCCESS)
+			return returnWithErrorMessage(mr.getReport().toString());
+
+		String sessionID = DigitalObjectDiskCache.cacheDigitalObject(mr.getDigitalObject());
 		String imgPath = null;
 		URL sessionURL = null;
 		try {
@@ -162,9 +217,9 @@ public class GrateViewService implements CreateView {
 		CreateView grate = service.getPort(CreateView.class);
 
 		// Construct a list of DOBs covering the given URL:
-		DigitalObject.Builder dob = new DigitalObject.Builder(Content.byReference( _url.toURL() ));
+		DigitalObject dob = new DigitalObject.Builder(Content.byReference(_url.toURL())).build();
 		List<DigitalObject> digitalObjects = new ArrayList<DigitalObject>();
-		digitalObjects.add(dob.build());
+		digitalObjects.add(dob);
 
 		// Invoke the service and create the view:
 		CreateViewResult cvr = grate.createView(digitalObjects, null);
