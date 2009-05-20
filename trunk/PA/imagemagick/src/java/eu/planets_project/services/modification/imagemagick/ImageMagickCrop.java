@@ -9,6 +9,7 @@ import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -116,6 +117,14 @@ public class ImageMagickCrop implements Modify {
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
         sd.description("This service uses ImageMagick to crop images. That means, that you will have to install ImageMagick on the machine" +
         		"where this service will be deployed to get this to work. ");
+        List<Parameter> parameters = new ArrayList<Parameter>();
+        Parameter top_left_point = new Parameter.Builder("top_left_point", "x,y").description("This parameter specifies the top-left point of the area to keep. You can define the cropping area in two ways: 1) give top-left and bottom-right corner 2) give top-left corner and width and height of the cropping area.").type("int").build();
+        Parameter bottom_right_point = new Parameter.Builder("bottom_right_point", "x,y").description("This parameter specifies the bottom_right point of the area to keep. You can define the cropping area in two ways: 1) give top-left and bottom-right corner 2) give top-left corner and width and height of the cropping area.").type("int").build();
+        Parameter crop_area_size = new Parameter.Builder("crop_area_size", "width, height").description("This parameter specifies the widht and height of the area to keep. You can define the cropping area in two ways: 1) give top-left and bottom-right corner 2) give top-left corner and width and height of the cropping area.").type("int (Pixel)").build();
+        parameters.add(top_left_point);
+        parameters.add(bottom_right_point);
+        parameters.add(crop_area_size);
+        sd.parameters(parameters);
         sd.classname(this.getClass().getCanonicalName());
         sd.version("1.0");
         sd.tool(Tool.create(null, "ImageMagick", "v6.3.9-Q8", null, "http://www.imagemagick.org"));
