@@ -126,7 +126,6 @@ public class ImageMagickRotate implements Modify {
         parameters.add(rotateClockwise);
         parameters.add(rotateCounterClockwise);
         parameters.add(backgroundColor);
-        // http://www.imagemagick.org/script/color.php for color names (-background param)
         sd.classname(this.getClass().getCanonicalName());
         sd.version("1.0");
         sd.tool(Tool.create(null, "ImageMagick", "v6.3.9-Q8", null, "http://www.imagemagick.org"));

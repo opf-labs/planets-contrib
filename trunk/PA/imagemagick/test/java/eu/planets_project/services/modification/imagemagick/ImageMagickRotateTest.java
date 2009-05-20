@@ -52,7 +52,7 @@ public class ImageMagickRotateTest {
 	public void testModifyRotateClockwise() {
 		DigitalObject input = new DigitalObject.Builder(Content.byReference(testFile)).build();
 		List<Parameter> parameters = new ArrayList<Parameter>();
-		parameters.add(new Parameter("rotateClockwise", "0.5"));
+		parameters.add(new Parameter("rotateClockwise", "17.63"));
 		ModifyResult mr = im_rotate.modify(input, formatReg.createExtensionUri("tiff"), parameters);
 		assertTrue("ModifyResult should not be NULL!", mr!=null);
 		File result = new File(test_tmp_folder, "rotated_CW.tiff");
@@ -82,7 +82,7 @@ public class ImageMagickRotateTest {
 	public void testModifyRotateClockwiseWithBackground() {
 		DigitalObject input = new DigitalObject.Builder(Content.byReference(testFile)).build();
 		List<Parameter> parameters = new ArrayList<Parameter>();
-		parameters.add(new Parameter("rotateClockwise", "0.5"));
+		parameters.add(new Parameter("rotateClockwise", "7.75"));
 		parameters.add(new Parameter("backgroundColor", "CornflowerBlue"));
 		ModifyResult mr = im_rotate.modify(input, formatReg.createExtensionUri("tiff"), parameters);
 		assertTrue("ModifyResult should not be NULL!", mr!=null);
