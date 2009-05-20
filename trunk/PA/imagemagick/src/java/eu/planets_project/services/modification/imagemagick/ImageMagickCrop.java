@@ -116,7 +116,13 @@ public class ImageMagickCrop implements Modify {
 		sd.properties(new Property.Builder(URI.create("planets:mod/crop")).name("Supported modification action").value("crop").build());
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
         sd.description("This service uses ImageMagick to crop images. That means, that you will have to install ImageMagick on the machine" +
-        		"where this service will be deployed to get this to work. ");
+        		"where this service will be deployed to get this to work.");
+        sd.instructions("You have to specify the cropping parameters the following way:" + br + 
+				"1) top_left_point = X,Y (with X and Y beeing the coordinates this point should have!)" + br + 
+				"   bottom_right_point = X,Y (with X and Y beeing the coordinates this point should have!)" + br +
+				"2) top_left_point = X,Y (with X and Y beeing the coordinates this point should have!)" + br + 
+				"   crop_area_size = WIDTH,HEIGHT (with WIDTH and HEIGHT beeing the width and height (in pixel) of the area to keep!)" + br + 
+				"If no top_left_point is specified, it is assumed to be located at (0,0) which is the upper left corner of the image.");
         List<Parameter> parameters = new ArrayList<Parameter>();
         Parameter top_left_point = new Parameter.Builder("top_left_point", "x,y").description("This parameter specifies the top-left point of the area to keep. You can define the cropping area in two ways: 1) give top-left and bottom-right corner 2) give top-left corner and width and height of the cropping area.").type("int").build();
         Parameter bottom_right_point = new Parameter.Builder("bottom_right_point", "x,y").description("This parameter specifies the bottom_right point of the area to keep. You can define the cropping area in two ways: 1) give top-left and bottom-right corner 2) give top-left corner and width and height of the cropping area.").type("int").build();
