@@ -1,6 +1,8 @@
 package eu.planets_project.services.migration.xenaservices;
 
-import eu.planets_project.ifr.core.techreg.api.formats.Format;
+import eu.planets_project.ifr.core.techreg.formats.Format;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import org.junit.Test;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
@@ -90,9 +92,11 @@ public final class XenaServicesMigrationTest extends TestCase {
     }
 
     private void migrate(String from, String to) throws IOException {
+        FormatRegistry formatRegistry = FormatRegistryFactory.getFormatRegistry();
         byte[] binary = FileUtils.readFileIntoByteArray(new File("PA/xena/test/testfiles/testin." + from));
         DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
-        MigrateResult mr = dom.migrate(input, Format.extensionToURI(from), Format.pronomIdToURI(to), null);
+//        MigrateResult mr = dom.migrate(input, Format.extensionToURI(from), Format.pronomIdToURI(to), null);
+        MigrateResult mr = dom.migrate(input, formatRegistry.createExtensionUri(from), formatRegistry.createPronomUri(to), null);
         DigitalObject doOut = mr.getDigitalObject();
         assertTrue("Resulting digital object is null.", doOut != null);
         InputStream inputStream_odf = doOut.getContent().read();
