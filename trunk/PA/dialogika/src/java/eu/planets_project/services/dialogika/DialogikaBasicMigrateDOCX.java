@@ -19,8 +19,8 @@ import de.dialogika.planets.planets_webservice.genericmigration.GenericMigration
 import de.dialogika.planets.planets_webservice.genericmigration.GenericMigrationSoap;
 import de.dialogika.planets.planets_webservice.genericmigration.MigrateOneBinaryResult;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
@@ -34,7 +34,10 @@ import eu.planets_project.services.utils.FileUtils;
  * A simple service to wrap the Dialogika services.
  * @author <a href="mailto:Andrew.Jackson@bl.uk">Andy Jackson</a>
  */
-@WebService(name = DialogikaBasicMigrateDOCX.NAME, serviceName = Migrate.NAME, targetNamespace = PlanetsServices.NS, endpointInterface = "eu.planets_project.services.migrate.BasicMigrateOneBinary")
+@WebService(name = DialogikaBasicMigrateDOCX.NAME, 
+		serviceName = Migrate.NAME,
+        targetNamespace = PlanetsServices.NS,
+        endpointInterface = "eu.planets_project.services.migrate.Migrate")
 public class DialogikaBasicMigrateDOCX implements Migrate {
 
     public static final String NAME = "DialogikaBasicMigrateDOCX";
