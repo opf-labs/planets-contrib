@@ -193,13 +193,13 @@ public class JJ2000ViewerService implements CreateView {
      */
     public ViewStatus getViewStatus(String sessionIdentifier) {
         // Lookup this cache:
-        File cache = DigitalObjectDiskCache.recoverDigitalObjects( sessionIdentifier );
+        List<DigitalObject> cache = DigitalObjectDiskCache.recoverDigitalObjects( sessionIdentifier );
         
         // Default to 'inactive'
         ViewStatus vs = new ViewStatus( ViewStatus.Status.INACTIVE, null );
         
         // If it's active, return info:
-        if( cache != null && cache.exists() && cache.isDirectory() ) {
+        if( cache != null && cache.size() > 0 ) {
             vs = new ViewStatus( ViewStatus.Status.ACTIVE, null );
         }
         // TODO Override with UNKNOWN for now.

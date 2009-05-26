@@ -1,5 +1,5 @@
 <%@ page
-  import="java.io.*,java.net.URLDecoder,java.util.List,javax.activation.MimetypesFileTypeMap,eu.planets_project.services.jj2000.JJ2000ViewerService,eu.planets_project.services.datatypes.DigitalObject,eu.planets_project.services.utils.cache.DigitalObjectDiskCache"
+  import="java.io.*,java.net.URLDecoder,java.util.List,javax.activation.MimetypesFileTypeMap,eu.planets_project.services.jj2000.JJ2000ViewerService,eu.planets_project.services.datatypes.DigitalObject,eu.planets_project.ifr.core.storage.utils.DigitalObjectDiskCache"
 %><% 
 
 // Pick up the parameters:
@@ -14,10 +14,14 @@ sid = URLDecoder.decode(sid, "UTF-8");
 
 // Look at the file list:
 List<DigitalObject> dobs = DigitalObjectDiskCache.recoverDigitalObjects(sid);
-if( fid >= dobs.size() ) fid = 0;
+
+// sizes etc.
+int num = 0;
+if( dobs != null ) num = dobs.size();
+if( dobs != null && fid >= dobs.size() ) fid = 0;
 
 // Create title
-String pageTitle = "Viewing Digital Object "+(fid+1)+" of "+dobs.size();
+String pageTitle = "Viewing Digital Object "+(fid+1)+" of "+num;
 
 %>
 <html>
@@ -43,6 +47,10 @@ select, input, #footer {
 </style>
 </head>
 <body>
+
+<%
+  if( dobs != null ) {
+%>
 
 <table id="page" cellpadding="0" cellspacing="0" border="1"
   style="width:100%; height:100%; margin:0; padding: 0; border-collapse: collapse;">
@@ -89,6 +97,17 @@ select, input, #footer {
 </tr>
 </table>
 
+<%
+  } else {
+%>
+
+<p>
+This viewer session has expired.
+</p>
+
+<%
+  }
+%>
 
 </body>
 </html>
