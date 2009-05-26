@@ -36,13 +36,13 @@ import eu.planets_project.services.view.CreateView;
 import eu.planets_project.services.view.CreateViewResult;
 import eu.planets_project.services.view.ViewActionResult;
 import eu.planets_project.services.view.ViewStatus;
+import eu.planets_project.ifr.core.storage.utils.DigitalObjectDiskCache;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ZipResult;
 
 
-import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 
 import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelperFactory;

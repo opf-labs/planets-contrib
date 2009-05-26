@@ -32,7 +32,7 @@ import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
-import eu.planets_project.services.utils.cache.DigitalObjectDiskCache;
+import eu.planets_project.ifr.core.storage.utils.DigitalObjectDiskCache;
 import eu.planets_project.services.view.CreateView;
 import eu.planets_project.services.view.CreateViewResult;
 import eu.planets_project.services.view.ViewAction;
@@ -193,7 +193,7 @@ public class JJ2000ViewerService implements CreateView {
      */
     public ViewStatus getViewStatus(String sessionIdentifier) {
         // Lookup this cache:
-        File cache = DigitalObjectDiskCache.findCacheDir( sessionIdentifier );
+        File cache = DigitalObjectDiskCache.recoverDigitalObjects( sessionIdentifier );
         
         // Default to 'inactive'
         ViewStatus vs = new ViewStatus( ViewStatus.Status.INACTIVE, null );
