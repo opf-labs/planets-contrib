@@ -10,6 +10,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.io.File;
 
 import javax.annotation.Resource;
@@ -77,6 +78,8 @@ public class GrateViewService implements CreateView {
 
 	private static final String FLOPPY_PATH =  "grate-floppy-content";
 	private static final String TMP_PATH = "grate-tmp";
+	
+	private static String grateBaseUrl = "http://planets.ruf.uni-freiburg.de/~randy/GRATE_IF.php";
 
 	/** A reference to the web service context. */
 	@Resource 
@@ -129,6 +132,19 @@ public class GrateViewService implements CreateView {
 		return baseUrl;
 	}
 
+	private static void loadProperties()
+	{
+		Properties props = new Properties();
+		try {
+			props.load(GrateViewService.class.getResourceAsStream("grateview.properties"));
+			grateBaseUrl = props.getProperty("grate.base.url");
+		}
+		catch (Exception e)
+		{	
+			e.printStackTrace();
+		}
+	}
+
 	public CreateViewResult createView(List<DigitalObject> digitalObjects,  List<Parameter> parameters) {
 		// Instanciate the View:
 		return createViewerSession(digitalObjects, getBaseURIFromWSContext(wsc));
@@ -149,7 +165,8 @@ public class GrateViewService implements CreateView {
 		    }
 		}
 
-		
+		loadProperties();
+	
 		FileUtils.deleteTempFiles(new File(FileUtils.getSystemTempFolder(), TMP_PATH)); 
 		File temp_dir = FileUtils.createFolderInWorkFolder(FileUtils.getSystemTempFolder(), TMP_PATH);
 		if(temp_dir == null)
@@ -199,11 +216,11 @@ public class GrateViewService implements CreateView {
 		}
 
 		try {
-			sessionURL = new URL("http://planets.ruf.uni-freiburg.de/~randy/GRATE_IF.php?puid=2&uid=1&object_url=" + imgPath);
+			sessionURL = new URL(grateBaseUrl + "?puid=2&uid=1&object_url=" + imgPath);
 		}
 		catch (Exception e)
 		{
-			return returnWithErrorMessage("Failed creating sessionURL");
+			return returnWithErrorMessage("Failed creating sessionURL: " + grateBaseUrl + "?puid=2&uid=1&object_url=" + imgPath);
 		}
 		ServiceReport rep = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
 
