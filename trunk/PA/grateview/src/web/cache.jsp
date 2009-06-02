@@ -1,5 +1,5 @@
 <%@ page
-  import="java.io.*,java.net.URLDecoder,javax.activation.MimetypesFileTypeMap,eu.planets_project.services.datatypes.DigitalObject,eu.planets_project.services.grateview.DigitalObjectDiskCache"
+  import="java.io.*,java.net.URLDecoder,javax.activation.MimetypesFileTypeMap,eu.planets_project.services.datatypes.DigitalObject,eu.planets_project.ifr.core.storage.utils.DigitalObjectDiskCache"
 %><% 
 
 // Pick up the parameters:
