@@ -132,7 +132,7 @@ public class SoX implements Migrate, Serializable {
         sd.classname(this.getClass().getCanonicalName());
         sd.version("0.1");
         sd.name("Sox Audio Converter Service");
-        sd.type("Migrate");
+        sd.type(Migrate.class.getCanonicalName());
         List<Parameter> parameterList = new ArrayList<Parameter>();
         
         Parameter showProgress = new Parameter.Builder("showProgress", "-S")
