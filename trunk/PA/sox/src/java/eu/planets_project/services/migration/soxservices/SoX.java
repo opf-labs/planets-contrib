@@ -376,7 +376,8 @@ public class SoX implements Migrate, Serializable {
 		//**********************************************************************
         // Configuring and running the ProcessRunner
 		ProcessRunner pr = new ProcessRunner(soxCommands);
-        pr.setStartingDir(new File(SOX_HOME));
+		if( SOX_HOME != null && ! "".equals(SOX_HOME))
+		    pr.setStartingDir(new File(SOX_HOME));
         
         plogger.info("Executing: " + soxCommands);
         
