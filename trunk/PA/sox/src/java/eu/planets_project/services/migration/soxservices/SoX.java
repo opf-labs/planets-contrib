@@ -98,13 +98,16 @@ public class SoX implements Migrate, Serializable {
 	
 	public SoX() {
 		// Getting SoX installation location 
-		SOX_HOME = System.getenv("SOX_HOME") + File.separator;
+		SOX_HOME = System.getenv("SOX_HOME");
     	
     	if(SOX_HOME==null){
     		System.err.println("SOX_HOME is not set! Please create an system variable\n" +
     				"and point it to the SoX installation folder!");
     		plogger.error("SOX_HOME is not set! Please create an system variable\n" +
     				"and point it to the SoX installation folder!");
+    		SOX_HOME = "";
+    	} else {
+    	    SOX_HOME += File.separator;
     	}
 		
         plogger.info("Found SoX installation in: " + SOX_HOME);
