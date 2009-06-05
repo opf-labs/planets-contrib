@@ -34,6 +34,7 @@ import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
+import eu.planets_project.services.identification.imagemagick.utils.ImageMagickHelper;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -128,35 +129,39 @@ public class ImageMagickMigrate implements Migrate, Serializable {
         sd.parameters(parameterList);
         
         sd.tool( Tool.create(null, "ImageMagick", "6.3.9-Q8", null, IMAGE_MAGICK_URI) );
-
+        
+        
+        
         // Migration Paths: List all combinations:
-        List<String> inputFormats = new ArrayList<String> ();
-
-        inputFormats.add("JPEG");
-        inputFormats.add("JP2");
-        inputFormats.add("TIFF");
-        inputFormats.add("GIF");
-        inputFormats.add("PNG");
-        inputFormats.add("BMP");
-        //		inputFormats.add("RAW");
-        inputFormats.add("PCX");
-        inputFormats.add("TGA");
-        inputFormats.add("PDF");
-
-        List<String> outputFormats = new ArrayList<String> ();
-
-        outputFormats.add("TIFF");
-        outputFormats.add("PNG");
-        outputFormats.add("JPEG");
-        outputFormats.add("JP2");
-        outputFormats.add("GIF");
-        outputFormats.add("PDF");
-        //		outputFormats.add("RAW");
-        outputFormats.add("PCX");
-        outputFormats.add("TGA");
-        outputFormats.add("BMP");
-
-        sd.paths(createMigrationPathwayMatrix(inputFormats, outputFormats));
+//        List<String> inputFormats = new ArrayList<String> ();
+//
+//        inputFormats.add("JPEG");
+//        inputFormats.add("JP2");
+//        inputFormats.add("TIFF");
+//        inputFormats.add("GIF");
+//        inputFormats.add("PNG");
+//        inputFormats.add("BMP");
+//        //		inputFormats.add("RAW");
+//        inputFormats.add("PCX");
+//        inputFormats.add("TGA");
+//        inputFormats.add("PDF");
+//
+//        List<String> outputFormats = new ArrayList<String> ();
+//
+//        outputFormats.add("TIFF");
+//        outputFormats.add("PNG");
+//        outputFormats.add("JPEG");
+//        outputFormats.add("JP2");
+//        outputFormats.add("GIF");
+//        outputFormats.add("PDF");
+//        //		outputFormats.add("RAW");
+//        outputFormats.add("PCX");
+//        outputFormats.add("TGA");
+//        outputFormats.add("BMP");
+        
+        // Checks the installed extensions and supported formats on the fly and creates Migration paths matching the systems capabilities.
+        sd.paths(ServiceUtils.createMigrationPathways(ImageMagickHelper.getSupportedInputFormats(), ImageMagickHelper.getSupportedOutputFormats()));
+//        sd.paths(createMigrationPathwayMatrix(inputFormats, outputFormats));
 
         return sd.build();
     }

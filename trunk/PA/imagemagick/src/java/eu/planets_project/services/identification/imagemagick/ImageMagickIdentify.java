@@ -26,6 +26,7 @@ import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
+import eu.planets_project.services.identification.imagemagick.utils.ImageMagickHelper;
 import eu.planets_project.services.identify.Identify;
 import eu.planets_project.services.identify.IdentifyResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -81,6 +82,7 @@ public class ImageMagickIdentify implements Identify {
         		"The following URIs are the matching PRONOM IDs.");
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
         sd.classname(this.getClass().getCanonicalName());
+        sd.inputFormats(ImageMagickHelper.getSupportedInputFormats().toArray(new URI[]{}));
         return sd.build();
 	}
 

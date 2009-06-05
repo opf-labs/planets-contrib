@@ -13,25 +13,25 @@ public class ImageMagickMigrateTestHelper {
 	/** output for local tests */
 	public static final String LOCAL_TEST_OUT = "IMAGE_MAGICK_MIGRATIONS_LOCAL_TEST";
 	/** the location of the jped test file */
-	public static final String JPG_TEST_FILE = "PA/jmagickconverter/src/main/resources/test_images/test_jpg/2326378356_65c3b81dfd.jpg";
+	public static final String JPG_TEST_FILE = "tests/test-files/images/bitmap/test_jpg/2274192346_4a0a03c5d6.jpg";
 	/** location of the PNG test file */
-	public static final String PNG_TEST_FILE = "PA/jmagickconverter/src/main/resources/test_images/test_png/2326378356_65c3b81dfd.png";
+	public static final String PNG_TEST_FILE = "tests/test-files/images/bitmap/test_png/2274192346_4a0a03c5d6.png";
 	/** location of the TIFF test file */
-	public static final String TIFF_TEST_FILE = "PA/jmagickconverter/src/main/resources/test_images/test_tiff/2326378356_65c3b81dfd.tif";
+	public static final String TIFF_TEST_FILE = "tests/test-files/images/bitmap/test_tiff/2274192346_4a0a03c5d6.tif";
 	/** location of the GIF test file */
-	public static final String GIF_TEST_FILE = "PA/jmagickconverter/src/main/resources/test_images/test_gif/2326378356_65c3b81dfd.gif";
+	public static final String GIF_TEST_FILE = "tests/test-files/images/bitmap/test_gif/2274192346_4a0a03c5d6.gif";
 	/** location of the BMP test file */
-	public static final String BMP_TEST_FILE = "PA/jmagickconverter/src/main/resources/test_images/test_bmp/2326378356_65c3b81dfd.bmp";
+	public static final String BMP_TEST_FILE = "tests/test-files/images/bitmap/test_bmp/2274192346_4a0a03c5d6.bmp";
 	/** location of the RAW test file */
-	public static final String RAW_TEST_FILE = "PA/jmagickconverter/src/main/resources/test_images/test_raw/2326378356_65c3b81dfd.raw";
+	public static final String RAW_TEST_FILE = "tests/test-files/images/bitmap/test_raw/2274192346_4a0a03c5d6.raw";
 	/** location of the TGA test file */
-	public static final String TGA_TEST_FILE = "PA/jmagickconverter/src/main/resources/test_images/test_tga/2326378356_65c3b81dfd.tga";
+	public static final String TGA_TEST_FILE = "tests/test-files/images/bitmap/test_tga/2274192346_4a0a03c5d6.tga";
 	/** location of the PCX test file */
-	public static final String PCX_TEST_FILE = "PA/jmagickconverter/src/main/resources/test_images/test_pcx/2326378356_65c3b81dfd.pcx";
+	public static final String PCX_TEST_FILE = "tests/test-files/images/bitmap/test_pcx/2274192346_4a0a03c5d6.pcx";
 	/** location of the PDF test file */
-	public static final String PDF_TEST_FILE = "PA/jmagickconverter/src/main/resources/test_images/test_pdf/2326378356_65c3b81dfd.pdf";
+	public static final String PDF_TEST_FILE = "tests/test-files/images/bitmap/test_pdf/2274192346_4a0a03c5d6.pdf";
 	/** location of the JPEG 200 test file */
-	public static final String JP2_TEST_FILE = "PA/jmagickconverter/src/main/resources/test_images/test_jp2/2274192346_4a0a03c5d6.jp2";
+	public static final String JP2_TEST_FILE = "tests/test-files/images/bitmap/test_jp2/2274192346_4a0a03c5d6.jp2";
 	/** compression quality constant */
 	public static String COMP_QUAL_25 = "25";
 	/** compression quality constant */
