@@ -98,18 +98,12 @@ public class ImageMagickHelper {
 		if(inFormats == null || outFormats == null) {
 			init();
 		}
-		else {
-			log.info("ImageMagick format tables already initialized.");
-		}
 		return inFormats;
 	}
 	
 	public static List<URI> getSupportedOutputFormats() {
 		if(inFormats == null || outFormats == null) {
 			init();
-		}
-		else {
-			log.info("ImageMagick format tables already initialized.");
 		}
 		return outFormats;
 	}

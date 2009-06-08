@@ -76,7 +76,6 @@ public class Im4JavaImageMagickMigrate implements Migrate, Serializable {
     private static final double COMPRESSION_QUALITY_LEVEL_DEFAULT = 100.00;
     private static final String IMAGEMAGICK_TEMP = "Im4JavaImageMagickMigrate";
     private static final String DEFAULT_INPUT_FILE_NAME = "Im4JavaImageMagickInput";
-    private static final String DEFAULT_OUTPUT_FILE_NAME = "Im4JavaImageMagickOutput";
     private static final String IMAGE_MAGICK_URI = "http://www.imagemagick.org";
     private static final FormatRegistry formatRegistry = FormatRegistryFactory.getFormatRegistry();
     
@@ -206,8 +205,8 @@ public class Im4JavaImageMagickMigrate implements Migrate, Serializable {
         
         if(actualSrcFormat!=null) {
         	if(!extensionsAreEqual(inputExt, actualSrcFormat)) {
-        		return this.returnWithErrorMessage("The inputImage does NOT have the file format you claim it has: " + inputExt + "" +
-        				"The actual format is instead: " + actualSrcFormat + ". Please check! " +
+        		return this.returnWithErrorMessage("The inputImage does NOT have the file format you claim it has: " + inputExt.toUpperCase() + 
+        				" The actual format is instead: " + actualSrcFormat + ". Please check! " +
         						"Returning with Error-Report, nothing has been done, sorry!", null);
         	}
         }

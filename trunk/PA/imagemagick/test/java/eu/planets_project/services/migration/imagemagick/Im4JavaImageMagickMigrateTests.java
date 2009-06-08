@@ -113,6 +113,7 @@ public class Im4JavaImageMagickMigrateTests {
         testMigrate(inputFormatExt, outputFormatExt, createParameters(Im4JavaImageMagickMigrateTestHelper.COMP_TYPE_NO, Im4JavaImageMagickMigrateTestHelper.COMP_QUAL_100));
     }
     
+    
     /**
      * test jpg to tiff migration
      * @throws IOException
