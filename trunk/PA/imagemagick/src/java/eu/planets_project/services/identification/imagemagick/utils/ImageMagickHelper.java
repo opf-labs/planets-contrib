@@ -22,7 +22,6 @@ import eu.planets_project.services.utils.ProcessRunner;
 public class ImageMagickHelper {
 	
 //	private static File im_home = new File(System.getenv("IMAGEMAGICK_HOME"));
-	private static File im_home = null;
 	private static FormatRegistry fReg = FormatRegistryFactory.getFormatRegistry();
 	private static List<URI> inFormats = null;
 	private static List<URI> outFormats = null;
@@ -36,14 +35,13 @@ public class ImageMagickHelper {
 					"set up an Environment variable \"IMAGEMAGICK_HOME\" pointing to the installation folder.");
 			System.err.println("Cannot find ImageMagick installation. If you have ImageMagick installed on your system, please " +
 					"set up an Environment variable \"IMAGEMAGICK_HOME\" pointing to the installation folder.");
-			return;
 		}
-		
-		im_home = new File(im_home_path);
 		
 		log.info("Initializing ImageMagick format tables." + System.getProperty("line.separator") +  "Checking supported formats and installed libraries...will be back soon, please hang on!");
 		ProcessRunner imageMagick = new ProcessRunner();
-		imageMagick.setStartingDir(im_home);
+		if( im_home_path != null ) {
+		    imageMagick.setStartingDir(new File(im_home_path));
+		}
 		imageMagick.setCommand(getListCommand());
 		imageMagick.run();
 		String output = imageMagick.getProcessOutputAsString();
@@ -78,7 +76,7 @@ public class ImageMagickHelper {
 	
 	private static List<String> getListCommand() {
 		List<String> commands = new ArrayList<String>();
-		commands.add(im_home.getAbsolutePath() + File.separator + "identify");
+		commands.add("identify");
 		commands.add("-list");
 		commands.add("format");
 		return commands;

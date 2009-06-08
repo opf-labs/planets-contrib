@@ -82,7 +82,9 @@ public class ImageMagickIdentify implements Identify {
         		"The following URIs are the matching PRONOM IDs.");
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
         sd.classname(this.getClass().getCanonicalName());
-        sd.inputFormats(ImageMagickHelper.getSupportedInputFormats().toArray(new URI[]{}));
+        List<URI> formats = ImageMagickHelper.getSupportedInputFormats();
+        if( formats != null )
+            sd.inputFormats(formats.toArray(new URI[]{}));
         return sd.build();
 	}
 

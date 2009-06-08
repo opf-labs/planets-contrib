@@ -160,9 +160,10 @@ public class ImageMagickMigrate implements Migrate, Serializable {
 //        outputFormats.add("BMP");
         
         // Checks the installed extensions and supported formats on the fly and creates Migration paths matching the systems capabilities.
-        sd.paths(ServiceUtils.createMigrationPathways(ImageMagickHelper.getSupportedInputFormats(), ImageMagickHelper.getSupportedOutputFormats()));
+        if( ImageMagickHelper.getSupportedInputFormats() != null ) {
+          sd.paths(ServiceUtils.createMigrationPathways(ImageMagickHelper.getSupportedInputFormats(), ImageMagickHelper.getSupportedOutputFormats()));
 //        sd.paths(createMigrationPathwayMatrix(inputFormats, outputFormats));
-
+        }
         return sd.build();
     }
 
