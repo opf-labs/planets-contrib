@@ -62,9 +62,21 @@ public class ImageMagickHelper {
 		for (String currentString : lines) {
 			splitted = currentString.split(" ", 4);
 			if(splitted[2].contains("r")) {
+				if(splitted[1].equalsIgnoreCase("TIFF")) {
+					inputFormats.add(fReg.createExtensionUri("TIF"));
+				}
+				if(splitted[1].equalsIgnoreCase("JPEG")) {
+					inputFormats.add(fReg.createExtensionUri("JPG"));
+				}
 				inputFormats.add(fReg.createExtensionUri(splitted[1]));
 			}
 			if(splitted[2].contains("w")) {
+				if(splitted[1].equalsIgnoreCase("TIFF")) {
+					outputFormats.add(fReg.createExtensionUri("TIF"));
+				}
+				if(splitted[1].equalsIgnoreCase("JPEG")) {
+					outputFormats.add(fReg.createExtensionUri("JPG"));
+				}
 				outputFormats.add(fReg.createExtensionUri(splitted[1]));
 			}
 		}

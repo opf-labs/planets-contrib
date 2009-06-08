@@ -179,20 +179,17 @@ public class ImageMagickCrop implements Modify {
 	    
 	    try {
 	    	ConvertCmd convert = new ConvertCmd();
-		    List<String> commands = op.getCmdArgs();
+//		    List<String> commands = op.getCmdArgs();
 //		    for (String string : commands) {
 //				System.out.print(string + " ");
 //			}
 			convert.run(op);
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IM4JavaException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
