@@ -90,8 +90,11 @@ public class CoreImageMagick {
         compressionTypes.add("RLE");
         compressionTypes.add("Zip");
         compressionTypes.add("RunlegthEncoded");
-        
-        jmagick_compressionTypes[0] = "Undefined Compression";
+
+        plogger.info("Hello! Initializing Im4JavaImageMagickMigrate service...");
+    }
+    public static ServiceDescription describeJMagickMigrate(String serviceName, String className) {
+    	jmagick_compressionTypes[0] = "Undefined Compression";
         jmagick_compressionTypes[1] = "No Compression";
         jmagick_compressionTypes[2] = "BZip Compression";
         jmagick_compressionTypes[3] = "Fax Compression";
@@ -102,10 +105,7 @@ public class CoreImageMagick {
         jmagick_compressionTypes[8] = "LZW Compression";
         jmagick_compressionTypes[9] = "RLE Compression";
         jmagick_compressionTypes[10] = "Zip Compression";
-
-        plogger.info("Hello! Initializing Im4JavaImageMagickMigrate service...");
-    }
-    public static ServiceDescription describeJMagickMigrate(String serviceName, String className) {
+        
         ServiceDescription.Builder sd = new ServiceDescription.Builder(serviceName,Migrate.class.getCanonicalName());
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
         sd.description("A wrapper for ImageMagick file format conversions. Using ImageMagick v6.3.9-Q8 and JMagick v6.3.9-Q8.\n" +
@@ -116,8 +116,14 @@ public class CoreImageMagick {
         sd.version("1.0");
 
         List<Parameter> parameterList = new ArrayList<Parameter>();
-        Parameter compressionTypeParam = new Parameter.Builder("compressionType", "0-10").description( 
-                "Allowed int values: 0 - 10").build();
+        StringBuffer buf = new StringBuffer();
+        for(int i=0;i<jmagick_compressionTypes.length;i++) {
+        	buf.append(i + " = " + jmagick_compressionTypes[i] + System.getProperty("line.separator"));
+        }
+        Parameter compressionTypeParam = new Parameter.Builder("compressionType", "0-10")
+        	.description("Allowed int values: " + System.getProperty("line.separator")
+        			+ buf.toString())
+        			.build();
         parameterList.add(compressionTypeParam);
 
         Parameter compressionLevelParam = new Parameter.Builder("compressionQuality", "0-100").description(
