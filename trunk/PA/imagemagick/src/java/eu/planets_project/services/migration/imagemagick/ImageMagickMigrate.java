@@ -2,7 +2,6 @@ package eu.planets_project.services.migration.imagemagick;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.Local;
@@ -18,11 +17,8 @@ import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
-import eu.planets_project.services.datatypes.Tool;
-import eu.planets_project.services.identification.imagemagick.utils.ImageMagickHelper;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.ServiceUtils;
 
 
 /**
@@ -53,10 +49,6 @@ public class ImageMagickMigrate implements Migrate, Serializable {
      */
     public static final String NAME = "ImageMagickMigrate";
 
-    /** Array of compression type strings */
-    public static String[] jmagick_compressionTypes = new String[11];
-    private static final String IMAGE_MAGICK_URI = "http://www.imagemagick.org";
-
     /**
      * default no arg constructor
      */
@@ -68,33 +60,7 @@ public class ImageMagickMigrate implements Migrate, Serializable {
      * @see eu.planets_project.services.migrate.Migrate#describe()
      */
     public ServiceDescription describe() {
-        ServiceDescription.Builder sd = new ServiceDescription.Builder(NAME,Migrate.class.getCanonicalName());
-        sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
-        sd.description("A wrapper for ImageMagick file format conversions. Using ImageMagick v6.3.9-Q8 and JMagick v6.3.9-Q8.\n" +
-                "This service accepts input and target formats of this shape: 'planets:fmt/ext/[extension]'\n" +
-        "e.g. 'planets:fmt/ext/tiff' or 'planets:fmt/ext/tif'");
-
-        sd.classname(this.getClass().getCanonicalName());
-        sd.version("0.1");
-
-        List<Parameter> parameterList = new ArrayList<Parameter>();
-        Parameter compressionTypeParam = new Parameter.Builder("compressionType", "0-10").description( 
-                "Allowed int values: 0 - 10").build();
-        parameterList.add(compressionTypeParam);
-
-        Parameter compressionLevelParam = new Parameter.Builder("compressionQuality", "0-100").description(
-                "This should be an int value between: 0 - 100, representing the compression quality in percent.").build();
-        parameterList.add(compressionLevelParam);
-
-        sd.parameters(parameterList);
-        
-        sd.tool( Tool.create(null, "ImageMagick", "6.3.9-Q8", null, IMAGE_MAGICK_URI) );
-        
-        // Checks the installed extensions and supported formats on the fly and creates Migration paths matching the systems capabilities.
-        if( ImageMagickHelper.getSupportedInputFormats() != null ) {
-          sd.paths(ServiceUtils.createMigrationPathways(ImageMagickHelper.getSupportedInputFormats(), ImageMagickHelper.getSupportedOutputFormats()));
-        }
-        return sd.build();
+        return CoreImageMagick.describeJMagickMigrate(NAME, this.getClass().getCanonicalName());
     }
 
     /**

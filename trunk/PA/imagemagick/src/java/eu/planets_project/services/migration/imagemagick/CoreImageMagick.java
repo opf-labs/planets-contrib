@@ -24,10 +24,13 @@ import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameter;
+import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.identification.imagemagick.utils.ImageMagickHelper;
+import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ServiceUtils;
@@ -64,8 +67,11 @@ public class CoreImageMagick {
     private File im_home = null;
     private String im_home_path = null;
     
+    private static final String IMAGE_MAGICK_URI = "http://www.imagemagick.org";
+    
     public CoreImageMagick() {
     	System.setProperty("jmagick.systemclassloader","no"); // Use the JBoss-Classloader, instead of the Systemclassloader.
+    	
     	im_home_path = System.getenv("IMAGEMAGICK_HOME");
         if(im_home_path!=null) {
         	im_home = new File(im_home_path);
@@ -99,17 +105,87 @@ public class CoreImageMagick {
 
         plogger.info("Hello! Initializing Im4JavaImageMagickMigrate service...");
     }
+    public static ServiceDescription describeJMagickMigrate(String serviceName, String className) {
+        ServiceDescription.Builder sd = new ServiceDescription.Builder(serviceName,Migrate.class.getCanonicalName());
+        sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
+        sd.description("A wrapper for ImageMagick file format conversions. Using ImageMagick v6.3.9-Q8 and JMagick v6.3.9-Q8.\n" +
+                "This service accepts input and target formats of this shape: 'planets:fmt/ext/[extension]'\n" +
+        "e.g. 'planets:fmt/ext/tiff' or 'planets:fmt/ext/tif'");
+
+        sd.classname(className);
+        sd.version("1.0");
+
+        List<Parameter> parameterList = new ArrayList<Parameter>();
+        Parameter compressionTypeParam = new Parameter.Builder("compressionType", "0-10").description( 
+                "Allowed int values: 0 - 10").build();
+        parameterList.add(compressionTypeParam);
+
+        Parameter compressionLevelParam = new Parameter.Builder("compressionQuality", "0-100").description(
+                "This should be an int value between: 0 - 100, representing the compression quality in percent.").build();
+        parameterList.add(compressionLevelParam);
+
+        sd.parameters(parameterList);
+        
+        sd.tool( Tool.create(null, "ImageMagick", "6.3.9-Q8", null, IMAGE_MAGICK_URI) );
+        
+        // Checks the installed extensions and supported formats on the fly and creates Migration paths matching the systems capabilities.
+        if(inFormats!=null && outFormats!=null) {
+        	 sd.paths(ServiceUtils.createMigrationPathways(inFormats, outFormats));
+        }
+        return sd.build();
+    }
+    
+    public static ServiceDescription describeIm4JavaMigrate(String serviceName , String className) {
+    	StringBuffer compressionTypesList = new StringBuffer();
+    	for (String compressionType : compressionTypes) {
+			compressionTypesList.append(compressionType + ", ");
+		}
+    	String supportedCompressionTypes = compressionTypesList.toString();
+    	if(supportedCompressionTypes.endsWith(", ")) {
+    		supportedCompressionTypes = supportedCompressionTypes.substring(0, supportedCompressionTypes.lastIndexOf(", "));
+    	}
+        ServiceDescription.Builder sd = new ServiceDescription.Builder(serviceName, Migrate.class.getCanonicalName());
+        sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
+        sd.description("A wrapper for ImageMagick file format conversions. Using ImageMagick v6.3.9-Q8, im4Java and JMagick v6.3.9-Q8.\n" +
+                "This service accepts input and target formats of this shape: 'planets:fmt/ext/[extension]'\n" +
+        		"e.g. 'planets:fmt/ext/tiff' or 'planets:fmt/ext/tif'");
+
+        sd.classname(className);
+        sd.version("1.0");
+
+        List<Parameter> parameterList = new ArrayList<Parameter>();
+        Parameter compressionTypeParam = new Parameter.Builder("compressionType", supportedCompressionTypes).description( 
+                "Allowed values: " + supportedCompressionTypes).build();
+        parameterList.add(compressionTypeParam);
+
+        Parameter imageQualityLevelParam = new Parameter.Builder("imageQuality", "0.00-100.00").description(
+                "This should be an double value between: 0.00 - 100.00, " +
+                "representing the image quality of the compressed image in percent (Best=100.00).").build();
+        parameterList.add(imageQualityLevelParam);
+
+        sd.parameters(parameterList);
+        
+        sd.tool( Tool.create(null, "ImageMagick", "6.3.9-Q8", null, IMAGE_MAGICK_URI) );
+        
+        // Checks the installed extensions and supported formats on the fly and creates Migration paths matching the systems capabilities.
+        if(inFormats!=null && outFormats!=null) {
+        	sd.paths(ServiceUtils.createMigrationPathways(inFormats, outFormats));
+        }
+        return sd.build();
+    }
 	
 	public MigrateResult doJMagickMigration(DigitalObject digOb, URI inputFormat, URI outputFormat, List<Parameter> parameters) {
 		plogger.info("...and ready! Checking input...");
         
-        if(!inFormats.contains(inputFormat)) {
-        	return returnWithErrorMessage("The Format: " + inputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
-        }
-        
-        if(!outFormats.contains(outputFormat)) {
-        	return returnWithErrorMessage("The Format: " + outputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
-        }
+		if(inFormats!=null && outFormats!=null) {
+		    if(!inFormats.contains(inputFormat)) {
+		    	return returnWithErrorMessage("The Format: " + inputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
+		    }
+		    
+		    if(!outFormats.contains(outputFormat)) {
+		    	return returnWithErrorMessage("The Format: " + outputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
+		    }
+		}
         
         
         String inputExt = formatRegistry.getFirstExtension(inputFormat);
@@ -125,9 +201,10 @@ public class CoreImageMagick {
         plogger.info("Writing content to temp file.");
 		inputFile = new File(imageMagickTmpFolder, getInputFileName(digOb, inputFormat));
 		if(inputFile.exists()) {
-			plogger.info("Input file with same name already exists. Deleting file: " + inputFile.getName());
+			plogger.info("PLEASE NOTE: Input file with same name already exists. Deleting old file: " + inputFile.getName());
 			inputFile.delete();
 		}
+		
 		FileUtils.writeInputStreamToFile( digOb.getContent().read(), inputFile );
 		plogger.info("Temp file created for input: " + inputFile.getAbsolutePath());
 
@@ -192,6 +269,96 @@ public class CoreImageMagick {
 	}
 	
 	
+	public MigrateResult doIm4JavaMigration(DigitalObject digOb, URI inputFormat, URI outputFormat, List<Parameter> parameters) {
+		plogger.info("...and ready! Checking input...");
+	    
+	    if(!inFormats.contains(inputFormat)) {
+	    	return returnWithErrorMessage("The Format: " + inputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
+	    }
+	    
+	    if(!outFormats.contains(outputFormat)) {
+	    	return returnWithErrorMessage("The Format: " + outputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
+	    }
+	    
+	    
+	    String inputExt = formatRegistry.getFirstExtension(inputFormat);
+	    String outputExt = formatRegistry.getFirstExtension(outputFormat);
+	    
+	    File imageMagickTmpFolder = FileUtils.createWorkFolderInSysTemp(IM4JAVA_TEMP);
+	    plogger.info("Created tmp folder: " + imageMagickTmpFolder.getAbsolutePath());
+	
+	    plogger.info("Getting content from DigitalObject as InputStream...");
+	    File inputFile;
+	    File outputFile;
+	
+	    plogger.info("Writing content to temp file.");
+		inputFile = new File(imageMagickTmpFolder, getInputFileName(digOb, inputFormat));
+		if(inputFile.exists()) {
+			plogger.info("PLEASE NOTE: Input file with same name already exists. Deleting old file: " + inputFile.getName());
+			inputFile.delete();
+		}
+		FileUtils.writeInputStreamToFile( digOb.getContent().read(), inputFile );
+		plogger.info("Temp file created for input: " + inputFile.getAbsolutePath());
+	
+		// Also define the output file:
+		outputFile = new File(imageMagickTmpFolder, getOutputFileName(inputFile.getName(), outputFormat));
+	
+	    plogger.info("Starting ImageMagick Migration from " + inputExt + " to " + outputExt + "...");
+	    
+	    
+	    String actualSrcFormat = verifyInputFormat(inputFile);
+	    
+	    if(actualSrcFormat!=null) {
+	    	if(!extensionsAreEqual(inputExt, actualSrcFormat)) {
+	    		return returnWithErrorMessage("The inputImage does NOT have the file format you claim it has: " + inputExt.toUpperCase() + 
+	    				" The actual format is instead: " + actualSrcFormat + ". Please check! " +
+	    						"Returning with Error-Report, nothing has been done, sorry!", null);
+	    	}
+	    }
+	    else {
+	    	return returnWithErrorMessage("Unable to figure out input file format. It does NOT have the format you think it has: " + inputExt + 
+	    			". Please check! " +
+	    			"Returning with Error-Report, nothing has been done, sorry.", null);
+	    }
+	    
+	    parseIm4JavaParameters(parameters);
+	    
+	    try {
+	    	IMOperation imOp = new IMOperation();
+	        imOp.addImage(inputFile.getAbsolutePath());
+	        imOp.quality(imageQuality);
+	        imOp.compress(compressionType);
+	        imOp.addImage(outputFile.getAbsolutePath());
+	        
+	        ConvertCmd convert = new ConvertCmd();
+	    	
+			convert.run(imOp);
+			
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		} catch (IM4JavaException e1) {
+			e1.printStackTrace();
+		}
+	
+	    if(migrationSuccessful(outputFile))
+	        plogger.info("Successfully created result file at: " + outputFile.getAbsolutePath());
+	    else 
+	        return returnWithErrorMessage("Something went terribly wrong with ImageMagick: No output file created!!!", null);
+	
+	    DigitalObject newDigObj = createDigitalObject(outputFile, outputFormat);
+	    
+	    ServiceReport report = null;
+	
+	    plogger.info("Created new DigitalObject for result file...");
+	
+	    report = new ServiceReport(Type.INFO, Status.SUCCESS, "OK! Migration successful.");
+	    plogger.info("Created Service report...");
+	
+	    plogger.info("Success!! Returning results! Goodbye!");
+	    return new MigrateResult(newDigObj, report);
+	}
 	private void parseJMagickParameters(List<Parameter> parameters, ImageInfo imageInfo, MagickImage image) {
 		try {
 			if(parameters != null) {
@@ -250,107 +417,6 @@ public class CoreImageMagick {
 		}
 	}
 	
-	private DigitalObject createDigitalObject(File outputFile, URI outputFormat) {
-		DigitalObject newDigObj = new DigitalObject.Builder(Content.byReference(outputFile))
-   			.format(outputFormat)
-   			.title(outputFile.getName())
-   			.build();
-		return newDigObj;
-	}
-
-	public MigrateResult doIm4JavaMigration(DigitalObject digOb, URI inputFormat, URI outputFormat, List<Parameter> parameters) {
-		plogger.info("...and ready! Checking input...");
-        
-        if(!inFormats.contains(inputFormat)) {
-        	return returnWithErrorMessage("The Format: " + inputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
-        }
-        
-        if(!outFormats.contains(outputFormat)) {
-        	return returnWithErrorMessage("The Format: " + outputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
-        }
-        
-        
-        String inputExt = formatRegistry.getFirstExtension(inputFormat);
-        String outputExt = formatRegistry.getFirstExtension(outputFormat);
-        
-        File imageMagickTmpFolder = FileUtils.createWorkFolderInSysTemp(IM4JAVA_TEMP);
-        plogger.info("Created tmp folder: " + imageMagickTmpFolder.getAbsolutePath());
-
-        plogger.info("Getting content from DigitalObject as InputStream...");
-        File inputFile;
-        File outputFile;
-
-        plogger.info("Writing content to temp file.");
-		inputFile = new File(imageMagickTmpFolder, getInputFileName(digOb, inputFormat));
-		if(inputFile.exists()) {
-			plogger.info("Input file with same name already exists. Deleting file: " + inputFile.getName());
-			inputFile.delete();
-		}
-		FileUtils.writeInputStreamToFile( digOb.getContent().read(), inputFile );
-		plogger.info("Temp file created for input: " + inputFile.getAbsolutePath());
-
-		// Also define the output file:
-		outputFile = new File(imageMagickTmpFolder, getOutputFileName(inputFile.getName(), outputFormat));
-
-        plogger.info("Starting ImageMagick Migration from " + inputExt + " to " + outputExt + "...");
-        
-        
-        String actualSrcFormat = verifyInputFormat(inputFile);
-        
-        if(actualSrcFormat!=null) {
-        	if(!extensionsAreEqual(inputExt, actualSrcFormat)) {
-        		return returnWithErrorMessage("The inputImage does NOT have the file format you claim it has: " + inputExt.toUpperCase() + 
-        				" The actual format is instead: " + actualSrcFormat + ". Please check! " +
-        						"Returning with Error-Report, nothing has been done, sorry!", null);
-        	}
-        }
-        else {
-        	return returnWithErrorMessage("Unable to figure out input file format. It does NOT have the format you think it has: " + inputExt + 
-        			". Please check! " +
-        			"Returning with Error-Report, nothing has been done, sorry.", null);
-        }
-        
-        parseIm4JavaParameters(parameters);
-        
-        try {
-        	IMOperation imOp = new IMOperation();
-            imOp.addImage(inputFile.getAbsolutePath());
-            imOp.quality(imageQuality);
-            imOp.compress(compressionType);
-            imOp.addImage(outputFile.getAbsolutePath());
-            
-            ConvertCmd convert = new ConvertCmd();
-        	
-			convert.run(imOp);
-			
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		} catch (IM4JavaException e1) {
-			e1.printStackTrace();
-		}
-
-        if(migrationSuccessful(outputFile))
-            plogger.info("Successfully created result file at: " + outputFile.getAbsolutePath());
-        else 
-            return returnWithErrorMessage("Something went terribly wrong with ImageMagick: No output file created!!!", null);
-
-        DigitalObject newDigObj = createDigitalObject(outputFile, outputFormat);
-        
-        ServiceReport report = null;
-
-        plogger.info("Created new DigitalObject for result file...");
-
-        report = new ServiceReport(Type.INFO, Status.SUCCESS, "OK! Migration successful.");
-        plogger.info("Created Service report...");
-
-        plogger.info("Success!! Returning results! Goodbye!");
-        return new MigrateResult(newDigObj, report);
-	}
-	
-	
-
 	private void parseIm4JavaParameters(List<Parameter> parameters) {
 		if(parameters != null) {
 	        plogger.info("Got additional parameters:");
@@ -400,6 +466,13 @@ public class CoreImageMagick {
 	        compressionType = COMPRESSION_TYPE_PARAM_DEFAULT;
 	        plogger.info("No parameters passed! Using default values for 1) compressionType: " + compressionType +" and 2) compressionQuality: " + imageQuality);
 	    }
+	}
+	private DigitalObject createDigitalObject(File outputFile, URI outputFormat) {
+		DigitalObject newDigObj = new DigitalObject.Builder(Content.byReference(outputFile))
+   			.format(outputFormat)
+   			.title(outputFile.getName())
+   			.build();
+		return newDigObj;
 	}
 
 	private String verifyInputFormat(File inputImage) {
