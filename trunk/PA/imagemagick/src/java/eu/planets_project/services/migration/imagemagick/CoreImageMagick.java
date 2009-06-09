@@ -78,19 +78,6 @@ public class CoreImageMagick {
         	IMGlobalSettings.setImageMagickHomeDir(im_home);
         }
         
-        compressionTypes.add("BZip");
-        compressionTypes.add("Fax");
-        compressionTypes.add("Group4");
-        compressionTypes.add("JPEG");
-        compressionTypes.add("JPEG2000");
-        compressionTypes.add("Lossless");
-        compressionTypes.add("LosslessJPEG");
-        compressionTypes.add("LZW");
-        compressionTypes.add("None");
-        compressionTypes.add("RLE");
-        compressionTypes.add("Zip");
-        compressionTypes.add("RunlegthEncoded");
-
         plogger.info("Hello! Initializing Im4JavaImageMagickMigrate service...");
     }
     public static ServiceDescription describeJMagickMigrate(String serviceName, String className) {
@@ -142,6 +129,19 @@ public class CoreImageMagick {
     }
     
     public static ServiceDescription describeIm4JavaMigrate(String serviceName , String className) {
+    	compressionTypes.add("BZip");
+        compressionTypes.add("Fax");
+        compressionTypes.add("Group4");
+        compressionTypes.add("JPEG");
+        compressionTypes.add("JPEG2000");
+        compressionTypes.add("Lossless");
+        compressionTypes.add("LosslessJPEG");
+        compressionTypes.add("LZW");
+        compressionTypes.add("None");
+        compressionTypes.add("RLE");
+        compressionTypes.add("Zip");
+        compressionTypes.add("RunlegthEncoded");
+    	
     	StringBuffer compressionTypesList = new StringBuffer();
     	for (String compressionType : compressionTypes) {
 			compressionTypesList.append(compressionType + ", ");
