@@ -3,9 +3,7 @@ package eu.planets_project.services.migration.imagemagick;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -19,7 +17,6 @@ import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.Event;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
@@ -52,8 +49,13 @@ public class ImageMagickMigrateTests {
      */
     @BeforeClass
     public static void setup() {
-        // Config the logger:
+    	
+    	// Config the logger:
         Logger.getLogger("").setLevel( Level.FINE );
+    	
+//    	System.setProperty("pserv.test.context", "server");
+//        System.setProperty("pserv.test.host", "localhost");
+//        System.setProperty("pserv.test.port", "8080");
         
         // This method handles the local/standalone/server test context setup:
         imageMagick = ServiceCreator.createTestService(Migrate.QNAME, ImageMagickMigrate.class, wsdlLocation);
@@ -69,6 +71,8 @@ public class ImageMagickMigrateTests {
         compressionTypes[8] = "LZW Compression";
         compressionTypes[9] = "RLE Compression";
         compressionTypes[10] = "Zip Compression";
+        
+        
     }
     
     /**
@@ -534,14 +538,11 @@ public class ImageMagickMigrateTests {
 
         File inputFile = getTestFile(srcExtension);
 
-        FileInputStream is = new FileInputStream(inputFile);
-
         FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
-        DigitalObject input = new  DigitalObject.Builder(Content.byValue(is))
-        .permanentUri(URI.create("http://imageMagickMigrationsTests"))
-        .format(format.createExtensionUri(srcExtension))
-        .title(inputFile.getName())
-        .build();
+        DigitalObject input = new  DigitalObject.Builder(Content.byReference(inputFile))
+        	.format(format.createExtensionUri(srcExtension))
+        	.title(inputFile.getName())
+        	.build();
         System.out.println("Input: " + input);
 
         MigrateResult mr = imageMagick.migrate(input, format
@@ -558,15 +559,15 @@ public class ImageMagickMigrateTests {
         System.out.println("DigitalObject.getTitle(): " + doOut.getTitle());
         System.out.println("DigitalObject.getFormat(): " + doOut.getFormat().toASCIIString());
         System.out.println("Events: ");
-        List<Event> events = doOut.getEvents();
-        for (Event event : events) {
-            System.out.println("Agent name: " + event.getAgent().getName());
-            System.out.println("Agent type: " + event.getAgent().getType());
-            System.out.println("Agent id: " + event.getAgent().getId());
-            System.out.println("Event summary: " + event.getSummary());
-            System.out.println("Event datetime: " + event.getDatetime());
-            System.out.println("Event duration: " + event.getDuration());
-        }
+//        List<Event> events = doOut.getEvents();
+//        for (Event event : events) {
+//            System.out.println("Agent name: " + event.getAgent().getName());
+//            System.out.println("Agent type: " + event.getAgent().getType());
+//            System.out.println("Agent id: " + event.getAgent().getId());
+//            System.out.println("Event summary: " + event.getSummary());
+//            System.out.println("Event datetime: " + event.getDatetime());
+//            System.out.println("Event duration: " + event.getDuration());
+//        }
 
         int compressionType = 1;
         String compressionQuality= "";

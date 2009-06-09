@@ -3,7 +3,6 @@ package eu.planets_project.services.migration.imagemagick;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -52,6 +51,10 @@ public class Im4JavaImageMagickMigrateTests {
     public static void setup() {
         // Config the logger:
         Logger.getLogger("").setLevel( Level.FINE );
+        
+//        System.setProperty("pserv.test.context", "server");
+//        System.setProperty("pserv.test.host", "localhost");
+//        System.setProperty("pserv.test.port", "8080");
         
         
         
@@ -461,13 +464,11 @@ public class Im4JavaImageMagickMigrateTests {
 
         File inputFile = getTestFile(srcExtension);
 
-        FileInputStream is = new FileInputStream(inputFile);
-
         FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
-        DigitalObject input = new  DigitalObject.Builder(Content.byReference(is))
-        .format(format.createExtensionUri(srcExtension))
-        .title(inputFile.getName())
-        .build();
+        DigitalObject input = new  DigitalObject.Builder(Content.byReference(inputFile))
+        	.format(format.createExtensionUri(srcExtension))
+        	.title(inputFile.getName())
+        	.build();
         System.out.println("Input: " + input);
 
         MigrateResult mr = imageMagick.migrate(input, format
