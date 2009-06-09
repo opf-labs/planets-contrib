@@ -136,7 +136,7 @@ public class Im4JavaImageMagickMigrateTests {
      */
     @Test
     public void testJP2ToPng () throws IOException {
-    	String inputFormatExt = "jp2";
+    	String inputFormatExt = "JPC";
         String outputFormatExt = "png";
         
         testMigrate(inputFormatExt, outputFormatExt, createParameters(Im4JavaImageMagickMigrateTestHelper.COMP_TYPE_LZW, Im4JavaImageMagickMigrateTestHelper.COMP_QUAL_25));
@@ -410,6 +410,11 @@ public class Im4JavaImageMagickMigrateTests {
     	
     	if(srcExtension.equalsIgnoreCase("JP2") || srcExtension.equalsIgnoreCase("J2K")) {
     		testFile = new File(Im4JavaImageMagickMigrateTestHelper.JP2_TEST_FILE);
+    		return testFile;
+    	}
+    	
+    	if(srcExtension.equalsIgnoreCase("JPC")) {
+    		testFile = new File(Im4JavaImageMagickMigrateTestHelper.JPC_TEST_FILE);
     		return testFile;
     	}
     	

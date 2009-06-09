@@ -373,7 +373,12 @@ public class Im4JavaImageMagickMigrate implements Migrate, Serializable {
 
     
     private boolean extensionsAreEqual(String extension1, String extension2) {
-
+    	if(extension1.contains(".")) {
+    		extension1 = extension1.replace(".", "");
+    	}
+    	if(extension2.contains(".")) {
+    		extension2 = extension2.replace(".", "");
+    	}
 //        plogger.info("Starting to compare these two extensions: " + extension1 + " and " + extension2);
 
         Set <URI> ext1FormatURIs = formatRegistry.getUrisForExtension(extension1.toLowerCase());
@@ -383,6 +388,15 @@ public class Im4JavaImageMagickMigrate implements Migrate, Serializable {
 //        plogger.info("Got list of URIs for " + extension2);
 
         boolean success = false;
+        
+        if(ext1FormatURIs==null || ext2FormatURIs==null) {
+        	if(extension1.equalsIgnoreCase(extension2)) {
+        		return true;
+        	}
+        	else {
+        		return false;
+        	}
+        }
 
 //        plogger.info("Trying to match URIs...");
         for(URI currentUri: ext1FormatURIs) {

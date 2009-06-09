@@ -32,6 +32,10 @@ public class ImageMagickMigrateTestHelper {
 	public static final String PDF_TEST_FILE = "tests/test-files/images/bitmap/test_pdf/2274192346_4a0a03c5d6.pdf";
 	/** location of the JPEG 200 test file */
 	public static final String JP2_TEST_FILE = "tests/test-files/images/bitmap/test_jp2/2274192346_4a0a03c5d6.jp2";
+//	public static final String JP2_TEST_FILE = "tests/test-files/images/bitmap/test_jp2/Descartes.jp2";
+	
+	public static final String JPC_TEST_FILE = "tests/test-files/images/bitmap/test_jp2/Descartes.jpc";
+	
 	/** compression quality constant */
 	public static String COMP_QUAL_25 = "25";
 	/** compression quality constant */

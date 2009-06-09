@@ -5,9 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -19,9 +17,9 @@ import org.junit.Test;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
+import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Event;
-import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
@@ -138,6 +136,22 @@ public class ImageMagickMigrateTests {
     public void testJP2ToPng () throws IOException {
     	String inputFormatExt = "jp2";
         String outputFormatExt = "png";
+        
+        testMigrate(inputFormatExt, outputFormatExt, createParameters(ImageMagickMigrateTestHelper.COMP_TYPE_LZW, ImageMagickMigrateTestHelper.COMP_QUAL_25));
+        
+        testMigrate(inputFormatExt, outputFormatExt, createParameters(ImageMagickMigrateTestHelper.COMP_TYPE_LZW, ImageMagickMigrateTestHelper.COMP_QUAL_50));
+        
+        testMigrate(inputFormatExt, outputFormatExt, null);
+    }
+    
+    /**
+     * Test JPEG2 to PNG migration
+     * @throws IOException
+     */
+    @Test
+    public void testJpcToPng () throws IOException {
+    	String inputFormatExt = "jpc";
+        String outputFormatExt = "tiff";
         
         testMigrate(inputFormatExt, outputFormatExt, createParameters(ImageMagickMigrateTestHelper.COMP_TYPE_LZW, ImageMagickMigrateTestHelper.COMP_QUAL_25));
         
@@ -465,6 +479,11 @@ public class ImageMagickMigrateTests {
     	
     	if(srcExtension.equalsIgnoreCase("JP2") || srcExtension.equalsIgnoreCase("J2K")) {
     		testFile = new File(ImageMagickMigrateTestHelper.JP2_TEST_FILE);
+    		return testFile;
+    	}
+    	
+    	if(srcExtension.equalsIgnoreCase("JPC")) {
+    		testFile = new File(ImageMagickMigrateTestHelper.JPC_TEST_FILE);
     		return testFile;
     	}
     	

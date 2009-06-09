@@ -25,8 +25,8 @@ import org.apache.commons.logging.LogFactory;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
@@ -256,9 +256,9 @@ public class ImageMagickMigrate implements Migrate, Serializable {
             plogger.info("ImageMagickMigrate: Actual src format is: " + actualSrcFormat);
             
             // Has the input file the format it claims it has?
-            if(compareExtensions(inputExt, actualSrcFormat) == false) {
+            if(extensionsAreEqual(inputExt, actualSrcFormat) == false) {
                 // if NOT just return without doing anything...
-                return this.returnWithErrorMessage("The passed input file format (" + inputExt + " does not match the actual format (" + actualSrcFormat + ") of the file!\n" +
+                return this.returnWithErrorMessage("The passed input file format (" + inputExt.toUpperCase() + ") does not match the actual format (" + actualSrcFormat + ") of the file!\n" +
                         "This could cause unpredictable behaviour. Nothing has been done!", null);
             }
 
@@ -406,6 +406,53 @@ public class ImageMagickMigrate implements Migrate, Serializable {
         plogger.info("Trying to match URIs...");
         for(URI currentUri: ext1FormatURIs) {
             plogger.info("current URI: " + currentUri.toASCIIString());
+            if(ext2FormatURIs.contains(currentUri)) {
+                success = true;
+                break;
+            }
+            else {
+                success = false;
+            }
+        }
+        if(success) {
+            plogger.info("Success!");
+        }
+        else {
+            plogger.info("No success.");
+        }
+
+        return success;
+    }
+    
+    private boolean extensionsAreEqual(String extension1, String extension2) {
+    	if(extension1.contains(".")) {
+    		extension1 = extension1.replace(".", "");
+    	}
+    	if(extension2.contains(".")) {
+    		extension2 = extension2.replace(".", "");
+    	}
+//        plogger.info("Starting to compare these two extensions: " + extension1 + " and " + extension2);
+
+        Set <URI> ext1FormatURIs = formatRegistry.getUrisForExtension(extension1.toLowerCase());
+//        plogger.info("Got list of URIs for " + extension1);
+
+        Set <URI> ext2FormatURIs = formatRegistry.getUrisForExtension(extension2.toLowerCase());
+//        plogger.info("Got list of URIs for " + extension2);
+
+        boolean success = false;
+        
+        if(ext1FormatURIs==null || ext2FormatURIs==null) {
+        	if(extension1.equalsIgnoreCase(extension2)) {
+        		return true;
+        	}
+        	else {
+        		return false;
+        	}
+        }
+
+//        plogger.info("Trying to match URIs...");
+        for(URI currentUri: ext1FormatURIs) {
+//            plogger.info("current URI: " + currentUri.toASCIIString());
             if(ext2FormatURIs.contains(currentUri)) {
                 success = true;
                 break;
