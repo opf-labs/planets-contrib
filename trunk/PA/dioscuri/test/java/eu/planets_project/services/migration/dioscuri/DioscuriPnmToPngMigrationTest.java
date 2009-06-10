@@ -13,8 +13,8 @@ import org.junit.Test;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
-import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.migrate.Migrate;
@@ -64,6 +64,7 @@ public class DioscuriPnmToPngMigrationTest {
 	
 	@Test
 	public void testMigrate() {
+		printTestTitle("Testing Doscuri PNM to PNG migration");
 		DigitalObject inputDigOb = new DigitalObject.Builder(Content.byReference(PNM_TEST_FILE)).title(PNM_TEST_FILE.getName()).format(format.createExtensionUri(FileUtils.getExtensionFromFile(PNM_TEST_FILE))).build();
 		MigrateResult result = DIOSCURI_MIGRATE.migrate(inputDigOb, format.createExtensionUri(FileUtils.getExtensionFromFile(PNM_TEST_FILE)), format.createExtensionUri("PNG"), null);
 		
@@ -78,7 +79,7 @@ public class DioscuriPnmToPngMigrationTest {
 		System.out.println("Please find the converted file here: " + resultFile.getAbsolutePath());
 		
 		PNG_TEST_FILE = resultFile;
-		
+		printTestTitle("Testing Doscuri PNG to PNM migration");
 		inputDigOb = new DigitalObject.Builder(Content.byReference(PNG_TEST_FILE)).title(PNG_TEST_FILE.getName()).format(format.createExtensionUri(FileUtils.getExtensionFromFile(PNG_TEST_FILE))).build();
 		result = DIOSCURI_MIGRATE.migrate(inputDigOb, format.createExtensionUri(FileUtils.getExtensionFromFile(PNG_TEST_FILE)), format.createExtensionUri("PNM"), null);
 		
@@ -91,6 +92,18 @@ public class DioscuriPnmToPngMigrationTest {
 		FileUtils.writeInputStreamToFile(result.getDigitalObject().getContent().read(), resultFile);
 		
 		System.out.println("Please find the converted file here: " + resultFile.getAbsolutePath());
+	}
+	
+	private void printTestTitle(String title) {
+		for(int i=0;i<title.length()+4;i++) {
+			System.out.print("*");
+		}
+		System.out.println();
+		System.out.println("* " + title + " *");
+		for(int i=0;i<title.length()+4;i++) {
+			System.out.print("*");
+		}
+		System.out.println();
 	}
 
 }

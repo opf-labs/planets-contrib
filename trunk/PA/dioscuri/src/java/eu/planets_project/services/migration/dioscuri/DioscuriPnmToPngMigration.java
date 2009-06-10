@@ -16,8 +16,8 @@ import javax.xml.ws.BindingType;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
@@ -33,6 +33,7 @@ import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ServiceUtils;
 import eu.planets_project.services.utils.ZipResult;
+import eu.planets_project.services.utils.ZipUtils;
 
 /**
  * @author melmsp
@@ -56,13 +57,14 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 	public static final String NAME = "DioscuriPnmToPngMigration";
 	private static String DIOSCURI_HOME = System.getenv("DIOSCURI_HOME");
 	private static String WORK_TEMP_NAME = "DIOSCURI_PNM2PNG_TMP";
-	private static String FLOPPY_INPUT_NAME = "FLOPPY_INPUT";
+	private static String FLOPPY_INPUT_NAME = FileUtils.randomizeFileName("FLOPPY_INPUT");
 	private static File WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp(WORK_TEMP_NAME);
 	private static File FLOPPY_INPUT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, FLOPPY_INPUT_NAME);
 	
-	private static String DEFAULT_INPUT_NAME = "input";
+	private static String DEFAULT_INPUT_NAME = FileUtils.randomizeFileName("input");
 	private static String RUN_BAT = "RUN.BAT";
-	private static String INPUT_ZIP_NAME = "input.zip";
+//	private static String INPUT_ZIP_NAME = "input.zip";
+	private static String INPUT_ZIP_NAME = null;
 	
 //	private static String EMU_PICTVIEW_PATH = "c:\\pictview\\pictview.exe";
 	
@@ -145,9 +147,11 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 	 */
 	public MigrateResult migrate(DigitalObject digitalObject, URI inputFormat,
 			URI outputFormat, List<Parameter> parameters) {
+		if(WORK_TEMP_FOLDER.exists()) {
+			FileUtils.deleteAllFilesInFolder(WORK_TEMP_FOLDER);
+		}
+		INPUT_ZIP_NAME = FileUtils.randomizeFileName("dioscuri-pnm-png-input.zip");
 		
-		FileUtils.deleteTempFiles(WORK_TEMP_FOLDER);
-		WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp(WORK_TEMP_NAME);
 		FLOPPY_INPUT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, FLOPPY_INPUT_NAME);
 		
 		File inputFile = getInputFileFromDigitalObject(digitalObject, inputFormat, FLOPPY_INPUT_FOLDER);
@@ -159,7 +163,7 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 		DioscuriWrapper dioscuri = new DioscuriWrapper();
 		
 		if(runBatCreated) {
-			ZipResult zipResult = FileUtils.createZipFileWithChecksum(FLOPPY_INPUT_FOLDER, WORK_TEMP_FOLDER, INPUT_ZIP_NAME);
+			ZipResult zipResult = ZipUtils.createZipAndCheck(FLOPPY_INPUT_FOLDER, WORK_TEMP_FOLDER, INPUT_ZIP_NAME);
 			DioscuriWrapperResult result = dioscuri.createFloppyImageAndRunDioscuri(zipResult.getZipFile(), inFileName, outFileName, zipResult.getChecksum());
 			if(result.getState()==DioscuriWrapperResult.ERROR) {
 				return this.returnWithErrorMessage(result.getMessage(), null);
@@ -274,10 +278,8 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 	private MigrateResult createMigrateResult(File resultFile, URI inputFormat, URI outputFormat) {
 		DigitalObject result = new DigitalObject.Builder(Content.byReference(resultFile))
 								.title(resultFile.getName())
-								.format(format.createExtensionUri(FileUtils.getExtensionFromFile(resultFile)))
+								.format(outputFormat)
 								.build();
-
-		
 
 		String message = "Successfully converted input from: \""
                 + format.getFirstExtension(inputFormat) + "\" to \""
@@ -288,8 +290,6 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 		
 		return mainMigrateResult;
 	}
-	
-	
 	
 	/**
 	 * @param message an optional message on what happened to the service

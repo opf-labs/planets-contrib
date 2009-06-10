@@ -9,17 +9,18 @@ import org.jboss.annotation.ejb.TransactionTimeout;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.datatypes.Checksum;
-import eu.planets_project.services.datatypes.DigitalObjectContent;
-import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.DigitalObjectContent;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
-import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelper;
 import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelperFactory;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
+import eu.planets_project.services.utils.ZipUtils;
 
 
 @TransactionTimeout(1500)
@@ -28,7 +29,7 @@ public class DioscuriWrapper {
 	public DioscuriWrapper() {
 		FileUtils.deleteTempFiles(WORK_TEMP_FOLDER);
 		WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp(WORK_TEMP_NAME);
-		FLOPPY_RESULT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, "EXTRACTED_FILES");
+		FLOPPY_RESULT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, FileUtils.randomizeFileName("EXTRACTED_FILES"));
 		log.info("Installed OS: " + OS_NAME + ", Version: " + OS_VERSION + ", Architecture: " + OS_ARCHITECTURE);
 	}
 	
@@ -40,10 +41,10 @@ public class DioscuriWrapper {
 	private String OS_ARCHITECTURE = System.getProperty("os.arch");
 	private String WORK_TEMP_NAME = "DIOSCURI_WRAPPER_TMP";
 	private File WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp(WORK_TEMP_NAME);
-	private String FLOPPY_RESULT_NAME = "EXTRACTED_FILES";
+	private String FLOPPY_RESULT_NAME = FileUtils.randomizeFileName("EXTRACTED_FILES");
 	private File FLOPPY_RESULT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, FLOPPY_RESULT_NAME);
 	
-	private String FLOPPY_NAME = "floppy.ima";
+	private String FLOPPY_NAME = FileUtils.randomizeFileName("floppy.ima");
 	
 	private String DIOSCURI_CONFIG_FILE_PATH = "DioscuriConfig.xml";
 	
@@ -85,19 +86,21 @@ public class DioscuriWrapper {
 			return this.createErrorResult(ERROR_OUT);
 		}
 		
-		DigitalObjectContent content = null;
+//		DigitalObjectContent content = null;
+//		
+//		if(checksum==null) {
+//			content = Content.byReference(allFilesAsZIP);
+//		}
+//		else {
+//			content = Content.byReference(allFilesAsZIP).withChecksum(checksum);
+//		}
 		
-		if(checksum==null) {
-			content = Content.byReference(allFilesAsZIP);
-		}
-		else {
-			content = Content.byReference(allFilesAsZIP).withChecksum(checksum);
-		}
+//		DigitalObject floppyInput = new DigitalObject.Builder(content)
+//										.title(allFilesAsZIP.getName())
+//										.format(format.createExtensionUri("ZIP"))
+//										.build();
 		
-		DigitalObject floppyInput = new DigitalObject.Builder(content)
-										.title(allFilesAsZIP.getName())
-										.format(format.createExtensionUri("ZIP"))
-										.build();
+		DigitalObject floppyInput = DigitalObjectUtils.createZipTypeDigOb(allFilesAsZIP, allFilesAsZIP.getName(), true, true);
 		
 		MigrateResult floppyHelperResult = floppyHelper.migrate(floppyInput, format.createExtensionUri("ZIP"), format.createExtensionUri("IMA"), null);
 		
@@ -154,7 +157,7 @@ public class DioscuriWrapper {
 		String resultName = mr.getDigitalObject().getTitle();
 		
 		if(resultName==null) {
-			resultName = "FIH_result.zip";
+			resultName = FileUtils.randomizeFileName("FIH_result.zip");
 		}
 		
 		File resultZIP = new File(WORK_TEMP_FOLDER, resultName);
@@ -166,17 +169,17 @@ public class DioscuriWrapper {
 			return this.createErrorResult("There is no result file! Returning with ERROR! ");
 		}
 		
-		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().read(), resultZIP);
+		FileUtils.writeInputStreamToFile(resultContent.read(), resultZIP);
 		
-		Checksum check = mr.getDigitalObject().getContent().getChecksum();
+		Checksum check = resultContent.getChecksum();
 		
 		List<File> extractedFiles = null;
 		
 		if(check==null) {
-			extractedFiles = FileUtils.extractFilesFromZip(resultZIP, FLOPPY_RESULT_FOLDER);
+			extractedFiles = ZipUtils.unzipTo(resultZIP, FLOPPY_RESULT_FOLDER);
 		}
 		else {
-			extractedFiles = FileUtils.extractFilesFromZipAndCheck(resultZIP, FLOPPY_RESULT_FOLDER, check);
+			extractedFiles = ZipUtils.checkAndUnzipTo(resultZIP, FLOPPY_RESULT_FOLDER, check);
 		}
 		
 		int index = extractedFiles.indexOf(new File(FLOPPY_RESULT_FOLDER, outputFileName));
