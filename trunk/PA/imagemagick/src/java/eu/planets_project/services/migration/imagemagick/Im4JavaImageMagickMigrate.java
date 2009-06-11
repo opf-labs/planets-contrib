@@ -37,7 +37,7 @@ import eu.planets_project.services.migrate.MigrateResult;
         endpointInterface = "eu.planets_project.services.migrate.Migrate")
 public class Im4JavaImageMagickMigrate implements Migrate, Serializable {
 
-	private static final long serialVersionUID = 5719023841822556481L;
+	private static final long serialVersionUID = 1403576052893838800L;
 
 	private static Log plogger = LogFactory.getLog(Im4JavaImageMagickMigrate.class);
     

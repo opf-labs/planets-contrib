@@ -59,8 +59,9 @@ public class ImageMagickRotate implements Modify {
 	
 	private String workFolderName = "IMAGEMAGICK_ROTATE_TMP";
 	private File work_folder = FileUtils.createWorkFolderInSysTemp(workFolderName);
-	private String inputImageName = "imageMagickRotateInput";
-	private String resultImageName = "imageMagickRotateResult";
+	private String sessionID = FileUtils.randomizeFileName("");
+	private String inputImageName = "imageMagickRotateInput" + sessionID;
+	private String resultImageName = "imageMagickRotateResult" + sessionID;
 	private String extension = null;
 	
 	private String rotateClockwise = "rotateClockwise";
@@ -99,8 +100,8 @@ public class ImageMagickRotate implements Modify {
 	public ServiceDescription describe() {
 		ServiceDescription.Builder sd = new ServiceDescription.Builder(NAME, Modify.class.getCanonicalName());
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
-        sd.description("This service uses ImageMagick to rotate images. That means, that you will have to install ImageMagick on the machine" +
-        		"where this service will be deployed to get this to work. ");
+        sd.description("This service uses ImageMagick (via 'im4java') to rotate images. That means, that you will have to install ImageMagick on the machine" +
+        		" where this service will be deployed to get this to work. ");
         sd.instructions("You can specify the amount of degrees, about which the image will be rotated. This rotation can be performed clockwise" + 
         		br + "(use \"rotateClockwise\"-param or counter-clockwise (use \"rotateCounterClockwise\" param." + 
         				br + "You can also give a background color used to fill the image areas added during rotation." + 

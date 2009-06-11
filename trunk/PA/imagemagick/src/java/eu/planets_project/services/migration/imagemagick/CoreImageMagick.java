@@ -55,7 +55,8 @@ public class CoreImageMagick {
     
     private static final String IM4JAVA_TEMP = "Im4Java_ImageMagickMigrate";
     private static final String JMAGICK_TEMP = "JMagick_ImageMagickMigrate";
-    private static final String DEFAULT_INPUT_FILE_NAME = "imageMagickInput";
+    private static final String sessionID = FileUtils.randomizeFileName("");
+    private static final String DEFAULT_INPUT_FILE_NAME = "imageMagickInput" + sessionID;
     private static final FormatRegistry formatRegistry = FormatRegistryFactory.getFormatRegistry();
     
     private static List<URI> inFormats = ImageMagickHelper.getSupportedInputFormats();
@@ -143,8 +144,8 @@ public class CoreImageMagick {
         compressionTypes.add("RunlegthEncoded");
     	
     	StringBuffer compressionTypesList = new StringBuffer();
-    	for (String compressionType : compressionTypes) {
-			compressionTypesList.append(compressionType + ", ");
+    	for (String currentCompressionType : compressionTypes) {
+			compressionTypesList.append(currentCompressionType + ", ");
 		}
     	String supportedCompressionTypes = compressionTypesList.toString();
     	if(supportedCompressionTypes.endsWith(", ")) {
@@ -157,7 +158,7 @@ public class CoreImageMagick {
         		"e.g. 'planets:fmt/ext/tiff' or 'planets:fmt/ext/tif'");
 
         sd.classname(className);
-        sd.version("1.0");
+        sd.version("1.1");
 
         List<Parameter> parameterList = new ArrayList<Parameter>();
         Parameter compressionTypeParam = new Parameter.Builder("compressionType", supportedCompressionTypes).description( 

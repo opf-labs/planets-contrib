@@ -52,9 +52,9 @@ public class Im4JavaImageMagickMigrateTests {
         // Config the logger:
         Logger.getLogger("").setLevel( Level.FINE );
         
-//        System.setProperty("pserv.test.context", "server");
-//        System.setProperty("pserv.test.host", "localhost");
-//        System.setProperty("pserv.test.port", "8080");
+        System.setProperty("pserv.test.context", "server");
+        System.setProperty("pserv.test.host", "localhost");
+        System.setProperty("pserv.test.port", "8080");
         
         
         

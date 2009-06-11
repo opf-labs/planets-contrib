@@ -36,15 +36,18 @@ public class DioscuriWrapper {
 	private PlanetsLogger log = PlanetsLogger.getLogger(this.getClass());
 	
 	private String DIOSCURI_HOME = System.getenv("DIOSCURI_HOME");
+//	private String DIOSCURI_HOME = "D:/PLANETS/DIOSCURI_HOME"; // TESTING
+	
 	private String OS_NAME = System.getProperty("os.name");
 	private String OS_VERSION = System.getProperty("os.version");
 	private String OS_ARCHITECTURE = System.getProperty("os.arch");
 	private String WORK_TEMP_NAME = "DIOSCURI_WRAPPER_TMP";
 	private File WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp(WORK_TEMP_NAME);
-	private String FLOPPY_RESULT_NAME = FileUtils.randomizeFileName("EXTRACTED_FILES");
+	private String sessionID = FileUtils.randomizeFileName("");
+	private String FLOPPY_RESULT_NAME = "EXTRACTED_FILES" + sessionID;
 	private File FLOPPY_RESULT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, FLOPPY_RESULT_NAME);
 	
-	private String FLOPPY_NAME = FileUtils.randomizeFileName("floppy.ima");
+	private String FLOPPY_NAME = "floppy" + sessionID + ".ima";
 	
 	private String DIOSCURI_CONFIG_FILE_PATH = "DioscuriConfig.xml";
 	
@@ -74,6 +77,7 @@ public class DioscuriWrapper {
 			DioscuriWrapperResult result = new DioscuriWrapperResult();
 			result.setMessage(ERROR_OUT);
 			result.setState(DioscuriWrapperResult.ERROR);
+			log.error(ERROR_OUT);
 			return result;
 		}
 		else {
@@ -141,7 +145,7 @@ public class DioscuriWrapper {
 			return this.createErrorResult(ERROR_OUT);
 		}
 		
-		log.info("FloppyImageHelper instance created...");
+		log.info("FloppyImageHelper instance created: " + extract.getClass().getName());
 		DigitalObject floppy = new DigitalObject.Builder(Content.byReference(floppyImage))
 									.title(floppyImage.getName())
 									.format(format.createExtensionUri(FileUtils.getExtensionFromFile(floppyImage)))
@@ -157,7 +161,7 @@ public class DioscuriWrapper {
 		String resultName = mr.getDigitalObject().getTitle();
 		
 		if(resultName==null) {
-			resultName = FileUtils.randomizeFileName("FIH_result.zip");
+			resultName = "FIH_result" + sessionID + ".zip";
 		}
 		
 		File resultZIP = new File(WORK_TEMP_FOLDER, resultName);

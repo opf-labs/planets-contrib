@@ -59,8 +59,9 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 //	private static File FLOPPY_INPUT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, "FLOPPY_INPUT");
 	private static String FLOPPY_INPUT_FOLDER_NAME = null;
 	private static File FLOPPY_INPUT_FOLDER = null;
-	
 	private static String DEFAULT_INPUT_NAME = null;
+	private String sessionID = FileUtils.randomizeFileName("");
+	
 	private static String RUN_BAT = "RUN.BAT";
 //	private static String INPUT_ZIP_NAME = "input.zip";
 	private static String INPUT_ZIP_NAME = null;
@@ -110,11 +111,11 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 			log.info("Deleted all files in: " + WORK_TEMP_FOLDER.getAbsolutePath() + ": " + String.valueOf(deletedAllFiles).toUpperCase());
 		}
 		
-		INPUT_ZIP_NAME = FileUtils.randomizeFileName("dioscuri-arj-input.zip");
+		INPUT_ZIP_NAME = FileUtils.randomizeFileName("dioscuri-arj-migrate.zip");
 		
-		DEFAULT_INPUT_NAME = FileUtils.randomizeFileName("input");
+		DEFAULT_INPUT_NAME = "input" + sessionID;
 		
-		FLOPPY_INPUT_FOLDER_NAME = FileUtils.randomizeFileName("FLOPPY_INPUT");
+		FLOPPY_INPUT_FOLDER_NAME = "FLOPPY_INPUT" + sessionID;
 		
 		FLOPPY_INPUT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, FLOPPY_INPUT_FOLDER_NAME);
 		

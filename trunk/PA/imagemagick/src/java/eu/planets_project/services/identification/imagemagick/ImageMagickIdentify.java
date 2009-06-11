@@ -56,7 +56,8 @@ public class ImageMagickIdentify implements Identify {
 	private PlanetsLogger PLOGGER = PlanetsLogger.getLogger(this.getClass()) ;
 	
 	private static final String WORKFOLDER_NAME = "ImageMagickIdentify";
-	private static final String DEFAULT_INPUT_NAME = "ImageMagickIdentify_input";
+	private String sessionID = FileUtils.randomizeFileName("");
+	private final String DEFAULT_INPUT_NAME = "ImageMagickIdentify_input" + sessionID;
 	private static final String DEFAULT_EXTENSION = "bin";
 	private static final FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 	
@@ -122,6 +123,9 @@ public class ImageMagickIdentify implements Identify {
 		
 		File workFolder = FileUtils.createWorkFolderInSysTemp(WORKFOLDER_NAME);
 		PLOGGER.info("Created workfolder for temp files: " + workFolder.getAbsolutePath());
+		if(workFolder.exists()) {
+			FileUtils.deleteAllFilesInFolder(workFolder);
+		}
 		
 		File inputFile = FileUtils.writeInputStreamToFile(digitalObject.getContent().read(), workFolder, fileName);
 		PLOGGER.info("Created temporary input file: " + inputFile.getAbsolutePath());

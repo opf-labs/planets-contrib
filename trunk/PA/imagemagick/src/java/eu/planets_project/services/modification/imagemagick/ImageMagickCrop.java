@@ -67,8 +67,9 @@ public class ImageMagickCrop implements Modify {
 	
 	private String workFolderName = "IMAGEMAGICK_CROP_TMP";
 	private File work_folder = FileUtils.createWorkFolderInSysTemp(workFolderName);
-	private String inputImageName = "imageMagickCropInput";
-	private String resultImageName = "imageMagickCropResult";
+	private static String sessionID = FileUtils.randomizeFileName("");
+	private String inputImageName = "imageMagickCropInput" + sessionID;
+	private String resultImageName = "imageMagickCropResult" + sessionID;
 	private String extension = null;
 	
 	private Point top_left = new Point();
@@ -93,12 +94,22 @@ public class ImageMagickCrop implements Modify {
 	private List<URI> inFormats = null;
 	
 	public ImageMagickCrop () {
-		File im_home = new File(System.getenv("IMAGEMAGICK_HOME"));
+		String im_home_path = System.getenv("IMAGEMAGICK_HOME");
+		if(im_home_path!=null) {
+			// Setting the installation dir for ImageMagick to make im4java work on windows platforms
+			File im_home = new File(im_home_path);
+			IMGlobalSettings.setImageMagickHomeDir(im_home);
+		}
+		else {
+			PLOGGER.error("The System variable IMAGEMAGICK_HOME is not set properly. " +
+					"Please install ImageMagick and set up a system variable pointing to the ImageMagick " +
+					"installation folder! Otherwise this service won't work on Windows OS!");
+		}
+			
 		// cleaning the TMP folder first
 		FileUtils.deleteTempFiles(work_folder);
 		work_folder = FileUtils.createWorkFolderInSysTemp(workFolderName);
-		// Setting the installation dir for ImageMagick to make im4java work on windows platforms 
-		IMGlobalSettings.setImageMagickHomeDir(im_home);
+ 
 		// Use the JBoss-Classloader, instead of the Systemclassloader.
 		System.setProperty("jmagick.systemclassloader","no"); 
 	    PLOGGER.info("Hello! Initializing and starting ImageMagickCrop service!");
@@ -113,10 +124,9 @@ public class ImageMagickCrop implements Modify {
 	 */
 	public ServiceDescription describe() {
 		ServiceDescription.Builder sd = new ServiceDescription.Builder(NAME, Modify.class.getCanonicalName());
-		sd.properties(new Property.Builder(URI.create("planets:mod/crop")).name("Supported modification action").value("crop").build());
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
-        sd.description("This service uses ImageMagick to crop images. That means, that you will have to install ImageMagick on the machine" +
-        		"where this service will be deployed to get this to work.");
+        sd.description("This service uses ImageMagick (via 'im4java') to crop images. That means, that you will have to install ImageMagick on the machine" +
+        		" where this service will be deployed to get this to work.");
         sd.instructions("You have to specify the cropping parameters the following way:" + br + 
 				"1) top_left_point = X,Y (with X and Y beeing the coordinates this point should have!)" + br + 
 				"   bottom_right_point = X,Y (with X and Y beeing the coordinates this point should have!)" + br +

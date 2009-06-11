@@ -55,13 +55,13 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 	private static final long serialVersionUID = 7520484154909390134L;
 
 	public static final String NAME = "DioscuriPnmToPngMigration";
-	private static String DIOSCURI_HOME = System.getenv("DIOSCURI_HOME");
-	private static String WORK_TEMP_NAME = "DIOSCURI_PNM2PNG_TMP";
-	private static String FLOPPY_INPUT_NAME = FileUtils.randomizeFileName("FLOPPY_INPUT");
-	private static File WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp(WORK_TEMP_NAME);
-	private static File FLOPPY_INPUT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, FLOPPY_INPUT_NAME);
+	private String WORK_TEMP_NAME = "DIOSCURI_PNM2PNG_TMP";
+	private String sessionID = FileUtils.randomizeFileName("");
+	private String FLOPPY_INPUT_NAME = "FLOPPY_INPUT" + sessionID;
+	private File WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp(WORK_TEMP_NAME);
+	private File FLOPPY_INPUT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, FLOPPY_INPUT_NAME);
 	
-	private static String DEFAULT_INPUT_NAME = FileUtils.randomizeFileName("input");
+	private String DEFAULT_INPUT_NAME = "input" + sessionID;
 	private static String RUN_BAT = "RUN.BAT";
 //	private static String INPUT_ZIP_NAME = "input.zip";
 	private static String INPUT_ZIP_NAME = null;
@@ -111,7 +111,7 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 		ServiceDescription.Builder sd = new ServiceDescription.Builder(NAME, Migrate.class.getCanonicalName());
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
         sd.description("This is a Prototype wrapper for the DIOSCURI-Emulator developed at KB-NL.\r\n" +
-        		"This service converts images from \".PNM\"-format to \".PNG\", using \"pnm2png.exe\" running in a MS-DOS 5.0 environment\r\n" +
+        		"This service converts images from \".PNM\"-format to \".PNG\" and vice versa, using \"pnm2png.exe\" and \" png2pnm.exe\" running on MS-DOS 5.0 \r\n" +
         		"emulated by DIOSCURI (16-Bit mode).");
         sd.classname(this.getClass().getCanonicalName());
         sd.version("1.0");
