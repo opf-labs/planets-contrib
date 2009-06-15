@@ -58,7 +58,7 @@ public class ImageMagickRotate implements Modify {
 	private PlanetsLogger PLOGGER = PlanetsLogger.getLogger(this.getClass()) ;
 	
 	private String workFolderName = "IMAGEMAGICK_ROTATE_TMP";
-	private File work_folder = FileUtils.createWorkFolderInSysTemp(workFolderName);
+	private File work_folder = FileUtils.createFolderInWorkFolder(FileUtils.getPlanetsTmpStoreFolder(), workFolderName);
 	private String sessionID = FileUtils.randomizeFileName("");
 	private String inputImageName = "imageMagickRotateInput" + sessionID;
 	private String resultImageName = "imageMagickRotateResult" + sessionID;
@@ -79,12 +79,18 @@ public class ImageMagickRotate implements Modify {
 	private List<URI> inFormats = null;
 	
 	public ImageMagickRotate () {
-		File im_home = new File(System.getenv("IMAGEMAGICK_HOME"));
-		// cleaning the TMP folder first
-		FileUtils.deleteTempFiles(work_folder);
-		work_folder = FileUtils.createWorkFolderInSysTemp(workFolderName);
-		// Setting the installation dir for ImageMagick to make im4java work on windows platforms 
-		IMGlobalSettings.setImageMagickHomeDir(im_home);
+		String im_home_path = System.getenv("IMAGEMAGICK_HOME");
+		if(im_home_path!=null) {
+			// Setting the installation dir for ImageMagick to make im4java work on windows platforms
+			File im_home = new File(im_home_path);
+			IMGlobalSettings.setImageMagickHomeDir(im_home);
+		}
+		else {
+			PLOGGER.error("The System variable IMAGEMAGICK_HOME is not set properly. " +
+					"Please install ImageMagick and set up a system variable pointing to the ImageMagick " +
+					"installation folder! Otherwise this service won't work on Windows OS!");
+		}
+		
 		// Use the JBoss-Classloader, instead of the Systemclassloader.
 		System.setProperty("jmagick.systemclassloader","no"); 
 	    PLOGGER.info("Hello! Initializing and starting ImageMagickRotate service!");

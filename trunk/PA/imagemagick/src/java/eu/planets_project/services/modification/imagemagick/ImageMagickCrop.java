@@ -66,7 +66,8 @@ public class ImageMagickCrop implements Modify {
 	private PlanetsLogger PLOGGER = PlanetsLogger.getLogger(this.getClass()) ;
 	
 	private String workFolderName = "IMAGEMAGICK_CROP_TMP";
-	private File work_folder = FileUtils.createWorkFolderInSysTemp(workFolderName);
+//	private File work_folder = FileUtils.createWorkFolderInSysTemp(workFolderName);
+	private File work_folder = FileUtils.createFolderInWorkFolder(FileUtils.getPlanetsTmpStoreFolder(), workFolderName);
 	private static String sessionID = FileUtils.randomizeFileName("");
 	private String inputImageName = "imageMagickCropInput" + sessionID;
 	private String resultImageName = "imageMagickCropResult" + sessionID;
@@ -107,8 +108,11 @@ public class ImageMagickCrop implements Modify {
 		}
 			
 		// cleaning the TMP folder first
-		FileUtils.deleteTempFiles(work_folder);
-		work_folder = FileUtils.createWorkFolderInSysTemp(workFolderName);
+//		FileUtils.deleteTempFiles(work_folder);
+//		work_folder = FileUtils.createWorkFolderInSysTemp(workFolderName);
+		if(work_folder.exists()) {
+			
+		}
  
 		// Use the JBoss-Classloader, instead of the Systemclassloader.
 		System.setProperty("jmagick.systemclassloader","no"); 

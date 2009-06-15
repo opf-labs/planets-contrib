@@ -40,9 +40,9 @@ public class ImageMagickCropTest {
 	
 	@BeforeClass
 	public static void setup() {
-		System.setProperty("pserv.test.context", "server");
-        System.setProperty("pserv.test.host", "localhost");
-        System.setProperty("pserv.test.port", "8080");
+//		System.setProperty("pserv.test.context", "server");
+//        System.setProperty("pserv.test.host", "localhost");
+//        System.setProperty("pserv.test.port", "8080");
 	}
 
 	/**
