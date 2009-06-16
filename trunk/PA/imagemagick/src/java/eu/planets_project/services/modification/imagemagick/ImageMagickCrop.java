@@ -68,9 +68,11 @@ public class ImageMagickCrop implements Modify {
 	private String workFolderName = "IMAGEMAGICK_CROP_TMP";
 //	private File work_folder = FileUtils.createWorkFolderInSysTemp(workFolderName);
 	private File work_folder = FileUtils.createFolderInWorkFolder(FileUtils.getPlanetsTmpStoreFolder(), workFolderName);
-	private static String sessionID = FileUtils.randomizeFileName("");
-	private String inputImageName = "imageMagickCropInput" + sessionID;
-	private String resultImageName = "imageMagickCropResult" + sessionID;
+//	private static String sessionID = FileUtils.randomizeFileName("");
+//	private String inputImageName = "imageMagickCropInput" + sessionID;
+//	private String resultImageName = "imageMagickCropResult" + sessionID;
+	private String inputImageName = "imageMagickCropInput";
+	private String resultImageName = "imageMagickCropResult";
 	private String extension = null;
 	
 	private Point top_left = new Point();
@@ -110,9 +112,6 @@ public class ImageMagickCrop implements Modify {
 		// cleaning the TMP folder first
 //		FileUtils.deleteTempFiles(work_folder);
 //		work_folder = FileUtils.createWorkFolderInSysTemp(workFolderName);
-		if(work_folder.exists()) {
-			
-		}
  
 		// Use the JBoss-Classloader, instead of the Systemclassloader.
 		System.setProperty("jmagick.systemclassloader","no"); 
@@ -162,7 +161,7 @@ public class ImageMagickCrop implements Modify {
 			List<Parameter> parameters) {
 
 		extension = "." + formatReg.getFirstExtension(inputFormat);
-		File inputFile = new File(work_folder, inputImageName + extension); 
+		File inputFile = new File(work_folder, FileUtils.randomizeFileName(inputImageName + extension)); 
 		FileUtils.writeInputStreamToFile(digitalObject.getContent().read(), inputFile);
 		
 		Rectangle croppingArea = null;
@@ -181,6 +180,8 @@ public class ImageMagickCrop implements Modify {
 					"If no top_left_point is specified, it is assumed to be located at (0,0) which is the upper left corner of the image.", null);
 		}
 		
+		File resultFile = new File(work_folder.getAbsolutePath() + File.separator + FileUtils.randomizeFileName(resultImageName + extension));
+		
 		croppingArea = createCroppingArea(inputFile);
 		
 		IMOperation op = new IMOperation();
@@ -189,7 +190,7 @@ public class ImageMagickCrop implements Modify {
 	    op.crop(croppingArea.width, croppingArea.height, croppingArea.x, croppingArea.y);
 	    
 	    op.p_repage();
-	    op.addImage(work_folder.getAbsolutePath() + File.separator + resultImageName + extension);
+	    op.addImage(resultFile.getAbsolutePath());
 	    
 	    try {
 	    	ConvertCmd convert = new ConvertCmd();
@@ -207,7 +208,7 @@ public class ImageMagickCrop implements Modify {
 			e.printStackTrace();
 		}
 		
-		File resultFile = new File(work_folder.getAbsolutePath() + File.separator + resultImageName + extension);
+//		File resultFile = new File(work_folder.getAbsolutePath() + File.separator + resultImageName + extension);
 		
 		if(!resultFile.exists()) {
 			return this.returnWithErrorMessage("No result file found. Something has gone terribly wrong during this operation. Sorry.", null);
@@ -215,6 +216,7 @@ public class ImageMagickCrop implements Modify {
 		
 		DigitalObject result = new DigitalObject.Builder(Content.byReference(resultFile))
 									.format(inputFormat)
+									.title(resultFile.getName())
 									.build();
 		
 		ServiceReport report = new ServiceReport(Type.INFO, Status.SUCCESS, "Crop operation executed successfully (as far as I can tell from here ;-) ).");

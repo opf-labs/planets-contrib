@@ -59,9 +59,11 @@ public class ImageMagickRotate implements Modify {
 	
 	private String workFolderName = "IMAGEMAGICK_ROTATE_TMP";
 	private File work_folder = FileUtils.createFolderInWorkFolder(FileUtils.getPlanetsTmpStoreFolder(), workFolderName);
-	private String sessionID = FileUtils.randomizeFileName("");
-	private String inputImageName = "imageMagickRotateInput" + sessionID;
-	private String resultImageName = "imageMagickRotateResult" + sessionID;
+//	private String sessionID = FileUtils.randomizeFileName("");
+//	private String inputImageName = "imageMagickRotateInput" + sessionID;
+//	private String resultImageName = "imageMagickRotateResult" + sessionID;
+	private String inputImageName = "imageMagickRotateInput";
+	private String resultImageName = "imageMagickRotateResult";
 	private String extension = null;
 	
 	private String rotateClockwise = "rotateClockwise";
@@ -150,7 +152,7 @@ public class ImageMagickRotate implements Modify {
 			List<Parameter> parameters) {
 
 		extension = "." + formatReg.getFirstExtension(inputFormat);
-		File inputFile = new File(work_folder, inputImageName + extension); 
+		File inputFile = new File(work_folder, FileUtils.randomizeFileName(inputImageName + extension)); 
 		FileUtils.writeInputStreamToFile(digitalObject.getContent().read(), inputFile);
 		
 		boolean parameters_correct = parseParameters(parameters);
@@ -158,6 +160,8 @@ public class ImageMagickRotate implements Modify {
 		if(!parameters_correct) {
 			return this.returnWithErrorMessage("Don't understand the parameters you've passed to this service! Sorry.", null);
 		}
+		
+		File resultFile = new File(work_folder.getAbsolutePath() + File.separator + FileUtils.randomizeFileName(resultImageName + extension));
 		
 		IMOperation op = new IMOperation();
 	    op.addImage(inputFile.getAbsolutePath());
@@ -168,7 +172,7 @@ public class ImageMagickRotate implements Modify {
 	    
 	    op.rotate(degrees);
 	    
-	    op.addImage(work_folder.getAbsolutePath() + File.separator + resultImageName + extension);
+	    op.addImage(resultFile.getAbsolutePath());
 	    
 	    try {
 	    	ConvertCmd convert = new ConvertCmd();
@@ -189,7 +193,7 @@ public class ImageMagickRotate implements Modify {
 			e.printStackTrace();
 		}
 		
-		File resultFile = new File(work_folder.getAbsolutePath() + File.separator + resultImageName + extension);
+//		File resultFile = new File(work_folder.getAbsolutePath() + File.separator + resultImageName + extension);
 		
 		if(!resultFile.exists()) {
 			return this.returnWithErrorMessage("No result file found. Something has gone terribly wrong during this operation. Sorry.", null);
