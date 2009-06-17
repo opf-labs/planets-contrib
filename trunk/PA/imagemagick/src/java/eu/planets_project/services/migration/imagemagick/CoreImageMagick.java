@@ -191,13 +191,18 @@ public class CoreImageMagick {
 		URI testOut = formatRegistry.createExtensionUri(outputExt);
         
 		if(inFormats!=null && outFormats!=null) {
-		    if(!inFormats.contains(testIn)) {
-		    	return returnWithErrorMessage("The Format: " + inputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
-		    }
-		    
-		    if(!outFormats.contains(testOut)) {
-		    	return returnWithErrorMessage("The Format: " + outputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
-		    }
+			if(testIn!=null) {
+			    if(!inFormats.contains(testIn)) {
+			    	return returnWithErrorMessage("The input format: " + inputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
+			    }
+			    
+			    if(!outFormats.contains(testOut)) {
+			    	return returnWithErrorMessage("The output format: " + outputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
+			    }
+			}
+			else {
+				return returnWithErrorMessage("The format you have passed can not be resolved: " + inputFormat.toASCIIString() + " Nothing has been done, sorry!", null);
+			}
 		}
         
         
@@ -289,13 +294,18 @@ public class CoreImageMagick {
 		URI testOut = formatRegistry.createExtensionUri(outputExt);
         
 		if(inFormats!=null && outFormats!=null) {
-		    if(!inFormats.contains(testIn)) {
-		    	return returnWithErrorMessage("The Format: " + inputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
-		    }
-		    
-		    if(!outFormats.contains(testOut)) {
-		    	return returnWithErrorMessage("The Format: " + outputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
-		    }
+			if(testIn!=null) {
+			    if(!inFormats.contains(testIn)) {
+			    	return returnWithErrorMessage("The input format: " + inputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
+			    }
+			    
+			    if(!outFormats.contains(testOut)) {
+			    	return returnWithErrorMessage("The output format: " + outputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
+			    }
+			}
+			else {
+				return returnWithErrorMessage("The format you have passed can not be resolved: " + inputFormat.toASCIIString() + " Nothing has been done, sorry!", null);
+			}
 		}
 	    
 	    File imageMagickTmpFolder = FileUtils.createWorkFolderInSysTemp(IM4JAVA_TEMP);

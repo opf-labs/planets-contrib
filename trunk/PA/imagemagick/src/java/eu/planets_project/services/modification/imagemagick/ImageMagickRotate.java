@@ -152,6 +152,20 @@ public class ImageMagickRotate implements Modify {
 			List<Parameter> parameters) {
 
 		extension = "." + formatReg.getFirstExtension(inputFormat);
+		
+		URI testIn = formatReg.createExtensionUri(formatReg.getFirstExtension(inputFormat));
+		
+		if(inFormats!=null) {
+			if(testIn!=null) {
+			    if(!inFormats.contains(testIn)) {
+			    	return returnWithErrorMessage("The input format: " + inputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
+			    }
+			}
+			else  {
+				return returnWithErrorMessage("The input format: " + inputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
+			}
+		}
+		
 		File inputFile = new File(work_folder, FileUtils.randomizeFileName(inputImageName + extension)); 
 		FileUtils.writeInputStreamToFile(digitalObject.getContent().read(), inputFile);
 		
