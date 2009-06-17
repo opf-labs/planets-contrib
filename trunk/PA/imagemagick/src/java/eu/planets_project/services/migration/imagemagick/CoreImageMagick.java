@@ -183,20 +183,23 @@ public class CoreImageMagick {
 	
 	public MigrateResult doJMagickMigration(DigitalObject digOb, URI inputFormat, URI outputFormat, List<Parameter> parameters) {
 		plogger.info("...and ready! Checking input...");
+		
+		String inputExt = formatRegistry.getFirstExtension(inputFormat);
+	    String outputExt = formatRegistry.getFirstExtension(outputFormat);
+		
+		URI testIn = formatRegistry.createExtensionUri(inputExt);
+		URI testOut = formatRegistry.createExtensionUri(outputExt);
         
 		if(inFormats!=null && outFormats!=null) {
-		    if(!inFormats.contains(inputFormat)) {
+		    if(!inFormats.contains(testIn)) {
 		    	return returnWithErrorMessage("The Format: " + inputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
 		    }
 		    
-		    if(!outFormats.contains(outputFormat)) {
+		    if(!outFormats.contains(testOut)) {
 		    	return returnWithErrorMessage("The Format: " + outputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
 		    }
 		}
         
-        
-        String inputExt = formatRegistry.getFirstExtension(inputFormat);
-        String outputExt = formatRegistry.getFirstExtension(outputFormat);
         
         File imageMagickTmpFolder = FileUtils.createWorkFolderInSysTemp(JMAGICK_TEMP);
         plogger.info("Created tmp folder: " + imageMagickTmpFolder.getAbsolutePath());
@@ -279,17 +282,21 @@ public class CoreImageMagick {
 	public MigrateResult doIm4JavaMigration(DigitalObject digOb, URI inputFormat, URI outputFormat, List<Parameter> parameters) {
 		plogger.info("...and ready! Checking input...");
 	    
-	    if(!inFormats.contains(inputFormat)) {
-	    	return returnWithErrorMessage("The Format: " + inputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
-	    }
-	    
-	    if(!outFormats.contains(outputFormat)) {
-	    	return returnWithErrorMessage("The Format: " + outputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
-	    }
-	    
-	    
-	    String inputExt = formatRegistry.getFirstExtension(inputFormat);
+		String inputExt = formatRegistry.getFirstExtension(inputFormat);
 	    String outputExt = formatRegistry.getFirstExtension(outputFormat);
+		
+		URI testIn = formatRegistry.createExtensionUri(inputExt);
+		URI testOut = formatRegistry.createExtensionUri(outputExt);
+        
+		if(inFormats!=null && outFormats!=null) {
+		    if(!inFormats.contains(testIn)) {
+		    	return returnWithErrorMessage("The Format: " + inputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
+		    }
+		    
+		    if(!outFormats.contains(testOut)) {
+		    	return returnWithErrorMessage("The Format: " + outputFormat.toASCIIString() + " is NOT supported by this ImageMagick-Service!", null);
+		    }
+		}
 	    
 	    File imageMagickTmpFolder = FileUtils.createWorkFolderInSysTemp(IM4JAVA_TEMP);
 	    plogger.info("Created tmp folder: " + imageMagickTmpFolder.getAbsolutePath());
