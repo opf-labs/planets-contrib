@@ -541,7 +541,7 @@ public class ImageMagickMigrateTests {
         FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
         DigitalObject input = new  DigitalObject.Builder(Content.byReference(inputFile))
         	.format(format.createExtensionUri(srcExtension))
-        	.title(inputFile.getName())
+        	.title("test title with lots of spaces in it")
         	.build();
         System.out.println("Input: " + input);
 

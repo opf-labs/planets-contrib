@@ -23,7 +23,7 @@ import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.utils.ZipUtils;
 
 
-@TransactionTimeout(1500)
+@TransactionTimeout(6000)
 public class DioscuriWrapper {
 	
 	public DioscuriWrapper() {

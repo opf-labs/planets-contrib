@@ -519,18 +519,17 @@ public class CoreImageMagick {
 	}
 
 	private String getInputFileName(DigitalObject digOb, URI inputFormat) {
-		String title = DigitalObjectUtils.getFileNameFromDigObject(digOb);
-		String fileName = null;
+		String title = DigitalObjectUtils.getFileNameFromDigObject(digOb, inputFormat);
 		
-		if(title==null || title.equals("")) {
-			String inputExt = formatRegistry.getFirstExtension(inputFormat);
-			fileName = DEFAULT_INPUT_FILE_NAME + "." + inputExt;
-		}
-		else {
-			fileName = title;
-		}
+//		if(title==null || title.equals("")) {
+//			String inputExt = formatRegistry.getFirstExtension(inputFormat);
+//			fileName = DEFAULT_INPUT_FILE_NAME + "." + inputExt;
+//		}
+//		else {
+//			fileName = title;
+//		}
 		
-		return fileName;
+		return title;
 	}
 
 	private String getOutputFileName(String inputFileName, URI outputFormat) {

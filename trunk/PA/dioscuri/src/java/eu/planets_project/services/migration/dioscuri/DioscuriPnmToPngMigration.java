@@ -207,7 +207,7 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 	 * @return the name of the file inside the DigObj as a String
 	 */
 	private String getFileNameFromDigitalObject(DigitalObject digObj, URI inputFormat) {
-		String fileName = DigitalObjectUtils.getFileNameFromDigObject(digObj);
+		String fileName = DigitalObjectUtils.getFileNameFromDigObject(digObj, inputFormat);
 		if(fileName==null) {
 			String ext = "." + format.getFirstExtension(inputFormat);
 			fileName = DEFAULT_INPUT_NAME + ext;
