@@ -29,6 +29,7 @@ import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.migration.dioscuri.utils.DioscuriWrapper;
 import eu.planets_project.services.migration.dioscuri.utils.DioscuriWrapperResult;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ServiceUtils;
@@ -174,7 +175,7 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 	 * @return the name of the file inside the DigObj as a String
 	 */
 	private String getFileNameFromDigitalObject(DigitalObject digObj, URI inputFormat) {
-		String fileName = digObj.getTitle();
+		String fileName = DigitalObjectUtils.getFileNameFromDigObject(digObj);
 		if(fileName==null) {
 			String ext = "." + format.getFirstExtension(inputFormat);
 			fileName = DEFAULT_INPUT_NAME + ext;

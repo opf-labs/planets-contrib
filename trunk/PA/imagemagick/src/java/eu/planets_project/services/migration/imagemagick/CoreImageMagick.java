@@ -32,6 +32,7 @@ import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.identification.imagemagick.utils.ImageMagickHelper;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ServiceUtils;
 
@@ -214,7 +215,8 @@ public class CoreImageMagick {
         File outputFile;
 
         plogger.info("Writing content to temp file.");
-		inputFile = new File(imageMagickTmpFolder, getInputFileName(digOb, inputFormat));
+		inputFile = new File(imageMagickTmpFolder, FileUtils.randomizeFileName(getInputFileName(digOb, inputFormat)));
+		
 		if(inputFile.exists()) {
 			plogger.info("PLEASE NOTE: Input file with same name already exists. Deleting old file: " + inputFile.getName());
 			inputFile.delete();
@@ -517,26 +519,27 @@ public class CoreImageMagick {
 	}
 
 	private String getInputFileName(DigitalObject digOb, URI inputFormat) {
-		String title = digOb.getTitle();
+		String title = DigitalObjectUtils.getFileNameFromDigObject(digOb);
 		String fileName = null;
-		String inputExt = formatRegistry.getFirstExtension(inputFormat);
-		if(title!=null && !title.equals("")) {
-			if(title.contains(".")) {
-				fileName = title.substring(0, title.lastIndexOf(".")) + "." + inputExt;
-			}
-			else {
-				fileName = title + "." + inputExt;
-			}
-		}
-		else {
+		
+		if(title==null || title.equals("")) {
+			String inputExt = formatRegistry.getFirstExtension(inputFormat);
 			fileName = DEFAULT_INPUT_FILE_NAME + "." + inputExt;
 		}
+		else {
+			fileName = title;
+		}
+		
 		return fileName;
 	}
 
 	private String getOutputFileName(String inputFileName, URI outputFormat) {
 		String fileName = null;
 		String outputExt = formatRegistry.getFirstExtension(outputFormat);
+		if(inputFileName.contains(" ")) {
+			inputFileName = inputFileName.replaceAll(" ", "_");
+		}
+		
 		if(inputFileName.contains(".")) {
 			fileName = inputFileName.substring(0, inputFileName.lastIndexOf(".")) + "." + outputExt;
 		}
