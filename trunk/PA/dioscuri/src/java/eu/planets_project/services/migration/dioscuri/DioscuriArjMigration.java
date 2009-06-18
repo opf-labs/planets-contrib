@@ -13,6 +13,8 @@ import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 
+import org.jboss.annotation.ejb.TransactionTimeout;
+
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
@@ -50,6 +52,7 @@ import eu.planets_project.services.utils.ZipUtils;
         serviceName = Migrate.NAME,
         targetNamespace = PlanetsServices.NS,
         endpointInterface = "eu.planets_project.services.migrate.Migrate")
+@TransactionTimeout(6000)
 public class DioscuriArjMigration implements Migrate, Serializable {
 	
 	private PlanetsLogger log = PlanetsLogger.getLogger(this.getClass()); 
