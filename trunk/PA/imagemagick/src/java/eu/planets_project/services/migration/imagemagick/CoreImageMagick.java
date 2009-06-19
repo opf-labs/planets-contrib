@@ -318,7 +318,7 @@ public class CoreImageMagick {
 	    File outputFile;
 	
 	    plogger.info("Writing content to temp file.");
-		inputFile = new File(imageMagickTmpFolder, getInputFileName(digOb, inputFormat));
+		inputFile = new File(imageMagickTmpFolder, FileUtils.randomizeFileName(getInputFileName(digOb, inputFormat)));
 		if(inputFile.exists()) {
 			plogger.info("PLEASE NOTE: Input file with same name already exists. Deleting old file: " + inputFile.getName());
 			inputFile.delete();
