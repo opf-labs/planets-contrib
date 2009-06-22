@@ -145,7 +145,6 @@ public class DioscuriWrapper {
 			return this.createErrorResult(ERROR_OUT);
 		}
 		
-		log.info("FloppyImageHelper instance created: " + extract.getClass().getName());
 		DigitalObject floppy = new DigitalObject.Builder(Content.byReference(floppyImage))
 									.title(floppyImage.getName())
 									.format(format.createExtensionUri(FileUtils.getExtensionFromFile(floppyImage)))
