@@ -90,20 +90,6 @@ public class DioscuriWrapper {
 			return this.createErrorResult(ERROR_OUT);
 		}
 		
-//		DigitalObjectContent content = null;
-//		
-//		if(checksum==null) {
-//			content = Content.byReference(allFilesAsZIP);
-//		}
-//		else {
-//			content = Content.byReference(allFilesAsZIP).withChecksum(checksum);
-//		}
-		
-//		DigitalObject floppyInput = new DigitalObject.Builder(content)
-//										.title(allFilesAsZIP.getName())
-//										.format(format.createExtensionUri("ZIP"))
-//										.build();
-		
 		DigitalObject floppyInput = DigitalObjectUtils.createZipTypeDigOb(allFilesAsZIP, allFilesAsZIP.getName(), true, true);
 		
 		MigrateResult floppyHelperResult = floppyHelper.migrate(floppyInput, format.createExtensionUri("ZIP"), format.createExtensionUri("IMA"), null);
@@ -239,7 +225,7 @@ public class DioscuriWrapper {
 		log.info("Looking up DioscuriConfig.xml template to create config file...");
 		String configString = new String(FileUtils.writeInputStreamToBinary(this.getClass().getResourceAsStream(DIOSCURI_CONFIG_FILE_PATH)));
 		if(configString!=null) {
-			log.info("Success! Template found.");
+			log.info("Success! DioscuriConfig.xml Template found and adjusted.");
 		}
 		else {
 			log.error("ERROR: Config file-template not found, unable to run Dioscuri without that!");
@@ -251,9 +237,9 @@ public class DioscuriWrapper {
 			floppyPath = floppyPath.replace("\\", "/");
 		}
 		configString = configString.replace("INSERT_FLOPPY_PATH_HERE", floppyPath);
-		File tmpConfigFile = new File(WORK_TEMP_FOLDER, "dioscuri_config.xml"); 
+		File tmpConfigFile = new File(WORK_TEMP_FOLDER, FileUtils.randomizeFileName("dioscuri_config.xml")); 
 		FileUtils.writeStringToFile(configString, tmpConfigFile);
-		log.info("Created config file for Dioscuri");
+		log.info("Created config file for Dioscuri: " + tmpConfigFile.getAbsolutePath());
 		return tmpConfigFile;
 	}
 
