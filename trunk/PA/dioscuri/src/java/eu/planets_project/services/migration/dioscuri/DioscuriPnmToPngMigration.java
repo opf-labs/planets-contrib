@@ -116,7 +116,14 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
         sd.description("This is a Prototype wrapper for the DIOSCURI-Emulator developed at KB-NL.\r\n" +
         		"This service converts images from \".PNM\"-format to \".PNG\" and vice versa, using \"pnm2png.exe\" and \" png2pnm.exe\" running on MS-DOS 5.0 \r\n" +
-        		"emulated by DIOSCURI (16-Bit mode).");
+        		"emulated by DIOSCURI (16-Bit mode)." + System.getProperty("line.separator") + 
+        		"IMPORTANT NOTE: As Dioscuri is emulating an 'ancient' MS-DOS system, " +
+        		"please mind that the file you like to migrate should be small. " +
+        		"MS-DOS 5.0 can adress 1 MB (!) physical memory, the processor is running at 10Mhz (!)." +
+        		"So please be aware that it can take a while for the service to finish " +
+        		"AND that passing files which are too large, can cause trouble. " +
+        		"In this context, keep in mind that the result file has to be written to a floppy " +
+        		"disk and therefore is limited regarding its size (1.44MB)!!!");
         sd.classname(this.getClass().getCanonicalName());
         sd.version("1.0");
         sd.tool( Tool.create(null, 
@@ -140,7 +147,6 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
         List<MigrationPath> pathways = new ArrayList<MigrationPath>();
         pathways.add(new MigrationPath(format.createExtensionUri("PNM"), format.createExtensionUri("PNG"), null));
         pathways.add(new MigrationPath(format.createExtensionUri("PNG"), format.createExtensionUri("PNM"), null));
-        
         sd.paths(pathways.toArray(new MigrationPath[] {}));
         return sd.build();
 	}

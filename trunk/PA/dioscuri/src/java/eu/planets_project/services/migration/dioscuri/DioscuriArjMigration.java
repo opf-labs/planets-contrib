@@ -89,7 +89,14 @@ public class DioscuriArjMigration implements Migrate, Serializable {
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
         sd.description("This is a Prototype wrapper for the DIOSCURI-Emulator developed at KB-NL.\r\n" +
         		"It converts \"ARJ\" archives to selfextracting \"EXE\" files using \"ARJ.EXE\" v2.21, running in a MS-DOS 5.0 environment\r\n" +
-        		"emulated by DIOSCURI (16-Bit mode).");
+        		"emulated by DIOSCURI (16-Bit mode)." + System.getProperty("line.separator") + 
+        		"IMPORTANT NOTE: As Dioscuri is emulating an 'ancient' MS-DOS system, " +
+        		"please mind that the file you like to migrate should be small. " +
+        		"MS-DOS 5.0 can adress 1 MB (!) physical memory, the processor is running at 10Mhz (!)." +
+        		"So please be aware that it can take a while for the service to finish " +
+        		"AND that passing files which are too large, can cause trouble. " +
+        		"In this context, keep in mind that the result file has to be written to a floppy " +
+        		"disk and therefore is limited regarding its size (1.44MB)!!!");
         sd.classname(this.getClass().getCanonicalName());
         sd.version("1.0");
         sd.tool( Tool.create(null, 
@@ -99,7 +106,6 @@ public class DioscuriArjMigration implements Migrate, Serializable {
         		"http://wiki.oldos.org/Downloads/MSDOS"));
         List<MigrationPath> pathways = new ArrayList<MigrationPath>();
         pathways.add(new MigrationPath(format.createExtensionUri("ARJ"), format.createExtensionUri("EXE"), null));
-        
         sd.paths(pathways.toArray(new MigrationPath[] {}));
         return sd.build();
 	}
