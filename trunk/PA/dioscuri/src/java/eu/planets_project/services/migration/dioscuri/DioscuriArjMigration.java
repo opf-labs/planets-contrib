@@ -232,8 +232,7 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 //				runScript = EMU_ARJ_PATH + " " + "f " + "A:\\" + inputFileName.toUpperCase() + " -je" + 
 //				"\r\n" + "ECHO Finished archive conversion to selfextracting ARJ archive. Bye Bye..." +
 //				"\r\n" + "HALT.EXE";
-				runScript = EMU_ARJ_PATH + " f " + "A:\\" + inputFileName.toUpperCase() + " -je" + 
-				"\r\n" + "ECHO Finished archive conversion to selfextracting ARJ archive. Bye Bye..." +
+				runScript = EMU_ARJ_PATH + " f " + " -je" + " A:\\" + inputFileName.toUpperCase() + " -w" + ARJ_HOME +
 				"\r\n" + "HALT.EXE";
 				
 				
@@ -245,7 +244,7 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 			
 			File runBat = new File(destFolder, RUN_BAT);
 			runBat = FileUtils.writeStringToFile(runScript, runBat);
-			log.info(RUN_BAT + " created: " + runScript);
+			log.info(RUN_BAT + " created: " + System.getProperty("line.separator") + runScript);
 			
 			return runBat.exists();
 		}
