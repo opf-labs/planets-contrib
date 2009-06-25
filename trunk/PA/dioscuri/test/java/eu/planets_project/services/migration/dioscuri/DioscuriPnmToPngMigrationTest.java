@@ -8,6 +8,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -47,6 +49,7 @@ public class DioscuriPnmToPngMigrationTest {
 //		System.setProperty("pserv.test.context", "server");
 //        System.setProperty("pserv.test.host", "localhost");
 //        System.setProperty("pserv.test.port", "8080");
+	    Logger.getRootLogger().setLevel(Level.DEBUG);
 		DIOSCURI_MIGRATE = ServiceCreator.createTestService(Migrate.QNAME, DioscuriPnmToPngMigration.class, wsdlLoc);
 	}
 	
