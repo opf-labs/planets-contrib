@@ -39,8 +39,11 @@ public class ShotgunModifyTests {
         Parameter length = new Parameter(Key.SEQ_LENGTH.toString(), "15");
         Parameter action = new Parameter(Key.ACTION.toString(), shotgunAction
                 .toString());
-        /* Instantiate the shotgun and modify the file: */
+        /* Instantiate the shotgun and modify the file without parameters: */
         ModifyResult modify = new ShotgunModify().modify(INPUT_DIGITAL_OBJECT,
+                null, null);
+        /* Instantiate the shotgun and modify the file with parameters: */
+        modify = new ShotgunModify().modify(INPUT_DIGITAL_OBJECT,
                 null, Arrays.asList(count, length, action));
         return modify;
     }

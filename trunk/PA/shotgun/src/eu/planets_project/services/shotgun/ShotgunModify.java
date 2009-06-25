@@ -31,6 +31,9 @@ import eu.planets_project.services.utils.DigitalObjectUtils;
 public final class ShotgunModify implements Modify {
 
     public static final String NAME = "ShotgunModify";
+    private static final String DEFAULT_ACTION = Action.CORRUPT.toString();
+    private static final int DEFAULT_SEQ_LENGTH = 15;
+    private static final int DEFAULT_SEQ_COUNT = 5;
 
     /**
      * {@inheritDoc}
@@ -62,16 +65,19 @@ public final class ShotgunModify implements Modify {
 
     private DigitalObject modify(DigitalObject digitalObject,
             List<Parameter> parameters) {
-        int seqCount = -1;
-        int seqLength = -1;
-        String action = null;
-        for (Parameter parameter : parameters) {
-            if (parameter.getName().equals(Key.SEQ_COUNT.toString())) {
-                seqCount = Integer.parseInt(parameter.getValue());
-            } else if (parameter.getName().equals(Key.SEQ_LENGTH.toString())) {
-                seqLength = Integer.parseInt(parameter.getValue());
-            } else if (parameter.getName().equals(Key.ACTION.toString())) {
-                action = parameter.getValue();
+        int seqCount = DEFAULT_SEQ_COUNT;
+        int seqLength = DEFAULT_SEQ_LENGTH;
+        String action = DEFAULT_ACTION;
+        if (parameters != null) {
+            for (Parameter parameter : parameters) {
+                if (parameter.getName().equals(Key.SEQ_COUNT.toString())) {
+                    seqCount = Integer.parseInt(parameter.getValue());
+                } else if (parameter.getName()
+                        .equals(Key.SEQ_LENGTH.toString())) {
+                    seqLength = Integer.parseInt(parameter.getValue());
+                } else if (parameter.getName().equals(Key.ACTION.toString())) {
+                    action = parameter.getValue();
+                }
             }
         }
         return modify(digitalObject, seqCount, seqLength, action);
@@ -82,7 +88,6 @@ public final class ShotgunModify implements Modify {
         File inputFile = DigitalObjectUtils.getContentAsTempFile(digitalObject);
         File outputFile = new FileShotgun().shoot(inputFile, seqCount,
                 seqLength, Action.valueOf(action));
-        return new DigitalObject.Builder(Content.byValue(outputFile))
-                .build();
+        return new DigitalObject.Builder(Content.byValue(outputFile)).build();
     }
 }
