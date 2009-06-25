@@ -211,6 +211,8 @@ public class DioscuriWrapper {
 		
 		PROCESS_OUT = dioscuriCmd.getProcessOutputAsString();
 		ERROR_OUT = dioscuriCmd.getProcessErrorAsString();
+        log.debug("Got Process output: "+PROCESS_OUT);
+        log.debug("Got Process error output: "+ERROR_OUT);
 	}
 
 
