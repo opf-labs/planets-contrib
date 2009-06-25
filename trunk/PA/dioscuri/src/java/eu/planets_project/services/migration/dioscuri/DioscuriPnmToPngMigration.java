@@ -72,8 +72,9 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 	
 //	private static String EMU_PICTVIEW_PATH = "c:\\pictview\\pictview.exe";
 	
-	private static String EMU_PNM_TO_PNG_PATH = "C:\\pngminus\\pnm2png.exe";
-	private static String EMU_PNG_TO_PNM_PATH = "C:\\pngminus\\png2pnm.exe";
+	private static String PNM_2_PNG_TOOL = "C:\\pngminus\\pnm2png.exe";
+	private static String PNGMINUS_HOME = "C:\\pngminus\\";
+	private static String PNG_2_PNM_TOOL = "C:\\pngminus\\png2pnm.exe";
 	
 	private static FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 	
@@ -261,17 +262,29 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 			String inputFileName = inputFile.getName();
 			String inputExt = FileUtils.getExtensionFromFile(inputFile);
 			if(inputExt.equalsIgnoreCase("PNM")) {
-				runScript = EMU_PNM_TO_PNG_PATH + " " + "A:\\" + inputFileName.toUpperCase() + " " + "A:\\" + outputFileName.toUpperCase() +
-					"\r\n" + "HALT.EXE";
+				runScript = PNM_2_PNG_TOOL + " " + "A:\\" + inputFileName.toUpperCase() + " " + PNGMINUS_HOME + outputFileName.toUpperCase() 
+					+ "\r\n"
+					+ "del " + "A:\\" + inputFileName.toUpperCase()
+					+ "\r\n"
+					+ "copy " + PNGMINUS_HOME + outputFileName.toUpperCase() + " " + "A:\\" + outputFileName.toUpperCase()
+					+ "\r\n"
+					+ "del " + PNGMINUS_HOME + outputFileName.toUpperCase()
+					+ "\r\n" + "HALT.EXE";
 			}
 			else {
-				runScript = EMU_PNG_TO_PNM_PATH + " " + "A:\\" + inputFileName.toUpperCase() + " " + "A:\\" + outputFileName.toUpperCase() +
-					"\r\n" + "HALT.EXE";
+				runScript = PNG_2_PNM_TOOL + " " + "A:\\" + inputFileName.toUpperCase() + " " + PNGMINUS_HOME + outputFileName.toUpperCase() 
+							+ "\r\n"
+							+ "del " + "A:\\" + inputFileName.toUpperCase()
+							+ "\r\n"
+							+ "copy " + PNGMINUS_HOME + outputFileName.toUpperCase() + " " + "A:\\" + outputFileName.toUpperCase()
+							+ "\r\n"
+							+ "del " + PNGMINUS_HOME + outputFileName.toUpperCase()
+							+ "\r\n" + "HALT.EXE";
 			}
 			
 			File runBat = new File(destFolder, RUN_BAT);
 			runBat = FileUtils.writeStringToFile(runScript, runBat);
-			log.info(RUN_BAT + " created: " + runScript);
+			log.info(RUN_BAT + " created: " + System.getProperty("line.separator") + runScript);
 			
 			return runBat.exists();
 		}

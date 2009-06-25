@@ -3,6 +3,7 @@
  */
 package eu.planets_project.services.grateview;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -11,7 +12,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.io.File;
 
 import javax.annotation.Resource;
 import javax.jws.WebService;
@@ -24,30 +24,27 @@ import javax.xml.ws.handler.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import eu.planets_project.ifr.core.storage.utils.DigitalObjectDiskCache;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.DigitalObjectContent;
 import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
+import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelper;
+import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelperFactory;
+import eu.planets_project.services.utils.DigitalObjectUtils;
+import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.ZipResult;
 import eu.planets_project.services.view.CreateView;
 import eu.planets_project.services.view.CreateViewResult;
 import eu.planets_project.services.view.ViewActionResult;
 import eu.planets_project.services.view.ViewStatus;
-import eu.planets_project.ifr.core.storage.utils.DigitalObjectDiskCache;
-import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
-import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
-import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.ZipResult;
-
-
-import eu.planets_project.services.migrate.MigrateResult;
-
-import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelperFactory;
-import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelper;
 
 /**
  * A GRATE Viewer service. 
@@ -185,20 +182,19 @@ public class GrateViewService implements CreateView {
 				filename = "no_file_name" + i++;
 			FileUtils.writeInputStreamToFile(dob.getContent().read(), content_dir, filename);
 		}
-		ZipResult zip_result = FileUtils.createZipFileWithChecksum(content_dir, temp_dir, "floppy.zip");
+		ZipResult zip_result = FileUtils.createZipFileWithChecksum(content_dir, temp_dir, FileUtils.randomizeFileName("floppy.zip"));
 		if(zip_result == null)
 			return returnWithErrorMessage("Failed to create zip file.");
 
-		DigitalObjectContent doc = Content.byReference(zip_result.getZipFile());
-		DigitalObject doz =  new DigitalObject.Builder(doc).format(format.createExtensionUri("zip"))
-				.title(zip_result.getZipFile().getName()).build();
+//		DigitalObjectContent doc = Content.byReference(zip_result.getZipFile());
+		DigitalObject doz =  DigitalObjectUtils.createZipTypeDigOb(zip_result.getZipFile(), zip_result.getZipFile().getName(), true, true);
 
 		FloppyImageHelper helper = FloppyImageHelperFactory.getFloppyImageHelperInstance();
 
 		List<Parameter> __unused__ = new ArrayList<Parameter>();
 		MigrateResult mr = helper.migrate(doz, 
 				format.createExtensionUri("zip"), 
-				format.createExtensionUri("IMG"), 
+				format.createExtensionUri("IMA"), 
 				__unused__);
 	
 		if(mr.getReport().getStatus() != Status.SUCCESS)

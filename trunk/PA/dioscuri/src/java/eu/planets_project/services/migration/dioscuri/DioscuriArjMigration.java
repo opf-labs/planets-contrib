@@ -68,9 +68,10 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 	
 	private static String RUN_BAT = "RUN.BAT";
 //	private static String INPUT_ZIP_NAME = "input.zip";
-	private static String INPUT_ZIP_NAME = null;
+	private String INPUT_ZIP_NAME = null;
 	
 	private static String EMU_ARJ_PATH= "C:\\ARJ\\ARJ.EXE";
+	private static String ARJ_HOME = "C:\\ARJ\\";
 	private static String INDEX_FILE_NAME = "INDEX.TXT";
 	
 	private static FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
@@ -134,7 +135,7 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 		String outFileName = getOutputFileName(inputFile, outputFormat);
 //		String outFileName = INDEX_FILE_NAME;
 		
-		boolean runBatCreated = createArchiveConversionRunBat(FLOPPY_INPUT_FOLDER, inputFile, outFileName);	
+		boolean runBatCreated = createRunBat(FLOPPY_INPUT_FOLDER, inputFile, outFileName);	
 //		boolean runBatCreated = createListOfContentRunBat(FLOPPY_INPUT_FOLDER, inputFile, INDEX_FILE_NAME);
 		
 		DioscuriWrapper dioscuri = new DioscuriWrapper();
@@ -220,7 +221,7 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 		 * @param inputExt 
 		 * @return
 		 */
-		private boolean createArchiveConversionRunBat(File destFolder, File inputFile, String outputFileName) {
+		private boolean createRunBat(File destFolder, File inputFile, String outputFileName) {
 			String runScript = null;
 			String inputFileName = inputFile.getName();
 			String inputExt = FileUtils.getExtensionFromFile(inputFile);
@@ -228,9 +229,14 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 				log.warn("Could not retrieve format extension from input file. Using '.arj' as default.");
 			}
 			if(inputExt.equalsIgnoreCase("ARJ")) {
-				runScript = EMU_ARJ_PATH + " " + "f " + "A:\\" + inputFileName.toUpperCase() + " -je" + 
+//				runScript = EMU_ARJ_PATH + " " + "f " + "A:\\" + inputFileName.toUpperCase() + " -je" + 
+//				"\r\n" + "ECHO Finished archive conversion to selfextracting ARJ archive. Bye Bye..." +
+//				"\r\n" + "HALT.EXE";
+				runScript = EMU_ARJ_PATH + " f " + "A:\\" + inputFileName.toUpperCase() + " -je" + 
 				"\r\n" + "ECHO Finished archive conversion to selfextracting ARJ archive. Bye Bye..." +
 				"\r\n" + "HALT.EXE";
+				
+				
 			}
 //			else {
 //				runScript = EMU_ARJ_PATH + " " + "f " + "A:\\" + inputFileName.toUpperCase() + "-je" + 
