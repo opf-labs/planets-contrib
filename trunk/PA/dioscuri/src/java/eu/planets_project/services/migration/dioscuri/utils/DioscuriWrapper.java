@@ -12,6 +12,7 @@ import eu.planets_project.services.datatypes.Checksum;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.DigitalObjectContent;
+import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelper;
@@ -94,7 +95,7 @@ public class DioscuriWrapper {
 		
 		MigrateResult floppyHelperResult = floppyHelper.migrate(floppyInput, format.createExtensionUri("ZIP"), format.createExtensionUri("IMA"), null);
 		
-		if(floppyHelperResult.getReport().getType() == Type.ERROR) {
+		if(floppyHelperResult.getReport().getStatus() != Status.SUCCESS ) {
 			log.error(floppyHelperResult.getReport().getMessage());
 			return createErrorResult(floppyHelperResult.getReport().getMessage());
 		}
@@ -179,7 +180,7 @@ public class DioscuriWrapper {
 			main_result = extractedFiles.get(index);
 		}
 		else {
-			return this.createErrorResult("An unidentified error occured! No result file created!");
+			return this.createErrorResult("An unidentified error occured! No result file created! "+PROCESS_OUT+" : "+ERROR_OUT);
 		}
 		
 		DioscuriWrapperResult dr = new DioscuriWrapperResult();
