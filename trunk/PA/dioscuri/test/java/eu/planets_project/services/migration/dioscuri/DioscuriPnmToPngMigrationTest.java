@@ -72,7 +72,7 @@ public class DioscuriPnmToPngMigrationTest {
 		MigrateResult result = DIOSCURI_MIGRATE.migrate(inputDigOb, format.createExtensionUri(FileUtils.getExtensionFromFile(PNM_TEST_FILE)), format.createExtensionUri("PNG"), null);
 		
 		assertTrue("MigrateResult should not be NULL", result!=null);
-		System.out.println("ServiceReport: " + result.getReport() );
+		System.out.println("DEBUG ServiceReport: " + result.getReport() );
 		assertTrue("ServiceReport should be SUCCESS", result.getReport().getStatus()==Status.SUCCESS);
 		
 		System.out.println(result.getReport());
