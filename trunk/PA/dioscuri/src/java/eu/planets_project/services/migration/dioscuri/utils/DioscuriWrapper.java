@@ -173,7 +173,13 @@ public class DioscuriWrapper {
 			extractedFiles = ZipUtils.checkAndUnzipTo(resultZIP, FLOPPY_RESULT_FOLDER, check);
 		}
 		
-		int index = extractedFiles.indexOf(new File(FLOPPY_RESULT_FOLDER, outputFileName));
+		File outFile = new File(FLOPPY_RESULT_FOLDER, outputFileName);
+        log.info("Looking for filename: "+outputFileName+" - "+outFile.getAbsolutePath());
+		for( File exfile: extractedFiles) {
+		    log.info("Found file: "+exfile.getAbsolutePath());
+		}
+		
+		int index = extractedFiles.indexOf(outFile);
 		
 		File main_result = null;
 		
@@ -181,7 +187,7 @@ public class DioscuriWrapper {
 			main_result = extractedFiles.get(index);
 		}
 		else {
-			return this.createErrorResult("An unidentified error occured! No result file created! "+PROCESS_OUT+" : "+ERROR_OUT);
+			return this.createErrorResult("Result file could not be found. An unidentified error occured! No result file created! "+PROCESS_OUT+" : "+ERROR_OUT);
 		}
 		
 		DioscuriWrapperResult dr = new DioscuriWrapperResult();
