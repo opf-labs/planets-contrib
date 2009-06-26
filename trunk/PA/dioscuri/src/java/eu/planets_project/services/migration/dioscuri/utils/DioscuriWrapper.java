@@ -188,6 +188,7 @@ public class DioscuriWrapper {
 		dr.setMessage(PROCESS_OUT);
 		dr.setResultFile(main_result);
 		dr.setState(DioscuriWrapperResult.SUCCESS);
+		log.info("Dioscuri executed just fine. Returning SUCCESS");
 		return dr;
 	}
 
