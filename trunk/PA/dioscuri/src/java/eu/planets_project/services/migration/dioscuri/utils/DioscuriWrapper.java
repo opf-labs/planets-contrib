@@ -261,11 +261,7 @@ public class DioscuriWrapper {
 		commands.add("-jar");
 		commands.add("dioscuri.jar");
 		commands.add("-c");
-		try {
-            commands.add("\"" + configFile.getCanonicalPath()+ "\"");
-        } catch (IOException e) {
-            commands.add("\"" + configFile.getAbsolutePath()+ "\"");
-        }
+		commands.add(configFile.getAbsolutePath());
 		commands.add("-h");
 		commands.add("autorun");
 		commands.add("autoshutdown");
