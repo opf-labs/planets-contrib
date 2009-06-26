@@ -1,6 +1,7 @@
 package eu.planets_project.services.migration.dioscuri.utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -211,8 +212,9 @@ public class DioscuriWrapper {
 		
 		PROCESS_OUT = dioscuriCmd.getProcessOutputAsString();
 		ERROR_OUT = dioscuriCmd.getProcessErrorAsString();
-        log.debug("Got Process output: "+PROCESS_OUT);
-        log.debug("Got Process error output: "+ERROR_OUT);
+        log.info("Got Process output: "+PROCESS_OUT);
+        if( ERROR_OUT != null && !"".equals(ERROR_OUT) )
+            log.error("Got Process error output: "+ERROR_OUT);
 	}
 
 
@@ -259,7 +261,11 @@ public class DioscuriWrapper {
 		commands.add("-jar");
 		commands.add("dioscuri.jar");
 		commands.add("-c");
-		commands.add("\"" + configFile.getAbsolutePath()+ "\"");
+		try {
+            commands.add("\"" + configFile.getCanonicalPath()+ "\"");
+        } catch (IOException e) {
+            commands.add("\"" + configFile.getAbsolutePath()+ "\"");
+        }
 		commands.add("-h");
 		commands.add("autorun");
 		commands.add("autoshutdown");
