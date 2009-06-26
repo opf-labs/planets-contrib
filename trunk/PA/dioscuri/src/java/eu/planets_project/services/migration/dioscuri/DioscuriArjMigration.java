@@ -200,7 +200,7 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 	private String getOutputFileName(File inputFile, URI outputFormat) {
 		String inName = inputFile.getName();
 		String outName = null;
-		String outExt = "." + format.getFirstExtension(outputFormat);
+		String outExt = "." + format.getFirstExtension(outputFormat).toUpperCase();
 		if(inName.contains(".")) {
 			outName = inName.substring(0, inName.lastIndexOf(".")) + outExt;
 		}

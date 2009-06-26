@@ -176,6 +176,7 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 		if(runBatCreated) {
 			ZipResult zipResult = ZipUtils.createZipAndCheck(FLOPPY_INPUT_FOLDER, WORK_TEMP_FOLDER, INPUT_ZIP_NAME);
 			DioscuriWrapperResult result = dioscuri.createFloppyImageAndRunDioscuri(zipResult.getZipFile(), inFileName, outFileName, zipResult.getChecksum());
+			log.info("Got result state: "+result.getState());
 			if(result.getState()==DioscuriWrapperResult.ERROR) {
 				return this.returnWithErrorMessage(result.getMessage(), null);
 			}
@@ -236,7 +237,7 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 	private String getOutputFileName(File inputFile, URI outputFormat) {
 		String inName = inputFile.getName();
 		String outName = null;
-		String outExt = "." + format.getFirstExtension(outputFormat);
+		String outExt = "." + format.getFirstExtension(outputFormat).toUpperCase();
 		if(inName.contains(".")) {
 			outName = inName.substring(0, inName.lastIndexOf(".")) + outExt;
 		}

@@ -1,7 +1,6 @@
 package eu.planets_project.services.migration.dioscuri.utils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -174,9 +173,10 @@ public class DioscuriWrapper {
 		}
 		
 		File outFile = new File(FLOPPY_RESULT_FOLDER, outputFileName);
-        log.info("Looking for filename: "+outputFileName+" - "+outFile.getAbsolutePath());
+        log.debug("Looking for file: "+outFile.getAbsolutePath());
+        
 		for( File exfile: extractedFiles) {
-		    log.info("Found file: "+exfile.getAbsolutePath());
+		    log.debug("Found file: "+exfile.getAbsolutePath());
 		}
 		
 		int index = extractedFiles.indexOf(outFile);
