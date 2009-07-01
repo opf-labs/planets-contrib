@@ -3,7 +3,6 @@
  */
 package eu.planets_project.services.identification.imagemagick.utils;
 
-import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,19 +28,26 @@ public class ImageMagickHelper {
 	private static PlanetsLogger log = PlanetsLogger.getLogger(ImageMagickHelper.class) ; 
 	
 	private static void init() {
-		String im_home_path = System.getenv("IMAGEMAGICK_HOME");
-		if(im_home_path==null) {
-			log.error("Cannot find ImageMagick installation. If you have ImageMagick installed on your system, please " +
-					"set up an Environment variable \"IMAGEMAGICK_HOME\" pointing to the installation folder.");
-			System.err.println("Cannot find ImageMagick installation. If you have ImageMagick installed on your system, please " +
-					"set up an Environment variable \"IMAGEMAGICK_HOME\" pointing to the installation folder.");
-		}
+//		String os = System.getProperty("os.name").toUpperCase();
 		
-		log.info("Initializing ImageMagick format tables." + System.getProperty("line.separator") +  "Checking supported formats and installed libraries...will be back soon, please hang on!");
+//		String im_home_path = System.getenv("IMAGEMAGICK_HOME");
+		
+//		if(im_home_path==null) {
+//			if(os.contains("WINDOWS")) {
+//				log.error("[" + ImageMagickHelper.class.getName() + "] " + "Cannot find ImageMagick installation. If you have ImageMagick installed on your system, please " +
+//					"set up an Environment variable \"IMAGEMAGICK_HOME\" pointing to the installation folder.");
+//				System.err.println("[" + ImageMagickHelper.class.getName() + "] " + "Cannot find ImageMagick installation. If you have ImageMagick installed on your system, please " +
+//					"set up an Environment variable \"IMAGEMAGICK_HOME\" pointing to the installation folder.");
+//			}
+//		}
+		
+		log.info("[" + ImageMagickHelper.class.getName() + "] " + "Initializing ImageMagick format tables." + System.getProperty("line.separator") +  "Checking supported formats and installed libraries...will be back soon, please hang on!");
 		ProcessRunner imageMagick = new ProcessRunner();
-		if( im_home_path != null ) {
-		    imageMagick.setStartingDir(new File(im_home_path));
-		}
+		
+//		if( im_home_path != null ) {
+//		    imageMagick.setStartingDir(new File(im_home_path));
+//		}
+		
 		imageMagick.setCommand(getListCommand());
 		imageMagick.run();
 		String output = imageMagick.getProcessOutputAsString();
