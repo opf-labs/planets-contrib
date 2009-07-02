@@ -72,14 +72,6 @@ public class CoreImageMagick {
     private static final String IMAGE_MAGICK_URI = "http://www.imagemagick.org";
     
     public CoreImageMagick() {
-    	System.setProperty("jmagick.systemclassloader","no"); // Use the JBoss-Classloader, instead of the Systemclassloader.
-    	
-    	im_home_path = System.getenv("IMAGEMAGICK_HOME");
-        if(im_home_path!=null) {
-        	im_home = new File(im_home_path);
-        	IMGlobalSettings.setImageMagickHomeDir(im_home);
-        }
-        
         plogger.info("Hello! Initializing Im4JavaImageMagickMigrate service...");
     }
     public static ServiceDescription describeJMagickMigrate(String serviceName, String className) {
@@ -183,6 +175,7 @@ public class CoreImageMagick {
     }
 	
 	public MigrateResult doJMagickMigration(DigitalObject digOb, URI inputFormat, URI outputFormat, List<Parameter> parameters) {
+		System.setProperty("jmagick.systemclassloader","no"); // Use the JBoss-Classloader, instead of the Systemclassloader.
 		plogger.info("...and ready! Checking input...");
 		
 		String inputExt = formatRegistry.getFirstExtension(inputFormat);
@@ -287,6 +280,12 @@ public class CoreImageMagick {
 	
 	
 	public MigrateResult doIm4JavaMigration(DigitalObject digOb, URI inputFormat, URI outputFormat, List<Parameter> parameters) {
+		im_home_path = System.getenv("IMAGEMAGICK_HOME");
+        if(im_home_path!=null) {
+        	im_home = new File(im_home_path);
+        	IMGlobalSettings.setImageMagickHomeDir(im_home);
+        }
+		
 		plogger.info("...and ready! Checking input...");
 	    
 		String inputExt = formatRegistry.getFirstExtension(inputFormat);
