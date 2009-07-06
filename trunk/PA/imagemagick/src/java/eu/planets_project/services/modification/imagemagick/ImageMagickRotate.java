@@ -141,7 +141,7 @@ public class ImageMagickRotate implements Modify {
         // InputFormats are created on the fly, depending on the system where the service is deployed. 
         sd.inputFormats(inFormats.toArray(new URI[]{}));
         URI rotateActionUri = formatReg.createActionUri("rotate");
-        sd.properties(new Property.Builder(rotateActionUri).name("Supported modification ation").value(rotateActionUri.toASCIIString()).description("this service rotate images.").unit("Degree").build());
+        sd.properties(new Property.Builder(rotateActionUri).name("Supported modification ation").value(rotateActionUri.toASCIIString()).description("this service rotates images.").unit("Degree").build());
         return sd.build();
 	}
 

@@ -37,7 +37,7 @@ public class GraphicsMagickMigrateTest {
 	static Migrate graphicsMagick;
     /* The location of this service when deployed. */
 	
-	static String wsdlLocation = "/pserv-pa-graphicsMagick/GraphicsMagickMigrate?wsdl";
+	static String wsdlLocation = "/pserv-pa-graphicsmagick/GraphicsMagickMigrate?wsdl";
 	
 	/**
 	 * test output
