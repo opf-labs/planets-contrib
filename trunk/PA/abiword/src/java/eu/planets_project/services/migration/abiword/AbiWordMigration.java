@@ -145,19 +145,20 @@ public final class AbiWordMigration implements Migrate {
                 + tmpInFile.getAbsolutePath());
 
         // outfile name
-        String outFileStr = tmpInFile.getAbsolutePath() + "." + outputFmtExt;
+        // bugfix 07/07/09
+        // String outFileStr = tmpInFile.getAbsolutePath() + "." + outputFmtExt;
+        String outFileStr = tmpInFile.getAbsolutePath().replaceAll(inputFmtExt,outputFmtExt);
+
         log.info("[AbiWordMigration] Output file name: " + outFileStr);
 
         // run command
         ProcessRunner runner = new ProcessRunner();
         List<String> command = new ArrayList<String>();
         // setting up command
-        // Example: abiword --input testin.jpeg --input-format jpg
-        // --output-format jp2 --output testout.jp2
-        // Example (short version): abiword -f testin.jpg -t jpg -F testin.jp2
-        // -T jp2
         command.add(this.abiword_app_name);
-        command.add("--to=" + outFileStr);
+        // bugfix 07/07/09
+        // command.add("--to=" + outFileStr);
+        command.add("--to=" + outputFmtExt);
         command.add(tmpInFile.getAbsolutePath());
         runner.setCommand(command);
         runner.setInputStream(inputStream);
