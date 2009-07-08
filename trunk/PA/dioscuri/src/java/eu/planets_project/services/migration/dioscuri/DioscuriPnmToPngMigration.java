@@ -174,7 +174,7 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 		DioscuriWrapper dioscuri = new DioscuriWrapper();
 		
 		if(runBatCreated) {
-			ZipResult zipResult = ZipUtils.createZipAndCheck(FLOPPY_INPUT_FOLDER, WORK_TEMP_FOLDER, INPUT_ZIP_NAME);
+			ZipResult zipResult = ZipUtils.createZipAndCheck(FLOPPY_INPUT_FOLDER, WORK_TEMP_FOLDER, INPUT_ZIP_NAME, false);
 			DioscuriWrapperResult result = dioscuri.createFloppyImageAndRunDioscuri(zipResult.getZipFile(), inFileName, outFileName, zipResult.getChecksum());
 			log.info("Got result state: "+result.getState());
 			if(result.getState()==DioscuriWrapperResult.ERROR) {

@@ -142,7 +142,7 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 		
 		if(runBatCreated) {
 //			ZipResult zipResult = FileUtils.createZipFileWithChecksum(FLOPPY_INPUT_FOLDER, WORK_TEMP_FOLDER, INPUT_ZIP_NAME);
-			ZipResult zipResult = ZipUtils.createZipAndCheck(FLOPPY_INPUT_FOLDER, WORK_TEMP_FOLDER, INPUT_ZIP_NAME);
+			ZipResult zipResult = ZipUtils.createZipAndCheck(FLOPPY_INPUT_FOLDER, WORK_TEMP_FOLDER, INPUT_ZIP_NAME, false);
 			DioscuriWrapperResult result = dioscuri.createFloppyImageAndRunDioscuri(zipResult.getZipFile(), inFileName, outFileName, zipResult.getChecksum());
 			if(result.getState()==DioscuriWrapperResult.ERROR) {
 				return this.returnWithErrorMessage(result.getMessage(), null);

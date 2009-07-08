@@ -41,6 +41,7 @@ import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHe
 import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ZipResult;
+import eu.planets_project.services.utils.ZipUtils;
 import eu.planets_project.services.view.CreateView;
 import eu.planets_project.services.view.CreateViewResult;
 import eu.planets_project.services.view.ViewActionResult;
@@ -182,12 +183,12 @@ public class GrateViewService implements CreateView {
 				filename = "no_file_name" + i++;
 			FileUtils.writeInputStreamToFile(dob.getContent().read(), content_dir, filename);
 		}
-		ZipResult zip_result = FileUtils.createZipFileWithChecksum(content_dir, temp_dir, FileUtils.randomizeFileName("floppy.zip"));
+		ZipResult zip_result = ZipUtils.createZipAndCheck(content_dir, temp_dir, FileUtils.randomizeFileName("floppy.zip"), false);
 		if(zip_result == null)
 			return returnWithErrorMessage("Failed to create zip file.");
 
 //		DigitalObjectContent doc = Content.byReference(zip_result.getZipFile());
-		DigitalObject doz =  DigitalObjectUtils.createZipTypeDigOb(zip_result.getZipFile(), zip_result.getZipFile().getName(), true, true);
+		DigitalObject doz =  DigitalObjectUtils.createZipTypeDigOb(zip_result.getZipFile(), zip_result.getZipFile().getName(), true, true, false);
 
 		FloppyImageHelper helper = FloppyImageHelperFactory.getFloppyImageHelperInstance();
 

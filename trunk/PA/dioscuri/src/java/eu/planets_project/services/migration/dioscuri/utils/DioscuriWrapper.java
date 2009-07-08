@@ -91,7 +91,7 @@ public class DioscuriWrapper {
 			return this.createErrorResult(ERROR_OUT);
 		}
 		
-		DigitalObject floppyInput = DigitalObjectUtils.createZipTypeDigOb(allFilesAsZIP, allFilesAsZIP.getName(), true, true);
+		DigitalObject floppyInput = DigitalObjectUtils.createZipTypeDigOb(allFilesAsZIP, allFilesAsZIP.getName(), true, true, false);
 		
 		MigrateResult floppyHelperResult = floppyHelper.migrate(floppyInput, format.createExtensionUri("ZIP"), format.createExtensionUri("IMA"), null);
 		
