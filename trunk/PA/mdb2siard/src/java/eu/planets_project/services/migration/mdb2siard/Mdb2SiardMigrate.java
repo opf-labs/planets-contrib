@@ -25,6 +25,7 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
+import javax.xml.ws.BindingType;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
@@ -55,6 +56,7 @@ import eu.planets_project.services.utils.ServiceUtils;
 @Remote(Migrate.class)
 @Stateless
 @WebService(name = Mdb2SiardMigrate.NAME, serviceName = Migrate.NAME, targetNamespace = PlanetsServices.NS, endpointInterface = "eu.planets_project.services.migrate.Migrate")
+@BindingType(value = "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")
 public final class Mdb2SiardMigrate implements Migrate, Serializable
 {
 	/** constants */
@@ -126,7 +128,6 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 			}
 			
 			/* empty doOutput in case of error ... */
-	//		DigitalObject doOutput = new DigitalObject.Builder(Content.byValue(new byte[] {})).build();
 			DigitalObject doOutput = null;
 			File fileInput = null;
 			File fileOutput = null;
@@ -157,7 +158,8 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 		    /* read do from temporary file */
 			
 			if (sr.getStatus() == Status.SUCCESS)
-			  doOutput = new DigitalObject.Builder(Content.byReference(FileUtils.getUrlFromFile(fileOutput))).format(format.createExtensionUri(sSIARD_EXTENSION.substring(1))).build();
+//				doOutput = new DigitalObject.Builder(Content.byReference(FileUtils.getUrlFromFile(fileOutput))).format(format.createExtensionUri(sSIARD_EXTENSION.substring(1))).build();
+				doOutput = new DigitalObject.Builder(Content.byReference(fileOutput)).format(format.createExtensionUri(sSIARD_EXTENSION.substring(1))).build();
 			}
 			catch(Exception e)
 			{
@@ -292,7 +294,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	/* (non-Javadoc)
 	 * execute the conversion on files in the file system.
 	 */
-	static ServiceReport migrate(File fileInput, File fileOutput, ServiceReport sr)
+	ServiceReport migrate(File fileInput, File fileOutput, ServiceReport sr)
 	{
     Properties props = new Properties();
     try
@@ -317,9 +319,18 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
         listCommand.add(sConvMdbDir + "convmdb.js");
         listCommand.add("/t:0");
         listCommand.add("/dsn:"+sOdbcDsn);
-        listCommand.add(fileInput.getAbsolutePath());
-        listCommand.add(fileOutput.getAbsolutePath());
+        listCommand.add("\"" + fileInput.getAbsolutePath() + "\"");
+        listCommand.add("\"" + fileOutput.getAbsolutePath()+ "\"");
         ProcessRunner pr = new ProcessRunner(listCommand);
+        
+        // building command for logging:
+        StringBuffer cmdBuf = new StringBuffer();
+        for (String string : listCommand) {
+        	cmdBuf.append(string + " ");
+		}
+        
+        log.info("Running ConvMdb with this command:" + System.getProperty("line.separator") + cmdBuf.toString());
+        
         pr.run();
     		/* analyze result */
         int iResult = pr.getReturnCode();

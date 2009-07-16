@@ -20,7 +20,7 @@ import static org.junit.Assert.fail;
 import java.io.File;
 
 import org.junit.After;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
@@ -37,8 +37,9 @@ import eu.planets_project.services.utils.test.ServiceCreator;
 
 public class Mdb2SiardMigrateTester
 {
-	// private static String sINPUT_FILE = "PA/mdb2siard/test/testfiles/testin.mdb";
-	private static String sINPUT_FILE = "PA/mdb2siard/test/testfiles/testin.mdb";
+	 private static String sINPUT_FILE = "PA/mdb2siard/test/testfiles/testin.mdb";
+//	private static String sINPUT_FILE = "PA/mdb2siard/test/testfiles/newspaper.tif";
+	
   // private static String sOUTPUT_FILE = "PA/mdb2siard/test/testfiles/testout.siard";
   private static String sOUTPUT_FILE = "PA/mdb2siard/test/testfiles/testout.siard";
   /* The location of this service when deployed. */
@@ -47,17 +48,17 @@ public class Mdb2SiardMigrateTester
   private static FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 
   /* A holder for the object to be tested */
-  Migrate dom = null;
+  static Migrate dom = null;
 
 	/*--------------------------------------------------------------------*/
-	@Before
-	public void setUp() throws Exception
+	@BeforeClass
+	public static void setUp() throws Exception
 	{
-		/* this is configured by the system properties
-		 * pserv.test.context default: local (standalone or server)
-		 * pserv.test.host host name for non-local context default:localhost
-		 * pserv.test.port port number for non-local context default:8080
-		 */
+//		 this is configured by the system properties
+    	System.setProperty("pserv.test.context", "server");
+    	System.setProperty("pserv.test.host", "localhost");
+     	 System.setProperty("pserv.test.port", "8080");
+		 
     dom = ServiceCreator.createTestService(Migrate.QNAME, 
     		  Mdb2SiardMigrate.class, sWSDL_LOC);
 	} /* setUp */
@@ -73,7 +74,7 @@ public class Mdb2SiardMigrateTester
 	public void testDescribe()
 	{
     ServiceDescription desc = dom.describe();
-    System.out.println("Received service description: " + desc);
+    System.out.println("Received service description: " + desc.toXmlFormatted());
     assertTrue("The ServiceDescription should not be NULL.", desc != null );
 	} /* testDescribe */
 
@@ -151,7 +152,7 @@ public class Mdb2SiardMigrateTester
           FileUtils.delete(fileOutput);
       File fileInput = new File(sINPUT_FILE);
       DigitalObject doInput = new DigitalObject.Builder(
-      		Content.byReference(fileInput)).build();
+      		Content.byReference(FileUtils.getUrlFromFile(fileInput))).build();
       MigrateResult mr = dom.migrate(doInput, format.createExtensionUri("mdb"), format.createExtensionUri("siard"), null);
       DigitalObject doOutput = mr.getDigitalObject();
       assertTrue("Resulting digital object is null.", doOutput != null);
