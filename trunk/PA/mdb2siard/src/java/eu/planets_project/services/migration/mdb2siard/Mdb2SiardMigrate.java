@@ -14,17 +14,27 @@ Sponsor    : Swiss Federal Archives, Berne, Switzerland
 
 package eu.planets_project.services.migration.mdb2siard;
 
-import java.io.InputStream;
+import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
+
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.*;
+import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.MigrationPath;
+import eu.planets_project.services.datatypes.Parameter;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
@@ -32,13 +42,7 @@ import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
-import java.io.File;
-import java.io.IOException;
-import java.io.FileOutputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.BufferedInputStream;
-import java.util.Properties;
+import eu.planets_project.services.utils.ServiceUtils;
 
 /*====================================================================*/
 /**
@@ -60,6 +64,10 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	public static final String sSIARD_EXTENSION = ".siard";  
 	private static final String sPROPERTIES_RESOURCE = "/eu/planets_project/services/migration/mdb2siard/mdb2siard.properties";
 	private static final String sKEY_CONVMDB_DIR ="convmdb.dir"; 
+	private String SIARD_TMP_NAME = "SIARD_TMP";
+	private File SIARD_TMP = null;
+	
+	private static FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 
 	/***/
 	static final String NAME = "Mdb2SiardMigrate";
@@ -69,6 +77,13 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 
 	/** data members */
 	PlanetsLogger log = PlanetsLogger.getLogger(Mdb2SiardMigrate.class);
+	
+	public Mdb2SiardMigrate() {
+		SIARD_TMP = FileUtils.createFolderInWorkFolder(FileUtils.getPlanetsTmpStoreFolder(), SIARD_TMP_NAME);
+		if(SIARD_TMP.exists()) {
+			// delete all files in here...?
+		}
+	}
 	
 	/*--------------------------------------------------------------------*/
 	/* (non-Javadoc)
@@ -81,9 +96,95 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
         .author("Hartwig Thomas <hartwig.thomas@enterag.ch>")
         .classname(this.getClass().getCanonicalName())
         .description("PLANETS IF wrapper for .mdb (MS Access) to .siard (Swiss Federal Archives) migration.")
+        .paths(new MigrationPath(format.createExtensionUri("mdb"), format.createExtensionUri("siard"), null))
         .build();
 		return mds;
 	} /* describe */
+
+	/*--------------------------------------------------------------------*/
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * @see eu.planets_project.ifr.core.common.services.migrate.MigrateOneDigitalObject#migrate(eu.planets_project.ifr.core.common.services.datatypes.DigitalObject)
+		 */
+		public MigrateResult migrate(
+				final DigitalObject doInput,
+		    URI inputFormat, URI outputFormat,
+		    List<Parameter> parameters)
+		{
+			String inputExt = format.getFirstExtension(inputFormat);
+			String outputExt = format.getFirstExtension(outputFormat);
+			
+			if(!inputExt.equalsIgnoreCase("mdb")) {
+				log.error("Sorry, unsupported input format: " + inputFormat.toASCIIString() + " Returning with ERROR.");
+				return this.returnWithErrorMessage("Sorry, unsupported input format: " + inputFormat.toASCIIString()  + " Returning with ERROR.", null);
+			}
+			
+			if(!outputExt.equalsIgnoreCase("siard")) {
+				log.error("Sorry, unsupported output format: " + outputFormat.toASCIIString() + " Returning with ERROR.");
+				return this.returnWithErrorMessage("Sorry, unsupported output format: " + outputFormat.toASCIIString() + " Returning with ERROR.", null);
+			}
+			
+			/* empty doOutput in case of error ... */
+	//		DigitalObject doOutput = new DigitalObject.Builder(Content.byValue(new byte[] {})).build();
+			DigitalObject doOutput = null;
+			File fileInput = null;
+			File fileOutput = null;
+			ServiceReport sr = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
+			/* display banner */
+			log.info("Mdb2Siard migrate starts");
+			try
+			{
+				/* write to temporary file */
+	//	    fileInput = File.createTempFile("planets", sMDB_EXTENSION);
+		    fileInput = new File(SIARD_TMP, FileUtils.randomizeFileName("siard_tmp"+ sMDB_EXTENSION));
+		    /* make sure, it is at least deleted, when the Web Service is stopped */
+		    fileInput.deleteOnExit();
+	        FileUtils.writeInputStreamToFile(doInput.getContent().read(), fileInput);
+			/* output file has same unique file name with different extension */
+			String sInputFile = fileInput.getAbsolutePath();
+			String sOutputFile = sInputFile.substring(0,sInputFile.lastIndexOf("."))+sSIARD_EXTENSION;
+			fileOutput = new File(sOutputFile);
+			
+	//		if (fileOutput.exists())
+	//			FileUtils.delete(fileOutput);
+			
+			/* make sure it is at least deleted when Web Service is stopped */
+	//		fileOutput.deleteOnExit();
+			
+			/* convert files, noting results in the service report */
+			sr = migrate(fileInput, fileOutput, sr);
+		    /* read do from temporary file */
+			
+			if (sr.getStatus() == Status.SUCCESS)
+			  doOutput = new DigitalObject.Builder(Content.byReference(FileUtils.getUrlFromFile(fileOutput))).format(format.createExtensionUri(sSIARD_EXTENSION.substring(1))).build();
+			}
+			catch(Exception e)
+			{
+				sr = appendError(sr,e.getClass().getName()+": "+e.getMessage());
+				e.printStackTrace();
+			}
+			finally
+			{
+				/* clean up temporary files in any case */
+				if ((fileInput != null) && (fileInput.exists()))
+				    FileUtils.delete(fileInput);
+	//			if ((fileOutput != null) && (fileOutput.exists()))
+	//			    FileUtils.delete(fileOutput);
+				/* if no output was generated, create a zero length byte array */
+	//			if (doOutput == null)
+	//				doOutput = new DigitalObject.Builder(Content.byValue(new byte[0])).build();
+			}
+			/* display success */
+			if (sr.getStatus() == Status.SUCCESS)
+			  log.info("Mdb2Siard migrate succeeded");
+			
+			else
+			  log.info("Mdb2Siard migrate failed!");
+			
+			MigrateResult mr = new MigrateResult(doOutput,sr);
+			return mr;
+		} /* migrate */
 
 	/*--------------------------------------------------------------------*/
 	/* (non-Javadoc)
@@ -128,57 +229,64 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 		return new ServiceReport(Type.INFO, Status.SUCCESS, sInfo);
 	} /* appendInfo */
 	
-	/*--------------------------------------------------------------------*/
-	/* (non-Javadoc)
-	 * write the bytes to the given file.
-	 */
-	static void writeByteArrayToFile(byte[] buffer, File file)
-    throws IOException
-	{
-    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
-    bos.write(buffer);
-    bos.flush();
-    bos.close();
-	} /* writeByteArrayToFile */
-
-	/*--------------------------------------------------------------------*/
-	/* (non-Javadoc)
-	 * write the bytes to the given file.
-	 */
-	static void writeByteContentToFile(DigitalObjectContent content, File file)
-    throws IOException
-	{
-    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
-    InputStream is = content.read();
-    byte[] buffer = new byte[iBUFFER_SIZE];
-    for (int iRead = is.read(buffer); iRead != iEOS; iRead = is.read(buffer))
-    	bos.write(buffer, 0, iRead);
-    bos.flush();
-    bos.close();
-	} /* writeByteContentToFile */
-
-	/*--------------------------------------------------------------------*/
-	/* (non-Javadoc)
-	 * reads a file into a byte array.
-	 */
-	static byte[] readByteArrayFromFile(File file)
-	  throws IOException, IllegalArgumentException
-	{
-		byte[] buffer = new byte[0]; // avoid returning null
-    BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-    if (file.length() <= Integer.MAX_VALUE)
-    {
-    	buffer = new byte[(int) file.length()];
-    	bis.read(buffer);
-    	bis.close();
-    }
-    else
-    {
-      throw new IllegalArgumentException("The file at " + file.getAbsolutePath()
-            + " is too large to be represented as a byte array!");
-    }
-    return buffer;
-	} /* readByteArrayFromFile */
+	
+	
+//	
+//	/*--------------------------------------------------------------------*/
+//	/* (non-Javadoc)
+//	 * write the bytes to the given file.
+//	 */
+//	static void writeByteArrayToFile(byte[] buffer, File file)
+//    throws IOException
+//	{
+//    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+//    bos.write(buffer);
+//    bos.flush();
+//    bos.close();
+//	} 
+//	
+//	/* writeByteArrayToFile */
+//
+//	/*--------------------------------------------------------------------*/
+//	/* (non-Javadoc)
+//	 * write the bytes to the given file.
+//	 */
+//	static void writeByteContentToFile(DigitalObjectContent content, File file)
+//    throws IOException
+//	{
+//    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+//    InputStream is = content.read();
+//    byte[] buffer = new byte[iBUFFER_SIZE];
+//    for (int iRead = is.read(buffer); iRead != iEOS; iRead = is.read(buffer))
+//    	bos.write(buffer, 0, iRead);
+//    bos.flush();
+//    bos.close();
+//	} /* writeByteContentToFile */
+//
+//	/*--------------------------------------------------------------------*/
+//	/* (non-Javadoc)
+//	 * reads a file into a byte array.
+//	 */
+//	static byte[] readByteArrayFromFile(File file)
+//	  throws IOException, IllegalArgumentException
+//	{
+//		byte[] buffer = new byte[0]; // avoid returning null
+//    BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+//    if (file.length() <= Integer.MAX_VALUE)
+//    {
+//    	buffer = new byte[(int) file.length()];
+//    	bis.read(buffer);
+//    	bis.close();
+//    }
+//    else
+//    {
+//      throw new IllegalArgumentException("The file at " + file.getAbsolutePath()
+//            + " is too large to be represented as a byte array!");
+//    }
+//    return buffer;
+//	} /* readByteArrayFromFile */
+	
+	
 
 	/*--------------------------------------------------------------------*/
 	/* (non-Javadoc)
@@ -202,7 +310,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
     		 * execution of several service calls (and must be removed in the end) */
         String sOdbcDsn = fileInput.getName();
     		/* set up the command line */
-  			sOdbcDsn = sOdbcDsn.substring(0,sOdbcDsn.lastIndexOf("."));
+		sOdbcDsn = sOdbcDsn.substring(0,sOdbcDsn.lastIndexOf("."));
         /* run the command */
         List<String> listCommand = new ArrayList<String>();
         listCommand.add("cscript");
@@ -234,68 +342,22 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 		return sr;
 	} /* migrate */
 	
-	/*--------------------------------------------------------------------*/
+	
+	
 	/**
-	 * {@inheritDoc}
-	 * 
-	 * @see eu.planets_project.ifr.core.common.services.migrate.MigrateOneDigitalObject#migrate(eu.planets_project.ifr.core.common.services.datatypes.DigitalObject)
-	 */
-	public MigrateResult migrate(
-			final DigitalObject doInput,
-	    URI inputFormat, URI outputFormat,
-	    List<Parameter> parameters)
-	{
-		/* empty doOutput in case of error ... */
-		DigitalObject doOutput = new DigitalObject.Builder(Content.byValue(new byte[] {})).build();
-		File fileInput = null;
-		File fileOutput = null;
-		ServiceReport sr = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
-		/* display banner */
-		log.info("Mdb2Siard migrate starts");
-		try
-		{
-			/* write to temporary file */
-	    fileInput = File.createTempFile("planets", sMDB_EXTENSION);
-	    /* make sure, it is at least deleted, when the Web Service is stopped */
-	    fileInput.deleteOnExit();
-	        FileUtils.writeInputStreamToFile(doInput.getContent().read(), fileInput);
-			/* output file has same unique file name with different extension */
-			String sInputFile = fileInput.getAbsolutePath();
-			String sOutputFile = sInputFile.substring(0,sInputFile.lastIndexOf("."))+sSIARD_EXTENSION;
-			fileOutput = new File(sOutputFile);
-			if (fileOutput.exists())
-				FileUtils.delete(fileOutput);
-			/* make sure it is at least deleted when Web Service is stopped */
-			fileOutput.deleteOnExit();
-			/* convert files, noting results in the service report */
-			sr = migrate(fileInput, fileOutput, sr);
-	    /* read do from temporary file */
-			if (sr.getStatus() == Status.SUCCESS)
-			  doOutput = new DigitalObject.Builder(Content.byValue(readByteArrayFromFile(fileOutput))).build();
-		}
-		catch(Exception e)
-		{
-			sr = appendError(sr,e.getClass().getName()+": "+e.getMessage());
-			e.printStackTrace();
-		}
-		finally
-		{
-			/* clean up temporary files in any case */
-			if ((fileInput != null) && (fileInput.exists()))
-			    FileUtils.delete(fileInput);
-			if ((fileOutput != null) && (fileOutput.exists()))
-			    FileUtils.delete(fileOutput);
-			/* if no output was generated, create a zero length byte array */
-			if (doOutput == null)
-				doOutput = new DigitalObject.Builder(Content.byValue(new byte[0])).build();
-		}
-		/* display success */
-		if (sr.getStatus() == Status.SUCCESS)
-		  log.info("Mdb2Siard migrate succeeded");
-		else
-		  log.info("Mdb2Siard migrate failed!");
-		MigrateResult mr = new MigrateResult(doOutput,sr);
-		return mr;
-	} /* migrate */
+     * @param message an optional message on what happened to the service
+     * @param e the Exception e which causes the problem
+     * @return CharacteriseResult containing a Error-Report
+     */
+    private MigrateResult returnWithErrorMessage(final String message,
+            final Exception e) {
+        if (e == null) {
+            return new MigrateResult(null, ServiceUtils
+                    .createErrorReport(message));
+        } else {
+            return new MigrateResult(null, ServiceUtils
+                    .createExceptionErrorReport(message, e));
+        }
+    }
 
 } /* class Mdb2SiardMigrate */
