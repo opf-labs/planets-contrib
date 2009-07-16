@@ -162,12 +162,12 @@ public final class AbiWordMigration implements Migrate {
         command.add(tmpInFile.getAbsolutePath());
         runner.setCommand(command);
         runner.setInputStream(inputStream);
-        log.info("[AbiWordMigration] Executing command: " + command.toString()
+        log.info("[AbiWordMigration] Executing command (update): " + command.toString()
                 + " ...");
         runner.run();
         int return_code = runner.getReturnCode();
         if (return_code != 0) {
-            log.error("[AbiWordMigration] Jasper conversion error code: "
+            log.error("[AbiWordMigration] Abiword conversion error code: "
                     + Integer.toString(return_code));
             log.error("[AbiWordMigration] " + runner.getProcessErrorAsString());
             // log.error("[AbiWordMigration] Output: "+runner.getProcessOutputAsString());
