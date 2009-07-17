@@ -55,9 +55,9 @@ public class Mdb2SiardMigrateTester
 	public static void setUp() throws Exception
 	{
 //		 this is configured by the system properties
-    	System.setProperty("pserv.test.context", "server");
-    	System.setProperty("pserv.test.host", "localhost");
-     	 System.setProperty("pserv.test.port", "8080");
+//    	System.setProperty("pserv.test.context", "server");
+//    	System.setProperty("pserv.test.host", "localhost");
+//     	 System.setProperty("pserv.test.port", "8080");
 		 
     dom = ServiceCreator.createTestService(Migrate.QNAME, 
     		  Mdb2SiardMigrate.class, sWSDL_LOC);
