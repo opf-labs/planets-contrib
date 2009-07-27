@@ -37,7 +37,7 @@ import eu.planets_project.services.utils.test.ServiceCreator;
 
 public class Mdb2SiardMigrateTester
 {
-	 private static String sINPUT_FILE = "PA/mdb2siard/test/testfiles/testin.mdb";
+	 private static String sINPUT_FILE = "PA/mdb2siard/test/testfiles/crm.mdb";
 //	private static String sINPUT_FILE = "PA/mdb2siard/test/testfiles/newspaper.tif";
 	
   // private static String sOUTPUT_FILE = "PA/mdb2siard/test/testfiles/testout.siard";
@@ -55,9 +55,9 @@ public class Mdb2SiardMigrateTester
 	public static void setUp() throws Exception
 	{
 //		 this is configured by the system properties
-//    	System.setProperty("pserv.test.context", "server");
-//    	System.setProperty("pserv.test.host", "localhost");
-//     	 System.setProperty("pserv.test.port", "8080");
+    	System.setProperty("pserv.test.context", "server");
+    	System.setProperty("pserv.test.host", "localhost");
+     	 System.setProperty("pserv.test.port", "8080");
 		 
     dom = ServiceCreator.createTestService(Migrate.QNAME, 
     		  Mdb2SiardMigrate.class, sWSDL_LOC);
@@ -152,7 +152,7 @@ public class Mdb2SiardMigrateTester
           FileUtils.delete(fileOutput);
       File fileInput = new File(sINPUT_FILE);
       DigitalObject doInput = new DigitalObject.Builder(
-      		Content.byReference(FileUtils.getUrlFromFile(fileInput))).build();
+      		Content.byReference(fileInput)).title(fileInput.getName()).format(format.createExtensionUri("mdb")).build();
       MigrateResult mr = dom.migrate(doInput, format.createExtensionUri("mdb"), format.createExtensionUri("siard"), null);
       DigitalObject doOutput = mr.getDigitalObject();
       assertTrue("Resulting digital object is null.", doOutput != null);
