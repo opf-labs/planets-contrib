@@ -72,7 +72,7 @@ public class CoreImageMagick {
     private static final String IMAGE_MAGICK_URI = "http://www.imagemagick.org";
     
     public CoreImageMagick() {
-        plogger.info("Hello! Initializing Im4JavaImageMagickMigrate service...");
+        plogger.info("Hello! Initializing ImageMagickMigrate service...");
     }
     public static ServiceDescription describeJMagickMigrate(String serviceName, String className) {
     	jmagick_compressionTypes[0] = "Undefined Compression";
