@@ -100,11 +100,11 @@ public class DioscuriWrapper {
 			return createErrorResult(floppyHelperResult.getReport().getMessage());
 		}
 		
-		log.info("FloppyImageHelperWin report: Successfull created floppy image!");
+		log.info("FloppyHelperService report: Successfull created floppy image!");
 		
 		DigitalObject floppyImageDigObj = floppyHelperResult.getDigitalObject();
 		
-		File floppyImage = new File(WORK_TEMP_FOLDER, FLOPPY_NAME) ;
+		File floppyImage = new File(WORK_TEMP_FOLDER, FileUtils.randomizeFileName(FLOPPY_NAME)) ;
 			
 		FileUtils.writeInputStreamToFile(floppyImageDigObj.getContent().read(), floppyImage);
 		
