@@ -1,5 +1,24 @@
-package eu.planets_project.services.migration.dia.impl;
+package eu.planets_project.services.migration.dia.impl.genericwrapper;
 
+import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.MigrationPath;
+import eu.planets_project.services.datatypes.Parameter;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.migrate.Migrate;
+import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.migration.dia.impl.genericwrapper.exceptions.MigrationException;
+import eu.planets_project.services.migration.dia.impl.genericwrapper.utils.ResourceLocator;
+import eu.planets_project.services.utils.PlanetsLogger;
+import org.w3c.dom.Document;
+
+import javax.ejb.Local;
+import javax.ejb.Remote;
+import javax.ejb.Stateless;
+import javax.jws.WebService;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -7,71 +26,71 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.ejb.Local;
-import javax.ejb.Remote;
-import javax.ejb.Stateless;
-import javax.jws.WebService;
-
-import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.migration.dia.impl.genericwrapper.utils.DocumentLocator;
-import eu.planets_project.services.migration.dia.impl.genericwrapper.GenericMigrationWrapper;
-import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.MigrationPath;
-import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.ServiceDescription;
-import eu.planets_project.services.migrate.Migrate;
-import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.PlanetsLogger;
-
 /**
  * DiaMigrationService testing service.
- *
- * @author Bolette Ammitzbøll Jurik (bam@statsbiblioteket.dk)
- * @author Thomas Skou Hansen (tsh@statsbiblioteket.dk)
+ * 
+ * @author Thomas Skou Hansen &lt;tsh@statsbiblioteket.dk&gt;
  */
 @Local(Migrate.class)
 @Remote(Migrate.class)
 @Stateless
-@WebService(name = DiaMigrationService.NAME, serviceName = Migrate.NAME, targetNamespace = PlanetsServices.NS, endpointInterface = "eu.planets_project.services.migrate.Migrate")
-public final class DiaMigrationService implements Migrate, Serializable {
-
-    /** The service name */
-    static final String NAME = "DiaMigrationService";
-
-    static final String configfile = "genericWrapperTempSrcDstConfig.xml";
+@WebService(name = GenericMigrationWrapperTestService.NAME, serviceName = Migrate.NAME, targetNamespace = PlanetsServices.NS, endpointInterface = "eu.planets_project.services.migrate.Migrate")
+public final class GenericMigrationWrapperTestService
+        implements Migrate,
+        Serializable {
 
     /** The unique class id */
-    private static final long serialVersionUID = 4596228292063217306L;
+    private static final long serialVersionUID = 2764657361729506384L;
+
+    /** The service name */
+    static final String NAME = "GenericCLIMigrationWrapperTestService";
 
     private PlanetsLogger log = PlanetsLogger
-            .getLogger(DiaMigrationService.class);
+            .getLogger(GenericMigrationWrapperTestService.class);
 
     /**
      * {@inheritDoc}
-     *
+     * 
+     * <b>Needs a parameter that specifies which configuration file the test
+     * service should use.</b>
+     * 
      * @see eu.planets_project.services.migrate.Migrate#migrate(eu.planets_project.services.datatypes.DigitalObject,
      *      java.net.URI, java.net.URI,
      *      eu.planets_project.services.datatypes.Parameter)
      */
     public MigrateResult migrate(final DigitalObject digitalObject,
-                                 URI inputFormat, URI outputFormat, List<Parameter> parameters) {
-
-        final DocumentLocator documentLocator =  new DocumentLocator(configfile);
+            URI inputFormat, URI outputFormat, List<Parameter> parameters) {
 
         MigrateResult migrationResult;
         try {
+            // Get the full file path to the configuration file to test from the
+            // parameter list.
+            String configResourceName = getConfigFileName(parameters);
+
+            ResourceLocator configurationLocator = new ResourceLocator(
+                    configResourceName);
+            InputStream configurationStream = configurationLocator
+                    .getResourceStream();
+
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+            DocumentBuilder builder = dbf.newDocumentBuilder();
+            Document configDocument = builder.parse(configurationStream);
+
+            
+            
             GenericMigrationWrapper genericWrapper = new GenericMigrationWrapper(
-                    documentLocator.getDocument());
+                    configDocument);
             migrationResult = genericWrapper.migrate(digitalObject,
-                                                     inputFormat, outputFormat, parameters);
+                    inputFormat, outputFormat, parameters);
         } catch (Exception e) {
             log
                     .error("Migration failed for object with title '"
-                           + digitalObject.getTitle()
-                           + "' from input format URI: " + inputFormat
-                           + " to output format URI: " + outputFormat, e);
-            return new MigrateResult(null, null);
-            // TODO! Report failure in a proper way.
+                            + digitalObject.getTitle()
+                            + "' from input format URI: " + inputFormat
+                            + " to output format URI: " + outputFormat, e);
+            return new MigrateResult(null, null); // FIXME! Report failure in a
+            // proper way.
         }
 
         return migrationResult;
@@ -81,8 +100,6 @@ public final class DiaMigrationService implements Migrate, Serializable {
      * @see eu.planets_project.services.migrate.Migrate#describe()
      */
     public ServiceDescription describe() {
-
-
 
         try {
             ServiceDescription.Builder serviceDescriptionBuilder = new ServiceDescription.Builder(
@@ -119,6 +136,28 @@ public final class DiaMigrationService implements Migrate, Serializable {
         } catch (Exception e) {
             throw new Error("Failed building migration path information.", e);
         }
+    }
+
+    /**
+     * Get the value of the &quot;configfile&quot; parameter.
+     * 
+     * @param parameters
+     *            The parameter list passed to this migration service at
+     *            invokation.
+     * @return The string value of the &quot;configfile&quot; parameter.
+     * @throws MigrationException
+     *             if the &quot;configfile&quot; parameter was not defined in
+     *             the parameter list.
+     */
+    private String getConfigFileName(List<Parameter> parameters)
+            throws MigrationException {
+        for (Parameter parameter : parameters) {
+            if ("configfile".equals(parameter.getName())) {
+                return parameter.getValue();
+            }
+        }
+        throw new MigrationException(
+                "No \"configfile\" parameter was specified. Please specify the full path to the configuration file to test.");
     }
 
     private Set<URI> getAllowedInputFormatURIs() throws URISyntaxException {
