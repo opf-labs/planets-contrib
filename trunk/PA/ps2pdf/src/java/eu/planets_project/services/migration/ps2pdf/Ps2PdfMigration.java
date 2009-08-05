@@ -31,6 +31,9 @@ import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.utils.cli.CliMigrationPaths;
+import eu.planets_project.ifr.core.services.migration.genericwrapper.utils.DocumentLocator;
+import eu.planets_project.ifr.core.services.migration.genericwrapper.GenericMigrationWrapper;
+import eu.planets_project.ifr.core.services.migration.genericwrapper.exceptions.MigrationInitialisationException;
 
 /**
  * The class migrates between a number of formats
@@ -54,9 +57,9 @@ public class Ps2PdfMigration implements Migrate, Serializable {
      */
     static final String NAME = "Ps2PdfMigration";
     static final String configfile = "ps2pdf.paths.xml";
+    GenericMigrationWrapper genericWrapper;
 
 
-    private CliMigrationPaths migrationPaths = null;
 
     /**
      * {@inheritDoc}
@@ -67,57 +70,26 @@ public class Ps2PdfMigration implements Migrate, Serializable {
                                  URI inputFormat, URI outputFormat, List<Parameter> parameters) {
 
 
-        String command = migrationPaths.findMigrationCommand(inputFormat,outputFormat);
 
-        if (command == null){
-            return returnWith(new ServiceReport(Type.ERROR, Status.TOOL_ERROR,
-                    "Could not find a migrationPath for the input and output formats"));
+        MigrateResult migrationResult;
+        try {
+            migrationResult = genericWrapper.migrate(digitalObject,
+                                                     inputFormat, outputFormat, parameters);
+        } catch (Exception e) {
+            log
+                    .error("Migration failed for object with title '"
+                           + digitalObject.getTitle()
+                           + "' from input format URI: " + inputFormat
+                           + " to output format URI: " + outputFormat, e);
+            return new MigrateResult(
+                    null,
+                    new ServiceReport(Type.ERROR,
+                                      Status.TOOL_ERROR,
+                                      "Failed to migrate, "+e.getMessage()));
+            // TODO! Report failure in a proper way.
         }
 
-
-        //log.info("Using ps2pdf application name: "+this.ps2pdf_app_name);
-
-
-        /*
-         * We just return a new digital object with the same required arguments
-         * as the given:
-         */
-
-
-        InputStream psfile = digitalObject.getContent().read();
-
-
-
-        ProcessRunner runner = new ProcessRunner();
-
-        runner.setCommand(Arrays.asList("/bin/sh","-c",command));
-
-        runner.setInputStream(psfile);
-        runner.setCollection(true);
-        runner.setOutputCollectionByteSize(-1);
-
-
-
-        runner.run();
-        int return_code = runner.getReturnCode();
-
-
-
-        if (return_code != 0){
-            return returnWith(new ServiceReport(Type.ERROR, Status.INSTALLATION_ERROR,
-                    runner.getProcessOutputAsString()+"\n"+runner.getProcessErrorAsString()));
-        }
-        InputStream newFileStream = runner.getProcessOutput();
-        byte[] outbytes = FileUtils.writeInputStreamToBinary(newFileStream);
-
-        DigitalObject pdfFile = new DigitalObject
-                .Builder(digitalObject)
-                .content(Content.byValue(outbytes))
-                .format(outputFormat)
-                .build();
-        return new MigrateResult(pdfFile, new ServiceReport(Type.INFO,
-                Status.SUCCESS, runner.getProcessOutputAsString()));
-
+        return migrationResult;
     }
 
     /**
@@ -125,39 +97,23 @@ public class Ps2PdfMigration implements Migrate, Serializable {
      * @return ServiceDescription
      */
     public ServiceDescription describe() {
-
-        ServiceDescription.Builder builder = new ServiceDescription.Builder(NAME, Migrate.class.getName());
-        builder.paths(migrationPaths.getAsPlanetsPaths());
-
-        builder.author("Asger Blekinge-Rasmussen <abr@statsbiblioteket.dk>");
-        builder.classname(this.getClass().getCanonicalName());
-        builder.description("Converts Ps to PDF Files and vice versa.");
-
-        builder.version("0.1");
-
-        return builder.build();
-
+        return genericWrapper.describe();
     }
 
     public Ps2PdfMigration()  {
 
+
+        final DocumentLocator documentLocator =  new DocumentLocator(configfile);
+
         try {
-            if (migrationPaths == null){
-                migrationPaths = CliMigrationPaths.initialiseFromFile(configfile);
-            }
-        } catch (ParserConfigurationException e) {
-            throw new Error("Problem invoking xml parser",e);
+            genericWrapper = new GenericMigrationWrapper(
+                    documentLocator.getDocument());
+        } catch (MigrationInitialisationException e) {
+            log.error("Failed to parse the config file",e);
         } catch (IOException e) {
-            throw new Error("Unable to read the properties file",e);
+            log.error("Could not read the config file",e);
         } catch (SAXException e) {
-            throw new Error("Unable to parse the xml in the properties file",e);
-        } catch (URISyntaxException e) {
-            throw new Error("Invalid URI in the properties fiel",e);
+            log.error("Could not parse the config file as valid xml",e);
         }
-    }
-
-
-    private MigrateResult returnWith(ServiceReport report){
-        return new MigrateResult(null,report);
     }
 }
