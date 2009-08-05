@@ -56,7 +56,7 @@ public class Ps2PdfMigration implements Migrate, Serializable {
      * The service name.
      */
     static final String NAME = "Ps2PdfMigration";
-    static final String configfile = "ps2pdf.paths.xml";
+    static final String configfile = "ps2pdf.gwrap.path.xml";
     GenericMigrationWrapper genericWrapper;
 
 
