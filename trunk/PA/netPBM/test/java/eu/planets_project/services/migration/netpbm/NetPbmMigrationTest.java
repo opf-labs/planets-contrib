@@ -6,9 +6,6 @@ import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.migration.ps2pdf.Ps2PdfMigration;
-import eu.planets_project.services.utils.ByteString;
-import eu.planets_project.services.utils.Checksums;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
 import junit.framework.TestCase;
@@ -16,8 +13,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * TODO abr forgot to document this class
@@ -38,8 +35,11 @@ public class NetPbmMigrationTest extends TestCase {
      * A test file object.
      */
 
-    private File testjpeg = new File("PA/netPBM/test/resources/JPEG_example_JPG_RIP_050.jpg");
+//    private File testjpeg = new File("PA/netPBM/test/resources/JPEG_example_JPG_RIP_050.jpg");
+    private File testpng = new File("tests/test-files/images/bitmap/test_png/2274192346_4a0a03c5d6.png");
+    private int testPngToGifLength = 1;
 
+                    File workfolder;
     /*
     * (non-Javadoc)
     * @see junit.framework.TestCase#setUp()
@@ -47,7 +47,10 @@ public class NetPbmMigrationTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         dom = ServiceCreator.createTestService(Migrate.QNAME,
-                Ps2PdfMigration.class, wsdlLoc);
+               NetPbmMigration.class, wsdlLoc);
+
+
+        workfolder = FileUtils.createWorkFolderInSysTemp("netpbm_test");
     }
 
     /*
@@ -58,6 +61,7 @@ public class NetPbmMigrationTest extends TestCase {
     protected void tearDown() throws Exception {
         // TODO Auto-generated method stub
         super.tearDown();
+        workfolder.delete();
     }
 
     /**
@@ -74,48 +78,46 @@ public class NetPbmMigrationTest extends TestCase {
      * Test the pass-thru migration.
      */
     @Test
-    public void testMigrate() throws IOException {
-        System.out.println(testjpeg.getCanonicalPath());
+    public void testMigratePngToGif() throws IOException, URISyntaxException {
+//        System.out.println(testjpeg.getCanonicalPath());
 
-        try {
 /*
         * To test usability of the digital object instance in web services,
 * we simply pass one into the service and expect one back:
 */
 
-            DigitalObject input =
-                    new DigitalObject.Builder(Content.byValue(testjpeg))
-                            .format(new URI("planets:fmt/ext/jpeg"))
-                            .title("test.jpeg").
-                            build();
-            System.out.println("Input: " + input);
+        DigitalObject input =
+                new DigitalObject.Builder(Content.byValue(testpng))
+                        .title("test.png").
+                        build();
+        System.out.println("Input: " + input);
 
-            MigrateResult mr = dom.migrate(input, new URI("planets:fmt/ext/jpeg"), new URI("planets:fmt/ext/pnm"), null);
-            DigitalObject doOut = mr.getDigitalObject();
+        MigrateResult mr = dom.migrate(input, new URI("info:pronom/fmt/12"), new URI("info:pronom/fmt/3"), null);
+        DigitalObject doOut = mr.getDigitalObject();
 
-            assertTrue("Resulting digital object is null.", doOut != null);
+        assertTrue("Resulting digital object is null.", doOut != null);
 
-            System.out.println("Output: " + doOut);
+        System.out.println("Output: " + doOut);
 
-            DigitalObjectContent content = doOut.getContent();
+        DigitalObjectContent content = doOut.getContent();
 
-            File workfolder = FileUtils.createWorkFolderInSysTemp("netpbm_test");
 
-            File resultHtml = FileUtils.writeInputStreamToFile(content.read(), workfolder, "netpbm_result.html");
 
-            System.out.println("Please find the result HTML file here: \n" + resultHtml.getAbsolutePath());
+        File result = FileUtils.writeInputStreamToFile(content.read(), workfolder, "test.png.gif");
 
-            assertTrue("Resulting digital object not equal to the original.",
-                    !input.equals(doOut));
+        System.out.println("Please find the result HTML file here: \n" + result.getAbsolutePath());
 
+        assertTrue("Resulting digital object not equal to the original.",
+                !input.equals(doOut));
+        assertEquals("Length of converted file wrong",result.length(),testPngToGifLength);
+
+/*
             InputStream convertedFile = doOut.getContent().read();
             String md5 = ByteString.toHex(Checksums.md5(convertedFile)).toLowerCase();
             assertEquals("The file was not converted correctly",md5,"da37d73c2be96c21e6d7628d71204e23");
+*/
 
 
-        } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
 
 
     }
