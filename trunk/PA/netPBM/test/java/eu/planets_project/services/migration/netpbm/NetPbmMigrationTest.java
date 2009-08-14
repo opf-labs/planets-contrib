@@ -37,7 +37,7 @@ public class NetPbmMigrationTest extends TestCase {
 
 //    private File testjpeg = new File("PA/netPBM/test/resources/JPEG_example_JPG_RIP_050.jpg");
     private File testpng = new File("tests/test-files/images/bitmap/test_png/2274192346_4a0a03c5d6.png");
-    private int testPngToGifLength = 1;
+    private int testPngToGifLength = 200037;
 
                     File workfolder;
     /*
