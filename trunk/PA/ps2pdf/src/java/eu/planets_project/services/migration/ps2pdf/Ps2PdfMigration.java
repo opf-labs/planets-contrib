@@ -1,25 +1,20 @@
 package eu.planets_project.services.migration.ps2pdf;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.ws.BindingType;
 
 import org.xml.sax.SAXException;
 
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
@@ -27,10 +22,7 @@ import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
-import eu.planets_project.services.utils.ProcessRunner;
-import eu.planets_project.services.utils.cli.CliMigrationPaths;
 import eu.planets_project.ifr.core.services.migration.genericwrapper.utils.DocumentLocator;
 import eu.planets_project.ifr.core.services.migration.genericwrapper.GenericMigrationWrapper;
 import eu.planets_project.ifr.core.services.migration.genericwrapper.exceptions.MigrationInitialisationException;
@@ -107,7 +99,7 @@ public class Ps2PdfMigration implements Migrate, Serializable {
 
         try {
             genericWrapper = new GenericMigrationWrapper(
-                    documentLocator.getDocument());
+                    documentLocator.getDocument(), this.getClass().getCanonicalName());
         } catch (MigrationInitialisationException e) {
             log.error("Failed to parse the config file",e);
         } catch (IOException e) {

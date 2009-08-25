@@ -94,7 +94,7 @@ public class NetPbmMigration implements Migrate, Serializable {
 
         try {
             genericWrapper = new GenericMigrationWrapper(
-                    documentLocator.getDocument());
+                    documentLocator.getDocument(),this.getClass().getCanonicalName());
         } catch (MigrationInitialisationException e) {
             log.error("Failed to parse the config file",e);
         } catch (IOException e) {
