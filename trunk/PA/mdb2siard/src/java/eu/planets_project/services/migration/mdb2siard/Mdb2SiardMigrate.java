@@ -64,8 +64,6 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	private static int iEOS = -1;
 	public static final String sMDB_EXTENSION = ".mdb";  
 	public static final String sSIARD_EXTENSION = ".siard";  
-	private static final String sPROPERTIES_RESOURCE = "/eu/planets_project/services/migration/mdb2siard/mdb2siard.properties";
-	private static final String sKEY_CONVMDB_DIR ="convmdb.dir"; 
 	private String SIARD_TMP_NAME = "SIARD_TMP";
 	private File SIARD_TMP = null;
 	
@@ -296,18 +294,8 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	 */
 	ServiceReport migrate(File fileInput, File fileOutput, ServiceReport sr)
 	{
-    Properties props = new Properties();
     try
     {
-  		/* get properties */
-      props.load( Mdb2SiardMigrate.class.getResourceAsStream(sPROPERTIES_RESOURCE));
-      /* configuration variable */
-      String sConvMdbDir = props.getProperty(sKEY_CONVMDB_DIR);
-      /* check its correct termination */
-      if (sConvMdbDir.endsWith("/"))
-      {
-        /* report in ServiceReport */
-        sr = appendInfo(sr,"Using ConvMdb directory: "+sConvMdbDir);
     		/* ODBC DSN must be as unique as the temporary file name to support concurrent
     		 * execution of several service calls (and must be removed in the end) */
         String sOdbcDsn = fileInput.getName();
@@ -316,7 +304,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
         /* run the command */
         List<String> listCommand = new ArrayList<String>();
         listCommand.add("cscript");
-        listCommand.add(sConvMdbDir + "convmdb.js");
+        listCommand.add("convmdb.js");
         listCommand.add("/t:0");
         listCommand.add("/dsn:"+sOdbcDsn);
         listCommand.add("\"" + fileInput.getAbsolutePath() + "\"");
@@ -341,9 +329,6 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
         else
         	sr = appendError(sr,"ConvMdb conversion error code: " + Integer.toString(iResult)+"\n"+
         			pr.getProcessErrorAsString());
-      }
-      else
-      	sr = appendError(sr,"Invalid value for "+sKEY_CONVMDB_DIR+" in "+sPROPERTIES_RESOURCE+":\n"+sConvMdbDir+" must terminate with '/'!");
     }
     catch(Exception e)
     {
