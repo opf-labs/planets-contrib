@@ -302,8 +302,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 		sOdbcDsn = sOdbcDsn.substring(0,sOdbcDsn.lastIndexOf("."));
         /* run the command */
         List<String> listCommand = new ArrayList<String>();
-        listCommand.add("cscript");
-        listCommand.add("convmdb.js");
+        listCommand.add("convmdb.cmd");
         listCommand.add("/t:0");
         listCommand.add("/dsn:"+sOdbcDsn);
         listCommand.add("\"" + fileInput.getAbsolutePath() + "\"");
