@@ -45,8 +45,7 @@ public final class Pdf2PdfaMayComputerMigrationTest extends TestCase {
     @Before
     public void setUp() throws Exception {
         formats = new ArrayList<String>();
-        formats.add("dvi");
-        formats.add("ps");
+        formats.add("pdf");
         dom = ServiceCreator.createTestService(Migrate.QNAME, Pdf2PdfaMayComputerMigration.class, wsdlLoc);
     }
 
@@ -79,7 +78,7 @@ public final class Pdf2PdfaMayComputerMigrationTest extends TestCase {
         String destExt = null;
         // Tests will be executed for 1 test file of the formats
         // that the pdf2pdfamaycomputer service wrapper supports:
-        // demonstration.dvi
+        // demonstration.pdf
         for (Iterator<String> itr1 = formats.iterator(); itr1.hasNext();) {
             origExt = (String) itr1.next();
             for (Iterator<String> itr2 = formats.iterator(); itr2.hasNext();)
@@ -87,7 +86,7 @@ public final class Pdf2PdfaMayComputerMigrationTest extends TestCase {
                 destExt = (String) itr2.next();
                 // do the migration only if original file extension differs
                 // from destination file extension
-                if( origExt.equalsIgnoreCase("dvi") && !origExt.equalsIgnoreCase(destExt) )
+                if( origExt.equalsIgnoreCase("pdf") && origExt.equalsIgnoreCase(destExt) )
                 {
                     System.out.println("Do migration test from "+origExt+" to "+destExt);
                     doMigration(origExt,destExt, null);
