@@ -166,7 +166,8 @@ public class SoX implements Migrate, Serializable {
         
         sd.parameters(parameterList);
 
-        sd.tool(Tool.create(null, "SoX", "14.1.0", null, SoX_HOMEPAGE_URI));
+        sd.tool(Tool.create(null, "SoX", "14.3.0", null, SoX_HOMEPAGE_URI));
+        sd.logo(URI.create("http://sox.sourceforge.net/sox-logo.png"));
 		
 		List<String> inputFormats = new ArrayList<String> ();
 //		inputFormats.add("MP3");	// mp3 needs additional library, e.g. "lame"

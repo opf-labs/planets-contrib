@@ -183,6 +183,7 @@ public class GraphicsMagickMigrate implements Migrate, Serializable {
         sd.parameters(parameterList);
         
         sd.tool( Tool.create(null, "GraphicsMagick", "1.3.5-Q8", null, "http://www.graphicsmagick.org/") );
+        sd.logo(URI.create("http://www.graphicsmagick.org/images/gm-107x76.png"));
         
         // Checks the installed extensions and supported formats on the fly and creates Migration paths matching the systems capabilities.
         if(inFormats!=null && outFormats!=null) {

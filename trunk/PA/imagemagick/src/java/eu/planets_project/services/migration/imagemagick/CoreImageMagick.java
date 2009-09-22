@@ -114,6 +114,7 @@ public class CoreImageMagick {
         sd.parameters(parameterList);
         
         sd.tool( Tool.create(null, "ImageMagick", "6.3.9-Q8", null, IMAGE_MAGICK_URI) );
+        sd.logo(URI.create("http://www.imagemagick.org/image/logo.jpg"));
         
         // Checks the installed extensions and supported formats on the fly and creates Migration paths matching the systems capabilities.
         if(inFormats!=null && outFormats!=null) {
@@ -166,6 +167,7 @@ public class CoreImageMagick {
         sd.parameters(parameterList);
         
         sd.tool( Tool.create(null, "ImageMagick", "6.3.9-Q8", null, IMAGE_MAGICK_URI) );
+        sd.logo(URI.create("http://www.imagemagick.org/image/logo.jpg"));
         
         // Checks the installed extensions and supported formats on the fly and creates Migration paths matching the systems capabilities.
         if(inFormats!=null && outFormats!=null) {
