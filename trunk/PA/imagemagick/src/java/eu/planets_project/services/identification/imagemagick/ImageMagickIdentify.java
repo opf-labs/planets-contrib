@@ -24,6 +24,7 @@ import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.identification.imagemagick.utils.ImageMagickHelper;
@@ -61,6 +62,8 @@ public class ImageMagickIdentify implements Identify {
 	private static final String DEFAULT_EXTENSION = "bin";
 	private static final FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 	
+	private static final String IMAGE_MAGICK_URI = "http://www.imagemagick.org";
+	
 	
 	
 	/**
@@ -83,6 +86,8 @@ public class ImageMagickIdentify implements Identify {
         		"The following URIs are the matching PRONOM IDs.");
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
         sd.classname(this.getClass().getCanonicalName());
+        sd.tool( Tool.create(null, "ImageMagick", "6.3.9-Q8", null, IMAGE_MAGICK_URI) );
+        sd.logo(URI.create("http://www.imagemagick.org/image/logo.jpg"));
         List<URI> formats = ImageMagickHelper.getSupportedInputFormats();
         if( formats != null )
             sd.inputFormats(formats.toArray(new URI[]{}));

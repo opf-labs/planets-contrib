@@ -147,6 +147,7 @@ public class ImageMagickCrop implements Modify {
         sd.classname(this.getClass().getCanonicalName());
         sd.version("1.0");
         sd.tool(Tool.create(null, "ImageMagick", "v6.3.9-Q8", null, "http://www.imagemagick.org"));
+        sd.logo(URI.create("http://www.imagemagick.org/image/logo.jpg"));
         // InputFormats are created on the fly, depending on the system where the service is deployed. 
         sd.inputFormats(inFormats.toArray(new URI[]{}));
         URI cropActionUri = formatReg.createActionUri("crop");
