@@ -1,17 +1,13 @@
 package eu.planets_project.services.migration.dia.impl;
 
-import eu.planets_project.services.migration.dia.impl.genericwrapper.MigrationPath;
-import eu.planets_project.services.migration.dia.impl.genericwrapper.MigrationPaths;
-import eu.planets_project.services.migration.dia.impl.genericwrapper.MigrationPathsFactory;
-import eu.planets_project.services.migration.dia.impl.genericwrapper.exceptions.MigrationException;
-import eu.planets_project.services.migration.dia.impl.genericwrapper.utils.DocumentLocator;
+import java.net.URI;
+
 import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
-
-import java.net.URI;
 
 /**
  * @author Thomas Skou Hansen &lt;tsh@statsbiblioteket.dk&gt;
@@ -23,16 +19,16 @@ public class CliMigrationPathsFactoryTest {
      * Full file path to the test configuration file used by this test class.
      */
     private static final String TEST_CONFIGURATION_FILE_NAME = "PA/dia/test/resources/genericWrapperTempSrcDstConfig.xml";
-    private final MigrationPaths migrationPathsToTest;
+    private final CliMigrationPaths migrationPathsToTest;
 
     public CliMigrationPathsFactoryTest() throws Exception {
         final DocumentLocator documentLocator = new DocumentLocator(
                 TEST_CONFIGURATION_FILE_NAME);
         final Document pathsConfiguration = documentLocator.getDocument();
 
-        final MigrationPathsFactory migrationPathsFactory = new MigrationPathsFactory();
+        final CliMigrationPathsFactory migrationPathsFactory = new CliMigrationPathsFactory();
         migrationPathsToTest = migrationPathsFactory
-                .getMigrationPaths(pathsConfiguration);
+                .getInstance(pathsConfiguration);
     }
 
     /**
@@ -51,13 +47,14 @@ public class CliMigrationPathsFactoryTest {
 
     /**
      * Test method for
-     * {@link eu.planets_project.services.migration.dia.impl.genericwrapper.MigrationPathsFactory#getMigrationPaths(org.w3c.dom.Document)}
+     * {@link eu.planets_project.services.migration.dia.impl.CliMigrationPathsFactory#getInstance(org.w3c.dom.Document)}
      * Verify that we can get migration path instances for all known paths in
      * the configuration file used by this test class.
      */
+    // FIXME! this is not actually a test of the getInstance() method. It is already executed in the constructor.
     @Test
     public void testGetInstance() throws Exception {
-
+        
         URI sourceFormat = new URI("info:test/lowercase");
         URI destinationFormat = new URI("info:test/uppercase");
         migrationPathsToTest.getMigrationPath(sourceFormat, destinationFormat);
@@ -87,7 +84,7 @@ public class CliMigrationPathsFactoryTest {
         final URI sourceFormatURI = new URI("info:test/lowercase");
         final URI destinationFormatURI = new URI("info:test/uppercase");
 
-        MigrationPath migrationPath = migrationPathsToTest.getMigrationPath(
+        CliMigrationPath migrationPath = migrationPathsToTest.getMigrationPath(
                 sourceFormatURI, destinationFormatURI);
         Assert
                 .assertEquals(
