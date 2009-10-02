@@ -12,7 +12,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
+//import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -91,19 +91,22 @@ public class XenaOOMigrations {
      * No arg constructor
      */
     public XenaOOMigrations() {
-        Properties props = new Properties();
-        try {
-            InputStream propStrem = this.getClass().getResourceAsStream("/eu/planets_project/services/migration/xenaservices/xena.properties");
-            if (propStrem != null) {
-                props.load(propStrem);
-                this.ooffice_install_dir = props.getProperty("openoffice.install.dir");
-            } else {
-                this.ooffice_install_dir = "C:/Programme/OpenOffice.org 3";
-            }
-        } catch (IOException e) {
-            // Use a default for now.
-            this.ooffice_install_dir = "C:/Programme/OpenOffice.org 3";
-        }
+        
+        this.ooffice_install_dir = System.getenv("XENA_HOME");
+
+//        Properties props = new Properties();
+//        try {
+//            InputStream propStrem = this.getClass().getResourceAsStream("/eu/planets_project/services/migration/xenaservices/xena.properties");
+//            if (propStrem != null) {
+//                props.load(propStrem);
+//                this.ooffice_install_dir = props.getProperty("openoffice.install.dir");
+//            } else {
+//                this.ooffice_install_dir = "C:/Programme/OpenOffice.org 3";
+//            }
+//        } catch (IOException e) {
+//            // Use a default for now.
+//            this.ooffice_install_dir = "C:/Programme/OpenOffice.org 3";
+//        }
         log.info("Pointed to OOffice in: " + this.ooffice_install_dir);
     }
 
@@ -232,7 +235,7 @@ public class XenaOOMigrations {
         commandList.add("-accept=socket,port=8100;urp;");
         String[] commandArr = commandList.toArray(new String[0]);
         try {
-            logger.info("Starting OpenOffice process: " + commandArr);
+            logger.info("Starting OpenOffice process: " + commandArr[0]);
             Runtime.getRuntime().exec(commandArr);
         } catch (IOException x) {
             throw new Exception("Cannot start OpenOffice.org. Try Checking Office Properties. " + sofficeProgram.getAbsolutePath(), x);
@@ -320,9 +323,9 @@ public class XenaOOMigrations {
             XComponent xcomponent = (XComponent) UnoRuntime.queryInterface(XComponent.class, xstorable);
             // Closing the converted document
             xcomponent.dispose();
-        /*          if (output.length() == 0) {
-        throw new Exception("OpenOffice open document file is empty. Do you have OpenOffice Java integration installed?");
-        }*/
+            /*          if (output.length() == 0) {
+            throw new Exception("OpenOffice open document file is empty. Do you have OpenOffice Java integration installed?");
+            }*/
         } catch (Exception e) {
             logger.log(Level.FINEST, "Problem normalisting office document", e);
             throw new SAXException(e);
@@ -394,7 +397,7 @@ public class XenaOOMigrations {
 
         File input = FileUtils.getTempFile("input", "0");
         input.deleteOnExit();
-        
+
         input = FileUtils.writeByteArrayToTempFile(binary);
 
         File output = FileUtils.getTempFile("output", "0");
