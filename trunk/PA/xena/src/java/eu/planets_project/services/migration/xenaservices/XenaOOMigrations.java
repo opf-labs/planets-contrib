@@ -56,7 +56,7 @@ public class XenaOOMigrations {
     /** doc import filter */
     public final static String IMPORT_FILTER_DOC = "doc";
     /** doc import filter */
-    public final static String IMPORT_FILTER_XLS = "xls";
+    public final static String IMPORT_FILTER_XLS = "doc";
     /** doc import filter */
     public final static String IMPORT_FILTER_PPT = "ppt";
     /** input filter value set to doc */
