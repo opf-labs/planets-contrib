@@ -164,7 +164,7 @@ public class XenaOOMigration implements Migrate, Serializable {
                     xena.setOoffice_import_filter(XenaOOMigrations.IMPORT_FILTER_DOC);
 
                 case XLS:
-                    xena.setOoffice_import_filter(XenaOOMigrations.IMPORT_FILTER_XLS);
+                    xena.setOoffice_import_filter(XenaOOMigrations.IMPORT_FILTER_NONE);
             }
         }
 
