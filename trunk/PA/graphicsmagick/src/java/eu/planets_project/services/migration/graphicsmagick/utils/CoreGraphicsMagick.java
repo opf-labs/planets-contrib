@@ -212,7 +212,7 @@ public class CoreGraphicsMagick {
 	            log.info("Success! Actual format of input file verified!");
 	        }
 	        else {
-	        	log.info("Error! File has a different format than it claims it has!");
+	        	log.error("Error! File has a different format than it claims it has!");
 	        }
 	
 	        return success;

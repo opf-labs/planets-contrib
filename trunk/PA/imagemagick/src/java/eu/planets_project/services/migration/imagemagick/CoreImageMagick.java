@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
+import org.im4java.core.IdentifyCmd;
 import org.im4java.settings.IMGlobalSettings;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
@@ -34,6 +35,7 @@ import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.utils.ServiceUtils;
 
 public class CoreImageMagick {
@@ -226,13 +228,20 @@ public class CoreImageMagick {
         plogger.info("Starting ImageMagick Migration from " + inputExt + " to " + outputExt + "...");
         
         try {
-            plogger.debug("Initialising ImageInfo Object");
-            ImageInfo imageInfo = new ImageInfo(inputFile.getAbsolutePath());
-            MagickImage image = new MagickImage(imageInfo);
-            plogger.info("ImageInfo object created for file: " + inputFile.getAbsolutePath());
-            String actualSrcFormat = image.getMagick();
-            plogger.info("ImageMagickMigrate: Given src file format extension is: " + inputExt);
-            plogger.info("ImageMagickMigrate: Actual src format is: " + actualSrcFormat);
+//            plogger.debug("Initialising ImageInfo Object");
+//            ImageInfo imageInfo = new ImageInfo(inputFile.getAbsolutePath());
+//            MagickImage image = new MagickImage(imageInfo);
+//            plogger.info("ImageInfo object created for file: " + inputFile.getAbsolutePath());
+//            String actualSrcFormat = image.getMagick();
+//            plogger.info("ImageMagickMigrate: Given src file format extension is: " + inputExt);
+//            plogger.info("ImageMagickMigrate: Actual src format is: " + actualSrcFormat);
+        	
+        	String actualSrcFormat = verifyInputFormat(inputFile);
+        	
+        	if(actualSrcFormat.equalsIgnoreCase("unknown")) {
+    	    	plogger.warn("The input format is unknown. Trying to use the specified input format...");
+    	    	actualSrcFormat = inputExt;
+    	    }
             
             // Has the input file the format it claims it has?
             if(extensionsAreEqual(inputExt, actualSrcFormat) == false) {
@@ -240,7 +249,10 @@ public class CoreImageMagick {
                 return returnWithErrorMessage("The passed input file format (" + inputExt.toUpperCase() + ") does not match the actual format (" + actualSrcFormat + ") of the file!\n" +
                         "This could cause unpredictable behaviour. Nothing has been done!", null);
             }
-
+            
+            ImageInfo imageInfo = new ImageInfo(inputFile.getAbsolutePath());
+            MagickImage image = new MagickImage(imageInfo);
+            
             parseJMagickParameters(parameters, imageInfo, image);
 
             image.setImageFormat(outputExt);
@@ -282,11 +294,14 @@ public class CoreImageMagick {
 	
 	
 	public MigrateResult doIm4JavaMigration(DigitalObject digOb, URI inputFormat, URI outputFormat, List<Parameter> parameters) {
-		im_home_path = System.getenv("IMAGEMAGICK_HOME");
-        if(im_home_path!=null) {
-        	im_home = new File(im_home_path);
-        	IMGlobalSettings.setImageMagickHomeDir(im_home);
-        }
+		String os = System.getProperty("os.name").toLowerCase();
+		if(os.contains("windows")) {
+			im_home_path = System.getenv("IMAGEMAGICK_HOME");
+			if(im_home_path!=null) {
+				im_home = new File(im_home_path);
+				IMGlobalSettings.setImageMagickHomeDir(im_home);
+			}
+		}
 		
 		plogger.info("...and ready! Checking input...");
 	    
@@ -334,6 +349,11 @@ public class CoreImageMagick {
 	    
 	    
 	    String actualSrcFormat = verifyInputFormat(inputFile);
+	    
+	    if(actualSrcFormat.equalsIgnoreCase("unknown")) {
+	    	plogger.warn("The input format is unknown. Trying to use the specified input format...");
+	    	actualSrcFormat = inputExt;
+	    }
 	    
 	    if(actualSrcFormat!=null) {
 	    	if(!extensionsAreEqual(inputExt, actualSrcFormat)) {
@@ -503,19 +523,32 @@ public class CoreImageMagick {
 	}
 
 	private String verifyInputFormat(File inputImage) {
-		plogger.debug("Checking image file format...");
-	    ImageInfo imageInfo;
-	    String actualSrcFormat = null;
-		try {
-			imageInfo = new ImageInfo(inputImage.getAbsolutePath());
-			MagickImage image = new MagickImage(imageInfo);
-	        actualSrcFormat = image.getMagick();
-	        plogger.info("Actual src format is: " + actualSrcFormat);
-	                
-		} catch (MagickException e) {
-			e.printStackTrace();
+		plogger.info("Checking image file format...");
+		
+		ProcessRunner identify = new ProcessRunner();
+		
+		ArrayList<String> cmd = new ArrayList<String>();
+		
+		cmd.add("identify");
+		cmd.add(inputImage.getAbsolutePath());
+		
+		identify.setCommand(cmd);
+		identify.run();
+		
+		String output = identify.getProcessOutputAsString();
+		String error = identify.getProcessErrorAsString();
+		
+		if(output.equalsIgnoreCase("")) {
+			plogger.warn(error);
+			return "unknown";
 		}
-		return actualSrcFormat;
+		else {
+			String[] parts = output.split(" ");
+			String ext = parts[1];
+			return ext;
+		}
+		
+		
 	    
 	}
 
