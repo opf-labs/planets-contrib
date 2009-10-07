@@ -135,7 +135,7 @@ public class ImageMagickMigrateTests {
             testMigrate(inputFormatExt, outputFormatExt, null);
         }
         if(javaVersion.contains("1.5")) {
-        	System.err.println("Skipping JP2 tests due to a known issue with ImageMagick, the JVM and the rest of the World.");
+        	System.err.println("Skipping JP2 tests due to a known issue with ImageMagick, the Java Hotspot VM 1.5 and the rest of the World.");
         }
     }
     
