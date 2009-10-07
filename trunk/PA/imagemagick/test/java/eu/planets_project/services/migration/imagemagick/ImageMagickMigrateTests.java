@@ -125,11 +125,18 @@ public class ImageMagickMigrateTests {
     	String inputFormatExt = "tiff";
         String outputFormatExt = "jp2";
         
-        testMigrate(inputFormatExt, outputFormatExt, createParameters(ImageMagickMigrateTestHelper.COMP_TYPE_JPEG2000, ImageMagickMigrateTestHelper.COMP_QUAL_25));
+        String javaVersion = System.getProperty("java.version");
         
-        testMigrate(inputFormatExt, outputFormatExt, createParameters(ImageMagickMigrateTestHelper.COMP_TYPE_JPEG2000, ImageMagickMigrateTestHelper.COMP_QUAL_50));
-        
-        testMigrate(inputFormatExt, outputFormatExt, null);
+        if(javaVersion.contains("1.6")) {
+        	testMigrate(inputFormatExt, outputFormatExt, createParameters(ImageMagickMigrateTestHelper.COMP_TYPE_JPEG2000, ImageMagickMigrateTestHelper.COMP_QUAL_25));
+            
+            testMigrate(inputFormatExt, outputFormatExt, createParameters(ImageMagickMigrateTestHelper.COMP_TYPE_JPEG2000, ImageMagickMigrateTestHelper.COMP_QUAL_50));
+            
+            testMigrate(inputFormatExt, outputFormatExt, null);
+        }
+        if(javaVersion.contains("1.5")) {
+        	System.err.println("Skipping JP2 tests due to a known issue with ImageMagick, the JVM and the rest of the World.");
+        }
     }
     
     /**
@@ -141,11 +148,19 @@ public class ImageMagickMigrateTests {
     	String inputFormatExt = "jp2";
         String outputFormatExt = "png";
         
-        testMigrate(inputFormatExt, outputFormatExt, createParameters(ImageMagickMigrateTestHelper.COMP_TYPE_LZW, ImageMagickMigrateTestHelper.COMP_QUAL_25));
+        String javaVersion = System.getProperty("java.version");
         
-        testMigrate(inputFormatExt, outputFormatExt, createParameters(ImageMagickMigrateTestHelper.COMP_TYPE_LZW, ImageMagickMigrateTestHelper.COMP_QUAL_50));
+        if(javaVersion.contains("1.6")) {
+        	testMigrate(inputFormatExt, outputFormatExt, createParameters(ImageMagickMigrateTestHelper.COMP_TYPE_LZW, ImageMagickMigrateTestHelper.COMP_QUAL_25));
         
-        testMigrate(inputFormatExt, outputFormatExt, null);
+        	testMigrate(inputFormatExt, outputFormatExt, createParameters(ImageMagickMigrateTestHelper.COMP_TYPE_LZW, ImageMagickMigrateTestHelper.COMP_QUAL_50));
+        
+        	testMigrate(inputFormatExt, outputFormatExt, null);
+        }
+        if(javaVersion.contains("1.5")) {
+        	System.err.println("Skipping JP2 tests due to a known issue with ImageMagick, the Java HotSpot VM 1.5 and the rest of the World.");
+        }
+        
     }
     
     /**
@@ -157,11 +172,18 @@ public class ImageMagickMigrateTests {
     	String inputFormatExt = "jpc";
         String outputFormatExt = "tiff";
         
-        testMigrate(inputFormatExt, outputFormatExt, createParameters(ImageMagickMigrateTestHelper.COMP_TYPE_LZW, ImageMagickMigrateTestHelper.COMP_QUAL_25));
+        String javaVersion = System.getProperty("java.version");
         
-        testMigrate(inputFormatExt, outputFormatExt, createParameters(ImageMagickMigrateTestHelper.COMP_TYPE_LZW, ImageMagickMigrateTestHelper.COMP_QUAL_50));
-        
-        testMigrate(inputFormatExt, outputFormatExt, null);
+        if(javaVersion.contains("1.6")) {
+	        testMigrate(inputFormatExt, outputFormatExt, createParameters(ImageMagickMigrateTestHelper.COMP_TYPE_LZW, ImageMagickMigrateTestHelper.COMP_QUAL_25));
+	        
+	        testMigrate(inputFormatExt, outputFormatExt, createParameters(ImageMagickMigrateTestHelper.COMP_TYPE_LZW, ImageMagickMigrateTestHelper.COMP_QUAL_50));
+	        
+	        testMigrate(inputFormatExt, outputFormatExt, null);
+        }
+        if(javaVersion.contains("1.5")) {
+        	System.err.println("Skipping JP2 tests due to a known issue with ImageMagick, the Java HotSpot VM 1.5 and the rest of the World.");
+        }
     }
     
     /**
