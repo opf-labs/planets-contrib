@@ -166,7 +166,7 @@ public class ImageMagickIdentify implements Identify {
 		
 		Set<URI> uris = format.getUrisForExtension(srcImageFormat);
 	    
-	    if(uris.size() <= 0) {
+	    if(uris==null || uris.size() <= 0) {
 	    	PLOGGER.error("No URI returned for this extension: " + srcImageFormat + ".\n" 
 	    			+ "Input file: " + inputFile.getName() + " could not be identified!!!");
 	    	return this.returnWithErrorMessage("No URI returned for this extension: " + srcImageFormat + ".\n" 
