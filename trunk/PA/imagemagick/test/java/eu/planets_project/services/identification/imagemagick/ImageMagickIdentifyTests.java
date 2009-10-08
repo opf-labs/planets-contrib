@@ -35,7 +35,7 @@ import eu.planets_project.services.utils.test.ServiceCreator;
  * @author melmsp
  *
  */
-public class ImageMagickIdentifyLocalTest {
+public class ImageMagickIdentifyTests {
 
     static Identify imIdentify;
 
@@ -53,7 +53,6 @@ public class ImageMagickIdentifyLocalTest {
         System.out.println("* Running LOCAL tests for ImageMagickIdentify *");
         System.out.println("***********************************************");
         System.out.println();
-        System.setProperty("pserv.test.context", "local");
         imIdentify = ServiceCreator.createTestService(Identify.QNAME, ImageMagickIdentify.class, WSDL);
     }
 
