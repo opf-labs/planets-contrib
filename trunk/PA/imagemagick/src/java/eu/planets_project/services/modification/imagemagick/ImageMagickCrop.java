@@ -101,18 +101,22 @@ public class ImageMagickCrop implements Modify {
 	
 	public ImageMagickCrop () {
 		version = CoreImageMagick.checkImageMagickVersion();
+		String osName = System.getProperty("os.name");
 		
-		String im_home_path = System.getenv("IMAGEMAGICK_HOME");
-		if(im_home_path!=null) {
-			// Setting the installation dir for ImageMagick to make im4java work on windows platforms
-			File im_home = new File(im_home_path);
-			IMGlobalSettings.setImageMagickHomeDir(im_home);
+		if(osName.toLowerCase().contains("windows")) {
+			String im_home_path = System.getenv("IMAGEMAGICK_HOME");
+			if(im_home_path!=null) {
+				// Setting the installation dir for ImageMagick to make im4java work on windows platforms
+				File im_home = new File(im_home_path);
+				IMGlobalSettings.setImageMagickHomeDir(im_home);
+			}
+			else {
+				PLOGGER.error("The System variable IMAGEMAGICK_HOME is not set properly. " +
+						"Please install ImageMagick and set up a system variable pointing to the ImageMagick " +
+						"installation folder! Otherwise this service won't work on Windows OS!");
+			}
 		}
-		else {
-			PLOGGER.error("The System variable IMAGEMAGICK_HOME is not set properly. " +
-					"Please install ImageMagick and set up a system variable pointing to the ImageMagick " +
-					"installation folder! Otherwise this service won't work on Windows OS!");
-		}
+		
 			
 		// cleaning the TMP folder first
 //		FileUtils.deleteTempFiles(work_folder);

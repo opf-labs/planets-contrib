@@ -85,20 +85,22 @@ public class ImageMagickRotate implements Modify {
 	
 	public ImageMagickRotate () {
 		version = CoreImageMagick.checkImageMagickVersion();
-		String im_home_path = System.getenv("IMAGEMAGICK_HOME");
-		if(im_home_path!=null) {
-			// Setting the installation dir for ImageMagick to make im4java work on windows platforms
-			File im_home = new File(im_home_path);
-			IMGlobalSettings.setImageMagickHomeDir(im_home);
-		}
-		else {
-			PLOGGER.error("The System variable IMAGEMAGICK_HOME is not set properly. " +
-					"Please install ImageMagick and set up a system variable pointing to the ImageMagick " +
-					"installation folder! Otherwise this service won't work on Windows OS!");
+		String osName = System.getProperty("os.name");
+		
+		if(osName.toLowerCase().contains("windows")) {
+			String im_home_path = System.getenv("IMAGEMAGICK_HOME");
+			if(im_home_path!=null) {
+				// Setting the installation dir for ImageMagick to make im4java work on windows platforms
+				File im_home = new File(im_home_path);
+				IMGlobalSettings.setImageMagickHomeDir(im_home);
+			}
+			else {
+				PLOGGER.error("The System variable IMAGEMAGICK_HOME is not set properly. " +
+						"Please install ImageMagick and set up a system variable pointing to the ImageMagick " +
+						"installation folder! Otherwise this service won't work on Windows OS!");
+			}
 		}
 		
-		// Use the JBoss-Classloader, instead of the Systemclassloader.
-		System.setProperty("jmagick.systemclassloader","no"); 
 	    PLOGGER.info("Hello! Initializing and starting ImageMagickRotate service!");
 	    // getting formats supported by ImageMagick on THIS system (the system where this service is running)
 	    // This may vary from system to system, depending on which external libraries are installed for image handling (e.g. jasper for JP2000 etc.)
