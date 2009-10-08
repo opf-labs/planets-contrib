@@ -40,6 +40,7 @@ import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.identification.imagemagick.utils.ImageMagickHelper;
+import eu.planets_project.services.migration.imagemagick.CoreImageMagick;
 import eu.planets_project.services.modify.Modify;
 import eu.planets_project.services.modify.ModifyResult;
 import eu.planets_project.services.utils.FileUtils;
@@ -96,7 +97,11 @@ public class ImageMagickCrop implements Modify {
 	
 	private List<URI> inFormats = null;
 	
+	private static String version = "unknown";
+	
 	public ImageMagickCrop () {
+		version = CoreImageMagick.checkImageMagickVersion();
+		
 		String im_home_path = System.getenv("IMAGEMAGICK_HOME");
 		if(im_home_path!=null) {
 			// Setting the installation dir for ImageMagick to make im4java work on windows platforms
@@ -128,7 +133,7 @@ public class ImageMagickCrop implements Modify {
 	public ServiceDescription describe() {
 		ServiceDescription.Builder sd = new ServiceDescription.Builder(NAME, Modify.class.getCanonicalName());
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
-        sd.description("This service uses ImageMagick (via 'im4java') to crop images. That means, that you will have to install ImageMagick on the machine" +
+        sd.description("This service uses ImageMagick " + version + " (via 'im4java') to crop images. That means, that you will have to install ImageMagick on the machine" +
         		" where this service will be deployed to get this to work.");
         sd.instructions("You have to specify the cropping parameters the following way:" + br + 
 				"1) top_left_point = X,Y (with X and Y beeing the coordinates this point should have!)" + br + 
@@ -146,7 +151,7 @@ public class ImageMagickCrop implements Modify {
         sd.parameters(parameters);
         sd.classname(this.getClass().getCanonicalName());
         sd.version("1.0");
-        sd.tool(Tool.create(null, "ImageMagick", "v6.3.9-Q8", null, "http://www.imagemagick.org"));
+        sd.tool(Tool.create(null, "ImageMagick", version, null, "http://www.imagemagick.org"));
         sd.logo(URI.create("http://www.imagemagick.org/image/logo.jpg"));
         // InputFormats are created on the fly, depending on the system where the service is deployed. 
         sd.inputFormats(inFormats.toArray(new URI[]{}));

@@ -30,8 +30,10 @@ import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.identification.imagemagick.utils.ImageMagickHelper;
 import eu.planets_project.services.identify.Identify;
 import eu.planets_project.services.identify.IdentifyResult;
+import eu.planets_project.services.migration.imagemagick.CoreImageMagick;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
+import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.utils.ServiceUtils;
 
 /**
@@ -64,14 +66,17 @@ public class ImageMagickIdentify implements Identify {
 	
 	private static final String IMAGE_MAGICK_URI = "http://www.imagemagick.org";
 	
+	private static String version = "unknown";
+	
 	
 	
 	/**
 	 * Default Constructor, setting the System.property to tell Jboss to use its own Classloader...
 	 */
 	public ImageMagickIdentify(){
-	    System.setProperty("jmagick.systemclassloader","no"); // Use the JBoss-Classloader, instead of the Systemclassloader.
+//	    System.setProperty("jmagick.systemclassloader","no"); // Use the JBoss-Classloader, instead of the Systemclassloader.
 	    PLOGGER.info("Hello! Initializing and starting ImageMagickIdentify service!");
+	    version = CoreImageMagick.checkImageMagickVersion();
 	}
 
 	/* (non-Javadoc)
@@ -79,20 +84,22 @@ public class ImageMagickIdentify implements Identify {
 	 */
 	public ServiceDescription describe() {
 		ServiceDescription.Builder sd = new ServiceDescription.Builder(NAME, Identify.class.getCanonicalName());
-        sd.description("A DigitalObject Identification Service based on ImageMagick. \n" +
+        sd.description("A DigitalObject Identification Service based on ImageMagick " + version + ". \n" +
         		"It returns a list of PRONOM IDs, matching for the identified file format!\n" +
         		"Please note: the first URI in the result list is a PLANETS format URI (e.g. \"planets:fmt/ext/tiff\")\n" +
         		"denoting the file format returned by ImageMagick for the file under consideration.\n" +
         		"The following URIs are the matching PRONOM IDs.");
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
         sd.classname(this.getClass().getCanonicalName());
-        sd.tool( Tool.create(null, "ImageMagick", "6.3.9-Q8", null, IMAGE_MAGICK_URI) );
+        sd.tool( Tool.create(null, "ImageMagick", version, null, IMAGE_MAGICK_URI) );
         sd.logo(URI.create("http://www.imagemagick.org/image/logo.jpg"));
         List<URI> formats = ImageMagickHelper.getSupportedInputFormats();
         if( formats != null )
             sd.inputFormats(formats.toArray(new URI[]{}));
         return sd.build();
 	}
+	
+	
 
 	/* (non-Javadoc)
 	 * @see eu.planets_project.services.identify.Identify#identify(eu.planets_project.services.datatypes.DigitalObject)
@@ -139,24 +146,25 @@ public class ImageMagickIdentify implements Identify {
 		
 		String srcImageFormat = null;
 		
-		try {
-			PLOGGER.info("Initialising ImageInfo Object");
-			ImageInfo imageInfo = new ImageInfo(inputFile.getAbsolutePath());
-			MagickImage image = new MagickImage(imageInfo);
-			
-		    // Checking input image format
-		    srcImageFormat = image.getMagick();
-		    PLOGGER.info("The image format is: '" + srcImageFormat + "'");
-		    image.destroyImages();
-		    
-		} catch (MagickException e) {
-			PLOGGER.error("The file seems to have an unsupported file format!");
-			e.getLocalizedMessage();
-			e.printStackTrace();
-		}
+//		try {
+//			PLOGGER.info("Initialising ImageInfo Object");
+//			ImageInfo imageInfo = new ImageInfo(inputFile.getAbsolutePath());
+//			MagickImage image = new MagickImage(imageInfo);
+//			
+//		    // Checking input image format
+//		    srcImageFormat = image.getMagick();
+//		    PLOGGER.info("The image format is: '" + srcImageFormat + "'");
+//		    image.destroyImages();
+//		    
+//		} catch (MagickException e) {
+//			PLOGGER.error("The file seems to have an unsupported file format!");
+//			e.getLocalizedMessage();
+//			e.printStackTrace();
+//		}
+		
+		srcImageFormat = CoreImageMagick.verifyInputFormat(inputFile);
 		
 		Set<URI> uris = format.getUrisForExtension(srcImageFormat);
-//		List<URI> uris = fr.search(srcImageFormat);
 	    
 	    if(uris.size() <= 0) {
 	    	PLOGGER.error("No URI returned for this extension: " + srcImageFormat + ".\n" 

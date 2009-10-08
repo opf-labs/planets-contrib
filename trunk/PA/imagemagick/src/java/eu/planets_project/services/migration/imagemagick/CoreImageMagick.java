@@ -71,12 +71,18 @@ public class CoreImageMagick {
     private File im_home = null;
     private String im_home_path = null;
     
+    private static String version = null;
+    
     private static final String IMAGE_MAGICK_URI = "http://www.imagemagick.org";
     
     public CoreImageMagick() {
-        plogger.info("Hello! Initializing ImageMagickMigrate service...");
+        plogger.info("Hello! Initializing ImageMagick services...");
     }
     public static ServiceDescription describeJMagickMigrate(String serviceName, String className) {
+    	if(version==null) {
+    		version = checkImageMagickVersion();
+    	}
+    	
     	jmagick_compressionTypes[0] = "Undefined Compression";
         jmagick_compressionTypes[1] = "No Compression";
         jmagick_compressionTypes[2] = "BZip Compression";
@@ -91,7 +97,7 @@ public class CoreImageMagick {
         
         ServiceDescription.Builder sd = new ServiceDescription.Builder(serviceName,Migrate.class.getCanonicalName());
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
-        sd.description("A wrapper for ImageMagick file format conversions. Using ImageMagick v6.3.9-Q8 and JMagick v6.3.9-Q8.\n" +
+        sd.description("A wrapper for ImageMagick file format conversions. Using ImageMagick " + version + " and JMagick.\n" +
                 "This service accepts input and target formats of this shape: 'planets:fmt/ext/[extension]'\n" +
         "e.g. 'planets:fmt/ext/tiff' or 'planets:fmt/ext/tif'");
 
@@ -115,7 +121,7 @@ public class CoreImageMagick {
 
         sd.parameters(parameterList);
         
-        sd.tool( Tool.create(null, "ImageMagick", "6.3.9-Q8", null, IMAGE_MAGICK_URI) );
+        sd.tool( Tool.create(null, "ImageMagick", version, null, IMAGE_MAGICK_URI) );
         sd.logo(URI.create("http://www.imagemagick.org/image/logo.jpg"));
         
         // Checks the installed extensions and supported formats on the fly and creates Migration paths matching the systems capabilities.
@@ -126,6 +132,10 @@ public class CoreImageMagick {
     }
     
     public static ServiceDescription describeIm4JavaMigrate(String serviceName , String className) {
+    	if(version==null) {
+    		version = checkImageMagickVersion();
+    	}
+    	
     	compressionTypes.add("BZip");
         compressionTypes.add("Fax");
         compressionTypes.add("Group4");
@@ -149,7 +159,7 @@ public class CoreImageMagick {
     	}
         ServiceDescription.Builder sd = new ServiceDescription.Builder(serviceName, Migrate.class.getCanonicalName());
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
-        sd.description("A wrapper for ImageMagick file format conversions. Using ImageMagick v6.3.9-Q8, im4Java and JMagick v6.3.9-Q8.\n" +
+        sd.description("A wrapper for ImageMagick file format conversions. Using ImageMagick " + version + " and im4Java.\n" +
                 "This service accepts input and target formats of this shape: 'planets:fmt/ext/[extension]'\n" +
         		"e.g. 'planets:fmt/ext/tiff' or 'planets:fmt/ext/tif'");
 
@@ -168,7 +178,7 @@ public class CoreImageMagick {
 
         sd.parameters(parameterList);
         
-        sd.tool( Tool.create(null, "ImageMagick", "6.3.9-Q8", null, IMAGE_MAGICK_URI) );
+        sd.tool( Tool.create(null, "ImageMagick", version, null, IMAGE_MAGICK_URI) );
         sd.logo(URI.create("http://www.imagemagick.org/image/logo.jpg"));
         
         // Checks the installed extensions and supported formats on the fly and creates Migration paths matching the systems capabilities.
@@ -522,7 +532,7 @@ public class CoreImageMagick {
 		return newDigObj;
 	}
 
-	private String verifyInputFormat(File inputImage) {
+	public static String verifyInputFormat(File inputImage) {
 		plogger.info("Checking image file format...");
 		
 		ProcessRunner identify = new ProcessRunner();
@@ -547,9 +557,30 @@ public class CoreImageMagick {
 			String ext = parts[1];
 			return ext;
 		}
+	}
+	
+	public static String checkImageMagickVersion() {
+		ProcessRunner checker = new ProcessRunner();
+		ArrayList<String> cmd = new ArrayList<String>();
+		cmd.add("identify");
+		cmd.add("-version");
+		checker.setCommand(cmd);
+		checker.run();
+		String error = checker.getProcessErrorAsString();
+		String output = checker.getProcessOutputAsString();
+		String version = "unknown";
 		
+		if(!error.equalsIgnoreCase("")) {
+			plogger.error(error);
+		}
+		if(output!= null && !output.equalsIgnoreCase("")) {
+			if(output.contains("ImageMagick")) {
+				String[] parts = output.split(" ", 6);
+				version = parts[2] + " " + parts[3] + " " + parts[4];
+			}
+		}
 		
-	    
+		return version;
 	}
 
 	private String getInputFileName(DigitalObject digOb, URI inputFormat) {
