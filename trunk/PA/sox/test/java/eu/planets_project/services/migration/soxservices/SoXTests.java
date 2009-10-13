@@ -23,6 +23,7 @@ import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.utils.test.ServiceCreator;
 
 public class SoXTests {
 	
@@ -42,13 +43,11 @@ public class SoXTests {
     public static void setup() {
 		TEST_OUT = SoXTestsHelper.SoX_LOCAL_OUT;
 		
-    	System.out.println("Running SoX LOCAL tests...");
+    	System.out.println("Running SoX tests...");
     	System.out.println("**************************");
     	
-    	System.setProperty("pserv.test.context", "local");
-    	
-//    	sox = ServiceCreator.createTestService(Migrate.QNAME, SoX.class, wsdlLocation);
-    	sox = new SoX();
+    	sox = ServiceCreator.createTestService(Migrate.QNAME, SoX.class, wsdlLocation);
+//    	sox = new SoX();
     	
     	migrationPaths = sox.describe().getPaths().toArray(new MigrationPath[]{});
     }

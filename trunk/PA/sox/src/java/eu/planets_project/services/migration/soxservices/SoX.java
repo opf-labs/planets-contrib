@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -59,7 +58,7 @@ public class SoX implements Migrate, Serializable {
 
 	private static final long serialVersionUID = -402768544068369154L;
 	
-	private static final String SoX_HOMEPAGE_URI = "http://sox.sourceforge.net/";
+	private static final String SoX_HOMEPAGE_URI = "http://sox.sourceforge.net/Main/HomePage";
 	
 	private static final String SHOW_PROGRESS_PARAM = "showProgress";
 	private static final String NO_SHOW_PROGRESS_PARAM = "noShowProgress";
@@ -76,17 +75,17 @@ public class SoX implements Migrate, Serializable {
 	/**
      * the SOX working directory
      */
-    public static  String SoX_WORK_DIR = "SOX";
+    public static  String SoX_WORK_DIR = FileUtils.randomizeFileName("SOX");
     
     /**
      * the SOX input dir
      */
-    public static  String SoX_IN = "INPUT";
+    public static  String SoX_IN = FileUtils.randomizeFileName("INPUT");
     
     /**
      * the SOX output dir
      */
-    public static  String SoX_OUTPUT_DIR = "OUT";
+    public static  String SoX_OUTPUT_DIR = FileUtils.randomizeFileName("OUT");
     
     /**
      * SOX home dir
@@ -119,7 +118,7 @@ public class SoX implements Migrate, Serializable {
 	public ServiceDescription describe() {
 		ServiceDescription.Builder sd = new ServiceDescription.Builder(NAME,Migrate.class.getCanonicalName());
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
-        sd.description("A wrapper for the SoX Audio Converter. Using SoX version 14.1.0\n" +
+        sd.description("A wrapper for the SoX Audio Converter. Using SoX version 14.3.0\n" +
         		"This service accepts input and target formats of this shape: 'planets:fmt/ext/[extension]'\n" +
         		"e.g. 'planets:fmt/ext/wav' or 'planets:fmt/ext/au'\n" +
         		"\n" +
@@ -288,11 +287,11 @@ public class SoX implements Migrate, Serializable {
 	
 	/**
 	 * 
-     * @param input input data as byte[]
+     * @param input input data as DigitalObject
      * @param inputFormat a format URI specifying the input format (e.g. planets:format/ext/wav) 
      * @param outputFormat a format URI specifying the destination format 
      * @param parameters some additional parameters you wish to pass to the underlying tool?
-     * @return the migrated byte[]
+     * @return the migrated DigitalObject along with a ServiceReport
      */
     public MigrateResult convertAudio(DigitalObject input,
             URI inputFormat, URI outputFormat, List<Parameter> parameters) {
@@ -404,14 +403,11 @@ public class SoX implements Migrate, Serializable {
         // read it into a byte[]
         if(processOutputFile.canRead()) {
         	DigitalObject resultDigObj = null;
-			try {
-				resultDigObj = createDigitalObjectByReference(new URL("http://planetsSoxMigrationService.org"), processOutputFile);
-				plogger.info("Created new DigitalObject for result file...");
-			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			resultDigObj = createDigitalObjectByReference(processOutputFile);
+			
+			plogger.info("Created new DigitalObject for result file...");
             plogger.info("Output file lenght: " + processOutputFile.length());
+            
          // create a ServiceReport...
             ServiceReport report = new ServiceReport(Type.INFO, Status.SUCCESS,
                     "Output and error logs:\n" + "--------------------------\n"
@@ -456,7 +452,7 @@ public class SoX implements Migrate, Serializable {
 	
 	
 	// Convenience method to create a DigitalObject byValue (File)
-	private DigitalObject createDigitalObjectByReference(URL permanentURL, File resultFile) {
+	private DigitalObject createDigitalObjectByReference(File resultFile) {
 		DigitalObject digObj =  new DigitalObject.Builder(Content.byReference(resultFile)).build();
 		return digObj;
 	}

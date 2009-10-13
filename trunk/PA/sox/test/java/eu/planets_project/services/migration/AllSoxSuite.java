@@ -3,8 +3,6 @@ package eu.planets_project.services.migration;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import eu.planets_project.services.migration.soxservices.SoXServerTests;
-import eu.planets_project.services.migration.soxservices.SoXStandaloneTests;
 import eu.planets_project.services.migration.soxservices.SoXTests;
 
 /**
@@ -14,5 +12,5 @@ import eu.planets_project.services.migration.soxservices.SoXTests;
  */
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses( { SoXTests.class, SoXStandaloneTests.class, SoXServerTests.class })
+@Suite.SuiteClasses( { SoXTests.class})
 public class AllSoxSuite {}
