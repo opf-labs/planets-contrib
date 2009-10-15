@@ -72,7 +72,9 @@ public class SoXHelper {
 	private static void readVersion() {
 		ProcessRunner versionCmd = new ProcessRunner();
 		versionCmd.setCommand(getVersionCmd());
-		versionCmd.setStartingDir(new File(SOX_HOME));
+		if(SOX_HOME!=null && !SOX_HOME.equalsIgnoreCase("")) {
+			versionCmd.setStartingDir(new File(SOX_HOME));
+		}
 		versionCmd.run();
 		String output = versionCmd.getProcessOutputAsString();
 		String soxPattern = "sox: ";
@@ -186,7 +188,7 @@ public class SoXHelper {
 	
 	private static List<String> getFullFormatListCmd() {
 		ArrayList<String> cmd = new ArrayList<String>();
-		cmd.add(SOX_HOME + File.separator + "sox");
+		cmd.add("sox");
 		cmd.add("--help-format");
 		cmd.add("all");
 		return cmd;
@@ -194,7 +196,7 @@ public class SoXHelper {
 	
 	private static List<String> getHelpCmd() {
 		ArrayList<String> cmd = new ArrayList<String>();
-		cmd.add(SOX_HOME + File.separator + "sox");
+		cmd.add("sox");
 		cmd.add("-h");
 		return cmd;
 	}
