@@ -131,8 +131,13 @@ public class SoXTests {
 	public void testAdvencedCLI() {
 		printTestTitle("Testing AdvancedCLI technologie ;-)");
 		
+		printTestTitle("AdvancedCLI: wav --> aiff, #INFILE# notation");
 		List<Parameter> parameters = createParameters("-S -V6 #INFILE# -c2 -r44100 #OUTFILE#", false, false, null); 
 		testMigrate(wav_URI, aiff_URI, parameters);
+		
+		printTestTitle("AdvancedCLI: aiff --> wav, 'infile' notation");
+		parameters = createParameters("-S -V6 infile -c2 -r22500 outfile", false, false, null);
+		testMigrate(aiff_URI, wav_URI, parameters);
 	}
 	
 	@Test

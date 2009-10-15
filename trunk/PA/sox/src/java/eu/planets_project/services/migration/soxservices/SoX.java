@@ -340,16 +340,21 @@ public class SoX implements Migrate, Serializable {
         
         // setting up the command line 
         List<String> soxCommands = new ArrayList<String>();
-        soxCommands.add(SOX_HOME + SOX);	// the path and name of the tool itself
-        if(srcExt.equalsIgnoreCase(".raw")) {
-        	soxCommands.add("-r");
-        	soxCommands.add("44100");
+        if(!SOX_HOME.equalsIgnoreCase("")) {
+        	soxCommands.add(SOX_HOME + SOX);	// the path and name of the tool itself
         }
-        soxCommands.add(inputFile.getAbsolutePath());	// the input file
-        if(destExt.equalsIgnoreCase(".raw")) {
-        	soxCommands.add("-r");
-        	soxCommands.add("44100");
+        else {
+        	soxCommands.add(SOX);
         }
+//        if(srcExt.equalsIgnoreCase(".raw")) {
+//        	soxCommands.add("-r");
+//        	soxCommands.add("44100");
+//        }
+//        soxCommands.add(inputFile.getAbsolutePath());	// the input file
+//        if(destExt.equalsIgnoreCase(".raw")) {
+//        	soxCommands.add("-r");
+//        	soxCommands.add("44100");
+//        }
         soxCommands.add(outputFilePath);	// the output file path
         
         
@@ -472,13 +477,18 @@ public class SoX implements Migrate, Serializable {
     private List<String> getAdvancedCmd(String cmdLine, File srcFile, String outFileName) {
     	String[] parts = cmdLine.split(" ");
     	ArrayList<String> cmd = new ArrayList<String>();
-    	cmd.add(SOX_HOME + SOX);
+    	if(!SOX_HOME.equalsIgnoreCase("")) {
+    		cmd.add(SOX_HOME + SOX);
+    	}
+    	else {
+    		cmd.add(SOX);
+    	}
     	for (String currentPart : parts) {
-			if(currentPart.equalsIgnoreCase("#INFILE#")) {
+			if(currentPart.equalsIgnoreCase("#INFILE#") || currentPart.equalsIgnoreCase("infile")) {
 				cmd.add(srcFile.getAbsolutePath());
 				continue;
 			}
-			if(currentPart.equalsIgnoreCase("#OUTFILE#")) {
+			if(currentPart.equalsIgnoreCase("#OUTFILE#")|| currentPart.equalsIgnoreCase("outfile")) {
 				cmd.add(outFileName);
 				continue;
 			}
