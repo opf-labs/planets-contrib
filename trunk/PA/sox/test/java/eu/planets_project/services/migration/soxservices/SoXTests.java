@@ -43,6 +43,9 @@ public class SoXTests {
 	
 	private static final String br = System.getProperty("line.separator");
 	
+	
+	private static final String java_version = System.getProperty("java.version");
+	
 	private static URI mp3_URI = URI.create("planets:fmt/ext/mp3");
 	private static URI raw_URI = URI.create("planets:fmt/ext/raw");
 	private static URI wav_URI = URI.create("planets:fmt/ext/wav");
@@ -57,7 +60,8 @@ public class SoXTests {
     public static void setup() {
 		TEST_OUT = SoXTestsHelper.SoX_LOCAL_OUT;
 		
-    	printTestTitle("Running SoX tests...");
+    	printTestTitle("Running SoX tests...on " + java_version);
+    	printTestTitle("Path: " + PATH);
     	
     	sox = ServiceCreator.createTestService(Migrate.QNAME, SoX.class, wsdlLocation);
     	
