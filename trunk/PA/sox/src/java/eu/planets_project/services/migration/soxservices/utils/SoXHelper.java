@@ -179,6 +179,9 @@ public class SoXHelper {
 	
 	public static String getHelpText() {
 		ProcessRunner soxHelp = new ProcessRunner(getHelpCmd());
+		if(SOX_HOME!=null && !SOX_HOME.equalsIgnoreCase("")) {
+			soxHelp.setStartingDir(new File(SOX_HOME));
+		}
 		soxHelp.run();
 		String help = soxHelp.getProcessOutputAsString();
 		return help;
