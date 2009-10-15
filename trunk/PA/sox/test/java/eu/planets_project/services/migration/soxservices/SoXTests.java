@@ -61,7 +61,6 @@ public class SoXTests {
 		TEST_OUT = SoXTestsHelper.SoX_LOCAL_OUT;
 		
     	printTestTitle("Running SoX tests...on " + java_version);
-    	printTestTitle("Path: " + PATH);
     	
     	sox = ServiceCreator.createTestService(Migrate.QNAME, SoX.class, wsdlLocation);
     	
