@@ -100,7 +100,8 @@ public class SoXHelper {
 		checkFormats.run();
 		String output = checkFormats.getProcessOutputAsString();
 		String[] lines = null;
-		if(getVersion().equalsIgnoreCase("v14.3.0")) {
+		
+		if(!output.contains(br)) {
 			lines = output.split("\n");
 		}
 		else {

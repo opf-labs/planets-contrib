@@ -135,47 +135,47 @@ public class SoXTests {
 		testMigrate(wav_URI, aiff_URI, parameters);
 	}
 	
-//	@Test
-//	public void testAllPossibleMigrationPathways() {
-//		printTestTitle("testing all supported Formats.");
-//		
-//		for(int i=0;i<migrationPaths.length;i++) {
-//			MigrationPath path = migrationPaths[i];
-//			URI inputFormat = path.getInputFormat();
-//			URI outputFormat = path.getOutputFormat();
-//			
-//			printTestTitle("Testing migrationPath: [" + inputFormat.toASCIIString() + " --> " + outputFormat.toASCIIString() + "]");
-//			
-//			printTestTitle("ShowProgress = TRUE, Verbosity level: 6");
-//			List<Parameter> parameters = createParameters(null, true, false, "6");
+	@Test
+	public void testAllPossibleMigrationPathways() {
+		printTestTitle("testing all supported Formats.");
+		
+		for(int i=0;i<migrationPaths.length;i++) {
+			MigrationPath path = migrationPaths[i];
+			URI inputFormat = path.getInputFormat();
+			URI outputFormat = path.getOutputFormat();
+			
+			printTestTitle("Testing migrationPath: [" + inputFormat.toASCIIString() + " --> " + outputFormat.toASCIIString() + "]");
+			
+			printTestTitle("ShowProgress = TRUE, Verbosity level: 6");
+			List<Parameter> parameters = createParameters(null, true, false, "6");
+			testMigrate(inputFormat, outputFormat, parameters);
+			
+//			printTestTitle("ShowProgress = TRUE, Verbosity level: 4");
+//			System.out.println("------------------");
+//			parameters = createParameters(true, false, "4");
 //			testMigrate(inputFormat, outputFormat, parameters);
-//			
-////			printTestTitle("ShowProgress = TRUE, Verbosity level: 4");
-////			System.out.println("------------------");
-////			parameters = createParameters(true, false, "4");
-////			testMigrate(inputFormat, outputFormat, parameters);
-////			System.out.println();
-//			
-////			printTestTitle("ShowProgress = FALSE, Verbosity level: 4");
-////			parameters = createParameters(false, false, "4");
-////			testMigrate(inputFormat, outputFormat, parameters);
-////			System.out.println();
-//			
-////			System.out.println("ShowProgress = FALSE, NoShowProgress = TRUE, Verbosity level: 4");
-////			System.out.println("------------------");
-////			parameters = createParameters(false, true, "4");
-////			testMigrate(inputFormat, outputFormat, parameters);
-////			System.out.println("*******************");
-////			System.out.println();
-//			
-////			System.out.println("ShowProgress = TRUE, NoShowProgress = TRUE, Verbosity level: 4");
-////			System.out.println("------------------");
-////			parameters = createParameters(true, true, "4");
-////			testMigrate(inputFormat, outputFormat, parameters);
-////			System.out.println("*******************");
-////			System.out.println();
-//		}
-//	}
+//			System.out.println();
+			
+//			printTestTitle("ShowProgress = FALSE, Verbosity level: 4");
+//			parameters = createParameters(false, false, "4");
+//			testMigrate(inputFormat, outputFormat, parameters);
+//			System.out.println();
+			
+//			System.out.println("ShowProgress = FALSE, NoShowProgress = TRUE, Verbosity level: 4");
+//			System.out.println("------------------");
+//			parameters = createParameters(false, true, "4");
+//			testMigrate(inputFormat, outputFormat, parameters);
+//			System.out.println("*******************");
+//			System.out.println();
+			
+//			System.out.println("ShowProgress = TRUE, NoShowProgress = TRUE, Verbosity level: 4");
+//			System.out.println("------------------");
+//			parameters = createParameters(true, true, "4");
+//			testMigrate(inputFormat, outputFormat, parameters);
+//			System.out.println("*******************");
+//			System.out.println();
+		}
+	}
 	
 	private void wait(int millisecondsToWait) {
 		for(int i=0; i<=millisecondsToWait;i++) {
