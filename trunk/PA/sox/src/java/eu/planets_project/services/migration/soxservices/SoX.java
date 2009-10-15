@@ -71,6 +71,11 @@ public class SoX implements Migrate, Serializable {
 	private static boolean USE_ADVANCED_CLI = false;
 	private static String CLI_STRING = null;
 	
+	private static List<URI> inFormats = SoXHelper.getSupportedInputFormats();
+	private static List<URI> outFormats = SoXHelper.getSupportedOutputFormats();
+	private static String sox_version = SoXHelper.getVersion();
+	private static String sox_help = SoXHelper.getHelpText();
+	
 	private PlanetsLogger plogger = PlanetsLogger.getLogger(this.getClass());
 	
 	
@@ -82,17 +87,17 @@ public class SoX implements Migrate, Serializable {
 	/**
      * the SOX working directory
      */
-    public static  String SoX_WORK_DIR = FileUtils.randomizeFileName("SOX");
+    public static  String SoX_WORK_DIR = "SOX";
     
     /**
      * the SOX input dir
      */
-    public static  String SoX_IN = FileUtils.randomizeFileName("INPUT");
+    public static  String SoX_IN = "INPUT";
     
     /**
      * the SOX output dir
      */
-    public static  String SoX_OUTPUT_DIR = FileUtils.randomizeFileName("OUT");
+    public static  String SoX_OUTPUT_DIR = "OUT";
     
     /**
      * SOX home dir
@@ -125,7 +130,7 @@ public class SoX implements Migrate, Serializable {
 	public ServiceDescription describe() {
 		ServiceDescription.Builder sd = new ServiceDescription.Builder(NAME,Migrate.class.getCanonicalName());
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
-        sd.description("A wrapper for the SoX Audio Converter. Using SoX " + SoXHelper.getVersion() + 
+        sd.description("A wrapper for the SoX Audio Converter. Using SoX " + sox_version + 
         		"\n" +
         		"This service accepts input and target formats of this shape: 'planets:fmt/ext/[extension]'\n" +
         		"e.g. 'planets:fmt/ext/wav' or 'planets:fmt/ext/au'\n" +
@@ -167,7 +172,7 @@ public class SoX implements Migrate, Serializable {
         parameterList.add(verbosityLevel);
         
         Parameter advancedCLI = new Parameter.Builder(ADVANCED_CLI_PARAM, "[gopts] [[fopts] #INFILE#]... [fopts] #OUTFILE# [effect [effopts]]...")
-        .description(SoXHelper.getHelpText() + br + "The #INFILE# and #OUTFILE# parts are placeholder, " +
+        .description(sox_help + br + "The #INFILE# and #OUTFILE# parts are placeholder, " +
         		"where the service fills in the actual files." + br + 
         		"You don't have to put the tools' name in the command line, this will be added by the service!" + br + 
         		"Please be aware of what you are doing, this command will be passed through to the Command line tool directly!")
@@ -176,7 +181,7 @@ public class SoX implements Migrate, Serializable {
         
         sd.parameters(parameterList);
 
-        sd.tool(Tool.create(null, "SoX", SoXHelper.getVersion(), null, SoX_HOMEPAGE_URI));
+        sd.tool(Tool.create(null, "SoX", sox_version, null, SoX_HOMEPAGE_URI));
         sd.logo(URI.create("http://sox.sourceforge.net/sox-logo.png"));
 		
 //		List<String> inputFormats = new ArrayList<String> ();
@@ -196,7 +201,7 @@ public class SoX implements Migrate, Serializable {
 //		outputFormats.add("RAW");
 		
 		// creating all possible/sensible combinations
-		sd.paths(ServiceUtils.createMigrationPathways(SoXHelper.getSupportedInputFormats(), SoXHelper.getSupportedOutputFormats()));
+		sd.paths(ServiceUtils.createMigrationPathways(inFormats, outFormats));
 		return sd.build();
 	}
 
@@ -263,7 +268,7 @@ public class SoX implements Migrate, Serializable {
 	 * whether the input format is found in the possible migration paths 
 	 */
 	private boolean isInputFormatSupported(URI inputFormat) {
-		MigrationPath[] migrationPaths = this.describe().getPaths().toArray(new MigrationPath[]{});
+		MigrationPath[] migrationPaths = ServiceUtils.createMigrationPathways(inFormats, outFormats);
 		boolean isSupported = false;
 		
 		for (int i = 0; i < migrationPaths.length; i++) {
@@ -281,7 +286,7 @@ public class SoX implements Migrate, Serializable {
 	 * whether the output format is found in the possible migration paths 
 	 */
 	private boolean isOutputFormatSupported(URI outputFormat) {
-		MigrationPath[] migrationPaths = this.describe().getPaths().toArray(new MigrationPath[]{});
+		MigrationPath[] migrationPaths = ServiceUtils.createMigrationPathways(inFormats, outFormats);
 		boolean isSupported = false;
 		
 		for (int i = 0; i < migrationPaths.length; i++) {
@@ -327,13 +332,13 @@ public class SoX implements Migrate, Serializable {
         File outputFolder = FileUtils.createFolderInWorkFolder(workFolder, SoX_OUTPUT_DIR);
         
         // the path for the migrated file to be created
-        String outputFilePath = outputFolder.getAbsolutePath() + File.separator + "SoX_OUTPUT_FILE" + destExt; 
+        String outputFilePath = outputFolder.getAbsolutePath() + File.separator + FileUtils.randomizeFileName("SoX_OUTPUT_FILE" + destExt); 
         
         // the file the input (temp) file is placed in
         File inputFolder = FileUtils.createFolderInWorkFolder(workFolder, SoX_IN);
         
         // the path to the input file
-        String inputFilePath = "SoX_INPUT_FILE" + srcExt;
+        String inputFilePath = FileUtils.randomizeFileName("SoX_INPUT_FILE" + srcExt);
         
      // getting the input data from the DigitalObject and writing it to a File...
         File inputFile = FileUtils.writeInputStreamToFile(input.getContent().read(), inputFolder, inputFilePath);
@@ -346,15 +351,22 @@ public class SoX implements Migrate, Serializable {
         else {
         	soxCommands.add(SOX);
         }
-//        if(srcExt.equalsIgnoreCase(".raw")) {
-//        	soxCommands.add("-r");
-//        	soxCommands.add("44100");
-//        }
-//        soxCommands.add(inputFile.getAbsolutePath());	// the input file
-//        if(destExt.equalsIgnoreCase(".raw")) {
-//        	soxCommands.add("-r");
-//        	soxCommands.add("44100");
-//        }
+        if(srcExt.equalsIgnoreCase(".raw")) {
+        	plogger.warn("RAW format detected! Using defaults. Please be aware that this might produce unpredictable results!"
+        			+ br +"To make sure you are using the correct settings, please use the advancedCmd parameter and pass the command line directly!");
+        	soxCommands.add("-r");
+        	soxCommands.add("44100");
+        	soxCommands.add("-g");
+        }
+        soxCommands.add(inputFile.getAbsolutePath());	// the input file
+        
+        if(destExt.equalsIgnoreCase(".raw")) {
+        	plogger.warn("RAW format detected! Using defaults. Please be aware that this might produce unpredictable results!"
+        			+ br +"To make sure you are using the correct settings, please use the advancedCmd parameter and pass the command line directly!");
+        	soxCommands.add("-r");
+        	soxCommands.add("44100");
+        	soxCommands.add("-g");
+        }
         soxCommands.add(outputFilePath);	// the output file path
         
         
@@ -415,15 +427,16 @@ public class SoX implements Migrate, Serializable {
 			List<String> cmd = getAdvancedCmd(CLI_STRING, inputFile, outputFilePath);
 			pr.setCommand(cmd);
 			plogger.info("Executing: " + cmd);
+			soxCommands = cmd;
+			USE_ADVANCED_CLI = false;
 		}
 		else {
 			pr.setCommand(soxCommands);
 			plogger.info("Executing: " + soxCommands);
 		}
-		if( SOX_HOME != null && ! "".equals(SOX_HOME))
+		if( SOX_HOME != null && ! "".equals(SOX_HOME)) {
 		    pr.setStartingDir(new File(SOX_HOME));
-        
-        
+		}
         
         pr.run();
 
@@ -433,7 +446,7 @@ public class SoX implements Migrate, Serializable {
         plogger.info("SOX call output: " + processOutput);
         plogger.error("SOX call error: " + processError);
         
-        plogger.debug("Executing: " + soxCommands + " finished.");
+        plogger.info("Executing " + soxCommands + " finished.");
 
         plogger.info("Migration finished.");
 		//**********************************************************************

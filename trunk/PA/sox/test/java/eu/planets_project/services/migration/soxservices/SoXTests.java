@@ -198,12 +198,12 @@ public class SoXTests {
 		ServiceReport sr = mr.getReport();
 		
 		if(sr.getType() == Type.ERROR) {
-			System.err.println("FAILED: " + sr);
-			assertTrue("This test SHOULD fail!", sr.getType() == Type.ERROR);
-			System.err.println("Service successfully failed ;-)");
+			System.err.println("FAILED: " + sr.getStatus());
+//			assertTrue("This test SHOULD fail!", sr.getType() == Type.ERROR);
+//			System.err.println("Service successfully failed ;-)");
 		}
 		else {
-			System.out.println("Got Report: " + sr);
+			System.out.println("Got Report: " + sr.getStatus());
         
 			DigitalObject doOut = mr.getDigitalObject();
 
