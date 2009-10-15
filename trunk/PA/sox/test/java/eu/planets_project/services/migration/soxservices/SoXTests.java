@@ -23,6 +23,8 @@ import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.migration.soxservices.utils.SoXHelper;
+import eu.planets_project.services.utils.ServiceUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
 
 public class SoXTests {
@@ -39,17 +41,49 @@ public class SoXTests {
 	
 	public static MigrationPath[] migrationPaths;
 	
+	private static final String br = System.getProperty("line.separator");
+	
+	private static URI mp3_URI = URI.create("planets:fmt/ext/mp3");
+	private static URI raw_URI = URI.create("planets:fmt/ext/raw");
+	private static URI wav_URI = URI.create("planets:fmt/ext/wav");
+	private static URI aiff_URI = URI.create("planets:fmt/ext/aiff");
+	private static URI flac_URI = URI.create("planets:fmt/ext/flac");
+	private static URI ogg_URI = URI.create("planets:fmt/ext/ogg");
+	
+	private static List<URI> supportedInputFormats = SoXHelper.getSupportedInputFormats();
+	private static List<URI> supportedOutputFormats = SoXHelper.getSupportedOutputFormats();
+	
 	@BeforeClass
     public static void setup() {
 		TEST_OUT = SoXTestsHelper.SoX_LOCAL_OUT;
 		
-    	System.out.println("Running SoX tests...");
-    	System.out.println("**************************");
+    	printTestTitle("Running SoX tests...");
     	
     	sox = ServiceCreator.createTestService(Migrate.QNAME, SoX.class, wsdlLocation);
-//    	sox = new SoX();
     	
-    	migrationPaths = sox.describe().getPaths().toArray(new MigrationPath[]{});
+    	List<URI> inputFormats = new ArrayList<URI>();
+    	if(supportedInputFormats.contains(mp3_URI)) {
+    		inputFormats.add(mp3_URI);
+    	}
+    	if(supportedInputFormats.contains(raw_URI)) {
+    		inputFormats.add(raw_URI);
+    	}
+    	inputFormats.add(wav_URI);
+    	inputFormats.add(aiff_URI);
+    	inputFormats.add(flac_URI);
+//    	inputFormats.add(ogg_URI);
+    	
+    	List<URI> outputFormats = new ArrayList<URI>();
+    	if(supportedOutputFormats.contains(mp3_URI)) {
+    		outputFormats.add(mp3_URI);
+    	}
+    	outputFormats.add(wav_URI);
+    	outputFormats.add(aiff_URI);
+    	outputFormats.add(flac_URI);
+//    	outputFormats.add(ogg_URI);
+//    	outputFormats.add(raw_URI);
+    	
+    	migrationPaths = ServiceUtils.createMigrationPathways(inputFormats, outputFormats);
     }
 
 	@Test
@@ -61,73 +95,87 @@ public class SoXTests {
 	
 	@Test
 	public void testUnsupportedFormats() throws URISyntaxException, InterruptedException {
-		URI inputFormat = new URI("planets:fmt/ext/mp3");
-		URI outputFormat = new URI("planets:fmt/ext/wav");
-		System.out.println("Testing unsupported INPUT format: " + inputFormat.toASCIIString() + "...service should fail!");
-		testMigrate(inputFormat, outputFormat, null);
-		wait(2500000);
+		printTestTitle("testing unsupported Format behaviour. Please note: Test SHOULD FAIL!");
 		
-		inputFormat = new URI("planets:fmt/ext/wav");
-		outputFormat = new URI("planets:fmt/ext/mp3");
-		System.out.println("Testing unsupported OUTPUT format: " + outputFormat.toASCIIString() + "...service should fail!");
-		testMigrate(inputFormat, outputFormat, null);
-		wait(2500000);
+		if(!supportedInputFormats.contains(mp3_URI)) {
+			System.out.println("Testing unsupported INPUT format: " + mp3_URI.toASCIIString() + "...service should fail!");
+			testMigrate(mp3_URI, wav_URI, null);
+//			wait(2500000);
+		}
+		else {
+			System.err.println("MP3 input-format is NOT unsupported: Skipping test for UN-supported Input-format!");
+		}
 		
-		inputFormat = new URI("planets:fmt/ext/raw");
-		outputFormat = new URI("planets:fmt/ext/mp3");
-		System.out.println("Testing unsupported migration path: [" 
-							+ inputFormat.toASCIIString() 
-							+ " --> " + outputFormat.toASCIIString() + "]...service should fail!");
-		testMigrate(inputFormat, outputFormat, null);
+		if(!supportedOutputFormats.contains(mp3_URI)) {
+			System.out.println("Testing unsupported OUTPUT format: " + mp3_URI.toASCIIString() + "...service should fail!");
+			testMigrate(wav_URI, mp3_URI, null);
+//			wait(2500000);
+		}
+		else {
+			System.err.println("MP3 output-format is NOT unsupported: Skipping test for UN-supported Output-format!");
+		}
+		
+		if(!supportedInputFormats.contains(raw_URI) && !supportedOutputFormats.contains(mp3_URI)) {
+			System.out.println("Testing unsupported migration path: [" 
+							+ raw_URI.toASCIIString() 
+							+ " --> " + mp3_URI.toASCIIString() + "]...service should fail!");
+			testMigrate(raw_URI, mp3_URI, null);
+		}
+		else {
+			System.err.println("Migrationpath: Raw --> MP3 is NOT unsupported: Skipping test for UN-supported MigrationPath!");
+		}
+		
 	}
 	
 	@Test
-	public void testAllPossibleMigrationPathways() {
-		for(int i=0;i<migrationPaths.length;i++) {
-			MigrationPath path = migrationPaths[i];
-			URI inputFormat = path.getInputFormat();
-			URI outputFormat = path.getOutputFormat();
-			
-			System.out.println("-------------------------------------------------------------");
-			System.out.println("Testing migrationPath: [" + inputFormat.toASCIIString() + " --> " + outputFormat.toASCIIString() + "]");
-			
-			System.out.println("ShowProgress = TRUE, Verbosity level: 0");
-			System.out.println("------------------");
-			List<Parameter> parameters = createParameters(true, false, "0");
-			testMigrate(inputFormat, outputFormat, parameters);
-			System.out.println("*******************");
-			
-			System.out.println("ShowProgress = TRUE, Verbosity level: 4");
-			System.out.println("------------------");
-			parameters = createParameters(true, false, "4");
-			testMigrate(inputFormat, outputFormat, parameters);
-			System.out.println("*******************");
-			System.out.println();
-			
-			System.out.println("ShowProgress = FALSE, Verbosity level: 4");
-			System.out.println("------------------");
-			parameters = createParameters(false, false, "4");
-			testMigrate(inputFormat, outputFormat, parameters);
-			System.out.println("*******************");
-			System.out.println();
-			
-//			System.out.println("ShowProgress = FALSE, NoShowProgress = TRUE, Verbosity level: 4");
-//			System.out.println("------------------");
-//			parameters = createParameters(false, true, "4");
-//			testMigrate(inputFormat, outputFormat, parameters);
-//			System.out.println("*******************");
-//			System.out.println();
-			
-//			System.out.println("ShowProgress = TRUE, NoShowProgress = TRUE, Verbosity level: 4");
-//			System.out.println("------------------");
-//			parameters = createParameters(true, true, "4");
-//			testMigrate(inputFormat, outputFormat, parameters);
-//			System.out.println("*******************");
-//			System.out.println();
-			
-			System.out.println("-------------------------------------------------------------\n\n");
-		}
+	public void testAdvencedCLI() {
+		printTestTitle("Testing AdvancedCLI technologie ;-)");
+		
+		List<Parameter> parameters = createParameters("-S -V6 #INFILE# -c2 -r44100 #OUTFILE#", false, false, null); 
+		testMigrate(wav_URI, aiff_URI, parameters);
 	}
+	
+//	@Test
+//	public void testAllPossibleMigrationPathways() {
+//		printTestTitle("testing all supported Formats.");
+//		
+//		for(int i=0;i<migrationPaths.length;i++) {
+//			MigrationPath path = migrationPaths[i];
+//			URI inputFormat = path.getInputFormat();
+//			URI outputFormat = path.getOutputFormat();
+//			
+//			printTestTitle("Testing migrationPath: [" + inputFormat.toASCIIString() + " --> " + outputFormat.toASCIIString() + "]");
+//			
+//			printTestTitle("ShowProgress = TRUE, Verbosity level: 6");
+//			List<Parameter> parameters = createParameters(null, true, false, "6");
+//			testMigrate(inputFormat, outputFormat, parameters);
+//			
+////			printTestTitle("ShowProgress = TRUE, Verbosity level: 4");
+////			System.out.println("------------------");
+////			parameters = createParameters(true, false, "4");
+////			testMigrate(inputFormat, outputFormat, parameters);
+////			System.out.println();
+//			
+////			printTestTitle("ShowProgress = FALSE, Verbosity level: 4");
+////			parameters = createParameters(false, false, "4");
+////			testMigrate(inputFormat, outputFormat, parameters);
+////			System.out.println();
+//			
+////			System.out.println("ShowProgress = FALSE, NoShowProgress = TRUE, Verbosity level: 4");
+////			System.out.println("------------------");
+////			parameters = createParameters(false, true, "4");
+////			testMigrate(inputFormat, outputFormat, parameters);
+////			System.out.println("*******************");
+////			System.out.println();
+//			
+////			System.out.println("ShowProgress = TRUE, NoShowProgress = TRUE, Verbosity level: 4");
+////			System.out.println("------------------");
+////			parameters = createParameters(true, true, "4");
+////			testMigrate(inputFormat, outputFormat, parameters);
+////			System.out.println("*******************");
+////			System.out.println();
+//		}
+//	}
 	
 	private void wait(int millisecondsToWait) {
 		for(int i=0; i<=millisecondsToWait;i++) {
@@ -146,6 +194,8 @@ public class SoXTests {
 		
 		if(sr.getType() == Type.ERROR) {
 			System.err.println("FAILED: " + sr);
+			assertTrue("This test SHOULD fail!", sr.getType() == Type.ERROR);
+			System.err.println("Service successfully failed ;-)");
 		}
 		else {
 			System.out.println("Got Report: " + sr);
@@ -203,8 +253,13 @@ public class SoXTests {
     }
 	
 	
-	private List<Parameter> createParameters(boolean showProgressFlag, boolean noShowProgressFlag, String verbosityLevelValue) {
+	private List<Parameter> createParameters(String advancedCmdLine, boolean showProgressFlag, boolean noShowProgressFlag, String verbosityLevelValue) {
     	List<Parameter> parameterList = new ArrayList<Parameter>();
+    	
+    	if(advancedCmdLine!=null && !advancedCmdLine.equalsIgnoreCase("")) {
+    		Parameter advancedCLI = new Parameter.Builder("advancedCmd", advancedCmdLine).build();
+    		parameterList.add(advancedCLI);
+    	}
     	
     	if(showProgressFlag==true) {
     		Parameter showProgress = new Parameter.Builder(
@@ -226,24 +281,33 @@ public class SoXTests {
             parameterList.add(noShowProgress);
         }
         
-        Parameter verbosityLevel = new Parameter.Builder("verbosityLevel",
-                verbosityLevelValue)
-                .description(
-                        "This should be an int value between: 0 - 4.\n"
-                                + "0: No messages are shown at all; use the exit status to determine if an error has occurred.\n"
-                                + "1: Only error messages are shown. These are generated if SoX cannot complete the requested commands.\n"
-                                + "2: Warning messages are also shown. These are generated if SoX can complete the requested commands, but not exactly according to the requested command parameters, or if clipping occurs.\n"
-                                + "3: Descriptions of SoX's processing phases are also shown. Useful for seeing exactly how SoX is processing your audio.\n"
-                                + "4: and above: Messages to help with debugging SoX are also shown.\n"
-                                + "By default, the verbosity level is set to 2; "
-                                + "each occurrence of the -V option increases the verbosity level by 1. "
-                                + "Alternatively, the verbosity level can be set to an absolute number by "
-                                + "specifying it immediately after the -V; e.g. -V0 sets it to 0. ")
-                .build();
-        parameterList.add(verbosityLevel);
+        if(verbosityLevelValue!=null) {
+	        Parameter verbosityLevel = new Parameter.Builder("verbosityLevel",
+	        verbosityLevelValue)
+	        .description(
+	                "Increment or set verbosity level (default 2); levels:" + br + 
+	                "1: failure messages" + br + 
+	                "2: warnings" + br + 
+	                "3: details of processing" + br + 
+	                "4-6: increasing levels of debug messages")
+	        .build();
+	        parameterList.add(verbosityLevel);
+        }
         
 		return parameterList;
     }
+
+	private static void printTestTitle(String title) {
+			for(int i=0;i<title.length()+4;i++) {
+				System.out.print("*");
+			}
+			System.out.println();
+			System.out.println("* " + title + " *");
+			for(int i=0;i<title.length()+4;i++) {
+				System.out.print("*");
+			}
+			System.out.println();
+		}
 	
 
 	

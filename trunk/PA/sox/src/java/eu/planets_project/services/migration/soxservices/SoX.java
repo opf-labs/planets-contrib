@@ -31,6 +31,7 @@ import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.migration.soxservices.utils.SoXHelper;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
@@ -63,6 +64,12 @@ public class SoX implements Migrate, Serializable {
 	private static final String SHOW_PROGRESS_PARAM = "showProgress";
 	private static final String NO_SHOW_PROGRESS_PARAM = "noShowProgress";
 	private static final String VERBOSITY_LEVEL_PARAM = "verbosityLevel";
+	private static final String ADVANCED_CLI_PARAM = "advancedCmd";
+	
+	private static final String br = System.getProperty("line.separator");
+	
+	private static boolean USE_ADVANCED_CLI = false;
+	private static String CLI_STRING = null;
 	
 	private PlanetsLogger plogger = PlanetsLogger.getLogger(this.getClass());
 	
@@ -118,7 +125,8 @@ public class SoX implements Migrate, Serializable {
 	public ServiceDescription describe() {
 		ServiceDescription.Builder sd = new ServiceDescription.Builder(NAME,Migrate.class.getCanonicalName());
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
-        sd.description("A wrapper for the SoX Audio Converter. Using SoX version 14.3.0\n" +
+        sd.description("A wrapper for the SoX Audio Converter. Using SoX " + SoXHelper.getVersion() + 
+        		"\n" +
         		"This service accepts input and target formats of this shape: 'planets:fmt/ext/[extension]'\n" +
         		"e.g. 'planets:fmt/ext/wav' or 'planets:fmt/ext/au'\n" +
         		"\n" +
@@ -148,44 +156,47 @@ public class SoX implements Migrate, Serializable {
 //        parameterList.add(noShowProgress);
         
         Parameter verbosityLevel = new Parameter.Builder("verbosityLevel",
-                "0-4")
+                "1-6")
                 .description(
-                        "This should be an int value between: 0 - 4.\n"
-                                + "0: No messages are shown at all; use the exit status to determine if an error has occurred.\n"
-                                + "1: Only error messages are shown. These are generated if SoX cannot complete the requested commands.\n"
-                                + "2: Warning messages are also shown. These are generated if SoX can complete the requested commands, but not exactly according to the requested command parameters, or if clipping occurs.\n"
-                                + "3: Descriptions of SoX's processing phases are also shown. Useful for seeing exactly how SoX is processing your audio.\n"
-                                + "4: and above: Messages to help with debugging SoX are also shown.\n"
-                                + "By default, the verbosity level is set to 2; "
-                                + "each occurrence of the -V option increases the verbosity level by 1. "
-                                + "Alternatively, the verbosity level can be set to an absolute number by "
-                                + "specifying it immediately after the -V; e.g. -V0 sets it to 0. ")
+                        "Increment or set verbosity level (default 2); levels:" + br + 
+                        "1: failure messages" + br + 
+                        "2: warnings" + br + 
+                        "3: details of processing" + br + 
+                        "4-6: increasing levels of debug messages")
                 .build();
         parameterList.add(verbosityLevel);
         
+        Parameter advancedCLI = new Parameter.Builder(ADVANCED_CLI_PARAM, "[gopts] [[fopts] #INFILE#]... [fopts] #OUTFILE# [effect [effopts]]...")
+        .description(SoXHelper.getHelpText() + br + "The #INFILE# and #OUTFILE# parts are placeholder, " +
+        		"where the service fills in the actual files." + br + 
+        		"You don't have to put the tools' name in the command line, this will be added by the service!" + br + 
+        		"Please be aware of what you are doing, this command will be passed through to the Command line tool directly!")
+        		.build();
+        parameterList.add(advancedCLI);
+        
         sd.parameters(parameterList);
 
-        sd.tool(Tool.create(null, "SoX", "14.3.0", null, SoX_HOMEPAGE_URI));
+        sd.tool(Tool.create(null, "SoX", SoXHelper.getVersion(), null, SoX_HOMEPAGE_URI));
         sd.logo(URI.create("http://sox.sourceforge.net/sox-logo.png"));
 		
-		List<String> inputFormats = new ArrayList<String> ();
+//		List<String> inputFormats = new ArrayList<String> ();
 //		inputFormats.add("MP3");	// mp3 needs additional library, e.g. "lame"
-        inputFormats.add("WAV");
-		inputFormats.add("AIFF");
-		inputFormats.add("FLAC");
-		inputFormats.add("OGG");
+//        inputFormats.add("WAV");
+//		inputFormats.add("AIFF");
+//		inputFormats.add("FLAC");
+//		inputFormats.add("OGG");
 //		inputFormats.add("RAW");	// raw does not work as input, but works as output
 		
-		List<String> outputFormats = new ArrayList<String> ();
-//		outputFormats.add("MP3");	// mp3 needs additional library, e.g. "lame"
-		outputFormats.add("WAV");
-		outputFormats.add("AIFF");
-		outputFormats.add("FLAC");
-		outputFormats.add("OGG");
-		outputFormats.add("RAW");
+//		List<String> outputFormats = new ArrayList<String> ();
+////		outputFormats.add("MP3");	// mp3 needs additional library, e.g. "lame"
+//		outputFormats.add("WAV");
+//		outputFormats.add("AIFF");
+//		outputFormats.add("FLAC");
+//		outputFormats.add("OGG");
+//		outputFormats.add("RAW");
 		
 		// creating all possible/sensible combinations
-		sd.paths(createMigrationPathwayMatrix(inputFormats, outputFormats));
+		sd.paths(ServiceUtils.createMigrationPathways(SoXHelper.getSupportedInputFormats(), SoXHelper.getSupportedOutputFormats()));
 		return sd.build();
 	}
 
@@ -293,7 +304,7 @@ public class SoX implements Migrate, Serializable {
      * @param parameters some additional parameters you wish to pass to the underlying tool?
      * @return the migrated DigitalObject along with a ServiceReport
      */
-    public MigrateResult convertAudio(DigitalObject input,
+    private MigrateResult convertAudio(DigitalObject input,
             URI inputFormat, URI outputFormat, List<Parameter> parameters) {
     	
     	FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
@@ -330,7 +341,15 @@ public class SoX implements Migrate, Serializable {
         // setting up the command line 
         List<String> soxCommands = new ArrayList<String>();
         soxCommands.add(SOX_HOME + SOX);	// the path and name of the tool itself
+        if(srcExt.equalsIgnoreCase(".raw")) {
+        	soxCommands.add("-r");
+        	soxCommands.add("44100");
+        }
         soxCommands.add(inputFile.getAbsolutePath());	// the input file
+        if(destExt.equalsIgnoreCase(".raw")) {
+        	soxCommands.add("-r");
+        	soxCommands.add("44100");
+        }
         soxCommands.add(outputFilePath);	// the output file path
         
         
@@ -340,6 +359,7 @@ public class SoX implements Migrate, Serializable {
 			String showProgress;
 			String noShowProgress;
 			String verbosityLevel;
+			String advancedCmd;
 			
 			for (Iterator<Parameter> iterator = parameters.iterator(); iterator.hasNext();) {
 				Parameter parameter = (Parameter) iterator.next();
@@ -347,14 +367,24 @@ public class SoX implements Migrate, Serializable {
 				String value = parameter.getValue();
 				
 				plogger.info("Got parameter: " + name + " with value: " + value);
-				if(!name.equalsIgnoreCase(SHOW_PROGRESS_PARAM) && !name.equalsIgnoreCase(NO_SHOW_PROGRESS_PARAM) && !name.equalsIgnoreCase(VERBOSITY_LEVEL_PARAM)) {
+				if(!name.equalsIgnoreCase(SHOW_PROGRESS_PARAM) 
+						&& !name.equalsIgnoreCase(NO_SHOW_PROGRESS_PARAM) 
+						&& !name.equalsIgnoreCase(VERBOSITY_LEVEL_PARAM) 
+						&& !name.equalsIgnoreCase(ADVANCED_CLI_PARAM)) {
 					plogger.info("Invalid parameter with name: " + parameter.getName()+"\n using DEFAULT values.");
+				}
+				
+				if(name.equalsIgnoreCase(ADVANCED_CLI_PARAM)) {
+					USE_ADVANCED_CLI = true;
+					CLI_STRING = value;
+					break;
 				}
 				
 				if(name.equalsIgnoreCase(SHOW_PROGRESS_PARAM)) {
 					showProgress = value;
 					soxCommands.add(showProgress);
 					plogger.info("Enabling 'showProgress' feature '-S'.");
+					continue;
 				}
 				
 				if(name.equalsIgnoreCase(NO_SHOW_PROGRESS_PARAM)) {
@@ -375,7 +405,13 @@ public class SoX implements Migrate, Serializable {
         
 		//**********************************************************************
         // Configuring and running the ProcessRunner
-		ProcessRunner pr = new ProcessRunner(soxCommands);
+		ProcessRunner pr = new ProcessRunner();
+		if(USE_ADVANCED_CLI) {
+			pr.setCommand(getAdvancedCmd(CLI_STRING, inputFile, outputFilePath));
+		}
+		else {
+			pr.setCommand(soxCommands);
+		}
 		if( SOX_HOME != null && ! "".equals(SOX_HOME))
 		    pr.setStartingDir(new File(SOX_HOME));
         
@@ -428,6 +464,24 @@ public class SoX implements Migrate, Serializable {
         	plogger.error("No result file created. Maybe SoX is missing a required library for this migration?");
         	return this.returnWithErrorMessage("No result file created. Maybe SoX is missing a required library for this migration?", null);
         }
+    }
+    
+    private List<String> getAdvancedCmd(String cmdLine, File srcFile, String outFileName) {
+    	String[] parts = cmdLine.split(" ");
+    	ArrayList<String> cmd = new ArrayList<String>();
+    	cmd.add(SOX_HOME + SOX);
+    	for (String currentPart : parts) {
+			if(currentPart.equalsIgnoreCase("#INFILE#")) {
+				cmd.add(srcFile.getAbsolutePath());
+				continue;
+			}
+			if(currentPart.equalsIgnoreCase("#OUTFILE#")) {
+				cmd.add(outFileName);
+				continue;
+			}
+			cmd.add(currentPart);
+		}
+    	return cmd;
     }
     
     // Creates a MigrateResult, containing a ServiceReport with the passed
