@@ -188,7 +188,7 @@ public class GrateViewService implements CreateView {
 			return returnWithErrorMessage("Failed to create zip file.");
 
 //		DigitalObjectContent doc = Content.byReference(zip_result.getZipFile());
-		DigitalObject doz =  DigitalObjectUtils.createZipTypeDigOb(zip_result.getZipFile(), zip_result.getZipFile().getName(), true, true, false);
+		DigitalObject doz =  DigitalObjectUtils.createZipTypeDigitalObject(zip_result.getZipFile(), zip_result.getZipFile().getName(), true, true, false);
 
 		FloppyImageHelper helper = FloppyImageHelperFactory.getFloppyImageHelperInstance();
 
