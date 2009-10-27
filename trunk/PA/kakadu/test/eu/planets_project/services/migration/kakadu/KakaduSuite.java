@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({KakaduMigrationTest.class})
+@Suite.SuiteClasses({KakaduCompressMigrationTest.class})
 public class KakaduSuite {
 
 }

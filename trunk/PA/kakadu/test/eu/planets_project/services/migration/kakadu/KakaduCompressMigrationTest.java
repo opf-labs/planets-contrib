@@ -32,7 +32,7 @@ import eu.planets_project.services.utils.test.ServiceCreator;
 public final class KakaduCompressMigrationTest extends TestCase {
 
     /* The location of this service when deployed. */
-    String wsdlLoc = "/pserv-pa-kakadu/KakaduMigration?wsdl";
+    String wsdlLoc = "/pserv-pa-kakadu/KakaduCompressMigration?wsdl";
     PlanetsLogger log = PlanetsLogger.getLogger(KakaduCompressMigrationTest.class);
 
     /* A holder for the object to be tested */
