@@ -29,11 +29,11 @@ import eu.planets_project.services.utils.test.ServiceCreator;
  *
  * @author Sven Schlarb <shsschlarb-planets@yahoo.de>
  */
-public final class KakaduMigrationTest extends TestCase {
+public final class KakaduCompressMigrationTest extends TestCase {
 
     /* The location of this service when deployed. */
     String wsdlLoc = "/pserv-pa-kakadu/KakaduMigration?wsdl";
-    PlanetsLogger log = PlanetsLogger.getLogger(KakaduMigrationTest.class);
+    PlanetsLogger log = PlanetsLogger.getLogger(KakaduCompressMigrationTest.class);
 
     /* A holder for the object to be tested */
     Migrate dom = null;
@@ -166,7 +166,7 @@ public final class KakaduMigrationTest extends TestCase {
         FormatRegistry formatRegistry = FormatRegistryFactory.getFormatRegistry();
         MigrateResult mr = dom.migrate(input, formatRegistry.createExtensionUri(origExt), formatRegistry.createExtensionUri(destExt), params);
         log.info("Service report: " + mr.getReport().getMessage());
-        assertTrue("Migration result is null is null for planetsMigrate" + origExt + "to" + destExt + ".", mr != null);
+        assertTrue("Migration result is null for planetsMigrate" + origExt + "to" + destExt + ".", mr != null);
         DigitalObject doOut = mr.getDigitalObject();
         assertTrue("Resulting digital object is null for planetsMigrate" + origExt + "to" + destExt + ".", doOut != null);
         FileUtils.writeInputStreamToFile(doOut.getContent().read(), new File(resFileDir), resFileName);

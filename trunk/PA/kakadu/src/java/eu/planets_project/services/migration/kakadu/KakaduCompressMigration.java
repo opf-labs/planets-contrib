@@ -36,16 +36,16 @@ import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
 
 /**
- * The KakaduMigration migrates JPEG files to JP2 files and vice versa.
+ * The KakaduCompressMigration migrates TIF files to JP2 files.
  * @author Sven Schlarb <shsschlarb-planets@yahoo.de>
  */
 @Local(Migrate.class)
 @Remote(Migrate.class)
 @Stateless
-@WebService(name = KakaduMigration.NAME, serviceName = Migrate.NAME, targetNamespace = PlanetsServices.NS, endpointInterface = "eu.planets_project.services.migrate.Migrate")
-public final class KakaduMigration implements Migrate {
+@WebService(name = KakaduCompressMigration.NAME, serviceName = Migrate.NAME, targetNamespace = PlanetsServices.NS, endpointInterface = "eu.planets_project.services.migrate.Migrate")
+public final class KakaduCompressMigration implements Migrate {
 
-    PlanetsLogger log = PlanetsLogger.getLogger(KakaduMigration.class);
+    PlanetsLogger log = PlanetsLogger.getLogger(KakaduCompressMigration.class);
     /** The dvi ps installation dir */
     public String kakadu_install_dir;
     /** The kakadu application name */
@@ -57,14 +57,14 @@ public final class KakaduMigration implements Migrate {
     String inputFmtExt = null;
     String outputFmtExt = null;
     /***/
-    static final String NAME = "KakaduMigration";
+    static final String NAME = "KakaduCompressMigration";
     List<String> inputFormats = null;
     List<String> outputFormats = null;
     HashMap<String, String> formatMapping = null;
     List<Parameter> serviceParametersList;
     List<Parameter> requestParametersList;
     StringBuffer serviceMessage = null;
-    KakaduServiceParameters kduServiceParameters = null;
+    KakaduCompressServiceParameters kduServiceParameters = null;
     
     /***/
     private static final long serialVersionUID = 2127494848765937613L;
@@ -85,7 +85,7 @@ public final class KakaduMigration implements Migrate {
         formatMapping.put("tiff", "tif");
         serviceMessage = new StringBuffer();
 
-        kduServiceParameters = new KakaduServiceParameters();
+        kduServiceParameters = new KakaduCompressServiceParameters();
         
     }
 
@@ -96,7 +96,7 @@ public final class KakaduMigration implements Migrate {
      * service by the user).
      */
     private void initParameters() {
-        serviceParametersList = KakaduServiceParameters.getParameterList();
+        serviceParametersList = KakaduCompressServiceParameters.getParameterList();
     }
 
     /**
@@ -173,11 +173,7 @@ public final class KakaduMigration implements Migrate {
             } else
                 serviceReportMessage.append("Parameter skipped: Service does not support parameter '"+requestParm.getName()+"'. ");
         }
-        //addParameter(command, "reversible");
-//        command.add("Creversible=yes");
-//        command.add("-rate");
-//        command.add("-,1,0.5,0.25");
-//        command.add("Clevels=5");
+      
         runner.setCommand(command);
         runner.setInputStream(inputStream);
         log.info("Executing command (update): " + command.toString() + " ...");
@@ -318,9 +314,8 @@ public final class KakaduMigration implements Migrate {
         builder.author("Sven Schlarb <shsschlarb-planets@yahoo.de>");
         builder.classname(this.getClass().getCanonicalName());
         builder.description("Kakadu Version 6.2.1 JPEG2000 sample command line" +
-                "application which shows the potential of the JPEG 2000 " +
-                "Developers' Toolkit " +
-                "This services uses the kdu_compress " +
+                "application 'kdu_compress' which shows the potential of the " +
+                "JPEG 2000 Developers' Toolkit This services uses the kdu_compress " +
                 "command line tool. This command line application uses a simple " +
                 "TIFF file reader which can only read uncompressed TIFF files.  " +
                 "This has nothing to do with Kakadu itself. In order to be able to " +

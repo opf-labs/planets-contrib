@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author onbscs
  */
-public class KakaduServiceParameters {
+public class KakaduCompressServiceParameters {
 
     private static List<ServiceParameter> serviceParametersList = null;
 
@@ -156,7 +156,7 @@ public class KakaduServiceParameters {
         }
         return null;
     }
-    public KakaduServiceParameters() {
+    public KakaduCompressServiceParameters() {
     }
 
 }
