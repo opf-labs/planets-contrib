@@ -49,7 +49,7 @@ public final class KakaduCompressMigrationTest extends TestCase {
         formats = new ArrayList<String>();
         formats.add("tif");
         formats.add("jp2");
-        dom = ServiceCreator.createTestService(Migrate.QNAME, KakaduMigration.class, wsdlLoc);
+        dom = ServiceCreator.createTestService(Migrate.QNAME, KakaduCompressMigration.class, wsdlLoc);
     }
 
     /*
