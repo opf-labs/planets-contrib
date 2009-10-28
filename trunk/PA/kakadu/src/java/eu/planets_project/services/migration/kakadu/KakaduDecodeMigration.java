@@ -36,16 +36,16 @@ import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
 
 /**
- * The KakaduCompressMigration migrates TIF files to JP2 files.
+ * The KakaduDecodeMigration migrates TIF files to JP2 files.
  * @author Sven Schlarb <shsschlarb-planets@yahoo.de>
  */
 @Local(Migrate.class)
 @Remote(Migrate.class)
 @Stateless
-@WebService(name = KakaduCompressMigration.NAME, serviceName = Migrate.NAME, targetNamespace = PlanetsServices.NS, endpointInterface = "eu.planets_project.services.migrate.Migrate")
-public final class KakaduCompressMigration implements Migrate {
+@WebService(name = KakaduDecodeMigration.NAME, serviceName = Migrate.NAME, targetNamespace = PlanetsServices.NS, endpointInterface = "eu.planets_project.services.migrate.Migrate")
+public final class KakaduDecodeMigration implements Migrate {
 
-    PlanetsLogger log = PlanetsLogger.getLogger(KakaduCompressMigration.class);
+    PlanetsLogger log = PlanetsLogger.getLogger(KakaduDecodeMigration.class);
     /** The dvi ps installation dir */
     public String kakadu_install_dir;
     /** The kakadu application name */
@@ -57,14 +57,14 @@ public final class KakaduCompressMigration implements Migrate {
     String inputFmtExt = null;
     String outputFmtExt = null;
     /***/
-    static final String NAME = "KakaduCompressMigration";
+    static final String NAME = "KakaduDecodeMigration";
     List<String> inputFormats = null;
     List<String> outputFormats = null;
     HashMap<String, String> formatMapping = null;
     List<Parameter> serviceParametersList;
     List<Parameter> requestParametersList;
     StringBuffer serviceMessage = null;
-    KakaduCompressServiceParameters kduServiceParameters = null;
+    KakaduDecodeServiceParameters kduServiceParameters = null;
     
     /***/
     private static final long serialVersionUID = 2127494848765937613L;
@@ -72,11 +72,11 @@ public final class KakaduCompressMigration implements Migrate {
     private void init() {
         // input formats
         inputFormats = new ArrayList<String>();
-        inputFormats.add("tif");
+        inputFormats.add("jp2");
 
         // output formats and associated output parameters
         outputFormats = new ArrayList<String>();
-        outputFormats.add("jp2");
+        outputFormats.add("tif");
 
         // Disambiguation of extensions, e.g. {"JPG","JPEG"} to {"JPEG"}
         // FIXIT This should be supported by the FormatRegistryImpl class, but
@@ -85,7 +85,7 @@ public final class KakaduCompressMigration implements Migrate {
         formatMapping.put("tiff", "tif");
         serviceMessage = new StringBuffer();
 
-        kduServiceParameters = new KakaduCompressServiceParameters();
+        kduServiceParameters = new KakaduDecodeServiceParameters();
         
     }
 
@@ -96,7 +96,7 @@ public final class KakaduCompressMigration implements Migrate {
      * service by the user).
      */
     private void initParameters() {
-        serviceParametersList = KakaduCompressServiceParameters.getParameterList();
+        serviceParametersList = KakaduDecodeServiceParameters.getParameterList();
     }
 
     /**
@@ -115,12 +115,12 @@ public final class KakaduCompressMigration implements Migrate {
             props.load(this.getClass().getResourceAsStream(strRsc));
             // config vars
             this.kakadu_install_dir = props.getProperty("kakadu.install.dir");
-            this.kakadu_app_name = props.getProperty("kakadu.app.name");
+            this.kakadu_app_name = props.getProperty("kakadu.app2.name");
 
         } catch (Exception e) {
             // // config vars
             this.kakadu_install_dir = "C:/Programme/Kakadu";
-            this.kakadu_app_name = "kdu_compress";
+            this.kakadu_app_name = "kdu_expand";
         }
         log.info("Using kakadu install directory: " + this.kakadu_install_dir);
         log.info("Using kakadu application name: " + this.kakadu_app_name);
@@ -147,7 +147,7 @@ public final class KakaduCompressMigration implements Migrate {
         log.info("Temporary input file created: " + tmpInFile.getAbsolutePath());
 
         // outfile name
-        String outFileStr = tmpInFile.getAbsolutePath().replaceAll(inputFmtExt, "jp2");
+        String outFileStr = tmpInFile.getAbsolutePath().replaceAll(inputFmtExt, "tif");
 
         log.info("Output file name: " + outFileStr);
 
@@ -307,21 +307,22 @@ public final class KakaduCompressMigration implements Migrate {
         builder.author("Sven Schlarb <shsschlarb-planets@yahoo.de>");
         builder.classname(this.getClass().getCanonicalName());
         builder.description("Kakadu Version 6.2.1 JPEG2000 sample command line" +
-                "application 'kdu_compress' which shows the potential of the " +
-                "JPEG 2000 Developers' Toolkit. The service uses the 'kdu_compress' " +
-                "command line tool. This command line application uses a simple " +
+                "application 'kdu_expand' which shows the potential of the " +
+                "JPEG 2000 Developers' Toolkit. This services uses the kdu_expand " +
+                "command line tool in order to decode a JPEG2000 image file. " +
+                "This command line application uses a simple " +
                 "TIFF file reader which can only read uncompressed TIFF files.  " +
                 "This has nothing to do with Kakadu itself. In order to be able to " +
                 "read compressed TIFF files, it should be sufficient " +
                 "to re-compile the command line application with the symbol " +
                 "KDU_INCLUDE_TIFF defined, and link it against the public-domain " +
-                "LIBTIFF library. Furthermore, it is possible to compress various" +
-                "inputfiles into one jpeg2000 file. But this service only supports" +
-                "the one tif input file to one jp2 output file migration.");
+                "LIBTIFF library. Furthermore, it is possible to create various" +
+                "outputfiles from one jpeg2000 file. But this service only supports" +
+                "the one jp2 input file to one tif output file migration.");
         FormatRegistry registry = FormatRegistryFactory.getFormatRegistry();
         MigrationPath[] mPaths = new MigrationPath[]{
-            new MigrationPath(registry.createExtensionUri("tif"),
-            registry.createExtensionUri("jp2"), null)
+            new MigrationPath(registry.createExtensionUri("jp2"),
+            registry.createExtensionUri("tif"), null)
         };
         builder.paths(mPaths);
         builder.classname(this.getClass().getCanonicalName());
