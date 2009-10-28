@@ -76,83 +76,83 @@ public final class KakaduCompressMigrationTest extends TestCase {
      * @throws IOException
      */
 
-//    @Test
-//    public void testWithoutParam()  throws IOException {
-//        List<Parameter> params = new ArrayList<Parameter>();
-//        doMigration("tif","jp2", "_withoutparam", params);
-//    }
-//
-//    @Test
-//    public void testWithParam_reversible()  throws IOException {
-//        List<Parameter> params = new ArrayList<Parameter>();
-//        Parameter parm = new Parameter.Builder("reversible", "true").build();
-//        params.add(parm);
-//        doMigration("tif","jp2", "_param_reversible", params);
-//    }
-//
-//    @Test
-//    public void testWithParam_rate()  throws IOException {
-//        List<Parameter> params = new ArrayList<Parameter>();
-//        Parameter parm = new Parameter.Builder("rate", "1.3,0.75,0.2").build();
-//        params.add(parm);
-//        doMigration("tif","jp2", "_param_rate", params);
-//    }
-//
-//    @Test
-//    public void testWithParam_layers()  throws IOException {
-//        List<Parameter> params = new ArrayList<Parameter>();
-//        Parameter parm = new Parameter.Builder("layers", "5").build();
-//        params.add(parm);
-//        doMigration("tif","jp2", "_param_layers", params);
-//    }
-//    @Test
-//    public void testWithParam_levels()  throws IOException {
-//        List<Parameter> params = new ArrayList<Parameter>();
-//        Parameter parm = new Parameter.Builder("levels", "5").build();
-//        params.add(parm);
-//        doMigration("tif","jp2", "_param_levels", params);
-//    }
-//    @Test
-//    public void testWithParam_tiles() throws IOException {
-//        List<Parameter> params = new ArrayList<Parameter>();
-//        Parameter parm = new Parameter.Builder("tiles", "100,100").build();
-//        params.add(parm);
-//        doMigration("tif", "jp2", "_param_tiles", params);
-//    }
-//    @Test
-//    public void testWithParam_cblk() throws IOException {
-//        List<Parameter> params = new ArrayList<Parameter>();
-//        Parameter parm = new Parameter.Builder("cblk", "64,64").build();
-//        params.add(parm);
-//        doMigration("tif", "jp2", "_param_cblk", params);
-//    }
-//    @Test
-//    public void testWithParam_order() throws IOException {
-//        List<Parameter> params = new ArrayList<Parameter>();
-//        Parameter parm = new Parameter.Builder("order", "LRCP").build();
-//        params.add(parm);
-//        doMigration("tif", "jp2", "_param_order", params);
-//    }
-//
-//    @Test
-//    public void testWithParam_all() throws IOException {
-//        List<Parameter> params = new ArrayList<Parameter>();
-//        Parameter parm1 = new Parameter.Builder("order", "LRCP").build();
-//        Parameter parm2 = new Parameter.Builder("cblk", "64,64").build();
-//        Parameter parm3 = new Parameter.Builder("tiles", "100,100").build();
-//        Parameter parm4 = new Parameter.Builder("levels", "5").build();
-//        Parameter parm5 = new Parameter.Builder("layers", "5").build();
-//        Parameter parm6 = new Parameter.Builder("reversible", "true").build();
-//        Parameter parm7 = new Parameter.Builder("rate", "1.3").build();
-//        params.add(parm1);
-//        params.add(parm2);
-//        params.add(parm3);
-//        params.add(parm4);
-//        params.add(parm5);
-//        params.add(parm6);
-//        params.add(parm7);
-//        doMigration("tif", "jp2", "_param_all", params);
-//    }
+    @Test
+    public void testWithoutParam()  throws IOException {
+        List<Parameter> params = new ArrayList<Parameter>();
+        doMigration("tif","jp2", "_withoutparam", params);
+    }
+
+    @Test
+    public void testWithParam_reversible()  throws IOException {
+        List<Parameter> params = new ArrayList<Parameter>();
+        Parameter parm = new Parameter.Builder("reversible", "true").build();
+        params.add(parm);
+        doMigration("tif","jp2", "_param_reversible", params);
+    }
+
+    @Test
+    public void testWithParam_rate()  throws IOException {
+        List<Parameter> params = new ArrayList<Parameter>();
+        Parameter parm = new Parameter.Builder("rate", "1.3,0.75,0.2").build();
+        params.add(parm);
+        doMigration("tif","jp2", "_param_rate", params);
+    }
+
+    @Test
+    public void testWithParam_layers()  throws IOException {
+        List<Parameter> params = new ArrayList<Parameter>();
+        Parameter parm = new Parameter.Builder("layers", "5").build();
+        params.add(parm);
+        doMigration("tif","jp2", "_param_layers", params);
+    }
+    @Test
+    public void testWithParam_levels()  throws IOException {
+        List<Parameter> params = new ArrayList<Parameter>();
+        Parameter parm = new Parameter.Builder("levels", "5").build();
+        params.add(parm);
+        doMigration("tif","jp2", "_param_levels", params);
+    }
+    @Test
+    public void testWithParam_tiles() throws IOException {
+        List<Parameter> params = new ArrayList<Parameter>();
+        Parameter parm = new Parameter.Builder("tiles", "100,100").build();
+        params.add(parm);
+        doMigration("tif", "jp2", "_param_tiles", params);
+    }
+    @Test
+    public void testWithParam_cblk() throws IOException {
+        List<Parameter> params = new ArrayList<Parameter>();
+        Parameter parm = new Parameter.Builder("cblk", "64,64").build();
+        params.add(parm);
+        doMigration("tif", "jp2", "_param_cblk", params);
+    }
+    @Test
+    public void testWithParam_order() throws IOException {
+        List<Parameter> params = new ArrayList<Parameter>();
+        Parameter parm = new Parameter.Builder("order", "LRCP").build();
+        params.add(parm);
+        doMigration("tif", "jp2", "_param_order", params);
+    }
+
+    @Test
+    public void testWithParam_all() throws IOException {
+        List<Parameter> params = new ArrayList<Parameter>();
+        Parameter parm1 = new Parameter.Builder("order", "LRCP").build();
+        Parameter parm2 = new Parameter.Builder("cblk", "64,64").build();
+        Parameter parm3 = new Parameter.Builder("tiles", "100,100").build();
+        Parameter parm4 = new Parameter.Builder("levels", "5").build();
+        Parameter parm5 = new Parameter.Builder("layers", "5").build();
+        Parameter parm6 = new Parameter.Builder("reversible", "true").build();
+        Parameter parm7 = new Parameter.Builder("rate", "1.3").build();
+        params.add(parm1);
+        params.add(parm2);
+        params.add(parm3);
+        params.add(parm4);
+        params.add(parm5);
+        params.add(parm6);
+        params.add(parm7);
+        doMigration("tif", "jp2", "_param_all", params);
+    }
 
     private void doMigration(String origExt, String destExt, String suffix, List<Parameter> params) throws IOException {
         // Test file name
