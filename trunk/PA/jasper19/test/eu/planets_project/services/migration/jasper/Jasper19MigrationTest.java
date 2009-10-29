@@ -104,6 +104,59 @@ public final class Jasper19MigrationTest extends TestCase {
         doMigration("jpg","jp2", "_param_rate", params);
     }
 
+
+    @Test
+    public void testWithParam_all()  throws IOException {
+        List<Parameter> params = new ArrayList<Parameter>();
+        Parameter parm1 = new Parameter.Builder("rate", "1.0").build();
+        params.add(parm1);
+        Parameter parm2 = new Parameter.Builder("numrlvls", "6").build();
+        params.add(parm2);
+        Parameter parm3 = new Parameter.Builder("imgareatlx", "100").build();
+        params.add(parm3);
+        Parameter parm4 = new Parameter.Builder("imgareatly", "100").build();
+        params.add(parm4);
+        Parameter parm5 = new Parameter.Builder("tilegrdtlx", "100").build();
+        params.add(parm5);
+        Parameter parm6 = new Parameter.Builder("tilegrdtly", "100").build();
+        params.add(parm6);
+        Parameter parm7 = new Parameter.Builder("tilewidth", "100").build();
+        params.add(parm7);
+        Parameter parm8 = new Parameter.Builder("tileheight", "100").build();
+        params.add(parm8);
+        Parameter parm9 = new Parameter.Builder("prcwidth", "32768").build();
+        params.add(parm9);
+        Parameter parm10 = new Parameter.Builder("prcheight", "32768").build();
+        params.add(parm10);
+        Parameter parm11 = new Parameter.Builder("cdblkwidth", "64").build();
+        params.add(parm11);
+        Parameter parm12 = new Parameter.Builder("cdblkheight", "64").build();
+        params.add(parm12);
+        Parameter parm13 = new Parameter.Builder("prg", "lrcp").build();
+        params.add(parm13);
+        Parameter parm14 = new Parameter.Builder("nomct", "true").build();
+        params.add(parm14);
+        Parameter parm15 = new Parameter.Builder("sop", "true").build();
+        params.add(parm15);
+        Parameter parm16 = new Parameter.Builder("eph", "true").build();
+        params.add(parm16);
+        Parameter parm17 = new Parameter.Builder("lazy", "true").build();
+        params.add(parm17);
+        Parameter parm18 = new Parameter.Builder("termall", "true").build();
+        params.add(parm18);
+        Parameter parm19 = new Parameter.Builder("segsym", "true").build();
+        params.add(parm19);
+        Parameter parm20 = new Parameter.Builder("vcausal", "true").build();
+        params.add(parm20);
+        Parameter parm21 = new Parameter.Builder("pterm", "true").build();
+        params.add(parm21);
+        Parameter parm22 = new Parameter.Builder("resetprob", "true").build();
+        params.add(parm22);
+        Parameter parm23 = new Parameter.Builder("numgbits", "6").build();
+        params.add(parm23);
+        doMigration("jpg","jp2", "_param_all", params);
+    }
+
     private void doMigration(String origExt, String destExt, String suffix, List<Parameter> params) throws IOException
     {
         // Test file name

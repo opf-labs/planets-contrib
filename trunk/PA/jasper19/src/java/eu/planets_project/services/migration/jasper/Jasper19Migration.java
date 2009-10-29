@@ -68,7 +68,7 @@ public final class Jasper19Migration implements Migrate {
     List<Parameter> serviceParametersList;
     List<Parameter> requestParametersList;
     StringBuffer serviceMessage = null;
-    Jasper19ServiceParameters kduServiceParameters = null;
+    Jasper19ServiceParameters jasperServiceParameters = null;
     /***/
     private static final long serialVersionUID = 2127494848765937613L;
 
@@ -108,7 +108,7 @@ public final class Jasper19Migration implements Migrate {
         formatMapping.put("pgm", "pnm");
         formatMapping.put("ppm", "pnm");
 
-        kduServiceParameters = new Jasper19ServiceParameters();
+        jasperServiceParameters = new Jasper19ServiceParameters();
     }
 
     /**
@@ -189,7 +189,7 @@ public final class Jasper19Migration implements Migrate {
         command.add(outputFmtExt);
         if( requestParametersList != null ) {
         for (Parameter requestParm : requestParametersList) {
-            ServiceParameter servParm = kduServiceParameters.getParameter(requestParm.getName());
+            ServiceParameter servParm = jasperServiceParameters.getParameter(requestParm.getName());
             if (servParm != null) {
                 servParm.setRequestValue(requestParm.getValue());
                 if (servParm.isValid()) {
@@ -342,20 +342,20 @@ public final class Jasper19Migration implements Migrate {
                 "http://www.jpeg.org/software");
         FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
         MigrationPath[] mPaths = new MigrationPath[]{
-            new MigrationPath(format.createExtensionUri("jpg"), format.createExtensionUri("jp2"), null),
-            new MigrationPath(format.createExtensionUri("bmp"), format.createExtensionUri("jp2"), null),
-            new MigrationPath(format.createExtensionUri("pgx"), format.createExtensionUri("jp2"), null),
-            new MigrationPath(format.createExtensionUri("pnm"), format.createExtensionUri("jp2"), null),
-            new MigrationPath(format.createExtensionUri("pgm"), format.createExtensionUri("jp2"), null),
-            new MigrationPath(format.createExtensionUri("ppm"), format.createExtensionUri("jp2"), null),
-            new MigrationPath(format.createExtensionUri("mif"), format.createExtensionUri("jp2"), null),
-            new MigrationPath(format.createExtensionUri("ras"), format.createExtensionUri("jp2"), null),
-            new MigrationPath(format.createExtensionUri("jpg"), format.createExtensionUri("jpc"), null),
-            new MigrationPath(format.createExtensionUri("bmp"), format.createExtensionUri("jpc"), null),
-            new MigrationPath(format.createExtensionUri("pgx"), format.createExtensionUri("jpc"), null),
-            new MigrationPath(format.createExtensionUri("pnm"), format.createExtensionUri("jpc"), null),
-            new MigrationPath(format.createExtensionUri("mif"), format.createExtensionUri("jpc"), null),
-            new MigrationPath(format.createExtensionUri("ras"), format.createExtensionUri("jpc"), null),
+            new MigrationPath(format.createExtensionUri("jpg"), format.createExtensionUri("jp2"), Jasper19ServiceParameters.getParameterList()),
+            new MigrationPath(format.createExtensionUri("bmp"), format.createExtensionUri("jp2"), Jasper19ServiceParameters.getParameterList()),
+            new MigrationPath(format.createExtensionUri("pgx"), format.createExtensionUri("jp2"), Jasper19ServiceParameters.getParameterList()),
+            new MigrationPath(format.createExtensionUri("pnm"), format.createExtensionUri("jp2"), Jasper19ServiceParameters.getParameterList()),
+            new MigrationPath(format.createExtensionUri("pgm"), format.createExtensionUri("jp2"), Jasper19ServiceParameters.getParameterList()),
+            new MigrationPath(format.createExtensionUri("ppm"), format.createExtensionUri("jp2"), Jasper19ServiceParameters.getParameterList()),
+            new MigrationPath(format.createExtensionUri("mif"), format.createExtensionUri("jp2"), Jasper19ServiceParameters.getParameterList()),
+            new MigrationPath(format.createExtensionUri("ras"), format.createExtensionUri("jp2"), Jasper19ServiceParameters.getParameterList()),
+            new MigrationPath(format.createExtensionUri("jpg"), format.createExtensionUri("jpc"), Jasper19ServiceParameters.getParameterList()),
+            new MigrationPath(format.createExtensionUri("bmp"), format.createExtensionUri("jpc"), Jasper19ServiceParameters.getParameterList()),
+            new MigrationPath(format.createExtensionUri("pgx"), format.createExtensionUri("jpc"), Jasper19ServiceParameters.getParameterList()),
+            new MigrationPath(format.createExtensionUri("pnm"), format.createExtensionUri("jpc"), Jasper19ServiceParameters.getParameterList()),
+            new MigrationPath(format.createExtensionUri("mif"), format.createExtensionUri("jpc"), Jasper19ServiceParameters.getParameterList()),
+            new MigrationPath(format.createExtensionUri("ras"), format.createExtensionUri("jpc"), Jasper19ServiceParameters.getParameterList()),
             new MigrationPath(format.createExtensionUri("jp2"), format.createExtensionUri("bmp"), null),
             new MigrationPath(format.createExtensionUri("jp2"), format.createExtensionUri("jpg"), null),
             new MigrationPath(format.createExtensionUri("jp2"), format.createExtensionUri("pgx"), null),
@@ -375,7 +375,6 @@ public final class Jasper19Migration implements Migrate {
         builder.paths(mPaths);
         builder.classname(this.getClass().getCanonicalName());
         builder.version("0.1");
-        builder.parameters(parameters);
 
         ServiceDescription mds = builder.build();
 
