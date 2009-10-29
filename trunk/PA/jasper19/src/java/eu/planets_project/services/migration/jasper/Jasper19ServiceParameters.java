@@ -112,34 +112,34 @@ public class Jasper19ServiceParameters {
 //        serviceParametersList.add(new BooleanParameter(ephParam,"-O eph", "true", "false"));
 
         
-        Parameter lazyParam = new Parameter.Builder("lazy", "false")
-                .description("Enable lazy coding mode (a.k.a. arithmetic coding bypass).").build();
-        serviceParametersList.add(new BooleanParameter(lazyParam,"-O lazy", "true", "false"));
-
-
-        Parameter termallParam = new Parameter.Builder("termall", "false")
-                .description("Terminate all coding passes.").build();
-        serviceParametersList.add(new BooleanParameter(termallParam,"-O termall", "true", "false"));
-        
-
-        Parameter segsymParam = new Parameter.Builder("segsym", "false")
-                .description("Use segmentation symbols.").build();
-        serviceParametersList.add(new BooleanParameter(segsymParam,"-O segsym", "true", "false"));
-
-
-        Parameter vcausalParam = new Parameter.Builder("vcausal", "false")
-                .description("Use vertically stripe causal contexts.").build();
-        serviceParametersList.add(new BooleanParameter(vcausalParam,"-O vcausal", "true", "false"));
-
-
-        Parameter ptermParam = new Parameter.Builder("pterm", "false")
-                .description("Use predictable termination.").build();
-        serviceParametersList.add(new BooleanParameter(ptermParam,"-O pterm", "true", "false"));
-        
-      
-        Parameter resetprobParam = new Parameter.Builder("resetprob", "false")
-                .description("Reset the probability models after each coding pass.").build();
-        serviceParametersList.add(new BooleanParameter(resetprobParam,"-O resetprob", "true", "false"));
+//        Parameter lazyParam = new Parameter.Builder("lazy", "false")
+//                .description("Enable lazy coding mode (a.k.a. arithmetic coding bypass).").build();
+//        serviceParametersList.add(new BooleanParameter(lazyParam,"-O lazy", "true", "false"));
+//
+//
+//        Parameter termallParam = new Parameter.Builder("termall", "false")
+//                .description("Terminate all coding passes.").build();
+//        serviceParametersList.add(new BooleanParameter(termallParam,"-O termall", "true", "false"));
+//
+//
+//        Parameter segsymParam = new Parameter.Builder("segsym", "false")
+//                .description("Use segmentation symbols.").build();
+//        serviceParametersList.add(new BooleanParameter(segsymParam,"-O segsym", "true", "false"));
+//
+//
+//        Parameter vcausalParam = new Parameter.Builder("vcausal", "false")
+//                .description("Use vertically stripe causal contexts.").build();
+//        serviceParametersList.add(new BooleanParameter(vcausalParam,"-O vcausal", "true", "false"));
+//
+//
+//        Parameter ptermParam = new Parameter.Builder("pterm", "false")
+//                .description("Use predictable termination.").build();
+//        serviceParametersList.add(new BooleanParameter(ptermParam,"-O pterm", "true", "false"));
+//
+//
+//        Parameter resetprobParam = new Parameter.Builder("resetprob", "false")
+//                .description("Reset the probability models after each coding pass.").build();
+//        serviceParametersList.add(new BooleanParameter(resetprobParam,"-O resetprob", "true", "false"));
 
 
         Parameter numgbitsParam = new Parameter.Builder("numgbits", "6")
