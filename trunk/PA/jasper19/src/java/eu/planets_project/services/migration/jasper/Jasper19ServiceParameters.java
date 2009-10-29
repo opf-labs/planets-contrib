@@ -75,27 +75,27 @@ public class Jasper19ServiceParameters {
                 .description("Set the cdblk height to this value. The argument h must be an integer power of two. The default value is 32768.").build();
         serviceParametersList.add(new IntegerParameter(cdblkheightParam, "-O cdblkheight=%s"));
 
-        Parameter prgParam = new Parameter.Builder("prg", "lrcp").description(
-                "Set the progression order to one of lrcp, rlcp, rpcl, pcrl, " +
-                "cprl. with the following meaning: lrcp is " +
-                "layer-resolution-component-position (LRCP) progressive " +
-                "(i.e., rate scalable), rlcp is " +
-                "resolution-layer-component-position (RLCP) progressive " +
-                "(i.e., resolution scalable), rpcl is " +
-                "resolution-position-component-layer (RPCL) progressive, " +
-                "pcrl is position-component-resolution-layer (PCRL) " +
-                "progressive, and cprl is component-position-resolution-layer " +
-                "(CPRL) progressive. By default, LRCP progressive ordering " +
-                "is employed. Note that the RPCL and PCRL progressions are " +
-                "not valid for all possible image geometries.").build();
-        RestrictedStringListParameter prgServiceParam =
-                new RestrictedStringListParameter(prgParam,"-O prg=%s");
-        prgServiceParam.add("lrcp");
-        prgServiceParam.add("rlcp");
-        prgServiceParam.add("rpcl");
-        prgServiceParam.add("pcrl");
-        prgServiceParam.add("cprl");
-        serviceParametersList.add(prgServiceParam);
+//        Parameter prgParam = new Parameter.Builder("prg", "lrcp").description(
+//                "Set the progression order to one of lrcp, rlcp, rpcl, pcrl, " +
+//                "cprl. with the following meaning: lrcp is " +
+//                "layer-resolution-component-position (LRCP) progressive " +
+//                "(i.e., rate scalable), rlcp is " +
+//                "resolution-layer-component-position (RLCP) progressive " +
+//                "(i.e., resolution scalable), rpcl is " +
+//                "resolution-position-component-layer (RPCL) progressive, " +
+//                "pcrl is position-component-resolution-layer (PCRL) " +
+//                "progressive, and cprl is component-position-resolution-layer " +
+//                "(CPRL) progressive. By default, LRCP progressive ordering " +
+//                "is employed. Note that the RPCL and PCRL progressions are " +
+//                "not valid for all possible image geometries.").build();
+//        RestrictedStringListParameter prgServiceParam =
+//                new RestrictedStringListParameter(prgParam,"-O prg=%s");
+//        prgServiceParam.add("lrcp");
+//        prgServiceParam.add("rlcp");
+//        prgServiceParam.add("rpcl");
+//        prgServiceParam.add("pcrl");
+//        prgServiceParam.add("cprl");
+//        serviceParametersList.add(prgServiceParam);
 
 
         Parameter nomctParam = new Parameter.Builder("nomct", "false")

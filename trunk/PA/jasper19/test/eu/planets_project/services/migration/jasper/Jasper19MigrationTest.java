@@ -132,8 +132,8 @@ public final class Jasper19MigrationTest extends TestCase {
         params.add(parm11);
         Parameter parm12 = new Parameter.Builder("cdblkheight", "64").build();
         params.add(parm12);
-        Parameter parm13 = new Parameter.Builder("prg", "lrcp").build();
-        params.add(parm13);
+//        Parameter parm13 = new Parameter.Builder("prg", "lrcp").build();
+//        params.add(parm13);
         Parameter parm14 = new Parameter.Builder("nomct", "true").build();
         params.add(parm14);
         Parameter parm15 = new Parameter.Builder("sop", "true").build();
