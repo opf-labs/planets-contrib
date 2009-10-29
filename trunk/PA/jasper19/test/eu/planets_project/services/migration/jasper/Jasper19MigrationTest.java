@@ -136,10 +136,10 @@ public final class Jasper19MigrationTest extends TestCase {
 //        params.add(parm13);
 //        Parameter parm14 = new Parameter.Builder("nomct", "true").build();
 //        params.add(parm14);
-        Parameter parm15 = new Parameter.Builder("sop", "true").build();
-        params.add(parm15);
-        Parameter parm16 = new Parameter.Builder("eph", "true").build();
-        params.add(parm16);
+//        Parameter parm15 = new Parameter.Builder("sop", "true").build();
+//        params.add(parm15);
+//        Parameter parm16 = new Parameter.Builder("eph", "true").build();
+//        params.add(parm16);
         Parameter parm17 = new Parameter.Builder("lazy", "true").build();
         params.add(parm17);
         Parameter parm18 = new Parameter.Builder("termall", "true").build();

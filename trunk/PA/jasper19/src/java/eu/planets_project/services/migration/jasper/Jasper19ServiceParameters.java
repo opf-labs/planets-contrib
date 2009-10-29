@@ -102,14 +102,14 @@ public class Jasper19ServiceParameters {
 //                .description("Disallow the use of any multicomponent transform.").build();
 //        serviceParametersList.add(new BooleanParameter(nomctParam,"-O nomct", "true", "false"));
 
-        Parameter sopParam = new Parameter.Builder("sop", "false")
-                .description("Generate SOP marker segments.").build();
-        serviceParametersList.add(new BooleanParameter(sopParam,"-O sop", "true", "false"));
-
-
-        Parameter ephParam = new Parameter.Builder("eph", "false")
-                .description("Generate EPH marker segments.").build();
-        serviceParametersList.add(new BooleanParameter(ephParam,"-O eph", "true", "false"));
+//        Parameter sopParam = new Parameter.Builder("sop", "false")
+//                .description("Generate SOP marker segments.").build();
+//        serviceParametersList.add(new BooleanParameter(sopParam,"-O sop", "true", "false"));
+//
+//
+//        Parameter ephParam = new Parameter.Builder("eph", "false")
+//                .description("Generate EPH marker segments.").build();
+//        serviceParametersList.add(new BooleanParameter(ephParam,"-O eph", "true", "false"));
 
         
         Parameter lazyParam = new Parameter.Builder("lazy", "false")
