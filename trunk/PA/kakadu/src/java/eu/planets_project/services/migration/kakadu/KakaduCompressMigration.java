@@ -72,7 +72,14 @@ public final class KakaduCompressMigration implements Migrate {
     private void init() {
         // input formats
         inputFormats = new ArrayList<String>();
+        // TIF, RAW, BMP, PBM, PGM and PPM
         inputFormats.add("tif");
+        inputFormats.add("raw");
+        inputFormats.add("bmp");
+        inputFormats.add("pbm");
+        inputFormats.add("pgm");
+        inputFormats.add("ppm");
+        
 
         // output formats and associated output parameters
         outputFormats = new ArrayList<String>();
@@ -319,8 +326,19 @@ public final class KakaduCompressMigration implements Migrate {
                 "inputfiles into one jpeg2000 file. But this service only supports" +
                 "the one tif input file to one jp2 output file migration.");
         FormatRegistry registry = FormatRegistryFactory.getFormatRegistry();
+
         MigrationPath[] mPaths = new MigrationPath[]{
             new MigrationPath(registry.createExtensionUri("tif"),
+            registry.createExtensionUri("jp2"), null),
+            new MigrationPath(registry.createExtensionUri("raw"),
+            registry.createExtensionUri("jp2"), null),
+            new MigrationPath(registry.createExtensionUri("bmp"),
+            registry.createExtensionUri("jp2"), null),
+            new MigrationPath(registry.createExtensionUri("pbm"),
+            registry.createExtensionUri("jp2"), null),
+            new MigrationPath(registry.createExtensionUri("pgm"),
+            registry.createExtensionUri("jp2"), null),
+            new MigrationPath(registry.createExtensionUri("ppm"),
             registry.createExtensionUri("jp2"), null)
         };
         builder.paths(mPaths);
