@@ -98,9 +98,9 @@ public class Jasper19ServiceParameters {
 //        serviceParametersList.add(prgServiceParam);
 
 
-        Parameter nomctParam = new Parameter.Builder("nomct", "false")
-                .description("Disallow the use of any multicomponent transform.").build();
-        serviceParametersList.add(new BooleanParameter(nomctParam,"-O nomct", "true", "false"));
+//        Parameter nomctParam = new Parameter.Builder("nomct", "false")
+//                .description("Disallow the use of any multicomponent transform.").build();
+//        serviceParametersList.add(new BooleanParameter(nomctParam,"-O nomct", "true", "false"));
 
         Parameter sopParam = new Parameter.Builder("sop", "false")
                 .description("Generate SOP marker segments.").build();
