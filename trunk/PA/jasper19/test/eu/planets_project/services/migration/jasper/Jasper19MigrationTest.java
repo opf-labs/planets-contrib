@@ -90,20 +90,28 @@ public final class Jasper19MigrationTest extends TestCase {
                 if( !origExt.equalsIgnoreCase(destExt) )
                 {
                     System.out.println("Do migration test from "+origExt+" to "+destExt);
-                    doMigration(origExt,destExt, null);
+                    doMigration(origExt,destExt,"", null);
                 }
             }
         }
     }
+    
+    @Test
+    public void testWithParam_reversible()  throws IOException {
+        List<Parameter> params = new ArrayList<Parameter>();
+        Parameter parm = new Parameter.Builder("rate", "1.0").build();
+        params.add(parm);
+        doMigration("jpg","jp2", "_param_rate", params);
+    }
 
-    private void doMigration(String origExt, String destExt, List<Parameter> params) throws IOException
+    private void doMigration(String origExt, String destExt, String suffix, List<Parameter> params) throws IOException
     {
         // Test file name
         String inTestFileName = "PA/jasper19/test/testfiles/demonstration." + origExt.toLowerCase();
         // Output file name
         //String outTestFileName = "PA/jasper19/test/testfiles/generatedfiles/planetsMigrate"+origExt+"to"+destExt+String.valueOf(cycle)+"."+destExt.toLowerCase();
         String resFileDir = "PA/jasper19/test/testfiles/generatedfiles/";
-        String resFileName = "planetsMigrate"+origExt.toUpperCase()+"to"+destExt.toUpperCase()+"."+destExt.toLowerCase();
+        String resFileName = "planetsMigrate"+origExt.toUpperCase()+"to"+destExt.toUpperCase() + suffix+"."+destExt.toLowerCase();
         byte[] binary = FileUtils.readFileIntoByteArray(new File(inTestFileName));
         DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
         FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
