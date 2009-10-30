@@ -111,7 +111,8 @@ public final class Gimp26Migration implements Migrate {
         outputFormats.add("TIFF");
         // options: none
         // defaults: 
-        outputFormats.add("BMP"); 
+        outputFormats.add("BMP");
+        outputFormats.add("PNM");
         
         // Disambiguation of extensions, e.g. {"JPG","JPEG"} to {"JPEG"}
         // FIXIT This should be supported by the FormatRegistryImpl class, but
@@ -119,6 +120,9 @@ public final class Gimp26Migration implements Migrate {
         formatMapping = new HashMap<String, String>();
         formatMapping.put("JPG","JPEG");
         formatMapping.put("TIF","TIFF");
+        formatMapping.put("PPM","PNM");
+        formatMapping.put("PBM","PNM");
+        formatMapping.put("PGM","PNM");
     }
     
     private void getExtensions(URI inputFormat, URI outputFormat)
@@ -289,6 +293,12 @@ public final class Gimp26Migration implements Migrate {
         Parameter pngDummyParam = new Parameter.Builder("bmp-dummy", "").description("BMP-Parameter: BMP Conversion has no parameters").build();
         bmpParameterList.add(pngDummyParam);
         defaultParameters.put("BMP", bmpParameterList);
+
+        // PNM
+        List<Parameter> pnmParameterList = new ArrayList<Parameter>();
+        Parameter pnmRawParam = new Parameter.Builder("pnm-raw", "1").description("PNM-Parameter: 1 means 'Save raw' and 0 means 'Save ASCII'").build();
+        pnmParameterList.add(pnmRawParam);
+        defaultParameters.put("PNM", pnmParameterList);
     }
     
     private void overrideDefaultParamets(List<Parameter> userParams)
@@ -587,7 +597,10 @@ public final class Gimp26Migration implements Migrate {
                 URI outFmt = registry.createExtensionUri(output);
                 MigrationPath path = new MigrationPath(inFmt,outFmt, null);
                 if( !(inFmt.toString().equals(outFmt.toString())) )
-                    paths.add(path);
+                {
+                    if(!(outFmt.toString().equals("PNM") && !(inFmt.toString().equals("TIF"))))
+                        paths.add(path);
+                }
             }
         }
         return paths.toArray(new MigrationPath[]{});
