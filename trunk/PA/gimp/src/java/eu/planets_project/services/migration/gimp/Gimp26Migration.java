@@ -598,7 +598,7 @@ public final class Gimp26Migration implements Migrate {
                 MigrationPath path = new MigrationPath(inFmt,outFmt, null);
                 if( !(inFmt.toString().equals(outFmt.toString())) )
                 {
-                    if(!(outFmt.toString().equals("PNM") && !(inFmt.toString().equals("TIF"))))
+                    if(!(outFmt.toString().equals("PNM") && !(inFmt.toString().equals("TIFF"))))
                         paths.add(path);
                 }
             }
