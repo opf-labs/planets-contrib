@@ -97,7 +97,7 @@ public final class Jasper19MigrationTest extends TestCase {
     }
     
     @Test
-    public void testWithParam_reversible()  throws IOException {
+    public void testWithParam_rate()  throws IOException {
         List<Parameter> params = new ArrayList<Parameter>();
         Parameter parm = new Parameter.Builder("rate", "1.0").build();
         params.add(parm);
