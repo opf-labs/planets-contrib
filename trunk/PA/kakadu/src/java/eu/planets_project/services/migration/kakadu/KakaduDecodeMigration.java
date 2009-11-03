@@ -76,7 +76,13 @@ public final class KakaduDecodeMigration implements Migrate {
 
         // output formats and associated output parameters
         outputFormats = new ArrayList<String>();
+        // TIF, RAW, BMP, PBM, PGM and PPM
         outputFormats.add("tif");
+        outputFormats.add("raw");
+        outputFormats.add("bmp");
+        outputFormats.add("pbm");
+        outputFormats.add("pgm");
+        outputFormats.add("ppm");
 
         // Disambiguation of extensions, e.g. {"JPG","JPEG"} to {"JPEG"}
         // FIXIT This should be supported by the FormatRegistryImpl class, but
@@ -322,8 +328,19 @@ public final class KakaduDecodeMigration implements Migrate {
         FormatRegistry registry = FormatRegistryFactory.getFormatRegistry();
         MigrationPath[] mPaths = new MigrationPath[]{
             new MigrationPath(registry.createExtensionUri("jp2"),
-            registry.createExtensionUri("tif"), null)
+            registry.createExtensionUri("tif"), null),
+            new MigrationPath(registry.createExtensionUri("jp2"),
+            registry.createExtensionUri("raw"), null),
+            new MigrationPath(registry.createExtensionUri("jp2"),
+            registry.createExtensionUri("bmp"), null),
+            new MigrationPath(registry.createExtensionUri("jp2"),
+            registry.createExtensionUri("pbm"), null),
+            new MigrationPath(registry.createExtensionUri("jp2"),
+            registry.createExtensionUri("pgm"), null),
+            new MigrationPath(registry.createExtensionUri("jp2"),
+            registry.createExtensionUri("ppm"), null)
         };
+
         builder.paths(mPaths);
         builder.classname(this.getClass().getCanonicalName());
         builder.version("0.1");
