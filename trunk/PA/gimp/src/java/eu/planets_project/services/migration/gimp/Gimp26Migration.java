@@ -85,6 +85,7 @@ public final class Gimp26Migration implements Migrate {
         inputFormats.add("PS");
         inputFormats.add("TIFF");
         inputFormats.add("BMP");
+        inputFormats.add("PNM");
         
         // output formats and associated output parameters
         outputFormats = new ArrayList<String>();
@@ -598,7 +599,7 @@ public final class Gimp26Migration implements Migrate {
                 MigrationPath path = new MigrationPath(inFmt,outFmt, null);
                 if( !(inFmt.toString().equals(outFmt.toString())) )
                 {
-                    if(!(outFmt.toString().equals("PNM") && !(inFmt.toString().equals("TIFF"))))
+                    if(!((inFmt.toString().equals("PNM") && !(outFmt.toString().equals("TIFF")))))
                         paths.add(path);
                 }
             }
