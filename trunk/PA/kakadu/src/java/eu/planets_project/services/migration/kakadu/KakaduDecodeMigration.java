@@ -324,7 +324,21 @@ public final class KakaduDecodeMigration implements Migrate {
                 "KDU_INCLUDE_TIFF defined, and link it against the public-domain " +
                 "LIBTIFF library. Furthermore, it is possible to create various" +
                 "outputfiles from one jpeg2000 file. But this service only supports" +
-                "the one jp2 input file to one tif output file migration.");
+                "the one jp2 input file to one tif output file migration."+
+                "IMPORTANT: " +
+                "The license conditions for this web service apply as if you" +
+                "were downloading and using the kakadu executables locally. " +
+                "KAKADU LICENSE NOTE: " +
+                "Copyright is owned by NewSouth Innovations Proprietary Ltd, " +
+                "commercial arm of the University of New South Wales, Sydney, " +
+                "Australia. You are free to play around with these executables " +
+                "and even to re-distribute them, so long as such use or " +
+                "re-distribution is accompanied this copyright notice and is " +
+                "not for commercial gain. Note: Binaries can only be used " +
+                "for non-commercial purposes. If in doubt please contact " +
+                "Dr. Taubman." +
+                "Notice: Using this web service, you are acknowledging and " +
+                "accepting these terms and conditions. ");
         FormatRegistry registry = FormatRegistryFactory.getFormatRegistry();
         MigrationPath[] mPaths = new MigrationPath[]{
             new MigrationPath(registry.createExtensionUri("jp2"),
