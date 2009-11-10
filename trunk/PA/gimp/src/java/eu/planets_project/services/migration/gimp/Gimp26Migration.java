@@ -420,12 +420,12 @@ public final class Gimp26Migration implements Migrate {
             if (return_code != 0) {
                 log.error("Gimp conversion error code: " + Integer.toString(return_code));
             }
-
+            
             // read byte array from temporary file
             if (tmpOutFile.isFile() && tmpOutFile.canRead()) {
                 binary = FileUtils.readFileIntoByteArray(tmpOutFile);
             } else {
-                log.error("Error: Unable to read temporary file " + tmpInFile.getPath() + tmpInFile.getName());
+                log.error("Error: Unable to read temporary file " + tmpOutFile.getAbsolutePath());
             }
         }
         
