@@ -109,6 +109,8 @@ public final class Jasper19Migration implements Migrate {
         formatMapping.put("ppm", "pnm");
 
         jasperServiceParameters = new Jasper19ServiceParameters();
+
+        serviceMessage = new StringBuffer();
     }
 
     /**
@@ -130,6 +132,7 @@ public final class Jasper19Migration implements Migrate {
             URI outputFormat, List<Parameter> parameters) {
             requestParametersList = parameters;
         Properties props = new Properties();
+
         try {
 
             String strRsc = "/eu/planets_project/services/migration/jasper19/jasper19.properties";
@@ -160,11 +163,16 @@ public final class Jasper19Migration implements Migrate {
         byte[] binary = null;
         InputStream inputStream = digitalObject.getContent().read();
 
+        DigitalObject newDO = null;
+        ServiceReport report = null;
+
         // write input stream to temporary file
         tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets", inputFmtExt);
         if (!(tmpInFile.exists() && tmpInFile.isFile() && tmpInFile.canRead())) {
-            log.error("[Jasper19Migration] Unable to create temporary input file!");
-            return null;
+            String msg = "Error: Unable to create temporary input file " + tmpInFile.getAbsolutePath();
+            log.error(msg);
+            report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
+            return new MigrateResult(null, report);
         }
         log.info("[Jasper19Migration] Temporary input file created: " + tmpInFile.getAbsolutePath());
 
@@ -204,14 +212,21 @@ public final class Jasper19Migration implements Migrate {
         }
         runner.setCommand(command);
         runner.setInputStream(inputStream);
-        log.info("[Jasper19Migration] Executing command: " + command.toString() + " ...");
+        log.info("Executing command: " + command.toString() + " ...");
         runner.run();
         int return_code = runner.getReturnCode();
         if (return_code != 0) {
-            log.error("[Jasper19Migration] Jasper conversion error code: " + Integer.toString(return_code));
-            log.error("[Jasper19Migration] " + runner.getProcessErrorAsString());
-            //log.error("[Jasper19Migration] Output: "+runner.getProcessOutputAsString());
-            return null;
+            String errMsg = "Jasper conversion error code: " + Integer.toString(return_code) +
+                    ". Jasper error message: "+runner.getProcessErrorAsString();
+            log.error(errMsg);
+            String msg = null;
+            if(serviceMessage.toString().equals("")) {
+                msg = errMsg;
+            } else {
+                msg = "Service message(s): "+serviceMessage.toString()+". "+errMsg;
+            }
+            report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
+            return new MigrateResult(null, report);
         }
 
         tmpOutFile = new File(outFileStr);
@@ -219,13 +234,15 @@ public final class Jasper19Migration implements Migrate {
         if (tmpOutFile.isFile() && tmpOutFile.canRead()) {
             binary = FileUtils.readFileIntoByteArray(tmpOutFile);
         } else {
-            log.error("Error: Unable to read temporary file " + tmpOutFile.getAbsolutePath());
+            String msg = "Error: Unable to read temporary file " + tmpOutFile.getAbsolutePath();
+            log.error(msg);
+            report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
+            return new MigrateResult(null, report);
         }
 
-        DigitalObject newDO = null;
+        
 
-        ServiceReport report = new ServiceReport(Type.INFO, Status.SUCCESS, "OK "+serviceMessage);
-
+        report = new ServiceReport(Type.INFO, Status.SUCCESS, "OK "+serviceMessage);
         newDO = new DigitalObject.Builder(Content.byValue(binary)).build();
 
         return new MigrateResult(newDO, report);
