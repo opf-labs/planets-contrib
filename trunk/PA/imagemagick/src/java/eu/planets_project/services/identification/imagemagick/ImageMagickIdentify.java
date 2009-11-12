@@ -14,9 +14,6 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 
-import magick.ImageInfo;
-import magick.MagickException;
-import magick.MagickImage;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
@@ -33,7 +30,6 @@ import eu.planets_project.services.identify.IdentifyResult;
 import eu.planets_project.services.migration.imagemagick.CoreImageMagick;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.PlanetsLogger;
-import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.utils.ServiceUtils;
 
 /**

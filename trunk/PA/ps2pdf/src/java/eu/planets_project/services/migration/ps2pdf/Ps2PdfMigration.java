@@ -42,7 +42,12 @@ import eu.planets_project.ifr.core.services.migration.genericwrapper1.utils.Docu
         endpointInterface = "eu.planets_project.services.migrate.Migrate")
 public class Ps2PdfMigration implements Migrate, Serializable {
 
-    PlanetsLogger log = PlanetsLogger.getLogger(Ps2PdfMigration.class);
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4329827996540798228L;
+
+	PlanetsLogger log = PlanetsLogger.getLogger(Ps2PdfMigration.class);
 
     /**
      * The service name.

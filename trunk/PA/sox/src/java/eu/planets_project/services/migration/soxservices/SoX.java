@@ -5,7 +5,6 @@ package eu.planets_project.services.migration.soxservices;
 
 import java.io.File;
 import java.io.Serializable;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -79,7 +79,7 @@ public class GraphicsMagickMigrateTest {
      */
     @Test
     public void testDescribe() {
-    	System.out.println("running Service at: " + graphicsMagick.QNAME);
+    	System.out.println("running Service at: " + Migrate.QNAME);
         ServiceDescription desc = graphicsMagick.describe();
         System.out.println("Recieved service description: " + desc.toXmlFormatted());
         assertTrue("The ServiceDescription should not be NULL.", desc != null );

@@ -80,7 +80,7 @@ public class Im4JavaImageMagickMigrateTests {
      */
     @Test
     public void testDescribe() {
-    	System.out.println("running Service at: " + imageMagick.QNAME);
+    	System.out.println("running Service at: " + Migrate.QNAME);
         ServiceDescription desc = imageMagick.describe();
         System.out.println("Recieved service description: " + desc.toXmlFormatted());
         assertTrue("The ServiceDescription should not be NULL.", desc != null );

@@ -42,7 +42,12 @@ import eu.planets_project.ifr.core.services.migration.genericwrapper1.utils.Docu
         endpointInterface = "eu.planets_project.services.migrate.Migrate")
 public class NetPbmMigration implements Migrate, Serializable {
 
-    PlanetsLogger log = PlanetsLogger.getLogger(NetPbmMigration.class);
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1446819389925183217L;
+
+	PlanetsLogger log = PlanetsLogger.getLogger(NetPbmMigration.class);
 
     /**
      * The service name.

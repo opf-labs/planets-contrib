@@ -43,7 +43,7 @@ public class ImageMagickRotateTest {
 	 */
 	@Test
 	public void testDescribe() {
-		System.out.println("running Service at: " + im_rotate.QNAME);
+		System.out.println("running Service at: " + Modify.QNAME);
 	    ServiceDescription desc = im_rotate.describe();
 	    System.out.println("Recieved service description: " + desc.toXmlFormatted());
 	    assertTrue("The ServiceDescription should not be NULL.", desc != null );

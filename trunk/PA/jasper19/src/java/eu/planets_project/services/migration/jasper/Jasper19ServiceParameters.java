@@ -4,10 +4,10 @@
  */
 package eu.planets_project.services.migration.jasper;
 
-import eu.planets_project.services.migration.*;
-import eu.planets_project.services.datatypes.Parameter;
 import java.util.ArrayList;
 import java.util.List;
+
+import eu.planets_project.services.datatypes.Parameter;
 
 /**
  *

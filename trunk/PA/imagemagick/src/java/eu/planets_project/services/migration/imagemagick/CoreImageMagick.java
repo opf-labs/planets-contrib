@@ -17,7 +17,6 @@ import org.apache.commons.logging.LogFactory;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
-import org.im4java.core.IdentifyCmd;
 import org.im4java.settings.IMGlobalSettings;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
