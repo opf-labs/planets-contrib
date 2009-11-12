@@ -85,7 +85,7 @@ public final class ShotgunModify implements Modify {
     }
 
     private DigitalObject modify(DigitalObject digitalObject, int seqCount, int seqLength, String action) {
-        File inputFile = DigitalObjectUtils.getContentAsTempFile(digitalObject);
+        File inputFile = DigitalObjectUtils.getAsTmpFile(digitalObject);
         File outputFile = new FileShotgun().shoot(inputFile, seqCount, seqLength, Action.valueOf(action));
         return new DigitalObject.Builder(Content.byValue(outputFile)).build();
     }

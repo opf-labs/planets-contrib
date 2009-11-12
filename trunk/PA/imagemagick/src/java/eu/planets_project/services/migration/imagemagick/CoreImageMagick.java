@@ -221,7 +221,7 @@ public class CoreImageMagick {
         File outputFile;
 
         plogger.info("Writing content to temp file.");
-		inputFile = new File(imageMagickTmpFolder, FileUtils.randomizeFileName(DigitalObjectUtils.getFileNameFromDigitalObject(digOb, inputFormat)));
+		inputFile = new File(imageMagickTmpFolder, FileUtils.randomizeFileName(DigitalObjectUtils.getFileNameFromDigObject(digOb, inputFormat)));
 		
 		if(inputFile.exists()) {
 			plogger.info("PLEASE NOTE: Input file with same name already exists. Deleting old file: " + inputFile.getName());
@@ -343,7 +343,7 @@ public class CoreImageMagick {
 	    File outputFile;
 	
 	    plogger.info("Writing content to temp file.");
-		inputFile = new File(imageMagickTmpFolder, FileUtils.randomizeFileName(DigitalObjectUtils.getFileNameFromDigitalObject(digOb, inputFormat)));
+		inputFile = new File(imageMagickTmpFolder, FileUtils.randomizeFileName(DigitalObjectUtils.getFileNameFromDigObject(digOb, inputFormat)));
 		if(inputFile.exists()) {
 			plogger.info("PLEASE NOTE: Input file with same name already exists. Deleting old file: " + inputFile.getName());
 			inputFile.delete();
@@ -583,7 +583,7 @@ public class CoreImageMagick {
 	}
 
 	private String getInputFileName(DigitalObject digOb, URI inputFormat) {
-		String title = DigitalObjectUtils.getFileNameFromDigitalObject(digOb, inputFormat);
+		String title = DigitalObjectUtils.getFileNameFromDigObject(digOb, inputFormat);
 		
 //		if(title==null || title.equals("")) {
 //			String inputExt = formatRegistry.getFirstExtension(inputFormat);

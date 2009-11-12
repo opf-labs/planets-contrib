@@ -169,7 +169,7 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 	 * @return the created file
 	 */
 	private File getInputFileFromDigitalObject(DigitalObject digObj, URI inputFormat, File destFolder) {
-		String inName = DigitalObjectUtils.getFileNameFromDigitalObject(digObj, inputFormat);
+		String inName = DigitalObjectUtils.getFileNameFromDigObject(digObj, inputFormat);
 		File in = new File(destFolder, inName);
 		FileUtils.writeInputStreamToFile(digObj.getContent().read(), in);
 		in = FileUtils.truncateNameAndRenameFile(in);
@@ -185,7 +185,7 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 	 * @return the name of the file inside the DigObj as a String
 	 */
 	private String getFileNameFromDigitalObject(DigitalObject digObj, URI inputFormat) {
-		String fileName = DigitalObjectUtils.getFileNameFromDigitalObject(digObj, inputFormat);
+		String fileName = DigitalObjectUtils.getFileNameFromDigObject(digObj, inputFormat);
 		return fileName;
 	}
 	
