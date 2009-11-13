@@ -11,8 +11,13 @@ import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 
+import eu.planets_project.ifr.core.services.migration.genericwrapper1.GenericMigrationWrapper;
+import eu.planets_project.ifr.core.services.migration.genericwrapper1.exceptions.MigrationInitialisationException;
+import eu.planets_project.ifr.core.services.migration.genericwrapper1.utils.DocumentLocator;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameter;
@@ -22,10 +27,6 @@ import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.PlanetsLogger;
-import eu.planets_project.ifr.core.services.migration.genericwrapper1.GenericMigrationWrapper;
-import eu.planets_project.ifr.core.services.migration.genericwrapper1.exceptions.MigrationInitialisationException;
-import eu.planets_project.ifr.core.services.migration.genericwrapper1.utils.DocumentLocator;
 
 /**
  * The class migrates between a number of formats
@@ -42,12 +43,7 @@ import eu.planets_project.ifr.core.services.migration.genericwrapper1.utils.Docu
         endpointInterface = "eu.planets_project.services.migrate.Migrate")
 public class Ps2PdfMigration implements Migrate, Serializable {
 
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 4329827996540798228L;
-
-	PlanetsLogger log = PlanetsLogger.getLogger(Ps2PdfMigration.class);
+    Log log = LogFactory.getLog(Ps2PdfMigration.class);
 
     /**
      * The service name.

@@ -13,6 +13,8 @@ import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jboss.annotation.ejb.TransactionTimeout;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
@@ -33,7 +35,6 @@ import eu.planets_project.services.migration.dioscuri.utils.DioscuriWrapper;
 import eu.planets_project.services.migration.dioscuri.utils.DioscuriWrapperResult;
 import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ServiceUtils;
 import eu.planets_project.services.utils.ZipResult;
 import eu.planets_project.services.utils.ZipUtils;
@@ -55,7 +56,7 @@ import eu.planets_project.services.utils.ZipUtils;
 @TransactionTimeout(6000)
 public class DioscuriArjMigration implements Migrate, Serializable {
 	
-	private PlanetsLogger log = PlanetsLogger.getLogger(this.getClass()); 
+	private Log log = LogFactory.getLog(this.getClass()); 
 	private static final long serialVersionUID = 7520484154909390134L;
 
 	public static final String NAME = "DioscuriArjMigration";

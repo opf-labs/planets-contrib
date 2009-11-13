@@ -9,9 +9,11 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
-import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
 
 /**
@@ -25,7 +27,7 @@ public class ImageMagickHelper {
 	private static List<URI> inFormats = null;
 	private static List<URI> outFormats = null;
 	
-	private static PlanetsLogger log = PlanetsLogger.getLogger(ImageMagickHelper.class) ; 
+	private static Log log = LogFactory.getLog(ImageMagickHelper.class) ; 
 	
 	private static void init() {
 //		String os = System.getProperty("os.name").toUpperCase();

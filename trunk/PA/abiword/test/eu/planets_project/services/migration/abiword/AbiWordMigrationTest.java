@@ -8,20 +8,21 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
-import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.test.ServiceCreator;
 
 /**
@@ -34,7 +35,7 @@ public final class AbiWordMigrationTest extends TestCase {
     /* The location of this service when deployed. */
     String wsdlLoc = "/pserv-pa-abiword/AbiWordMigration?wsdl";
 
-    PlanetsLogger log = PlanetsLogger.getLogger(AbiWordMigrationTest.class);
+    Log log = LogFactory.getLog(AbiWordMigrationTest.class);
 
     /* A holder for the object to be tested */
     Migrate dom = null;

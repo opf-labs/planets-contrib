@@ -26,8 +26,11 @@ import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 
-import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
@@ -40,7 +43,6 @@ import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.utils.ServiceUtils;
 
@@ -75,7 +77,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	private static final long serialVersionUID = 2127494848765937613L;
 
 	/** data members */
-	PlanetsLogger log = PlanetsLogger.getLogger(Mdb2SiardMigrate.class);
+	Log log = LogFactory.getLog(Mdb2SiardMigrate.class);
 	
 	public Mdb2SiardMigrate() {
 		SIARD_TMP = FileUtils.createFolderInWorkFolder(FileUtils.getPlanetsTmpStoreFolder(), SIARD_TMP_NAME);

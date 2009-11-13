@@ -12,10 +12,11 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-//import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 
 import com.sun.star.beans.PropertyValue;
@@ -27,7 +28,6 @@ import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.uno.UnoRuntime;
 
 import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.PlanetsLogger;
 
 /**
  * @author <a href="mailto:Andrew.Jackson@bl.uk">Andy Jackson</a>
@@ -35,7 +35,7 @@ import eu.planets_project.services.utils.PlanetsLogger;
  */
 public class XenaOOMigrations {
 
-    PlanetsLogger log = PlanetsLogger.getLogger(XenaOOMigrations.class);
+    Log log = LogFactory.getLog(XenaOOMigrations.class);
     /*
      * Code from the Xena project.
      */

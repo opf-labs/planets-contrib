@@ -17,11 +17,14 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
+import javax.xml.ws.BindingType;
 
 import magick.ImageInfo;
 import magick.MagickException;
 import magick.MagickImage;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
@@ -44,7 +47,6 @@ import eu.planets_project.services.migration.imagemagick.CoreImageMagick;
 import eu.planets_project.services.modify.Modify;
 import eu.planets_project.services.modify.ModifyResult;
 import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ServiceUtils;
 
 /**
@@ -55,7 +57,7 @@ import eu.planets_project.services.utils.ServiceUtils;
 @Stateless
 @Local(Modify.class)
 @Remote(Modify.class)
-
+@BindingType(value = "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")
 @WebService(name = ImageMagickCrop.NAME, 
         serviceName = Modify.NAME, 
         targetNamespace = PlanetsServices.NS,
@@ -64,7 +66,7 @@ public class ImageMagickCrop implements Modify {
 	
 	public static final String NAME = "ImageMagickCrop";
 	
-	private PlanetsLogger PLOGGER = PlanetsLogger.getLogger(this.getClass()) ;
+	private Log PLOGGER = LogFactory.getLog(this.getClass()) ;
 	
 	private String workFolderName = "IMAGEMAGICK_CROP_TMP";
 //	private File work_folder = FileUtils.createWorkFolderInSysTemp(workFolderName);

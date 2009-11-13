@@ -1,11 +1,5 @@
 package eu.planets_project.services.migration.dioscuri.utils;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.jboss.annotation.ejb.TransactionTimeout;
-
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.datatypes.Checksum;
@@ -17,11 +11,15 @@ import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelper;
 import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelperFactory;
-import eu.planets_project.services.utils.DigitalObjectUtils;
-import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.PlanetsLogger;
-import eu.planets_project.services.utils.ProcessRunner;
-import eu.planets_project.services.utils.ZipUtils;
+import eu.planets_project.services.utils.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.jboss.annotation.ejb.TransactionTimeout;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @TransactionTimeout(6000)
@@ -34,7 +32,7 @@ public class DioscuriWrapper {
 		log.info("Installed OS: " + OS_NAME + ", Version: " + OS_VERSION + ", Architecture: " + OS_ARCHITECTURE);
 	}
 	
-	private PlanetsLogger log = PlanetsLogger.getLogger(this.getClass());
+	private Log log = LogFactory.getLog(this.getClass());
 	
 	private String DIOSCURI_HOME = System.getenv("DIOSCURI_HOME");
 //	private String DIOSCURI_HOME = "D:/PLANETS/DIOSCURI_HOME"; // TESTING

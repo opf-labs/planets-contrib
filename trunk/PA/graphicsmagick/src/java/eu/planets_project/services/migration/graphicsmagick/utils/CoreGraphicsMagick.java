@@ -29,6 +29,8 @@ public class CoreGraphicsMagick {
 	private static List<URI> inFormats = null;
 	private static List<URI> outFormats = null;
 	
+	private static String version = null;
+	
 	public GraphicsMagickResult convert(File inputFile, File outputFolder, String outFormatExtension, String compressionType, int imageQuality) {
 		String outFileName = FileUtils.getOutputFileNameFor(inputFile.getName(), outFormatExtension);
 		File outputFile = new File(outputFolder, outFileName);
@@ -58,7 +60,7 @@ public class CoreGraphicsMagick {
 	}
 	
 	
-	public GraphicsMagickResult identify(File inputFile) {
+	public static GraphicsMagickResult identify(File inputFile) {
 		ProcessRunner identify = new ProcessRunner(getIdentifyCmd(inputFile));
 		identify.run();
 		String out = identify.getProcessOutputAsString();
@@ -77,6 +79,29 @@ public class CoreGraphicsMagick {
 			result.setErrorMsg(error);
 			return result;
 		}
+	}
+	
+	public static String getVersion() {
+		if(version!=null) {
+			return version;
+		}
+		
+		ProcessRunner gm_version = new ProcessRunner(getVersionCommand());
+		gm_version.run();
+		String out = gm_version.getProcessOutputAsString();
+		String error = gm_version.getProcessErrorAsString();
+		
+		version = "unknown";
+		
+		if(out!=null && !out.equalsIgnoreCase("")) {
+			String[] parts = out.split(" ", 5);
+			version = parts[1] + " " + parts[2] + " " + parts[3];
+			return version;
+		}
+		else {
+			log.error("[CoreGraphicsMagick] Sorry, cannot retrieve GraphicsMagick version: " + error);
+		}
+		return version;
 	}
 	
 	public static List<URI> getSupportedInputFormats() {
@@ -106,7 +131,7 @@ public class CoreGraphicsMagick {
 		return command;
 	}
 
-	private List<String> getIdentifyCmd(File inputFile) {
+	private static List<String> getIdentifyCmd(File inputFile) {
 		List<String> command = new ArrayList<String>();
 		command.add("gm");
 		command.add("identify");
@@ -168,6 +193,13 @@ public class CoreGraphicsMagick {
 		commands.add("convert");
 		commands.add("-list");
 		commands.add("format");
+		return commands;
+	}
+	
+	private static List<String> getVersionCommand(){
+		List<String> commands = new ArrayList<String>();
+		commands.add("gm");
+		commands.add("version");
 		return commands;
 	}
 

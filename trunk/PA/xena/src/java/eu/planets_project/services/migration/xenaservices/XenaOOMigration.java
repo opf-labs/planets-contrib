@@ -12,11 +12,14 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
@@ -26,7 +29,6 @@ import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.PlanetsLogger;
 
 /**
  * @author Georg Petz <georg.petz@onb.ac.at> *
@@ -75,7 +77,7 @@ public class XenaOOMigration implements Migrate, Serializable {
             }
         }
     };
-    PlanetsLogger log = PlanetsLogger.getLogger(XenaOOMigration.class);
+    Log log = LogFactory.getLog(XenaOOMigration.class);
     private static final long serialVersionUID = 3952711367037433051L;
     static final String NAME = "XenaOOMigration";
 

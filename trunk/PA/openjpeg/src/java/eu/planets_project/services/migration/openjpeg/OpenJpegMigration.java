@@ -18,11 +18,14 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
@@ -32,7 +35,6 @@ import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
 
 
@@ -51,7 +53,7 @@ import eu.planets_project.services.utils.ProcessRunner;
         endpointInterface = "eu.planets_project.services.migrate.Migrate" )
 public final class OpenJpegMigration implements Migrate {
 
-    PlanetsLogger log = PlanetsLogger.getLogger(OpenJpegMigration.class);
+    Log log = LogFactory.getLog(OpenJpegMigration.class);
 
 
     /** The dvi ps installation dir */

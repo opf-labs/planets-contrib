@@ -3,7 +3,16 @@
  */
 package eu.planets_project.services.migration.graphicsmagick;
 
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
+import eu.planets_project.services.datatypes.*;
+import eu.planets_project.services.migrate.Migrate;
+import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.test.ServiceCreator;
 import static org.junit.Assert.assertTrue;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,21 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
-import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
-import eu.planets_project.services.datatypes.Content;
-import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.ServiceDescription;
-import eu.planets_project.services.datatypes.ServiceReport;
-import eu.planets_project.services.migrate.Migrate;
-import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.test.ServiceCreator;
 
 /**
  * @author melmsp
@@ -79,7 +73,7 @@ public class GraphicsMagickMigrateTest {
      */
     @Test
     public void testDescribe() {
-    	System.out.println("running Service at: " + Migrate.QNAME);
+    	System.out.println("running Service at: " + graphicsMagick.QNAME);
         ServiceDescription desc = graphicsMagick.describe();
         System.out.println("Recieved service description: " + desc.toXmlFormatted());
         assertTrue("The ServiceDescription should not be NULL.", desc != null );

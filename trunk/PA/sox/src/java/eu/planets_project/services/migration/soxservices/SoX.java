@@ -16,6 +16,9 @@ import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
@@ -32,7 +35,6 @@ import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.migration.soxservices.utils.SoXHelper;
 import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.utils.ServiceUtils;
 
@@ -75,7 +77,7 @@ public class SoX implements Migrate, Serializable {
 	private static String sox_version = SoXHelper.getVersion();
 	private static String sox_help = SoXHelper.getHelpText();
 	
-	private PlanetsLogger plogger = PlanetsLogger.getLogger(this.getClass());
+	private Log plogger = LogFactory.getLog(this.getClass());
 	
 	
 	/**

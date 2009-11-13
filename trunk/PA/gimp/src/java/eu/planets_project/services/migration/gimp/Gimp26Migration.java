@@ -17,11 +17,14 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
@@ -31,7 +34,6 @@ import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
 
 /**
@@ -48,7 +50,7 @@ targetNamespace = PlanetsServices.NS,
 endpointInterface = "eu.planets_project.services.migrate.Migrate")
 public final class Gimp26Migration implements Migrate {
 
-    private PlanetsLogger log = PlanetsLogger.getLogger(Gimp26Migration.class);
+    private Log log = LogFactory.getLog(Gimp26Migration.class);
     @SuppressWarnings("unused")
 	private static Logger logger = Logger.getLogger(Gimp26Migration.class.getName());
     /** The GIMP install directory */
@@ -85,7 +87,6 @@ public final class Gimp26Migration implements Migrate {
         inputFormats.add("PS");
         inputFormats.add("TIFF");
         inputFormats.add("BMP");
-        inputFormats.add("PNM");
         
         // output formats and associated output parameters
         outputFormats = new ArrayList<String>();
@@ -112,8 +113,7 @@ public final class Gimp26Migration implements Migrate {
         outputFormats.add("TIFF");
         // options: none
         // defaults: 
-        outputFormats.add("BMP");
-        outputFormats.add("PNM");
+        outputFormats.add("BMP"); 
         
         // Disambiguation of extensions, e.g. {"JPG","JPEG"} to {"JPEG"}
         // FIXIT This should be supported by the FormatRegistryImpl class, but
@@ -121,9 +121,6 @@ public final class Gimp26Migration implements Migrate {
         formatMapping = new HashMap<String, String>();
         formatMapping.put("JPG","JPEG");
         formatMapping.put("TIF","TIFF");
-        formatMapping.put("PPM","PNM");
-        formatMapping.put("PBM","PNM");
-        formatMapping.put("PGM","PNM");
     }
     
     private void getExtensions(URI inputFormat, URI outputFormat)
@@ -294,12 +291,6 @@ public final class Gimp26Migration implements Migrate {
         Parameter pngDummyParam = new Parameter.Builder("bmp-dummy", "").description("BMP-Parameter: BMP Conversion has no parameters").build();
         bmpParameterList.add(pngDummyParam);
         defaultParameters.put("BMP", bmpParameterList);
-
-        // PNM
-        List<Parameter> pnmParameterList = new ArrayList<Parameter>();
-        Parameter pnmRawParam = new Parameter.Builder("pnm-raw", "1").description("PNM-Parameter: 1 means 'Save raw' and 0 means 'Save ASCII'").build();
-        pnmParameterList.add(pnmRawParam);
-        defaultParameters.put("PNM", pnmParameterList);
     }
     
     private void overrideDefaultParamets(List<Parameter> userParams)
@@ -420,12 +411,12 @@ public final class Gimp26Migration implements Migrate {
             if (return_code != 0) {
                 log.error("Gimp conversion error code: " + Integer.toString(return_code));
             }
-            
+
             // read byte array from temporary file
             if (tmpOutFile.isFile() && tmpOutFile.canRead()) {
                 binary = FileUtils.readFileIntoByteArray(tmpOutFile);
             } else {
-                log.error("Error: Unable to read temporary file " + tmpOutFile.getAbsolutePath());
+                log.error("Error: Unable to read temporary file " + tmpInFile.getPath() + tmpInFile.getName());
             }
         }
         
@@ -598,10 +589,7 @@ public final class Gimp26Migration implements Migrate {
                 URI outFmt = registry.createExtensionUri(output);
                 MigrationPath path = new MigrationPath(inFmt,outFmt, null);
                 if( !(inFmt.toString().equals(outFmt.toString())) )
-                {
-                    if(!((inFmt.toString().equals("PNM") && !(outFmt.toString().equals("TIFF")))))
-                        paths.add(path);
-                }
+                    paths.add(path);
             }
         }
         return paths.toArray(new MigrationPath[]{});

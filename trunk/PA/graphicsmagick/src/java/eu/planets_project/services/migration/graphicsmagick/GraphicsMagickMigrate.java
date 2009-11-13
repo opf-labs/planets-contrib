@@ -1,28 +1,9 @@
 package eu.planets_project.services.migration.graphicsmagick;
-import java.io.File;
-import java.io.Serializable;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ejb.Local;
-import javax.ejb.Remote;
-import javax.ejb.Stateless;
-import javax.jws.WebService;
-import javax.xml.ws.BindingType;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.Content;
-import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.datatypes.ServiceDescription;
-import eu.planets_project.services.datatypes.ServiceReport;
-import eu.planets_project.services.datatypes.Tool;
+import eu.planets_project.services.datatypes.*;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
@@ -31,6 +12,19 @@ import eu.planets_project.services.migration.graphicsmagick.utils.CoreGraphicsMa
 import eu.planets_project.services.migration.graphicsmagick.utils.GraphicsMagickResult;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ServiceUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import javax.ejb.Local;
+import javax.ejb.Remote;
+import javax.ejb.Stateless;
+import javax.jws.WebService;
+import javax.xml.ws.BindingType;
+import java.io.File;
+import java.io.Serializable;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Peter Melms
@@ -161,9 +155,12 @@ public class GraphicsMagickMigrate implements Migrate, Serializable {
     	if(supportedCompressionTypes.endsWith(", ")) {
     		supportedCompressionTypes = supportedCompressionTypes.substring(0, supportedCompressionTypes.lastIndexOf(", "));
     	}
+    	
+    	String version = CoreGraphicsMagick.getVersion();
+    	
         ServiceDescription.Builder sd = new ServiceDescription.Builder(NAME, Migrate.class.getCanonicalName());
         sd.author("Peter Melms, mailto:peter.melms@uni-koeln.de");
-        sd.description("A wrapper for GraphicsMagick file format conversions. Using GraphicsMagick v1.3.5-Q8.\n" +
+        sd.description("A wrapper for GraphicsMagick file format conversions. Using GraphicsMagick v" + version + ".\n" +
                 "This service accepts input and target formats of this shape: 'planets:fmt/ext/[extension]'\n" +
         		"e.g. 'planets:fmt/ext/tiff' or 'planets:fmt/ext/tif'");
 
@@ -182,7 +179,7 @@ public class GraphicsMagickMigrate implements Migrate, Serializable {
 
         sd.parameters(parameterList);
         
-        sd.tool( Tool.create(null, "GraphicsMagick", "1.3.5-Q8", null, "http://www.graphicsmagick.org/") );
+        sd.tool( Tool.create(null, "GraphicsMagick", version, null, "http://www.graphicsmagick.org/") );
         sd.logo(URI.create("http://www.graphicsmagick.org/images/gm-107x76.png"));
         
         // Checks the installed extensions and supported formats on the fly and creates Migration paths matching the systems capabilities.

@@ -9,21 +9,12 @@
 
 package eu.planets_project.ifr.core.services.migration.openXML.impl;
 
-import eu.planets_project.ifr.core.services.migration.openXML.api.OpenXMLMigrationServiceRemoteInterface;
-import eu.planets_project.ifr.core.services.migration.openXML.common.ConversionReport;
-import eu.planets_project.ifr.core.services.migration.openXML.common.ConversionResult;
-import eu.planets_project.ifr.core.services.migration.openXML.common.ConvertedFile;
-import eu.planets_project.ifr.core.services.migration.openXML.common.ConvertedFileNames;
-import eu.planets_project.ifr.core.services.migration.openXML.api.PlanetsServiceException;
-import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.PlanetsLogger;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -38,7 +29,18 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.ws.BindingType;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jboss.annotation.ejb.RemoteBinding;
+
+import eu.planets_project.ifr.core.services.migration.openXML.api.OpenXMLMigrationServiceRemoteInterface;
+import eu.planets_project.ifr.core.services.migration.openXML.api.PlanetsServiceException;
+import eu.planets_project.ifr.core.services.migration.openXML.common.ConversionReport;
+import eu.planets_project.ifr.core.services.migration.openXML.common.ConversionResult;
+import eu.planets_project.ifr.core.services.migration.openXML.common.ConvertedFile;
+import eu.planets_project.ifr.core.services.migration.openXML.common.ConvertedFileNames;
+import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.PlanetsLogger;
 
 /**
  *
@@ -51,8 +53,10 @@ import org.jboss.annotation.ejb.RemoteBinding;
 @BindingType(value="http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")
 @javax.jws.soap.SOAPBinding(style = SOAPBinding.Style.RPC)
 public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface {
-    private final static String logConfigFile = "eu/planets_project/ifr/core/services/migration/openXML/openXMLMigration-log4j.xml";
-    static final String TEMP_EXTENSION = ".$TMP$";
+    
+	private final static String logConfigFile = "eu/planets_project/ifr/core/services/migration/openXML/openXMLMigration-log4j.xml";
+	private Log log = LogFactory.getLog(this.getClass());
+	static final String TEMP_EXTENSION = ".$TMP$";
     static final String XML_EXTENSION = ".xml";
 
     // Configuration variable and public method to test that the configuration is OK
@@ -78,7 +82,7 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
      * @throws PlanetsServiceException 
      */
     public OpenXMLMigration() throws PlanetsServiceException {
-        PlanetsLogger.getLogger(this.getClass(), logConfigFile).debug("OpenXMLMigration: Loading Config File");
+        
         config = new OpenXMLMigrationConfig("eu/planets_project/ifr/core/services/migration/openXML/openXMLMigration-config.xml");
     }
 
@@ -88,14 +92,14 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
     @javax.jws.WebMethod()
     public String convertFileRef(@javax.jws.WebParam(name="fileRef") String toConvert_) throws PlanetsServiceException {
     //public ConversionReport convertFileRef(String toConvert_, String convertPath_) throws PlanetsServiceException {
-        PlanetsLogger.getLogger(this.getClass(), logConfigFile).debug("convertFileRef:: fileRef = " + toConvert_);
+    	log.debug("convertFileRef:: fileRef = " + toConvert_);
         File toConvert = new File(toConvert_);
         // Create the output dir if it doesn't already exist
         File convertPath = new File(config.getOutputDir());
         try {
-            PlanetsLogger.getLogger(this.getClass(), logConfigFile).debug("Checking output directory " + convertPath.getCanonicalPath());
+        	log.debug("Checking output directory " + convertPath.getCanonicalPath());
             if (!convertPath.exists()) {
-                PlanetsLogger.getLogger(this.getClass(), logConfigFile).debug("Creating output directory " + convertPath.getCanonicalPath());
+            	log.debug("Creating output directory " + convertPath.getCanonicalPath());
                 if (!convertPath.mkdirs()) {
                     throw new PlanetsServiceException("OpenXMLMigration::convertFile: Couldn't create output directory");
                 }
@@ -266,7 +270,7 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
         // Set the timeout loop
         int retries = config.getTimeout() / config.getPollfrequency();
         int timesTried = 0;
-        PlanetsLogger.getLogger(this.getClass(), logConfigFile).debug("getConversionReport:: retries = " + retries);
+        log.debug("getConversionReport:: retries = " + retries);
         try {
             // Loop looking for files, only finishes if it finds a .$FILESET$
             // or a .$END$ file, sleeps for 5 seconds between iterations
@@ -312,13 +316,13 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
     protected ArrayList<String> processConversionReport(File currentPath_, File convPath_) throws PlanetsServiceException {
         int successfulCount = 0;
         
-        PlanetsLogger.getLogger(this.getClass(), logConfigFile).debug("processConversionReport:: currentPath_ = " + currentPath_.getAbsolutePath());
-        PlanetsLogger.getLogger(this.getClass(), logConfigFile).debug("processConversionReport:: convPath_ = " + convPath_.getAbsolutePath());
+        log.debug("processConversionReport:: currentPath_ = " + currentPath_.getAbsolutePath());
+        log.debug("processConversionReport:: convPath_ = " + convPath_.getAbsolutePath());
         List<ConvertedFile> convFileList = convReport.getConvertedFileList();
         ArrayList<String> outputFileList = new ArrayList<String>();
         
         Iterator<ConvertedFile> iterator = convFileList.iterator();
-        PlanetsLogger.getLogger(this.getClass(), logConfigFile).debug("Iterator has " + convFileList.size() + " elements");
+        log.debug("Iterator has " + convFileList.size() + " elements");
         while (iterator.hasNext()) {
             ConvertedFile convFile = iterator.next();
 
@@ -349,7 +353,7 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
                 outputFile = new File(createIndexedName(outputFile.getAbsolutePath()));
             }
 
-            PlanetsLogger.getLogger(this.getClass(), logConfigFile).debug("processConversionReport:: renaming " + 
+            log.debug("processConversionReport:: renaming " + 
                                                                           currentFile.getAbsolutePath() + " to " +
                                                                           outputFile.getAbsolutePath());
             if (!currentFile.renameTo(outputFile)) {
@@ -375,9 +379,9 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
         String extPart = nameToIndex_.substring(nameToIndex_.lastIndexOf("."));
         String indexedName = null;
 
-        PlanetsLogger.getLogger(this.getClass(), logConfigFile).debug("createIndexName:: nameToIndex_: " + nameToIndex_);
-        PlanetsLogger.getLogger(this.getClass(), logConfigFile).debug("createIndexName:: pathPart: " + pathPart);
-        PlanetsLogger.getLogger(this.getClass(), logConfigFile).debug("createIndexName:: extPart: " + extPart);
+        log.debug("createIndexName:: nameToIndex_: " + nameToIndex_);
+        log.debug("createIndexName:: pathPart: " + pathPart);
+        log.debug("createIndexName:: extPart: " + extPart);
 
         for (int indexer = 0; indexer < 1000; indexer++) {
             // Create a new file name
@@ -389,7 +393,7 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
                 break;
             }
         }
-        PlanetsLogger.getLogger(this.getClass(), logConfigFile).debug("createIndexName:: indexedName: " + indexedName);
+        log.debug("createIndexName:: indexedName: " + indexedName);
 
         return indexedName;
     }
