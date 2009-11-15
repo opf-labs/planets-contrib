@@ -150,6 +150,7 @@ public final class Jasper19Migration implements Migrate {
         }
 	
 	init();
+	
 
 	String m1 = "Using jasper19 install directory: " + this.jasper19_install_dir + ". ";;
         log.info(m1); serviceMessage.append(m1+"\n");
@@ -224,8 +225,10 @@ public final class Jasper19Migration implements Migrate {
 	String m5 = "Command: " + command.toString() + ". ";
         log.info(m5); serviceMessage.append(m5+"\n");
 
+	long startMillis = System.currentTimeMillis();
         runner.run();
         int return_code = runner.getReturnCode();
+	long endMillis = System.currentTimeMillis();
         if (return_code != 0) {
             String errMsg = "Jasper conversion error code: " + Integer.toString(return_code) +
                     ". Jasper error message: "+runner.getProcessErrorAsString();
@@ -244,7 +247,9 @@ public final class Jasper19Migration implements Migrate {
         // read byte array from temporary file
         if (tmpOutFile.isFile() && tmpOutFile.canRead()) {
             	binary = FileUtils.readFileIntoByteArray(tmpOutFile);
-		String m6 = "Output file \"" + tmpOutFile.getAbsolutePath() + "\" created successfully. ";
+		String m60 = "Processing time: " + (endMillis-startMillis) + " milliseconds. ";
+		log.info(m60); serviceMessage.append(m60+"\n");
+		String m6 = "Output file: " + tmpOutFile.getAbsolutePath() + " created successfully. ";
 		log.info(m6); serviceMessage.append(m6+"\n");
 		String m61 = "Output file size: " + tmpOutFile.length() + " bytes. ";
         	log.info(m61); serviceMessage.append(m61+"\n");
