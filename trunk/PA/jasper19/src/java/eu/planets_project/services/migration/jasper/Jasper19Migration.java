@@ -148,13 +148,14 @@ public final class Jasper19Migration implements Migrate {
             this.jasper19_app_name = "jasper";
             //this.jasper19_outfile_ext = "jp2";
         }
-	String m = "Using jasper19 install directory: " + this.jasper19_install_dir;
-        log.info(m); serviceMessage.append(m+"\n");
-	m = "Using jasper19 application name: " + this.jasper19_app_name + ". ";
-        log.info(m); serviceMessage.append(m+"\n");
-        //log.info("Using jasper19 outfile extension: "+this.jasper19_outfile_ext);
+	
+	init();
 
-        init();
+	String m1 = "Using jasper19 install directory: " + this.jasper19_install_dir;
+        log.info(m1); serviceMessage.append(m1+"\n");
+	String m2 = "Using jasper19 application name: " + this.jasper19_app_name + ". ";
+        log.info(m2); serviceMessage.append(m2+"\n");
+        
         initParameters();
         getExtensions(inputFormat, outputFormat);
 
@@ -177,14 +178,14 @@ public final class Jasper19Migration implements Migrate {
             return new MigrateResult(null, report);
         }
 	
-	m = "Temporary input file created: " + tmpInFile.getAbsolutePath() + ". ";
-        log.info(m); serviceMessage.append(m+"\n");
+	String m3 = "Temporary input file created: " + tmpInFile.getAbsolutePath() + ". ";
+        log.info(m3); serviceMessage.append(m3+"\n");
 
         // outfile name
         String outFileStr = tmpInFile.getAbsolutePath() + "." + outputFmtExt;
 
-	m = "Output file name: " + outFileStr + ". ";
-        log.info(m); serviceMessage.append(m+" \n");
+	String m4 = "Output file name: " + outFileStr + ". ";
+        log.info(m4); serviceMessage.append(m4+" \n");
 
         // run command
         ProcessRunner runner = new ProcessRunner();
@@ -219,8 +220,8 @@ public final class Jasper19Migration implements Migrate {
         runner.setCommand(command);
         runner.setInputStream(inputStream);
 	
-	m = "Executing command: " + command.toString() + " .... ";
-        log.info(m); serviceMessage.append(m+"\n");
+	String m5 = "Executing command: " + command.toString() + " .... ";
+        log.info(m5); serviceMessage.append(m5+"\n");
 
         runner.run();
         int return_code = runner.getReturnCode();
@@ -242,8 +243,8 @@ public final class Jasper19Migration implements Migrate {
         // read byte array from temporary file
         if (tmpOutFile.isFile() && tmpOutFile.canRead()) {
             	binary = FileUtils.readFileIntoByteArray(tmpOutFile);
-		m = "Output file \"" + tmpOutFile.getAbsolutePath() + "\" created successfully. ";
-		log.info(m); serviceMessage.append(m+"\n");
+		String m6 = "Output file \"" + tmpOutFile.getAbsolutePath() + "\" created successfully. ";
+		log.info(m6); serviceMessage.append(m6+"\n");
         } else {
             String msg = "Error: Unable to read temporary file \"" + tmpOutFile.getAbsolutePath()+"\"";
             log.error(msg);
