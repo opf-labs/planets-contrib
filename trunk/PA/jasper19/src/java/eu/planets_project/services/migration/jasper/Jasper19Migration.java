@@ -151,7 +151,7 @@ public final class Jasper19Migration implements Migrate {
 	
 	init();
 
-	String m1 = "Using jasper19 install directory: " + this.jasper19_install_dir;
+	String m1 = "Using jasper19 install directory: " + this.jasper19_install_dir + ". ";;
         log.info(m1); serviceMessage.append(m1+"\n");
 	String m2 = "Using jasper19 application name: " + this.jasper19_app_name + ". ";
         log.info(m2); serviceMessage.append(m2+"\n");
@@ -180,10 +180,11 @@ public final class Jasper19Migration implements Migrate {
 	
 	String m3 = "Temporary input file created: " + tmpInFile.getAbsolutePath() + ". ";
         log.info(m3); serviceMessage.append(m3+"\n");
+	String m31 = "Input file size: " + tmpInFile.length() + " bytes. ";
+        log.info(m31); serviceMessage.append(m31+"\n");
 
         // outfile name
         String outFileStr = tmpInFile.getAbsolutePath() + "." + outputFmtExt;
-
 	String m4 = "Output file name: " + outFileStr + ". ";
         log.info(m4); serviceMessage.append(m4+" \n");
 
@@ -220,7 +221,7 @@ public final class Jasper19Migration implements Migrate {
         runner.setCommand(command);
         runner.setInputStream(inputStream);
 	
-	String m5 = "Executing command: " + command.toString() + " .... ";
+	String m5 = "Command: " + command.toString() + ". ";
         log.info(m5); serviceMessage.append(m5+"\n");
 
         runner.run();
@@ -245,14 +246,14 @@ public final class Jasper19Migration implements Migrate {
             	binary = FileUtils.readFileIntoByteArray(tmpOutFile);
 		String m6 = "Output file \"" + tmpOutFile.getAbsolutePath() + "\" created successfully. ";
 		log.info(m6); serviceMessage.append(m6+"\n");
+		String m61 = "Output file size: " + tmpOutFile.length() + " bytes. ";
+        	log.info(m61); serviceMessage.append(m61+"\n");
         } else {
             String msg = "Error: Unable to read temporary file \"" + tmpOutFile.getAbsolutePath()+"\"";
             log.error(msg);
             report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
             return new MigrateResult(null, report);
         }
-
-        
 
         report = new ServiceReport(Type.INFO, Status.SUCCESS, "Success: "+serviceMessage);
         newDO = new DigitalObject.Builder(Content.byValue(binary)).build();
