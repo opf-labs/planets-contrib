@@ -518,6 +518,8 @@ public final class Gimp26Migration implements Migrate {
             // read byte array from temporary file
             if (tmpOutFile.isFile() && tmpOutFile.canRead()) {
                 binary = FileUtils.readFileIntoByteArray(tmpOutFile);
+                m = "Temporary outputfile " + tmpOutFile.getAbsolutePath() + " created successfully. ";
+                log.info(m); serviceMessage.append(m+" \n");
             } else {
                 String msg = "Error: Unable to read temporary output file " + tmpOutFile.getAbsolutePath();
                 log.error(msg);
