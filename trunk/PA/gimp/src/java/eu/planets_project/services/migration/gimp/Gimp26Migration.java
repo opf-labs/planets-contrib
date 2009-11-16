@@ -342,7 +342,7 @@ public final class Gimp26Migration implements Migrate {
 						//hm.put(param.name, param.value); // override default parameter
 					}
 				} else {
-					String m = "Parameter skipped. Parameter: " + userParam.getName() + " is not supported by this Gimp service. ";
+					m = "Parameter skipped. Parameter: " + userParam.getName() + " is not supported by this Gimp service. ";
 					log.info(m); serviceMessage.append(m+" \n");
 				}
                 
