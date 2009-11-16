@@ -396,31 +396,52 @@ public final class Gimp26Migration implements Migrate {
             props.load(stream);
             this.gimp_install_dir = props.getProperty("gimp.install.dir");
             this.gimp_app_name = props.getProperty("gimp.app.name");
+            this.gimp_scripts_dir = props.getProperty("gimp.scripts.dir");
             FileUtils.close(stream);
         } catch (Exception e) {
-            this.gimp_install_dir = "/home/georg/Projects/PLANETS/";
+            this.gimp_install_dir = "/usr/bin";
             this.gimp_app_name = "gimp";
+	    this.gimp_scripts_dir = "/usr/share/gimp/2.0/scripts";
         }
+
+	// initialise input formats (GIF, JPEG, EPS, ...) and output formats list 
+        // (GIF, JPEG, EPS, ...) and apply disambiguation ("JPG" -> "JPEG"}
         init();
-        
         
         String m = "Using gimp install directory: " + this.gimp_install_dir + ". ";
         log.info(m); serviceMessage.append(m+" \n");
-        m = "Using gimp application name: " + this.gimp_app_name + ". ";
+        m = "Using application name: " + this.gimp_app_name + ". ";
         log.info(m); serviceMessage.append(m+" \n");
         m = "Using gimp application name: " + this.gimp_app_name + ". ";
         log.info(m); serviceMessage.append(m+" \n");
+        m = "Using Gimp scripts dir: " + this.gimp_scripts_dir + ". ";
+        log.info(m); serviceMessage.append(m+" \n");
         
-        // initialise input formats (GIF, JPEG, EPS, ...) and output formats list 
-        // (GIF, JPEG, EPS, ...) and apply disambiguation ("JPG" -> "JPEG"}
-        
-        
-         // set input and output extensions based upon input and output format
+        // Check for Gimp executable
+        String gimpPath = gimp_install_dir + "/" + gimp_app_name;
+        File gimpExecutable = new File(gimpPath);
+        if (!gimpExecutable.exists()) {
+            String msg = "Error: Unable to find Gimp executable in the given path " + gimpPath+ ". ";
+            log.error(msg);
+            report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
+            return new MigrateResult(null, report);
+        }
+
+        // set input and output extensions based upon input and output format
         // e.g. 
         // inputFormat="planets:fmt/ext/tif" -> inputFmtExt="TIFF"
         // outputFormat="planets:fmt/ext/jpg" -> outputFmtExt="JPEG"
         getExtensions(inputFormat,outputFormat);
-        
+      
+	// Check if Gimp-Fu-Script exists
+	File gimpFuScript = new File(gimp_scripts_dir+"/planetsMigrate" + inputFmtExt + "to" + outputFmtExt); 
+        if (!gimpFuScript.exists()) {
+            String msg = "Error: The Gimp script "+gimpFuScript+" which is required for executing this service request does not exist. ";
+            log.error(msg);
+            report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
+            return new MigrateResult(null, report);
+        }
+
         // Initialise parameters with default values
         initParameters();
         
@@ -436,7 +457,6 @@ public final class Gimp26Migration implements Migrate {
         //tmpInFile = ByteArrayHelper.write(binary);
         tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets", inputFmtExt);
 
-        System.out.println("tmpInFile: " + tmpInFile.getAbsolutePath());
         // read byte array from temporary file
         if (tmpInFile.isFile() && tmpInFile.canRead()) {
             m = "Temporary input file created successfully: " + tmpInFile.getAbsolutePath() + ". ";
