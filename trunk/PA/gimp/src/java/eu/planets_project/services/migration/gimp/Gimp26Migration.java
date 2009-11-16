@@ -412,8 +412,6 @@ public final class Gimp26Migration implements Migrate {
         
         String m = "Using gimp install directory: " + this.gimp_install_dir + ". ";
         log.info(m); serviceMessage.append(m+" \n");
-        m = "Using application name: " + this.gimp_app_name + ". ";
-        log.info(m); serviceMessage.append(m+" \n");
         m = "Using gimp application name: " + this.gimp_app_name + ". ";
         log.info(m); serviceMessage.append(m+" \n");
         m = "Using Gimp scripts dir: " + this.gimp_scripts_dir + ". ";
@@ -427,7 +425,7 @@ public final class Gimp26Migration implements Migrate {
             log.error(msg);
             report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
             return new MigrateResult(null, report);
-        }
+	}
 
         // set input and output extensions based upon input and output format
         // e.g. 
@@ -442,7 +440,10 @@ public final class Gimp26Migration implements Migrate {
             log.error(msg);
             report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
             return new MigrateResult(null, report);
-        }
+        } else {
+            m = "Gimp script " + gimpFuScript.getAbsolutePath() + " exists. ";
+            log.info(m); serviceMessage.append(m+" \n");
+	}
 
         // Initialise parameters with default values
         initParameters();
