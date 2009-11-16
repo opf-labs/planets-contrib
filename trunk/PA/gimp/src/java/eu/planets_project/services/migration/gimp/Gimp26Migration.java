@@ -319,26 +319,26 @@ public final class Gimp26Migration implements Migrate {
 
         // PNM
         List<Parameter> pnmParameterList = new ArrayList<Parameter>();
-        Parameter pnmDummyParam = new Parameter.Builder("pnm-dummy", "").description("PNM-Parameter: PNM Conversion has no parameters").build();
-        pnmParameterList.add(pnmDummyParam);
+        Parameter pnmRawParam = new Parameter.Builder("pnm-raw", "1").description("PNM-Parameter: Specify 1 for raw output, 0 for ascii output").build();
+        pnmParameterList.add(pnmRawParam);
         defaultParameters.put("PNM", pnmParameterList);
 
         // PGM
         List<Parameter> pgmParameterList = new ArrayList<Parameter>();
-        Parameter pgmDummyParam = new Parameter.Builder("pgm-dummy", "").description("PGM-Parameter: PGM Conversion has no parameters").build();
-        pgmParameterList.add(pgmDummyParam);
+        Parameter pgmRawParam = new Parameter.Builder("pgm-raw", "1").description("PGM-Parameter: Specify 1 for raw output, 0 for ascii output").build();
+        pgmParameterList.add(pgmRawParam);
         defaultParameters.put("PGM", pgmParameterList);
 
         // PPM
         List<Parameter> ppmParameterList = new ArrayList<Parameter>();
-        Parameter ppmDummyParam = new Parameter.Builder("ppm-dummy", "").description("PPM-Parameter: PPM Conversion has no parameters").build();
-        ppmParameterList.add(ppmDummyParam);
+        Parameter ppmRawParam = new Parameter.Builder("ppm-raw", "1").description("PPM-Parameter: Specify 1 for raw output, 0 for ascii output").build();
+        ppmParameterList.add(ppmRawParam);
         defaultParameters.put("PPM", ppmParameterList);
 
         // PBM
         List<Parameter> pbmParameterList = new ArrayList<Parameter>();
-        Parameter pbmDummyParam = new Parameter.Builder("pbm-dummy", "").description("PBM-Parameter: PBM Conversion has no parameters").build();
-        pbmParameterList.add(pbmDummyParam);
+        Parameter pbmRawParam = new Parameter.Builder("pbm-raw", "1").description("PBM-Parameter: Specify 1 for raw output, 0 for ascii output").build();
+        pbmParameterList.add(pbmRawParam);
         defaultParameters.put("PBM", pbmParameterList);
     }
     
