@@ -57,6 +57,8 @@ public final class Gimp26Migration implements Migrate {
     public String gimp_install_dir;
     /** The application name */
     public String gimp_app_name;
+    /** The application name */
+    public String gimp_scripts_dir;
     private File tmpInFile;
     private File tmpOutFile;
     
