@@ -436,7 +436,7 @@ public final class Gimp26Migration implements Migrate {
         getExtensions(inputFormat,outputFormat);
       
 	// Check if Gimp-Fu-Script exists
-	File gimpFuScript = new File(gimp_scripts_dir+"/planetsMigrate" + inputFmtExt + "to" + outputFmtExt); 
+	File gimpFuScript = new File(gimp_scripts_dir+"/planetsMigrate" + inputFmtExt + "to" + outputFmtExt+".scm"); 
         if (!gimpFuScript.exists()) {
             String msg = "Error: The Gimp script "+gimpFuScript+" which is required for executing this service request does not exist. ";
             log.error(msg);
