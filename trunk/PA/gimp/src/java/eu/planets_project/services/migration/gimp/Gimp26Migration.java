@@ -501,6 +501,8 @@ public final class Gimp26Migration implements Migrate {
             // temporary outfile, outfile name = infilename + ".out"
             String outFileStr = tmpInFile.getAbsolutePath() + ".out";
             tmpOutFile = new File(outFileStr);
+            
+            long startMillis = System.getCurrentTimeMillis();
 
             // Create process runner and execute commands
             ProcessRunner runner = new ProcessRunner();
@@ -520,6 +522,9 @@ public final class Gimp26Migration implements Migrate {
             // read byte array from temporary file
             if (tmpOutFile.isFile() && tmpOutFile.canRead()) {
                 binary = FileUtils.readFileIntoByteArray(tmpOutFile);
+		long endMillis = System.getCurrentTimeMillis();
+                m = "Processing time: " + (endMillis-startMillis) + " milliseconds. ";
+                log.info(m); serviceMessage.append(m+" \n");
                 m = "Temporary outputfile " + tmpOutFile.getAbsolutePath() + " created successfully. ";
                 log.info(m); serviceMessage.append(m+" \n");
                 m = "Output file size: " + tmpOutFile.length() + " bytes. ";
