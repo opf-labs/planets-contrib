@@ -91,6 +91,11 @@ public final class Gimp26Migration implements Migrate {
         inputFormats.add("PS");
         inputFormats.add("TIFF");
         inputFormats.add("BMP");
+        inputFormats.add("PNM");
+        inputFormats.add("PPM");
+        inputFormats.add("PGM");
+        inputFormats.add("PBM");
+
         
         // output formats and associated output parameters
         outputFormats = new ArrayList<String>();
@@ -117,7 +122,11 @@ public final class Gimp26Migration implements Migrate {
         outputFormats.add("TIFF");
         // options: none
         // defaults: 
-        outputFormats.add("BMP"); 
+        outputFormats.add("BMP");
+        outputFormats.add("PNM");
+        outputFormats.add("PPM");
+        outputFormats.add("PGM");
+        outputFormats.add("PBM");
         
         // Disambiguation of extensions, e.g. {"JPG","JPEG"} to {"JPEG"}
         // FIXIT This should be supported by the FormatRegistryImpl class, but
@@ -125,6 +134,7 @@ public final class Gimp26Migration implements Migrate {
         formatMapping = new HashMap<String, String>();
         formatMapping.put("JPG","JPEG");
         formatMapping.put("TIF","TIFF");
+
 
         serviceMessage = new StringBuffer();
     }
