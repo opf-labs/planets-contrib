@@ -157,6 +157,11 @@ public final class Gimp26Migration implements Migrate {
     private String getParameterString(String ext)
     {
         StringBuffer paramStrBuff = new StringBuffer();
+	if(!defaultParameters.containsKey(ext)) {
+		String m = "Error: No default parameters for format " + ext + ". ";
+        	log.info(m); serviceMessage.append(m+" \n");
+		return "";
+	}
         List<Parameter> fmtParameterList = (List<Parameter>) defaultParameters.get(ext);
         Iterator<Parameter> itr = fmtParameterList.iterator();
         while(itr.hasNext()) {
@@ -309,6 +314,30 @@ public final class Gimp26Migration implements Migrate {
         Parameter pngDummyParam = new Parameter.Builder("bmp-dummy", "").description("BMP-Parameter: BMP Conversion has no parameters").build();
         bmpParameterList.add(pngDummyParam);
         defaultParameters.put("BMP", bmpParameterList);
+
+        // PNM
+        List<Parameter> pnmParameterList = new ArrayList<Parameter>();
+        Parameter pnmDummyParam = new Parameter.Builder("pnm-dummy", "").description("PNM-Parameter: PNM Conversion has no parameters").build();
+        pnmParameterList.add(pnmDummyParam);
+        defaultParameters.put("PNM", pnmParameterList);
+
+        // PGM
+        List<Parameter> pgmParameterList = new ArrayList<Parameter>();
+        Parameter pgmDummyParam = new Parameter.Builder("pgm-dummy", "").description("PGM-Parameter: PGM Conversion has no parameters").build();
+        pgmParameterList.add(pgmDummyParam);
+        defaultParameters.put("PGM", pgmParameterList);
+
+        // PPM
+        List<Parameter> ppmParameterList = new ArrayList<Parameter>();
+        Parameter ppmDummyParam = new Parameter.Builder("ppm-dummy", "").description("PPM-Parameter: PPM Conversion has no parameters").build();
+        ppmParameterList.add(ppmDummyParam);
+        defaultParameters.put("PPM", ppmParameterList);
+
+        // PBM
+        List<Parameter> pbmParameterList = new ArrayList<Parameter>();
+        Parameter pbmDummyParam = new Parameter.Builder("pbm-dummy", "").description("PBM-Parameter: PBM Conversion has no parameters").build();
+        pbmParameterList.add(pbmDummyParam);
+        defaultParameters.put("PBM", pbmParameterList);
     }
     
     private void overrideDefaultParamets(List<Parameter> userParams)
