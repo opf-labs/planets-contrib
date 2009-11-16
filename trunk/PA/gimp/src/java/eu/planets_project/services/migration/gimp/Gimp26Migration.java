@@ -73,6 +73,10 @@ public final class Gimp26Migration implements Migrate {
     
     String inputFmtExt = null;
     String outputFmtExt = null;
+
+    StringBuffer serviceMessage = null;
+
+    ServiceReport report = null;
     
     private void init()
     {
@@ -121,12 +125,16 @@ public final class Gimp26Migration implements Migrate {
         formatMapping = new HashMap<String, String>();
         formatMapping.put("JPG","JPEG");
         formatMapping.put("TIF","TIFF");
+
+        serviceMessage = new StringBuffer();
     }
     
     private void getExtensions(URI inputFormat, URI outputFormat)
     {
         inputFmtExt = getFormatExt( inputFormat, false );
         outputFmtExt = getFormatExt( outputFormat, true );
+        String m = "Input format: " + inputFmtExt.toString() + " with value: " + outputFmtExt.toString() + ". ";
+        log.info(m); serviceMessage.append(m+" \n");
     }
     
     /**
@@ -302,7 +310,10 @@ public final class Gimp26Migration implements Migrate {
             Iterator<Parameter> userParmsItr = userParams.iterator(); 
             while(userParmsItr.hasNext()) {
                 Parameter userParam = (Parameter) userParmsItr.next();
-                System.out.println("Set parameter: " + userParam.getName() + " with value: " + userParam.getValue());
+
+                String m = "Set user request parameter: " + userParam.getName() + " with value: " + userParam.getValue() + ". ";
+                log.info(m); serviceMessage.append(m+" \n");
+
                 // get hashmap of the desired output format
                 List<Parameter> defaultParamList = (List<Parameter>)defaultParameters.get(outputFmtExt);
                 Iterator<Parameter> defParmsItr = defaultParamList.iterator();
@@ -345,13 +356,19 @@ public final class Gimp26Migration implements Migrate {
             this.gimp_install_dir = "/home/georg/Projects/PLANETS/";
             this.gimp_app_name = "gimp";
         }
-        log.info("Using gimp install directory: " + this.gimp_install_dir);
-        log.info("Using gimp application name: " + this.gimp_app_name);
-        log.info("Using gimp application name: " + this.gimp_app_name);
+        init();
+        
+        
+        String m = "Using gimp install directory: " + this.gimp_install_dir + ". ";
+        log.info(m); serviceMessage.append(m+" \n");
+        m = "Using gimp application name: " + this.gimp_app_name + ". ";
+        log.info(m); serviceMessage.append(m+" \n");
+        m = "Using gimp application name: " + this.gimp_app_name + ". ";
+        log.info(m); serviceMessage.append(m+" \n");
         
         // initialise input formats (GIF, JPEG, EPS, ...) and output formats list 
         // (GIF, JPEG, EPS, ...) and apply disambiguation ("JPG" -> "JPEG"}
-        init();
+        
         
          // set input and output extensions based upon input and output format
         // e.g. 
@@ -375,13 +392,27 @@ public final class Gimp26Migration implements Migrate {
         tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets", inputFmtExt);
 
         System.out.println("tmpInFile: " + tmpInFile.getAbsolutePath());
+        // read byte array from temporary file
+        if (tmpInFile.isFile() && tmpInFile.canRead()) {
+            m = "Temporary input file created successfully: " + tmpInFile.getAbsolutePath() + ". ";
+            log.info(m); serviceMessage.append(m+" \n");
+        } else {
+            String msg = "Error: Unable to read temporary input file " + tmpInFile.getAbsolutePath() + ". ";
+            log.error(msg);
+            report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
+            return new MigrateResult(null, report);
+        }
 
         // Create inputstream from binary array
         //InputStream inputStream = new ByteArrayInputStream(binary);
 
         // set gimp fu-script command
         gimpFuScriptCmdStr = getFuScriptMigrationStr();
-        System.out.println("GIMP Fu-Script command "+gimpFuScriptCmdStr);
+        System.out.println();
+
+        m = "GIMP Fu-Script command "+gimpFuScriptCmdStr+". ";
+        log.info(m); serviceMessage.append(m+" \n");
+
         if( gimpFuScriptCmdStr != null )
         {
             // commands string array
@@ -409,21 +440,28 @@ public final class Gimp26Migration implements Migrate {
             System.out.println(runner.getProcessErrorAsString());
             int return_code = runner.getReturnCode();
             if (return_code != 0) {
-                log.error("Gimp conversion error code: " + Integer.toString(return_code));
+                String errMsg = runner.getProcessErrorAsString();
+                String msg = "Gimp returned an error when trying to convert the image. Gimp error code: " + Integer.toString(return_code)+". Gimp error message: "+errMsg+". ";
+                log.error(msg);
+                report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
+                return new MigrateResult(null, report);
             }
 
             // read byte array from temporary file
             if (tmpOutFile.isFile() && tmpOutFile.canRead()) {
                 binary = FileUtils.readFileIntoByteArray(tmpOutFile);
             } else {
-                log.error("Error: Unable to read temporary file " + tmpInFile.getPath() + tmpInFile.getName());
+                String msg = "Error: Unable to read temporary output file " + tmpOutFile.getAbsolutePath();
+                log.error(msg);
+                report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
+                return new MigrateResult(null, report);
             }
         }
         
         // digital object output
         DigitalObject newDO = null;
         newDO = new DigitalObject.Builder(Content.byValue(binary)).build();
-        ServiceReport report = new ServiceReport(Type.INFO,Status.SUCCESS, "Nothing checked");
+        report = new ServiceReport(Type.INFO,Status.SUCCESS, this.serviceMessage.toString());
         return new MigrateResult(newDO, report);
     }
    
@@ -587,7 +625,7 @@ public final class Gimp26Migration implements Migrate {
                 FormatRegistry registry = FormatRegistryFactory.getFormatRegistry();
                 URI inFmt = registry.createExtensionUri(input);
                 URI outFmt = registry.createExtensionUri(output);
-                MigrationPath path = new MigrationPath(inFmt,outFmt, null);
+                MigrationPath path = new MigrationPath(inFmt,outFmt, defaultParameters.get(output));
                 if( !(inFmt.toString().equals(outFmt.toString())) )
                     paths.add(path);
             }
