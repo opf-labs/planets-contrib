@@ -410,7 +410,7 @@ public final class Gimp26Migration implements Migrate {
         // (GIF, JPEG, EPS, ...) and apply disambiguation ("JPG" -> "JPEG"}
         init();
         
-        String m = "Using gimp install directory: " + this.gimp_install_dir + ". ";
+        String m = "Success: Using gimp install directory: " + this.gimp_install_dir + ". ";
         log.info(m); serviceMessage.append(m+" \n");
         m = "Using gimp application name: " + this.gimp_app_name + ". ";
         log.info(m); serviceMessage.append(m+" \n");
@@ -463,6 +463,8 @@ public final class Gimp26Migration implements Migrate {
         // read byte array from temporary file
         if (tmpInFile.isFile() && tmpInFile.canRead()) {
             m = "Temporary input file created successfully: " + tmpInFile.getAbsolutePath() + ". ";
+            log.info(m); serviceMessage.append(m+" \n");
+            m = "Input file size: " + tmpInFile.length() + " bytes. ";
             log.info(m); serviceMessage.append(m+" \n");
         } else {
             String msg = "Error: Unable to read temporary input file " + tmpInFile.getAbsolutePath() + ". ";
@@ -519,6 +521,8 @@ public final class Gimp26Migration implements Migrate {
             if (tmpOutFile.isFile() && tmpOutFile.canRead()) {
                 binary = FileUtils.readFileIntoByteArray(tmpOutFile);
                 m = "Temporary outputfile " + tmpOutFile.getAbsolutePath() + " created successfully. ";
+                log.info(m); serviceMessage.append(m+" \n");
+                m = "Output file size: " + tmpOutFile.length() + " bytes. ";
                 log.info(m); serviceMessage.append(m+" \n");
             } else {
                 String msg = "Error: Unable to read temporary output file " + tmpOutFile.getAbsolutePath();
