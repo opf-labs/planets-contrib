@@ -143,7 +143,7 @@ public final class Gimp26Migration implements Migrate {
     {
         inputFmtExt = getFormatExt( inputFormat, false );
         outputFmtExt = getFormatExt( outputFormat, true );
-        String m = "Input format: " + inputFmtExt.toString() + " with value: " + outputFmtExt.toString() + ". ";
+        String m = "Input format: " + inputFmtExt.toString() + ". Output format: " + outputFmtExt.toString() + ". ";
         log.info(m); serviceMessage.append(m+" \n");
     }
     
@@ -323,22 +323,28 @@ public final class Gimp26Migration implements Migrate {
 
                 String m = "Set user request parameter: " + userParam.getName() + " with value: " + userParam.getValue() + ". ";
                 log.info(m); serviceMessage.append(m+" \n");
+				
+				if(defaultParameters.containsKey(outputFmtExt)) {
 
-                // get hashmap of the desired output format
-                List<Parameter> defaultParamList = (List<Parameter>)defaultParameters.get(outputFmtExt);
-                Iterator<Parameter> defParmsItr = defaultParamList.iterator();
-                int index = 0;
-                while( defParmsItr.hasNext() )
-                {
-                    Parameter defParam = (Parameter) defParmsItr.next();
-                    if( userParam.getName().equalsIgnoreCase(defParam.getName()) )
-                    {
-                        defaultParamList.set(index, userParam);
-                        break;
-                    }
-                    index++;
-                    //hm.put(param.name, param.value); // override default parameter
-                }
+					// get hashmap of the desired output format
+					List<Parameter> defaultParamList = (List<Parameter>)defaultParameters.get(outputFmtExt);
+					Iterator<Parameter> defParmsItr = defaultParamList.iterator();
+					int index = 0;
+					while( defParmsItr.hasNext() )
+					{
+						Parameter defParam = (Parameter) defParmsItr.next();
+						if( userParam.getName().equalsIgnoreCase(defParam.getName()) )
+						{
+							defaultParamList.set(index, userParam);
+							break;
+						}
+						index++;
+						//hm.put(param.name, param.value); // override default parameter
+					}
+				} else {
+					String m = "Parameter skipped. Parameter: " + userParam.getName() + " is not supported by this Gimp service. ";
+					log.info(m); serviceMessage.append(m+" \n");
+				}
                 
             }
         }
