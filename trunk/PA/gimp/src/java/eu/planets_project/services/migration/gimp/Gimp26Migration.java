@@ -45,14 +45,14 @@ import eu.planets_project.services.utils.ProcessRunner;
 @Local(Migrate.class)
 @Remote(Migrate.class)
 @Stateless
-@WebService(name = Gimp26Migration.NAME ,serviceName = Migrate.NAME,
+@WebService(name = Gimp26Migration.NAME, serviceName = Migrate.NAME,
 targetNamespace = PlanetsServices.NS,
 endpointInterface = "eu.planets_project.services.migrate.Migrate")
 public final class Gimp26Migration implements Migrate {
 
     private Log log = LogFactory.getLog(Gimp26Migration.class);
     @SuppressWarnings("unused")
-	private static Logger logger = Logger.getLogger(Gimp26Migration.class.getName());
+    private static Logger logger = Logger.getLogger(Gimp26Migration.class.getName());
     /** The GIMP install directory */
     public String gimp_install_dir;
     /** The application name */
@@ -61,29 +61,23 @@ public final class Gimp26Migration implements Migrate {
     public String gimp_scripts_dir;
     private File tmpInFile;
     private File tmpOutFile;
-    
     private String gimpFuScriptCmdStr;
     /***/
     static final String NAME = "Gimp26Migration";
     /***/
     private static final long serialVersionUID = 2127494848765937613L;
-    
     List<String> inputFormats = null;
     List<String> outputFormats = null;
-    HashMap<String, String>  formatMapping = null;
+    HashMap<String, String> formatMapping = null;
     HashMap<String, List<Parameter>> defaultParameters = null;
-    
     String inputFmtExt = null;
     String outputFmtExt = null;
-
     StringBuffer serviceMessage = null;
-
     ServiceReport report = null;
-    
-    private void init()
-    {
+
+    private void init() {
         gimpFuScriptCmdStr = null;
-        
+
         // input formats
         inputFormats = new ArrayList<String>();
         inputFormats.add("GIF");
@@ -98,26 +92,26 @@ public final class Gimp26Migration implements Migrate {
         inputFormats.add("PGM");
         inputFormats.add("PBM");
 
-        
+
         // output formats and associated output parameters
         outputFormats = new ArrayList<String>();
         // options: interlace dither palette num-colors alpha-dither remove-unused
         // defaults: 1 0 256 0 0
-        outputFormats.add("GIF"); 
+        outputFormats.add("GIF");
         // options:  width height x-offset y-offset unit keep-ratio rotation 
         // preview level
         // defaults: 0 0 0 0 0 1 0 0 2
-        outputFormats.add("EPS"); 
+        outputFormats.add("EPS");
         // options:  quality smoothing optimize progressive
         // defaults: 0.1 0 1 1
-        outputFormats.add("JPEG"); 
+        outputFormats.add("JPEG");
         // options: interlace compression
         // defaults:  1 1
-        outputFormats.add("PNG"); 
+        outputFormats.add("PNG");
         // options:  width height x-offset y-offset unit keep-ratio rotation 
         // preview level
         // default: 0 0 0 0 0 1 0 0 2
-        outputFormats.add("PS"); 
+        outputFormats.add("PS");
         // options: compression Compression type: {None (0), LZW (1), PACKBITS(2), 
         // DEFLATE (3), JPEG (4), CCITT G3 Fax (5), CCITT G4 Fax (6)}
         // defaults:  1
@@ -129,26 +123,26 @@ public final class Gimp26Migration implements Migrate {
         outputFormats.add("PPM");
         outputFormats.add("PGM");
         outputFormats.add("PBM");
-        
+
         // Disambiguation of extensions, e.g. {"JPG","JPEG"} to {"JPEG"}
         // FIXIT This should be supported by the FormatRegistryImpl class, but
         // it does not provide the complete set at the moment.
         formatMapping = new HashMap<String, String>();
-        formatMapping.put("JPG","JPEG");
-        formatMapping.put("TIF","TIFF");
+        formatMapping.put("JPG", "JPEG");
+        formatMapping.put("TIF", "TIFF");
 
 
         serviceMessage = new StringBuffer();
     }
-    
-    private void getExtensions(URI inputFormat, URI outputFormat)
-    {
-        inputFmtExt = getFormatExt( inputFormat, false );
-        outputFmtExt = getFormatExt( outputFormat, true );
+
+    private void getExtensions(URI inputFormat, URI outputFormat) {
+        inputFmtExt = getFormatExt(inputFormat, false);
+        outputFmtExt = getFormatExt(outputFormat, true);
         String m = "Input format: " + inputFmtExt.toString() + ". Output format: " + outputFmtExt.toString() + ". ";
-        log.info(m); serviceMessage.append(m+" \n");
+        log.info(m);
+        serviceMessage.append(m + " \n");
     }
-    
+
     /**
      * Create a white space separated parameter string which can be passed
      * over to the gimp script (e.g.  1 0 256 0 0 for migration to GIF).
@@ -156,161 +150,159 @@ public final class Gimp26Migration implements Migrate {
      * @param ext Extension for which we retrieve the parameter list.
      * @return Paramter string
      */
-    private String getParameterString(String ext)
-    {
+    private String getParameterString(String ext) {
         StringBuffer paramStrBuff = new StringBuffer();
-	if(!defaultParameters.containsKey(ext)) {
-		String m = "Error: No default parameters for format " + ext + ". ";
-        	log.info(m); serviceMessage.append(m+" \n");
-		return "";
-	}
+        if (!defaultParameters.containsKey(ext)) {
+            String m = "Error: No default parameters for format " + ext + ". ";
+            log.info(m);
+            serviceMessage.append(m + " \n");
+            return "";
+        }
         List<Parameter> fmtParameterList = (List<Parameter>) defaultParameters.get(ext);
         Iterator<Parameter> itr = fmtParameterList.iterator();
-        while(itr.hasNext()) {
+        while (itr.hasNext()) {
             Parameter param = (Parameter) itr.next();
-            if( param.getValue() != null )
-            {
+            if (param.getValue() != null) {
                 paramStrBuff.append(" ");
                 paramStrBuff.append(param.getValue());
             }
         }
         return paramStrBuff.toString();
     }
-    
+
     /**
      * Initialize the parameters list for all migration file formats. Every
      * parameter has a default value which is overridden where requested
      * from the user (parameters contains the parameters passed to the
      * service by the user).
      */
-    private void initParameters()
-    {
+    private void initParameters() {
         // main parameters hashmap
         // e.g. 
         // { "GIF" -> { Parameter("gif-interlace","1"), Parameter("gif-dither","1"), ... } }
         // { "JPEG" -> { Parameter("jpeg-quality","0.9"), Parameter("jpeg-smoothing"),"0.9"), ... } }
         // ...
         defaultParameters = new HashMap<String, List<Parameter>>();
-        
+
         // Define parameters and default values
         // GIF - 6 parameters
         List<Parameter> gifParameterList = new ArrayList<Parameter>();
-        Parameter gifInterlaceParam = new Parameter.Builder("gif-interlace", "1").description( 
+        Parameter gifInterlaceParam = new Parameter.Builder("gif-interlace", "1").description(
                 "GIF-Parameter: Boolean integer 0/1 indicating if interlacing should be used.").build();
         gifParameterList.add(gifInterlaceParam);
-        Parameter gifDitherParam = new Parameter.Builder("gif-dither", "1").description( 
+        Parameter gifDitherParam = new Parameter.Builder("gif-dither", "1").description(
                 "GIF-Parameter: Boolean integer 0/1 indicating if interlacing should be used.").build();
         gifParameterList.add(gifDitherParam);
-        Parameter gifPaletteParam = new Parameter.Builder("gif-palette", "0").description( 
+        Parameter gifPaletteParam = new Parameter.Builder("gif-palette", "0").description(
                 "GIF-Parameter: Integer indicating the palette to be used (MAKE-PALETTE (0), WEB-PALETTE (2), MONO-PALETTE (3), CUSTOM-PALETTE (4)).").build();
         gifParameterList.add(gifPaletteParam);
-        Parameter gifNumcolorsParam = new Parameter.Builder("gif-numcolors", "256").description( 
+        Parameter gifNumcolorsParam = new Parameter.Builder("gif-numcolors", "256").description(
                 "GIF-Parameter: Integer between 0 and 256 indicating how many colors should be used.").build();
         gifParameterList.add(gifNumcolorsParam);
-        Parameter gifAlphaditherParam = new Parameter.Builder("gif-alphadither", "1").description( 
+        Parameter gifAlphaditherParam = new Parameter.Builder("gif-alphadither", "1").description(
                 "GIF-Parameter: Boolean integer 0/1 indicating if alpha dither should be used.").build();
         gifParameterList.add(gifAlphaditherParam);
-        Parameter gifRemoveunusedParam = new Parameter.Builder("gif-removeunused", "1").description( 
+        Parameter gifRemoveunusedParam = new Parameter.Builder("gif-removeunused", "1").description(
                 "GIF-Parameter: Boolean integer 0/1 indicating if unused colors should be removed.").build();
         gifParameterList.add(gifRemoveunusedParam);
         defaultParameters.put("GIF", gifParameterList);
-        
+
         // EPS - 9 parameters
         List<Parameter> epsParameterList = new ArrayList<Parameter>();
-        Parameter epsInterlaceParam = new Parameter.Builder("eps-width", "0").description( 
+        Parameter epsInterlaceParam = new Parameter.Builder("eps-width", "0").description(
                 "EPS-Parameter: Positive integer value indicating the width.").build();
         epsParameterList.add(epsInterlaceParam);
-        Parameter epsDitherParam = new Parameter.Builder("eps-height", "0").description( 
+        Parameter epsDitherParam = new Parameter.Builder("eps-height", "0").description(
                 "EPS-Parameter: Positive integer value indicating the height.").build();
         epsParameterList.add(epsDitherParam);
-        Parameter epsNumcolorsParam = new Parameter.Builder("eps-xoffset", "0").description( 
+        Parameter epsNumcolorsParam = new Parameter.Builder("eps-xoffset", "0").description(
                 "EPS-Parameter: Positive integer value indicating the x-offset.").build();
         epsParameterList.add(epsNumcolorsParam);
-        Parameter epsAlphaditherParam = new Parameter.Builder("eps-yoffset", "0").description( 
+        Parameter epsAlphaditherParam = new Parameter.Builder("eps-yoffset", "0").description(
                 "EPS-Parameter: Positive integer value indicating the y-offset.").build();
         epsParameterList.add(epsAlphaditherParam);
-        Parameter epsRemoveunusedParam = new Parameter.Builder("eps-unit", "0").description( 
+        Parameter epsRemoveunusedParam = new Parameter.Builder("eps-unit", "0").description(
                 "EPS-Parameter: Unit parameter.").build();
         epsParameterList.add(epsRemoveunusedParam);
-        Parameter epsKeepratioParam = new Parameter.Builder("eps-keepratio", "1").description( 
+        Parameter epsKeepratioParam = new Parameter.Builder("eps-keepratio", "1").description(
                 "EPS-Parameter: Boolean integer 0/1 indicating if the ratio should be maintained.").build();
         epsParameterList.add(epsKeepratioParam);
-        Parameter epsRotationParam = new Parameter.Builder("eps-rotation", "0").description( 
+        Parameter epsRotationParam = new Parameter.Builder("eps-rotation", "0").description(
                 "EPS-Parameter: Boolean integer 0/1 indicating if the image should be rotated.").build();
         epsParameterList.add(epsRotationParam);
-        Parameter epsPreviewParam = new Parameter.Builder("eps-preview", "0").description( 
+        Parameter epsPreviewParam = new Parameter.Builder("eps-preview", "0").description(
                 "EPS-Parameter: Boolean integer 0/1 indicating if a preview image should be created.").build();
         epsParameterList.add(epsPreviewParam);
-        Parameter epsLevelParam = new Parameter.Builder("eps-level", "2").description( 
+        Parameter epsLevelParam = new Parameter.Builder("eps-level", "2").description(
                 "EPS-Parameter: Positive integer value 1 or 2 indicating the postscript level.").build();
         epsParameterList.add(epsLevelParam);
         defaultParameters.put("EPS", epsParameterList);
-        
+
         // JPEG - 4 parameters
         List<Parameter> jpegParameterList = new ArrayList<Parameter>();
-        Parameter jpegQualityParam = new Parameter.Builder("quality-width", "0.1").description( 
+        Parameter jpegQualityParam = new Parameter.Builder("quality-width", "0.1").description(
                 "JPEG-Parameter: Float value in the range from 0 to 1 (step size 0.1) indicating the image quality. 0.1 low quality, 1 high quality.").build();
         jpegParameterList.add(jpegQualityParam);
-        Parameter jpegSmoothingParam = new Parameter.Builder("quality-smoothing", "0.1").description( 
+        Parameter jpegSmoothingParam = new Parameter.Builder("quality-smoothing", "0.1").description(
                 "JPEG-Parameter: Float value in the range from 0 to 1 (step size 0.1) indicating the smoothing intensity. 0 no smoothing, 1 strong smoothing.").build();
         jpegParameterList.add(jpegSmoothingParam);
-        Parameter jpegOptimizeParam = new Parameter.Builder("quality-optimize", "0").description( 
+        Parameter jpegOptimizeParam = new Parameter.Builder("quality-optimize", "0").description(
                 "JPEG-Parameter: Boolean integer 0/1 indicating if the image should be optimized.").build();
         jpegParameterList.add(jpegOptimizeParam);
-        Parameter jpegProgressiveParam = new Parameter.Builder("quality-progressive", "0").description( 
+        Parameter jpegProgressiveParam = new Parameter.Builder("quality-progressive", "0").description(
                 "JPEG-Parameter: Boolean integer 0/1 indicating if progressive storage should be used.").build();
         jpegParameterList.add(jpegProgressiveParam);
         defaultParameters.put("JPEG", jpegParameterList);
-        
+
         // PNG - 2 parameters
         List<Parameter> pngParameterList = new ArrayList<Parameter>();
-        Parameter pngInterlaceParam = new Parameter.Builder("png-interlace", "1").description( 
+        Parameter pngInterlaceParam = new Parameter.Builder("png-interlace", "1").description(
                 "PNG-Parameter:  Boolean integer 0/1 indicating if interlacing should be used.").build();
         pngParameterList.add(pngInterlaceParam);
-        Parameter pngCompressionParam = new Parameter.Builder("png-compression", "1").description( 
+        Parameter pngCompressionParam = new Parameter.Builder("png-compression", "1").description(
                 "PNG-Parameter: Positive integer in the range 0 to 9 (step size 1) indicating the compression grade.").build();
         pngParameterList.add(pngCompressionParam);
         defaultParameters.put("PNG", pngParameterList);
-        
+
         // PS - 9 parameters
         List<Parameter> psParameterList = new ArrayList<Parameter>();
-        Parameter psInterlaceParam = new Parameter.Builder("ps-width", "0").description( 
+        Parameter psInterlaceParam = new Parameter.Builder("ps-width", "0").description(
                 "PS-Parameter: Positive integer value indicating the width. 0 indicates to take the size from the original.").build();
         psParameterList.add(psInterlaceParam);
-        Parameter psDitherParam = new Parameter.Builder("ps-height", "0").description( 
+        Parameter psDitherParam = new Parameter.Builder("ps-height", "0").description(
                 "PS-Parameter: Positive integer value indicating the height. 0 indicates to take the size from the original.").build();
         psParameterList.add(psDitherParam);
-        Parameter psNumcolorsParam = new Parameter.Builder("ps-xoffset", "0").description( 
+        Parameter psNumcolorsParam = new Parameter.Builder("ps-xoffset", "0").description(
                 "PS-Parameter: Positive integer value indicating the x-offset.").build();
         psParameterList.add(psNumcolorsParam);
-        Parameter psAlphaditherParam = new Parameter.Builder("ps-yoffset", "0").description( 
+        Parameter psAlphaditherParam = new Parameter.Builder("ps-yoffset", "0").description(
                 "PS-Parameter: Positive integer value indicating the y-offset.").build();
         psParameterList.add(psAlphaditherParam);
-        Parameter psRemoveunusedParam = new Parameter.Builder("ps-unit", "0").description( 
+        Parameter psRemoveunusedParam = new Parameter.Builder("ps-unit", "0").description(
                 "PS-Parameter: Unit parameter.").build();
         psParameterList.add(psRemoveunusedParam);
-        Parameter psKeepratioParam = new Parameter.Builder("ps-keepratio", "1").description( 
+        Parameter psKeepratioParam = new Parameter.Builder("ps-keepratio", "1").description(
                 "PS-Parameter: Boolean integer 0/1 indicating if the ratio should be maintained.").build();
         psParameterList.add(psKeepratioParam);
-        Parameter psRotationParam = new Parameter.Builder("ps-rotation", "0").description( 
+        Parameter psRotationParam = new Parameter.Builder("ps-rotation", "0").description(
                 "PS-Parameter: Boolean integer 0/1 indicating if the image should be rotated.").build();
         psParameterList.add(psRotationParam);
-        Parameter psPreviewParam = new Parameter.Builder("ps-preview", "0").description( 
+        Parameter psPreviewParam = new Parameter.Builder("ps-preview", "0").description(
                 "PS-Parameter: Boolean integer 0/1 indicating if a preview image should be created.").build();
         psParameterList.add(psPreviewParam);
-        Parameter psLevelParam = new Parameter.Builder("ps-level", "2").description( 
+        Parameter psLevelParam = new Parameter.Builder("ps-level", "2").description(
                 "PS-Parameter: Positive integer value 1 or 2 indicating the postscript level.").build();
         psParameterList.add(psLevelParam);
         defaultParameters.put("PS", psParameterList);
-        
+
         // TIFF - 1 parameter
         List<Parameter> tiffParameterList = new ArrayList<Parameter>();
         Parameter tiffCompressiontypeParam = new Parameter.Builder("tiff-compressiontype", "0").description(
                 "TIFF-Parameter: Positive integer for the compression type to be used. Possible compression types: {None (0), LZW (1), PACKBITS(2), DEFLATE (3), JPEG (4), CCITT G3 Fax (5), CCITT G4 Fax (6)}").build();
         tiffParameterList.add(tiffCompressiontypeParam);
         defaultParameters.put("TIFF", tiffParameterList);
-        
-        
+
+
         // BMP
         List<Parameter> bmpParameterList = new ArrayList<Parameter>();
         Parameter pngDummyParam = new Parameter.Builder("bmp-dummy", "").description("BMP-Parameter: BMP Conversion has no parameters").build();
@@ -341,46 +333,44 @@ public final class Gimp26Migration implements Migrate {
         pbmParameterList.add(pbmRawParam);
         defaultParameters.put("PBM", pbmParameterList);
     }
-    
-    private void overrideDefaultParamets(List<Parameter> userParams)
-    {
+
+    private void overrideDefaultParamets(List<Parameter> userParams) {
         // Change default parameters according to the parameters defined by the
         // user
-        if( userParams != null )
-        {
-            Iterator<Parameter> userParmsItr = userParams.iterator(); 
-            while(userParmsItr.hasNext()) {
+        if (userParams != null) {
+            Iterator<Parameter> userParmsItr = userParams.iterator();
+            while (userParmsItr.hasNext()) {
                 Parameter userParam = (Parameter) userParmsItr.next();
 
                 String m = "Set user request parameter: " + userParam.getName() + " with value: " + userParam.getValue() + ". ";
-                log.info(m); serviceMessage.append(m+" \n");
-				
-				if(defaultParameters.containsKey(outputFmtExt)) {
+                log.info(m);
+                serviceMessage.append(m + " \n");
 
-					// get hashmap of the desired output format
-					List<Parameter> defaultParamList = (List<Parameter>)defaultParameters.get(outputFmtExt);
-					Iterator<Parameter> defParmsItr = defaultParamList.iterator();
-					int index = 0;
-					while( defParmsItr.hasNext() )
-					{
-						Parameter defParam = (Parameter) defParmsItr.next();
-						if( userParam.getName().equalsIgnoreCase(defParam.getName()) )
-						{
-							defaultParamList.set(index, userParam);
-							break;
-						}
-						index++;
-						//hm.put(param.name, param.value); // override default parameter
-					}
-				} else {
-					m = "Parameter skipped. Parameter: " + userParam.getName() + " is not supported by this Gimp service. ";
-					log.info(m); serviceMessage.append(m+" \n");
-				}
-                
+                if (defaultParameters.containsKey(outputFmtExt)) {
+
+                    // get hashmap of the desired output format
+                    List<Parameter> defaultParamList = (List<Parameter>) defaultParameters.get(outputFmtExt);
+                    Iterator<Parameter> defParmsItr = defaultParamList.iterator();
+                    int index = 0;
+                    while (defParmsItr.hasNext()) {
+                        Parameter defParam = (Parameter) defParmsItr.next();
+                        if (userParam.getName().equalsIgnoreCase(defParam.getName())) {
+                            defaultParamList.set(index, userParam);
+                            break;
+                        }
+                        index++;
+                    //hm.put(param.name, param.value); // override default parameter
+                    }
+                } else {
+                    m = "Parameter skipped. Parameter: " + userParam.getName() + " is not supported by this Gimp service. ";
+                    log.info(m);
+                    serviceMessage.append(m + " \n");
+                }
+
             }
         }
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -388,7 +378,7 @@ public final class Gimp26Migration implements Migrate {
      */
     public MigrateResult migrate(final DigitalObject digitalObject, URI inputFormat,
             URI outputFormat, List<Parameter> parameters) {
-        
+
         // read global gimp configuration parameters from properties file
         Properties props = new Properties();
         try {
@@ -403,59 +393,63 @@ public final class Gimp26Migration implements Migrate {
         } catch (Exception e) {
             this.gimp_install_dir = "/usr/bin";
             this.gimp_app_name = "gimp";
-	    this.gimp_scripts_dir = "/usr/share/gimp/2.0/scripts";
+            this.gimp_scripts_dir = "/usr/share/gimp/2.0/scripts";
         }
 
-	// initialise input formats (GIF, JPEG, EPS, ...) and output formats list 
+        // initialise input formats (GIF, JPEG, EPS, ...) and output formats list
         // (GIF, JPEG, EPS, ...) and apply disambiguation ("JPG" -> "JPEG"}
         init();
-        
+
         String m = "Success: Using gimp install directory: " + this.gimp_install_dir + ". ";
-        log.info(m); serviceMessage.append(m+" \n");
+        log.info(m);
+        serviceMessage.append(m + " \n");
         m = "Using gimp application name: " + this.gimp_app_name + ". ";
-        log.info(m); serviceMessage.append(m+" \n");
+        log.info(m);
+        serviceMessage.append(m + " \n");
         m = "Using Gimp scripts dir: " + this.gimp_scripts_dir + ". ";
-        log.info(m); serviceMessage.append(m+" \n");
-        
+        log.info(m);
+        serviceMessage.append(m + " \n");
+
         // Check for Gimp executable
         String gimpPath = gimp_install_dir + "/" + gimp_app_name;
         File gimpExecutable = new File(gimpPath);
         if (!gimpExecutable.exists()) {
-            String msg = "Error: Unable to find Gimp executable in the given path " + gimpPath+ ". ";
+            String msg = "Error: Unable to find Gimp executable in the given path " + gimpPath + ". ";
             log.error(msg);
             report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
             return new MigrateResult(null, report);
-	}
+        }
 
         // set input and output extensions based upon input and output format
         // e.g. 
         // inputFormat="planets:fmt/ext/tif" -> inputFmtExt="TIFF"
         // outputFormat="planets:fmt/ext/jpg" -> outputFmtExt="JPEG"
-        getExtensions(inputFormat,outputFormat);
-      
-	// Check if Gimp-Fu-Script exists
-	File gimpFuScript = new File(gimp_scripts_dir+"/planetsMigrate" + inputFmtExt + "to" + outputFmtExt+".scm"); 
+        getExtensions(inputFormat, outputFormat);
+
+        // Check if Gimp-Fu-Script exists
+        File gimpFuScript = new File(gimp_scripts_dir + "/planetsMigrate" + inputFmtExt + "to" + outputFmtExt + ".scm");
         if (!gimpFuScript.exists()) {
-            String msg = "Error: The Gimp script "+gimpFuScript+" which is required for executing this service request does not exist. ";
+            String msg = "Error: The Gimp script " + gimpFuScript + " which is required for executing this service request does not exist. ";
             log.error(msg);
             report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
             return new MigrateResult(null, report);
         } else {
             m = "Gimp script " + gimpFuScript.getAbsolutePath() + " exists. ";
-            log.info(m); serviceMessage.append(m+" \n");
-	}
+            log.info(m);
+            serviceMessage.append(m + " \n");
+        }
 
         // Initialise parameters with default values
         initParameters();
-        
+
         // override the default parameters initialised above  by the parameters 
         // passed by the user
         overrideDefaultParamets(parameters);
-        
+
         // get binary data from digital object
         byte[] binary = null;
         InputStream inputStream = digitalObject.getContent().read();
-       
+
         // write binary array to temporary file
         //tmpInFile = ByteArrayHelper.write(binary);
         tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets", inputFmtExt);
@@ -463,9 +457,11 @@ public final class Gimp26Migration implements Migrate {
         // read byte array from temporary file
         if (tmpInFile.isFile() && tmpInFile.canRead()) {
             m = "Temporary input file created successfully: " + tmpInFile.getAbsolutePath() + ". ";
-            log.info(m); serviceMessage.append(m+" \n");
+            log.info(m);
+            serviceMessage.append(m + " \n");
             m = "Input file size: " + tmpInFile.length() + " bytes. ";
-            log.info(m); serviceMessage.append(m+" \n");
+            log.info(m);
+            serviceMessage.append(m + " \n");
         } else {
             String msg = "Error: Unable to read temporary input file " + tmpInFile.getAbsolutePath() + ". ";
             log.error(msg);
@@ -480,28 +476,28 @@ public final class Gimp26Migration implements Migrate {
         gimpFuScriptCmdStr = getFuScriptMigrationStr();
         System.out.println();
 
-        m = "GIMP Fu-Script command "+gimpFuScriptCmdStr+". ";
-        log.info(m); serviceMessage.append(m+" \n");
+        m = "GIMP Fu-Script command " + gimpFuScriptCmdStr + ". ";
+        log.info(m);
+        serviceMessage.append(m + " \n");
 
-        if( gimpFuScriptCmdStr != null )
-        {
+        if (gimpFuScriptCmdStr != null) {
             // commands string array
             String[] commands = new String[]{
-                    gimp_app_name, 
-                    "--verbose",
-                    "-c",
-                    "-i",
-                    "-d",
-                    "-b",
-                    gimpFuScriptCmdStr, // Migration Fu-Script function call
-                    "-b",
-                    "(gimp-quit 0)"
-                };
-            
+                gimp_app_name,
+                "--verbose",
+                "-c",
+                "-i",
+                "-d",
+                "-b",
+                gimpFuScriptCmdStr, // Migration Fu-Script function call
+                "-b",
+                "(gimp-quit 0)"
+            };
+
             // temporary outfile, outfile name = infilename + ".out"
             String outFileStr = tmpInFile.getAbsolutePath() + ".out";
             tmpOutFile = new File(outFileStr);
-            
+
             long startMillis = System.currentTimeMillis();
 
             // Create process runner and execute commands
@@ -513,7 +509,7 @@ public final class Gimp26Migration implements Migrate {
             int return_code = runner.getReturnCode();
             if (return_code != 0) {
                 String errMsg = runner.getProcessErrorAsString();
-                String msg = "Gimp returned an error when trying to convert the image. Gimp error code: " + Integer.toString(return_code)+". Gimp error message: "+errMsg+". ";
+                String msg = "Gimp returned an error when trying to convert the image. Gimp error code: " + Integer.toString(return_code) + ". Gimp error message: " + errMsg + ". ";
                 log.error(msg);
                 report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
                 return new MigrateResult(null, report);
@@ -522,13 +518,16 @@ public final class Gimp26Migration implements Migrate {
             // read byte array from temporary file
             if (tmpOutFile.isFile() && tmpOutFile.canRead()) {
                 binary = FileUtils.readFileIntoByteArray(tmpOutFile);
-		long endMillis = System.currentTimeMillis();
-                m = "Processing time: " + (endMillis-startMillis) + " milliseconds. ";
-                log.info(m); serviceMessage.append(m+" \n");
+                long endMillis = System.currentTimeMillis();
+                m = "Processing time: " + (endMillis - startMillis) + " milliseconds. ";
+                log.info(m);
+                serviceMessage.append(m + " \n");
                 m = "Temporary outputfile " + tmpOutFile.getAbsolutePath() + " created successfully. ";
-                log.info(m); serviceMessage.append(m+" \n");
+                log.info(m);
+                serviceMessage.append(m + " \n");
                 m = "Output file size: " + tmpOutFile.length() + " bytes. ";
-                log.info(m); serviceMessage.append(m+" \n");
+                log.info(m);
+                serviceMessage.append(m + " \n");
             } else {
                 String msg = "Error: Unable to read temporary output file " + tmpOutFile.getAbsolutePath();
                 log.error(msg);
@@ -536,31 +535,28 @@ public final class Gimp26Migration implements Migrate {
                 return new MigrateResult(null, report);
             }
         }
-        
+
         // digital object output
         DigitalObject newDO = null;
         newDO = new DigitalObject.Builder(Content.byValue(binary)).build();
-        report = new ServiceReport(Type.INFO,Status.SUCCESS, this.serviceMessage.toString());
+        report = new ServiceReport(Type.INFO, Status.SUCCESS, this.serviceMessage.toString());
         return new MigrateResult(newDO, report);
     }
-   
-    private List<Parameter> getParameters()
-    {
+
+    private List<Parameter> getParameters() {
         List<Parameter> paramList = new ArrayList<Parameter>();
         Iterator<String> itr = defaultParameters.keySet().iterator();
-        while( itr.hasNext() )
-        {
-            String key = (String)itr.next();
+        while (itr.hasNext()) {
+            String key = (String) itr.next();
             List<Parameter> parameterList = (List<Parameter>) defaultParameters.get(key);
             Iterator<Parameter> itr2 = parameterList.iterator();
-            while( itr2.hasNext() )
-            {
-                paramList.add((Parameter) itr2.next());                
+            while (itr2.hasNext()) {
+                paramList.add((Parameter) itr2.next());
             }
         }
         return paramList;
     }
-    
+
     /**
      * @see eu.planets_project.services.migrate.Migrate#describe()
      */
@@ -568,35 +564,28 @@ public final class Gimp26Migration implements Migrate {
         init();
         initParameters();
         List<Parameter> parameters = getParameters();
-        ServiceDescription mds = new ServiceDescription.Builder(NAME, Migrate.class.getName())
-                .author("Sven Schlarb <shsschlarb-planets@yahoo.de>, Georg Petz <georg.petz@onb.ac.at>")
-                .classname(this.getClass().getCanonicalName())
-//                .description(description)
+        ServiceDescription mds = new ServiceDescription.Builder(NAME, Migrate.class.getName()).author("Sven Schlarb <shsschlarb-planets@yahoo.de>, Georg Petz <georg.petz@onb.ac.at>").classname(this.getClass().getCanonicalName()) //                .description(description)
                 .description("This service provides file format migrations using \"The GIMP\" (GNU image manipulation program) version 2.6. " +
-                            "GIMP is  the  GNU Image Manipulation Program. It is used to edit and manipulate images. It can load and save a variety of image"+
-                            "formats and can be used to convert between formats."+
-                            "GIMP can also be used as a paint program. It features a set of drawing and painting tools such as airbrush, clone,  pencil,  and"+
-                            "paint  brush.  Painting and drawing tools can be applied to an image with a variety of paint modes.  It also offers an extensive"+
-                            "array of selection tools like rectangle, ellipse, fuzzy select, bezier select, intelligent scissors, and select by color."+
-                            "GIMP offers a variety of plug-ins that perform a variety of image manipulations.  Examples include bumpmap, edge  detect,  gaus-"+
-                            "sian  blur, and many others. In addition, GIMP has several scripting extension which allow for advanced non-interactive process-"+
-                            "ing and creation of images."+
-                            "GIMP ships with a second binary called gimp-console. This binary is a console-only version and behaves as  if  gimp  was  called"+
-                            "with the --no-interface command-line option. The gimp-console is the program used in this wrapper."+
-                            "Currently, this service only supports migration from one file format to another, not single file format migrations. "+
-                            "For example, planets:fmt/ext/tiff to planets:fmt/ext/tiff could migrate a TIFF image without compression to a TIFF image using the LZW compression type. "+
-                            "Furthermore, only the conversion to GIF format supports indexed colour (applying fu-script function gimp-convert-indexed). This is not provided for the file formats BMP, PNG, and TIFF which in principle do support indexed colours as well. "+
-                            "Alpha Channel transparency exists for some file formats, like GIF, PNG, BMP. If an alpha channel is encountered, the image is flattened using the gimp-image-flatten function. "+
-                            "It accepts input and target formats of the form: " +
-                            "'planets:fmt/ext/[extension]'\n" +
-                            "e.g. 'planets:fmt/ext/tiff' or 'planets:fmt/ext/tif'")
-                .version("0.1")
-                .parameters(parameters)
-                .paths(createMigrationPathwayMatrix(inputFormats, outputFormats))
-                .build();
+                "GIMP is  the  GNU Image Manipulation Program. It is used to edit and manipulate images. It can load and save a variety of image" +
+                "formats and can be used to convert between formats." +
+                "GIMP can also be used as a paint program. It features a set of drawing and painting tools such as airbrush, clone,  pencil,  and" +
+                "paint  brush.  Painting and drawing tools can be applied to an image with a variety of paint modes.  It also offers an extensive" +
+                "array of selection tools like rectangle, ellipse, fuzzy select, bezier select, intelligent scissors, and select by color." +
+                "GIMP offers a variety of plug-ins that perform a variety of image manipulations.  Examples include bumpmap, edge  detect,  gaus-" +
+                "sian  blur, and many others. In addition, GIMP has several scripting extension which allow for advanced non-interactive process-" +
+                "ing and creation of images." +
+                "GIMP ships with a second binary called gimp-console. This binary is a console-only version and behaves as  if  gimp  was  called" +
+                "with the --no-interface command-line option. The gimp-console is the program used in this wrapper." +
+                "Currently, this service only supports migration from one file format to another, not single file format migrations. " +
+                "For example, planets:fmt/ext/tiff to planets:fmt/ext/tiff could migrate a TIFF image without compression to a TIFF image using the LZW compression type. " +
+                "Furthermore, only the conversion to GIF format supports indexed colour (applying fu-script function gimp-convert-indexed). This is not provided for the file formats BMP, PNG, and TIFF which in principle do support indexed colours as well. " +
+                "Alpha Channel transparency exists for some file formats, like GIF, PNG, BMP. If an alpha channel is encountered, the image is flattened using the gimp-image-flatten function. " +
+                "It accepts input and target formats of the form: " +
+                "'planets:fmt/ext/[extension]'\n" +
+                "e.g. 'planets:fmt/ext/tiff' or 'planets:fmt/ext/tif'").version("0.1").parameters(parameters).paths(createMigrationPathwayMatrix(inputFormats, outputFormats)).build();
         return mds;
     }
-    
+
     /**
      * Gets one extension from a set of possible extensions for the incoming
      * request planets URI (e.g. planets:fmt/ext/jpeg) which matches with
@@ -608,8 +597,7 @@ public final class Gimp26Migration implements Migrate {
      * @param isOutput Is the format an input or an output format
      * @return Format extension (e.g. "JPEG")
      */
-    private String getFormatExt( URI formatUri, boolean isOutput  )
-    {
+    private String getFormatExt(URI formatUri, boolean isOutput) {
         String fmtStr = null;
         // status variable which indicates if an input/out format has been found 
         // while iterating over possible matches
@@ -618,37 +606,37 @@ public final class Gimp26Migration implements Migrate {
         // planets:fmt/ext/jpg -> { "JPEG", "JPG" }
         // or can be found in the list of GIMP supported formats
         Set<String> reqInputFormatExts = FormatRegistryFactory.getFormatRegistry().getExtensions(formatUri);
-        Iterator<String> itrReq = reqInputFormatExts.iterator(); 
+        Iterator<String> itrReq = reqInputFormatExts.iterator();
         // Iterate either over input formats ArrayList or over output formats
         // HasMap
-        Iterator<String> itrGimp = (isOutput)?outputFormats.iterator():inputFormats.iterator();
+        Iterator<String> itrGimp = (isOutput) ? outputFormats.iterator() : inputFormats.iterator();
         // Iterate over possible extensions that correspond to the request
         // planets uri.
-        while(itrReq.hasNext()) {
+        while (itrReq.hasNext()) {
             // Iterate over the different extensions of the planets:fmt/ext/jpg
             // format URI, note that the relation of Planets-format-URI to
             // extensions is 1 : n.
             String reqFmtExt = normalizeExt((String) itrReq.next());
-            while(itrGimp.hasNext()) {
+            while (itrGimp.hasNext()) {
                 // Iterate over the formats that GIMP offers either as input or
                 // as output format.
                 // See input formats in the this.init() method to see the
                 // GIMP input/output formats offered by this service.
                 String gimpFmtStr = (String) itrGimp.next();
-                if( reqFmtExt.equalsIgnoreCase(gimpFmtStr) )
-                {
+                if (reqFmtExt.equalsIgnoreCase(gimpFmtStr)) {
                     // select the gimp supported format
                     fmtStr = gimpFmtStr;
                     fmtFound = true;
                     break;
                 }
-                if( fmtFound )
+                if (fmtFound) {
                     break;
+                }
             }
         }
         return fmtStr;
     }
-    
+
     /**
      * Disambiguation (e.g. JPG -> JPEG) according to the formatMapping
      * datas structure defined in this class.
@@ -656,13 +644,11 @@ public final class Gimp26Migration implements Migrate {
      * @param ext
      * @return Uppercase disambiguized extension string
      */
-    private String normalizeExt(String ext)
-    {
+    private String normalizeExt(String ext) {
         String normExt = ext.toUpperCase();
-        return ((formatMapping.containsKey(normExt))?
-            (String)formatMapping.get(normExt):normExt);
+        return ((formatMapping.containsKey(normExt)) ? (String) formatMapping.get(normExt) : normExt);
     }
-    
+
     /**
      * Create fu-script command string.
      * 
@@ -671,24 +657,22 @@ public final class Gimp26Migration implements Migrate {
      * @return Null if the input or output format is not supported, fu-script 
      * command string otherwise
      */
-    private String getFuScriptMigrationStr()
-    {
+    private String getFuScriptMigrationStr() {
         // fu-script string of the planets migration command
         String fuScriptMigrString = null;
-        
-        if( inputFmtExt != null && outputFmtExt != null )
-        {
+
+        if (inputFmtExt != null && outputFmtExt != null) {
             // build fu-script command of the form e.g.
             // planetsMigrateJPEGtoPNG(infile.ext outfile.ext 1 1 1)
-            fuScriptMigrString = 
-                            "(planetsMigrate" + 
-                            inputFmtExt +
-                            "to" +
-                            outputFmtExt +
-                            " \"" + tmpInFile.getAbsolutePath() + "\"" +
-                            " \"" + tmpInFile.getAbsolutePath() + ".out\" " +
-                            getParameterString(outputFmtExt) + 
-                            ")";
+            fuScriptMigrString =
+                    "(planetsMigrate" +
+                    inputFmtExt +
+                    "to" +
+                    outputFmtExt +
+                    " \"" + tmpInFile.getAbsolutePath() + "\"" +
+                    " \"" + tmpInFile.getAbsolutePath() + ".out\" " +
+                    getParameterString(outputFmtExt) +
+                    ")";
         }
         return fuScriptMigrString;
     }
@@ -704,9 +688,10 @@ public final class Gimp26Migration implements Migrate {
                 FormatRegistry registry = FormatRegistryFactory.getFormatRegistry();
                 URI inFmt = registry.createExtensionUri(input);
                 URI outFmt = registry.createExtensionUri(output);
-                MigrationPath path = new MigrationPath(inFmt,outFmt, defaultParameters.get(output));
-                if( !(inFmt.toString().equals(outFmt.toString())) )
+                MigrationPath path = new MigrationPath(inFmt, outFmt, defaultParameters.get(output));
+                if (!(inFmt.toString().equals(outFmt.toString()))) {
                     paths.add(path);
+                }
             }
         }
         return paths.toArray(new MigrationPath[]{});
