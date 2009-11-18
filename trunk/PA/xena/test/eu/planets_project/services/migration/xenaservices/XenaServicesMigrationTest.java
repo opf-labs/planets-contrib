@@ -1,7 +1,7 @@
 package eu.planets_project.services.migration.xenaservices;
 
 import eu.planets_project.ifr.core.techreg.formats.Format;
-import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.formats.api.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import org.junit.Test;
 import eu.planets_project.services.datatypes.Content;

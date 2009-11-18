@@ -25,7 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import eu.planets_project.ifr.core.storage.utils.DigitalObjectDiskCache;
-import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.formats.api.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.Content;
