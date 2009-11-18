@@ -3,22 +3,27 @@
  */
 package eu.planets_project.services.migration.dia.impl;
 
-import eu.planets_project.services.datatypes.Content;
-import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.MigrationPath;
-import eu.planets_project.services.datatypes.ServiceDescription;
-import eu.planets_project.services.migrate.Migrate;
-import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.test.ServiceCreator;
-import junit.framework.TestCase;
-import org.junit.Test;
-
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import junit.framework.TestCase;
+
+import org.junit.Test;
+
+import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.MigrationPath;
+import eu.planets_project.services.datatypes.Parameter;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.migrate.Migrate;
+import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.utils.test.ServiceCreator;
 
 /**
  * @author tsh
@@ -65,6 +70,9 @@ public class DiaMigrationServiceTest extends TestCase {
 	}
 
 	/**
+	 * Test migration from Dia to SVG version 1.1
+	 * 
+	 * Test method for {@link eu.planets_project.services.migration.dia.impl.DiaMigrationService#migrate(eu.planets_project.services.datatypes.DigitalObject, java.net.URI, java.net.URI, eu.planets_project.services.datatypes.Parameter)}.
 	 */
 	@Test
 	public void testMigrationDiaToSvg() throws Exception {
@@ -76,27 +84,22 @@ public class DiaMigrationServiceTest extends TestCase {
 		 */
 		final File diaTestFile = new File(TEST_FILE_PATH, diaTestFileName);
 
-		final URI diaFormatURI = new URI("info:test/lowercase"); // DIA URI
-		final URI svgFormatURI1 = new URI("info:test/uppercase"); // SVG version 1.0
-		//final URI svgFormatURI2 = new URI("info:pronom/fmt/92"); // SVG version 1.1
-
+		final URI diaFormatURI = new URI("info:pronom/x-fmt/381"); // DIA URI
+		final URI svgFormatURI = new URI("info:pronom/fmt/92"); // SVG version 1.1
 
 		DigitalObject.Builder digitalObjectBuilder = new DigitalObject.Builder(Content.byValue(diaTestFile));
 		digitalObjectBuilder.format(diaFormatURI);
 		digitalObjectBuilder.title(diaTestFileName);
 		DigitalObject digitalObject = digitalObjectBuilder.build();
+			
+		List<Parameter> testParameters = new ArrayList<Parameter>();
+		Parameter.Builder parameterBuilder = new Parameter.Builder("outputFormat", "svg");
+		testParameters.add(parameterBuilder.build());
+		MigrateResult migrationResult = migrationService.migrate(digitalObject, diaFormatURI, svgFormatURI, testParameters);
 		
-		// Test migration from Dia to SVG version 1.0
-		MigrateResult migrationResult = migrationService.migrate(digitalObject, diaFormatURI, svgFormatURI1, null);
-		
-		if(migrationResult == null); //Kill warning
-		// TODO: Validate the output in some brilliant way
-		
-		// Test migration from Dia to SVG version 1.1
-		// migrationResult = migrationService.migrate(digitalObject, diaFormatURI, svgFormatURI1, null);
-		
-		// TODO: Validate the output in some brilliant way
-		
+		final ServiceReport serviceReport = migrationResult.getReport();
+		final ServiceReport.Status migrationStatus = serviceReport.getStatus();
+		assertEquals(ServiceReport.Status.SUCCESS, migrationStatus);
 		
 	}
 
@@ -104,6 +107,7 @@ public class DiaMigrationServiceTest extends TestCase {
 	 * Test method for {@link eu.planets_project.services.migration.dia.impl.DiaMigrationService#describe()}.
 	 */
 	@Test
+	/*
 	public void testDescribe() throws Exception {
 		ServiceDescription diaServiceDescription = migrationService.describe();
 
@@ -131,9 +135,8 @@ public class DiaMigrationServiceTest extends TestCase {
 		//      	System.out.println(suffix + " : " + formatURIMap.get(suffix));
 		//      }
 
-        //example
 	}
-
+*/
 	@SuppressWarnings("unused")
 	private void verifyMigrationPaths(List<MigrationPath> migrationPaths) {
 		// TODO: More intelligent test needed.
