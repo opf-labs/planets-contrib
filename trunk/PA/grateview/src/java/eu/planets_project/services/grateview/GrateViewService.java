@@ -77,7 +77,8 @@ public class GrateViewService implements CreateView {
 	private static final String FLOPPY_PATH =  "grate-floppy-content";
 	private static final String TMP_PATH = "grate-tmp";
 	
-	private static String grateBaseUrl = "http://planets.ruf.uni-freiburg.de/~randy/GRATE_IF.php";
+	/** The location of the GRATE server */
+    private static String grateBaseUrl = "http://planets.ruf.uni-freiburg.de/~randy/GRATE_IF.php";
 
 	/** A reference to the web service context. */
 	@Resource 
@@ -87,7 +88,7 @@ public class GrateViewService implements CreateView {
 	{
 		ServiceDescription.Builder mds;
 		mds = new ServiceDescription.Builder(NAME, CreateView.class.getCanonicalName());
-		mds.description("A GRATE (emulation) viewer service.");
+		mds.description("A GRATE (emulation) viewer service. This service uses the GRATE endpoint hosted at "+grateBaseUrl+".");
 		mds.author("Klaus Rechert <klaus.rechert@rz.uni-freiburg.de>");
 		mds.classname(this.getClass().getCanonicalName());
 		return mds.build();
