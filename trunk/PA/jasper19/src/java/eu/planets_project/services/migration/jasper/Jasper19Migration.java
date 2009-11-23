@@ -86,6 +86,7 @@ public final class Jasper19Migration implements Migrate {
         inputFormats.add("ppm"); // PNM/PGM/PPM
         inputFormats.add("mif"); // My Image Format
         inputFormats.add("ras"); // Sun Rasterformat
+        inputFormats.add("tif"); // Sun Rasterformat
 
         // output formats and associated output parameters
         outputFormats = new ArrayList<String>();
@@ -99,14 +100,13 @@ public final class Jasper19Migration implements Migrate {
         outputFormats.add("ppm"); // PNM/PGM/PPM
         outputFormats.add("mif"); // My Image Format
         outputFormats.add("ras"); // Sun Rasterformat
+        outputFormats.add("tif"); // Sun Rasterformat
 
         // Disambiguation of extensions, e.g. {"JPG","JPEG"} to {"JPEG"}
         // FIXIT This should be supported by the FormatRegistryImpl class, but
         // it does not provide the complete set at the moment.
         formatMapping = new HashMap<String, String>();
         formatMapping.put("jpeg", "jpg");
-        formatMapping.put("pgm", "pnm");
-        formatMapping.put("ppm", "pnm");
 
         jasperServiceParameters = new Jasper19ServiceParameters();
 
@@ -144,9 +144,8 @@ public final class Jasper19Migration implements Migrate {
 
         } catch (Exception e) {
             // // config vars
-            this.jasper19_install_dir = "/usr/bin";
+            this.jasper19_install_dir = "/usr/local/bin/"; // This Uses jasper-1.701.0.GEO!!!!
             this.jasper19_app_name = "jasper";
-            //this.jasper19_outfile_ext = "jp2";
         }
 	
 	init();
@@ -377,6 +376,7 @@ public final class Jasper19Migration implements Migrate {
                 "http://www.jpeg.org/software");
         FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
         MigrationPath[] mPaths = new MigrationPath[]{
+            new MigrationPath(format.createExtensionUri("tif"), format.createExtensionUri("jp2"), Jasper19ServiceParameters.getParameterList()),
             new MigrationPath(format.createExtensionUri("jpg"), format.createExtensionUri("jp2"), Jasper19ServiceParameters.getParameterList()),
             new MigrationPath(format.createExtensionUri("bmp"), format.createExtensionUri("jp2"), Jasper19ServiceParameters.getParameterList()),
             new MigrationPath(format.createExtensionUri("pgx"), format.createExtensionUri("jp2"), Jasper19ServiceParameters.getParameterList()),
@@ -399,6 +399,7 @@ public final class Jasper19Migration implements Migrate {
             new MigrationPath(format.createExtensionUri("jp2"), format.createExtensionUri("ppm"), null),
             new MigrationPath(format.createExtensionUri("jp2"), format.createExtensionUri("mif"), null),
             new MigrationPath(format.createExtensionUri("jp2"), format.createExtensionUri("ras"), null),
+            new MigrationPath(format.createExtensionUri("jp2"), format.createExtensionUri("tif"), null),
             new MigrationPath(format.createExtensionUri("jpc"), format.createExtensionUri("bmp"), null),
             new MigrationPath(format.createExtensionUri("jpc"), format.createExtensionUri("jpg"), null),
             new MigrationPath(format.createExtensionUri("jpc"), format.createExtensionUri("pgx"), null),
