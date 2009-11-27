@@ -1,10 +1,14 @@
 package eu.planets_project.services.migration.jasper;
 
+import java.util.logging.Logger;
+
+import eu.planets_project.ifr.core.services.migration.genericwrapper1.ServiceDescriptionFactory;
 import eu.planets_project.services.datatypes.Parameter;
 
 public class IntegerParameter extends NumberParameter<Integer> {
 
-    private Integer maxValue;
+    private static Logger log = Logger.getLogger(IntegerParameter.class.getName());
+	private Integer maxValue;
     private Integer minValue;
     private String statusMessage;
 

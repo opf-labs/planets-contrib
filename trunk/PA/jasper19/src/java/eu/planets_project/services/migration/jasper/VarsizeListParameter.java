@@ -4,10 +4,12 @@
  */
 package eu.planets_project.services.migration.jasper;
 
+import eu.planets_project.ifr.core.services.migration.genericwrapper1.ServiceDescriptionFactory;
 import eu.planets_project.services.datatypes.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
 /**
  *
@@ -15,6 +17,7 @@ import java.util.StringTokenizer;
  */
 public class VarsizeListParameter extends ServiceParameter {
 
+    private static Logger log = Logger.getLogger(VarsizeListParameter.class.getName());
     String commaSepExclFromValidation;
     PrimitiveParameterType type;
     List<String> valuesList;
@@ -55,7 +58,7 @@ public class VarsizeListParameter extends ServiceParameter {
                     case BOOLEANPARM:
                         if (val.equalsIgnoreCase("true") || val.equalsIgnoreCase("false")) {
                         } else {
-                            log.error("validate - Parameter '" + getParameter().getName() + "' with value '" + val + "' is not valid.");
+                            log.severe("validate - Parameter '" + getParameter().getName() + "' with value '" + val + "' is not valid.");
                             return false;
                         }
                         return true;
@@ -63,7 +66,7 @@ public class VarsizeListParameter extends ServiceParameter {
                         try {
                             Double.parseDouble(val);
                         } catch (NumberFormatException ex) {
-                            log.error("validate - Parameter '" + getParameter().getName() + "' with value '" + val + "' is not valid.");
+                            log.severe("validate - Parameter '" + getParameter().getName() + "' with value '" + val + "' is not valid.");
                             return false;
                         }
                         return true;
@@ -71,7 +74,7 @@ public class VarsizeListParameter extends ServiceParameter {
                         try {
                             new Integer(Integer.parseInt(val));
                         } catch (NumberFormatException ex) {
-                            log.error("validate - Parameter '" + getParameter().getName() + "' with value '" + val + "' is not valid.");
+                            log.severe("validate - Parameter '" + getParameter().getName() + "' with value '" + val + "' is not valid.");
                             return false;
                         }
                         return true;

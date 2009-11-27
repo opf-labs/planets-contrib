@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -32,7 +33,6 @@ import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
 
 /**
@@ -49,7 +49,7 @@ targetNamespace = PlanetsServices.NS,
 endpointInterface = "eu.planets_project.services.migrate.Migrate")
 public final class Jasper19Migration implements Migrate {
 
-    PlanetsLogger log = PlanetsLogger.getLogger(Jasper19Migration.class);
+    private static Logger log = Logger.getLogger(Jasper19Migration.class.getName());
     /** The dvi ps installation dir */
     public String jasper19_install_dir;
     /** The jasper19 application name */
@@ -173,7 +173,7 @@ public final class Jasper19Migration implements Migrate {
         tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets", inputFmtExt);
         if (!(tmpInFile.exists() && tmpInFile.isFile() && tmpInFile.canRead())) {
             String msg = "Error: Unable to create temporary input file " + tmpInFile.getAbsolutePath();
-            log.error(msg);
+            log.severe(msg);
             report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
             return new MigrateResult(null, report);
         }
@@ -231,7 +231,7 @@ public final class Jasper19Migration implements Migrate {
         if (return_code != 0) {
             String errMsg = "Jasper conversion error code: " + Integer.toString(return_code) +
                     ". Jasper error message: "+runner.getProcessErrorAsString();
-            log.error(errMsg);
+            log.severe(errMsg);
             String msg = null;
             if(serviceMessage.toString().equals("")) {
                 msg = errMsg;
@@ -254,7 +254,7 @@ public final class Jasper19Migration implements Migrate {
         	log.info(m61); serviceMessage.append(m61+"\n");
         } else {
             String msg = "Error: Unable to read temporary file \"" + tmpOutFile.getAbsolutePath()+"\"";
-            log.error(msg);
+            log.severe(msg);
             report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
             return new MigrateResult(null, report);
         }

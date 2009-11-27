@@ -40,7 +40,6 @@ import eu.planets_project.ifr.core.services.migration.openXML.common.ConversionR
 import eu.planets_project.ifr.core.services.migration.openXML.common.ConvertedFile;
 import eu.planets_project.ifr.core.services.migration.openXML.common.ConvertedFileNames;
 import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.PlanetsLogger;
 
 /**
  *

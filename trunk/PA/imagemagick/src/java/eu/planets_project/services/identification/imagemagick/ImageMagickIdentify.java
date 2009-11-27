@@ -8,6 +8,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -29,7 +30,6 @@ import eu.planets_project.services.identify.Identify;
 import eu.planets_project.services.identify.IdentifyResult;
 import eu.planets_project.services.migration.imagemagick.CoreImageMagick;
 import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ServiceUtils;
 
 /**
@@ -52,7 +52,7 @@ public class ImageMagickIdentify implements Identify {
 	
 	public static final long serialVersionUID = -772290809743383420L;
 	
-	private PlanetsLogger PLOGGER = PlanetsLogger.getLogger(this.getClass()) ;
+	private static Logger log = Logger.getLogger(ImageMagickIdentify.class.getName()) ;
 	
 	private static final String WORKFOLDER_NAME = "ImageMagickIdentify";
 	private String sessionID = FileUtils.randomizeFileName("");
@@ -71,7 +71,7 @@ public class ImageMagickIdentify implements Identify {
 	 */
 	public ImageMagickIdentify(){
 //	    System.setProperty("jmagick.systemclassloader","no"); // Use the JBoss-Classloader, instead of the Systemclassloader.
-	    PLOGGER.info("Hello! Initializing and starting ImageMagickIdentify service!");
+	    log.info("Hello! Initializing and starting ImageMagickIdentify service!");
 	    version = CoreImageMagick.checkImageMagickVersion();
 	}
 
@@ -103,40 +103,40 @@ public class ImageMagickIdentify implements Identify {
 	public IdentifyResult identify(DigitalObject digitalObject, List<Parameter> parameters ) {
 		
 		if(digitalObject.getContent()==null) {
-			PLOGGER.error("The Content of the DigitalObject should NOT be NULL! Returning with ErrorReport");
+			log.severe("The Content of the DigitalObject should NOT be NULL! Returning with ErrorReport");
 			return this.returnWithErrorMessage("The Content of the DigitalObject should NOT be NULL! Returning with ErrorReport", null);
 		}
 		
 		String fileName = digitalObject.getTitle();
-		PLOGGER.info("Input file to identify: " +fileName);
+		log.info("Input file to identify: " +fileName);
 		URI inputFormat = digitalObject.getFormat();
         if(inputFormat!=null) {
-            PLOGGER.info("Assumed file format: " + inputFormat.toASCIIString());
+            log.info("Assumed file format: " + inputFormat.toASCIIString());
         }
 		String extension = null;
 		
 		if(inputFormat!=null) {
 			extension = format.getExtensions(inputFormat).iterator().next();
-			PLOGGER.info("Found extension for input file: " + extension);
+			log.info("Found extension for input file: " + extension);
 		}
 		else {
-			PLOGGER.info("I am not able to find the file extension, using DEFAULT_EXTENSION instead: " + DEFAULT_EXTENSION);
+			log.info("I am not able to find the file extension, using DEFAULT_EXTENSION instead: " + DEFAULT_EXTENSION);
 			extension = DEFAULT_EXTENSION;
 		}
 		
 		if(fileName==null || fileName.equalsIgnoreCase("")) {
-			PLOGGER.info("Could not retrieve file name\n(digitalObject.getTitle() returns NULL), using DEFAULT_INPUT_NAME instead: " + DEFAULT_INPUT_NAME + "." + extension);
+			log.info("Could not retrieve file name\n(digitalObject.getTitle() returns NULL), using DEFAULT_INPUT_NAME instead: " + DEFAULT_INPUT_NAME + "." + extension);
 			fileName = DEFAULT_INPUT_NAME + "." + extension;
 		}
 		
 		File workFolder = FileUtils.createWorkFolderInSysTemp(WORKFOLDER_NAME);
-		PLOGGER.info("Created workfolder for temp files: " + workFolder.getAbsolutePath());
+		log.info("Created workfolder for temp files: " + workFolder.getAbsolutePath());
 		if(workFolder.exists()) {
 			FileUtils.deleteAllFilesInFolder(workFolder);
 		}
 		
 		File inputFile = FileUtils.writeInputStreamToFile(digitalObject.getContent().read(), workFolder, fileName);
-		PLOGGER.info("Created temporary input file: " + inputFile.getAbsolutePath());
+		log.info("Created temporary input file: " + inputFile.getAbsolutePath());
 		
 		ArrayList<URI> uriList = null;
 		
@@ -163,7 +163,7 @@ public class ImageMagickIdentify implements Identify {
 		Set<URI> uris = format.getUrisForExtension(srcImageFormat);
 	    
 	    if(uris==null || uris.size() <= 0) {
-	    	PLOGGER.error("No URI returned for this extension: " + srcImageFormat + ".\n" 
+	    	log.severe("No URI returned for this extension: " + srcImageFormat + ".\n" 
 	    			+ "Input file: " + inputFile.getName() + " could not be identified!!!");
 	    	return this.returnWithErrorMessage("No URI returned for this extension: " + srcImageFormat + ".\n" 
 	    			+ "Input file: " + inputFile.getName() + " could not be identified!!!", null);
@@ -174,13 +174,13 @@ public class ImageMagickIdentify implements Identify {
 	    URI formatURI = format.createExtensionUri(srcImageFormat);
 	    uriList.add(0, formatURI);
 	    String infoString = createFormatInfoString(uris);
-	    PLOGGER.info("Successfully identified Input file as: " + formatURI.toASCIIString() + "\n" + infoString);
+	    log.info("Successfully identified Input file as: " + formatURI.toASCIIString() + "\n" + infoString);
 	    ServiceReport sr = new ServiceReport(Type.INFO, Status.SUCCESS,
                 "Successfully identified Input file as: "
                         + formatURI.toASCIIString() + "\n" + infoString);
 		IdentifyResult identRes = new IdentifyResult(uriList, IdentifyResult.Method.PARTIAL_PARSE, sr);
 		
-		PLOGGER.info("SUCCESS! Returning IdentifyResult. Goodbye!");
+		log.info("SUCCESS! Returning IdentifyResult. Goodbye!");
 		return identRes;
 	}
 	
