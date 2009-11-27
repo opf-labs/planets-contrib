@@ -12,6 +12,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -23,8 +24,6 @@ import magick.ImageInfo;
 import magick.MagickException;
 import magick.MagickImage;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
@@ -66,7 +65,7 @@ public class ImageMagickCrop implements Modify {
 	
 	public static final String NAME = "ImageMagickCrop";
 	
-	private Log PLOGGER = LogFactory.getLog(this.getClass()) ;
+	private static Logger log = Logger.getLogger(ImageMagickCrop.class.getName()) ;
 	
 	private String workFolderName = "IMAGEMAGICK_CROP_TMP";
 //	private File work_folder = FileUtils.createWorkFolderInSysTemp(workFolderName);
@@ -113,7 +112,7 @@ public class ImageMagickCrop implements Modify {
 				IMGlobalSettings.setImageMagickHomeDir(im_home);
 			}
 			else {
-				PLOGGER.error("The System variable IMAGEMAGICK_HOME is not set properly. " +
+				log.severe("The System variable IMAGEMAGICK_HOME is not set properly. " +
 						"Please install ImageMagick and set up a system variable pointing to the ImageMagick " +
 						"installation folder! Otherwise this service won't work on Windows OS!");
 			}
@@ -126,11 +125,11 @@ public class ImageMagickCrop implements Modify {
  
 		// Use the JBoss-Classloader, instead of the Systemclassloader.
 		System.setProperty("jmagick.systemclassloader","no"); 
-	    PLOGGER.info("Hello! Initializing and starting ImageMagickCrop service!");
+	    log.info("Hello! Initializing and starting ImageMagickCrop service!");
 	    // getting formats supported by ImageMagick on THIS system (the system where this service is running)
 	    // This may vary from system to system, depending on which external libraries are installed for image handling (e.g. jasper for JP2000 etc.)
 	    inFormats = ImageMagickHelper.getSupportedInputFormats();
-	    PLOGGER.info("Ready!");
+	    log.info("Ready!");
 	}
 	
 	/* (non-Javadoc)

@@ -12,6 +12,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.annotation.Resource;
 import javax.jws.WebService;
@@ -20,9 +21,6 @@ import javax.servlet.ServletRequest;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import eu.planets_project.ifr.core.storage.utils.DigitalObjectDiskCache;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
@@ -72,7 +70,7 @@ public class GrateViewService implements CreateView {
 	private static final URI DEFAULT_BASE_URL = URI.create("http://132.230.4.14:8080"+CONTEXT_PATH);
 
 	/** A logger */
-	public static final Log LOG = LogFactory.getLog(GrateViewService.class);
+	public static final Logger log = Logger.getLogger(GrateViewService.class.getName());
 
 	private static final String FLOPPY_PATH =  "grate-floppy-content";
 	private static final String TMP_PATH = "grate-tmp";
@@ -97,7 +95,7 @@ public class GrateViewService implements CreateView {
 	private static CreateViewResult returnWithErrorMessage(String message) 
 	{
 		ServiceReport rep = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, message);
-		LOG.error(message);
+		log.severe(message);
 		return new CreateViewResult(null, null, rep);
 	}
 

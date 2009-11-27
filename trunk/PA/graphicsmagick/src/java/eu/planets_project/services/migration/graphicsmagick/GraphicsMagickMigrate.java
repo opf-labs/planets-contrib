@@ -12,8 +12,6 @@ import eu.planets_project.services.migration.graphicsmagick.utils.CoreGraphicsMa
 import eu.planets_project.services.migration.graphicsmagick.utils.GraphicsMagickResult;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ServiceUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -25,6 +23,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author Peter Melms
@@ -52,7 +51,7 @@ public class GraphicsMagickMigrate implements Migrate, Serializable {
 	
 	private String DEFAULT_INPUT_NAME = "gm_input";
 	
-	private static Log log = LogFactory.getLog(GraphicsMagickMigrate.class);
+	private static Logger log = Logger.getLogger(GraphicsMagickMigrate.class.getName());
 	
 	private static final FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 	

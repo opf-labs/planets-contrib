@@ -7,13 +7,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import magick.ImageInfo;
 import magick.MagickException;
 import magick.MagickImage;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
@@ -39,7 +38,7 @@ import eu.planets_project.services.utils.ServiceUtils;
 
 public class CoreImageMagick {
 	
-	private static Log plogger = LogFactory.getLog(CoreImageMagick.class);
+	private static Logger log = Logger.getLogger(CoreImageMagick.class.getName());
 	
 	/** Array of compression type strings */
     public static List<String> compressionTypes = new ArrayList<String>();
@@ -75,7 +74,7 @@ public class CoreImageMagick {
     private static final String IMAGE_MAGICK_URI = "http://www.imagemagick.org";
     
     public CoreImageMagick() {
-        plogger.info("Hello! Initializing ImageMagick services...");
+        log.info("Hello! Initializing ImageMagick services...");
     }
     public static ServiceDescription describeJMagickMigrate(String serviceName, String className) {
     	if(version==null) {
@@ -189,7 +188,7 @@ public class CoreImageMagick {
 	
 	public MigrateResult doJMagickMigration(DigitalObject digOb, URI inputFormat, URI outputFormat, List<Parameter> parameters) {
 		System.setProperty("jmagick.systemclassloader","no"); // Use the JBoss-Classloader, instead of the Systemclassloader.
-		plogger.info("...and ready! Checking input...");
+		log.info("...and ready! Checking input...");
 		
 		String inputExt = formatRegistry.getFirstExtension(inputFormat);
 	    String outputExt = formatRegistry.getFirstExtension(outputFormat);
@@ -214,27 +213,27 @@ public class CoreImageMagick {
         
         
         File imageMagickTmpFolder = FileUtils.createWorkFolderInSysTemp(JMAGICK_TEMP);
-        plogger.info("Created tmp folder: " + imageMagickTmpFolder.getAbsolutePath());
+        log.info("Created tmp folder: " + imageMagickTmpFolder.getAbsolutePath());
 
-        plogger.info("Getting content from DigitalObject as InputStream...");
+        log.info("Getting content from DigitalObject as InputStream...");
         File inputFile;
         File outputFile;
 
-        plogger.info("Writing content to temp file.");
+        log.info("Writing content to temp file.");
 		inputFile = new File(imageMagickTmpFolder, FileUtils.randomizeFileName(DigitalObjectUtils.getFileNameFromDigObject(digOb, inputFormat)));
 		
 		if(inputFile.exists()) {
-			plogger.info("PLEASE NOTE: Input file with same name already exists. Deleting old file: " + inputFile.getName());
+			log.info("PLEASE NOTE: Input file with same name already exists. Deleting old file: " + inputFile.getName());
 			inputFile.delete();
 		}
 		
 		FileUtils.writeInputStreamToFile( digOb.getContent().read(), inputFile );
-		plogger.info("Temp file created for input: " + inputFile.getAbsolutePath());
+		log.info("Temp file created for input: " + inputFile.getAbsolutePath());
 
 		// Also define the output file:
 		outputFile = new File(imageMagickTmpFolder, getOutputFileName(inputFile.getName(), outputFormat));
 
-        plogger.info("Starting ImageMagick Migration from " + inputExt + " to " + outputExt + "...");
+        log.info("Starting ImageMagick Migration from " + inputExt + " to " + outputExt + "...");
         
         try {
 //            plogger.debug("Initialising ImageInfo Object");
@@ -248,7 +247,7 @@ public class CoreImageMagick {
         	String actualSrcFormat = verifyInputFormat(inputFile);
         	
         	if(actualSrcFormat.equalsIgnoreCase("unknown")) {
-    	    	plogger.warn("The input format is unknown. Trying to use the specified input format...");
+    	    	log.warning("The input format is unknown. Trying to use the specified input format...");
     	    	actualSrcFormat = inputExt;
     	    }
             
@@ -265,16 +264,16 @@ public class CoreImageMagick {
             parseJMagickParameters(parameters, imageInfo, image);
 
             image.setImageFormat(outputExt);
-            plogger.info("Setting new file format for output file to: " + outputExt);
+            log.info("Setting new file format for output file to: " + outputExt);
 
             String outputFilePath = outputFile.getAbsolutePath();
-            plogger.info("Starting to write result file to: " + outputFilePath);
+            log.info("Starting to write result file to: " + outputFilePath);
 
             image.setFileName(outputFilePath);
             image.writeImage(imageInfo);
             
             if(migrationSuccessful(outputFile))
-                plogger.info("Successfully created result file at: " + outputFilePath);
+                log.info("Successfully created result file at: " + outputFilePath);
             else 
                 return returnWithErrorMessage("Something went terribly wrong with ImageMagick: No output file created!!!", null);
 
@@ -292,12 +291,12 @@ public class CoreImageMagick {
        		.title(outputFile.getName())
        		.build();
 
-       plogger.info("Created new DigitalObject for result file...");
+       log.info("Created new DigitalObject for result file...");
 
        report = new ServiceReport(Type.INFO, Status.SUCCESS, "OK! Migration successful.");
-       plogger.info("Created Service report...");
+       log.info("Created Service report...");
 
-       plogger.info("Success!! Returning results! Goodbye!");
+       log.info("Success!! Returning results! Goodbye!");
        return new MigrateResult(newDigObj, report);
 	}
 	
@@ -312,7 +311,7 @@ public class CoreImageMagick {
 			}
 		}
 		
-		plogger.info("...and ready! Checking input...");
+		log.info("...and ready! Checking input...");
 	    
 		String inputExt = formatRegistry.getFirstExtension(inputFormat);
 	    String outputExt = formatRegistry.getFirstExtension(outputFormat);
@@ -336,31 +335,31 @@ public class CoreImageMagick {
 		}
 	    
 	    File imageMagickTmpFolder = FileUtils.createWorkFolderInSysTemp(IM4JAVA_TEMP);
-	    plogger.info("Created tmp folder: " + imageMagickTmpFolder.getAbsolutePath());
+	    log.info("Created tmp folder: " + imageMagickTmpFolder.getAbsolutePath());
 	
-	    plogger.info("Getting content from DigitalObject as InputStream...");
+	    log.info("Getting content from DigitalObject as InputStream...");
 	    File inputFile;
 	    File outputFile;
 	
-	    plogger.info("Writing content to temp file.");
+	    log.info("Writing content to temp file.");
 		inputFile = new File(imageMagickTmpFolder, FileUtils.randomizeFileName(DigitalObjectUtils.getFileNameFromDigObject(digOb, inputFormat)));
 		if(inputFile.exists()) {
-			plogger.info("PLEASE NOTE: Input file with same name already exists. Deleting old file: " + inputFile.getName());
+			log.info("PLEASE NOTE: Input file with same name already exists. Deleting old file: " + inputFile.getName());
 			inputFile.delete();
 		}
 		FileUtils.writeInputStreamToFile( digOb.getContent().read(), inputFile );
-		plogger.info("Temp file created for input: " + inputFile.getAbsolutePath());
+		log.info("Temp file created for input: " + inputFile.getAbsolutePath());
 	
 		// Also define the output file:
 		outputFile = new File(imageMagickTmpFolder, getOutputFileName(inputFile.getName(), outputFormat));
 	
-	    plogger.info("Starting ImageMagick Migration from " + inputExt + " to " + outputExt + "...");
+	    log.info("Starting ImageMagick Migration from " + inputExt + " to " + outputExt + "...");
 	    
 	    
 	    String actualSrcFormat = verifyInputFormat(inputFile);
 	    
 	    if(actualSrcFormat.equalsIgnoreCase("unknown")) {
-	    	plogger.warn("The input format is unknown. Trying to use the specified input format...");
+	    	log.warning("The input format is unknown. Trying to use the specified input format...");
 	    	actualSrcFormat = inputExt;
 	    }
 	    
@@ -399,7 +398,7 @@ public class CoreImageMagick {
 		}
 	
 	    if(migrationSuccessful(outputFile))
-	        plogger.info("Successfully created result file at: " + outputFile.getAbsolutePath());
+	        log.info("Successfully created result file at: " + outputFile.getAbsolutePath());
 	    else 
 	        return returnWithErrorMessage("Something went terribly wrong with ImageMagick: No output file created!!!", null);
 	
@@ -407,43 +406,43 @@ public class CoreImageMagick {
 	    
 	    ServiceReport report = null;
 	
-	    plogger.info("Created new DigitalObject for result file...");
+	    log.info("Created new DigitalObject for result file...");
 	
 	    report = new ServiceReport(Type.INFO, Status.SUCCESS, "OK! Migration successful.");
-	    plogger.info("Created Service report...");
+	    log.info("Created Service report...");
 	
-	    plogger.info("Success!! Returning results! Goodbye!");
+	    log.info("Success!! Returning results! Goodbye!");
 	    return new MigrateResult(newDigObj, report);
 	}
 	private void parseJMagickParameters(List<Parameter> parameters, ImageInfo imageInfo, MagickImage image) {
 		try {
 			if(parameters != null) {
-	            plogger.info("Got additional parameters:");
+	            log.info("Got additional parameters:");
 	            int compressionType;
 	            int compressionQuality; 
 	            for (Iterator<Parameter> iterator = parameters.iterator(); iterator.hasNext();) {
 	                Parameter parameter = (Parameter) iterator.next();
 	                String name = parameter.getName();
-	                plogger.info("Got parameter: " + name + " with value: " + parameter.getValue());
+	                log.info("Got parameter: " + name + " with value: " + parameter.getValue());
 	                if(!name.equalsIgnoreCase(COMPRESSION_QUALITY_LEVEL) && !name.equalsIgnoreCase(COMPRESSION_TYPE)) {
-	                    plogger.info("Invalid parameter with name: " + parameter.getName());
+	                    log.info("Invalid parameter with name: " + parameter.getName());
 	
-	                    plogger.info("Setting compressionQualilty to Default value: " + JMAGICK_COMPRESSION_QUALITY_LEVEL_DEFAULT);
+	                    log.info("Setting compressionQualilty to Default value: " + JMAGICK_COMPRESSION_QUALITY_LEVEL_DEFAULT);
 	                    imageInfo.setQuality(JMAGICK_COMPRESSION_QUALITY_LEVEL_DEFAULT);
 	
-	                    plogger.info("Setting Compression Type to Default value: " + COMPRESSION_TYPE_PARAM_DEFAULT + jmagick_compressionTypes[JMAGICK_COMPRESSION_TYPE_PARAM_DEFAULT]);
+	                    log.info("Setting Compression Type to Default value: " + COMPRESSION_TYPE_PARAM_DEFAULT + jmagick_compressionTypes[JMAGICK_COMPRESSION_TYPE_PARAM_DEFAULT]);
 	                    image.setCompression(JMAGICK_COMPRESSION_TYPE_PARAM_DEFAULT);
 	                }
 	
 	                if(name.equalsIgnoreCase(COMPRESSION_QUALITY_LEVEL)) {
 	                    compressionQuality = Integer.parseInt(parameter.getValue());
 	                    if(compressionQuality >=0 && compressionQuality <=100) {
-	                        plogger.info("Setting compressionQualilty to: " + compressionQuality);
+	                        log.info("Setting compressionQualilty to: " + compressionQuality);
 	                        imageInfo.setQuality(compressionQuality);
 	                    }
 	                    else {
-	                        plogger.info("Invalid value for compressionQualilty: " + parameter.getValue());
-	                        plogger.info("Setting compressionQualilty to Default value: " + COMPRESSION_QUALITY_LEVEL_DEFAULT);
+	                        log.info("Invalid value for compressionQualilty: " + parameter.getValue());
+	                        log.info("Setting compressionQualilty to Default value: " + COMPRESSION_QUALITY_LEVEL_DEFAULT);
 	                        imageInfo.setQuality(JMAGICK_COMPRESSION_QUALITY_LEVEL_DEFAULT);
 	                    }
 	
@@ -452,19 +451,19 @@ public class CoreImageMagick {
 	                if(name.equalsIgnoreCase(COMPRESSION_TYPE)) {
 	                    compressionType = Integer.parseInt(parameter.getValue());
 	                    if(compressionType >= 0 && compressionType <= 10) {
-	                        plogger.info("Setting Compression type to: " + jmagick_compressionTypes[compressionType]);
+	                        log.info("Setting Compression type to: " + jmagick_compressionTypes[compressionType]);
 	                        image.setCompression(compressionType);
 	                    }
 	                    else {
-	                        plogger.info("Invalid value for Compression type: " + parameter.getValue());
-	                        plogger.info("Setting Compression Type to Default value: " + COMPRESSION_TYPE_PARAM_DEFAULT + jmagick_compressionTypes[JMAGICK_COMPRESSION_TYPE_PARAM_DEFAULT]);
+	                        log.info("Invalid value for Compression type: " + parameter.getValue());
+	                        log.info("Setting Compression Type to Default value: " + COMPRESSION_TYPE_PARAM_DEFAULT + jmagick_compressionTypes[JMAGICK_COMPRESSION_TYPE_PARAM_DEFAULT]);
 	                        image.setCompression(JMAGICK_COMPRESSION_TYPE_PARAM_DEFAULT);
 	                    }
 	                }
 	            }
 	        }
 	        else {
-	            plogger.info("No parameters passed! Setting default values for compressionType and compressionQuality");
+	            log.info("No parameters passed! Setting default values for compressionType and compressionQuality");
 	            image.setCompression(JMAGICK_COMPRESSION_TYPE_PARAM_DEFAULT);
 	            imageInfo.setQuality(JMAGICK_COMPRESSION_QUALITY_LEVEL_DEFAULT);
 	        }
@@ -475,18 +474,18 @@ public class CoreImageMagick {
 	
 	private void parseIm4JavaParameters(List<Parameter> parameters) {
 		if(parameters != null) {
-	        plogger.info("Got additional parameters:");
+	        log.info("Got additional parameters:");
 	
 	        for (Parameter parameter : parameters) {
 	            String name = parameter.getName();
-	            plogger.info("Got parameter: " + name + " with value: " + parameter.getValue());
+	            log.info("Got parameter: " + name + " with value: " + parameter.getValue());
 	            if(!name.equalsIgnoreCase(IMAGE_QUALITY_LEVEL) && !name.equalsIgnoreCase(COMPRESSION_TYPE)) {
-	                plogger.info("Invalid parameter with name: " + name);
+	                log.info("Invalid parameter with name: " + name);
 	
-	                plogger.info("Setting compressionQualilty to Default value: " + imageQuality);
+	                log.info("Setting compressionQualilty to Default value: " + imageQuality);
 	                imageQuality = COMPRESSION_QUALITY_LEVEL_DEFAULT;
 	
-	                plogger.info("Setting Compression Type to Default value: " + compressionType);
+	                log.info("Setting Compression Type to Default value: " + compressionType);
 	                compressionType = COMPRESSION_TYPE_PARAM_DEFAULT;
 	            }
 	
@@ -494,11 +493,11 @@ public class CoreImageMagick {
 	            if(name.equalsIgnoreCase(IMAGE_QUALITY_LEVEL)) {
 	                imageQuality = Double.parseDouble(parameter.getValue());
 	                if(imageQuality >=0.00 && imageQuality <=100.00) {
-	                    plogger.info("Setting compressionQualilty to: " + imageQuality);
+	                    log.info("Setting compressionQualilty to: " + imageQuality);
 	                }
 	                else {
-	                    plogger.info("Invalid value for compressionQualilty: " + parameter.getValue());
-	                    plogger.info("Setting compressionQualilty to Default value: " + COMPRESSION_QUALITY_LEVEL_DEFAULT);
+	                    log.info("Invalid value for compressionQualilty: " + parameter.getValue());
+	                    log.info("Setting compressionQualilty to Default value: " + COMPRESSION_QUALITY_LEVEL_DEFAULT);
 	                }
 	
 	            }
@@ -507,11 +506,11 @@ public class CoreImageMagick {
 	                compressionType = parameter.getValue();
 	                
 	                if(compressionTypes.contains(compressionType)) {
-	                    plogger.info("Setting Compression type to: " + compressionType);
+	                    log.info("Setting Compression type to: " + compressionType);
 	                }
 	                else {
-	                    plogger.info("Invalid value for Compression type: " + compressionType);
-	                    plogger.info("Setting Compression Type to Default value: " + COMPRESSION_TYPE_PARAM_DEFAULT);
+	                    log.info("Invalid value for Compression type: " + compressionType);
+	                    log.info("Setting Compression Type to Default value: " + COMPRESSION_TYPE_PARAM_DEFAULT);
 	                    compressionType = COMPRESSION_TYPE_PARAM_DEFAULT;
 	                }
 	            }
@@ -520,7 +519,7 @@ public class CoreImageMagick {
 	    else {
 	    	imageQuality = COMPRESSION_QUALITY_LEVEL_DEFAULT;
 	        compressionType = COMPRESSION_TYPE_PARAM_DEFAULT;
-	        plogger.info("No parameters passed! Using default values for 1) compressionType: " + compressionType +" and 2) compressionQuality: " + imageQuality);
+	        log.info("No parameters passed! Using default values for 1) compressionType: " + compressionType +" and 2) compressionQuality: " + imageQuality);
 	    }
 	}
 	private DigitalObject createDigitalObject(File outputFile, URI outputFormat) {
@@ -532,7 +531,7 @@ public class CoreImageMagick {
 	}
 
 	public static String verifyInputFormat(File inputImage) {
-		plogger.info("Checking image file format...");
+		log.info("Checking image file format...");
 		
 		ProcessRunner identify = new ProcessRunner();
 		
@@ -548,7 +547,7 @@ public class CoreImageMagick {
 		String error = identify.getProcessErrorAsString();
 		
 		if(output.equalsIgnoreCase("")) {
-			plogger.warn(error);
+			log.warning(error);
 			return "unknown";
 		}
 		else {
@@ -570,7 +569,7 @@ public class CoreImageMagick {
 		String version = "unknown";
 		
 		if(!error.equalsIgnoreCase("")) {
-			plogger.error(error);
+			log.severe(error);
 		}
 		if(output!= null && !output.equalsIgnoreCase("")) {
 			if(output.contains("ImageMagick")) {
@@ -659,10 +658,10 @@ public class CoreImageMagick {
 	            }
 	        }
 	        if(success) {
-	            plogger.info("Success! Actual format of input file verified!");
+	            log.info("Success! Actual format of input file verified!");
 	        }
 	        else {
-	            plogger.info("Error! File has a different format than it should have!");
+	            log.info("Error! File has a different format than it should have!");
 	        }
 	
 	        return success;

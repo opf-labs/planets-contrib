@@ -17,9 +17,6 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
@@ -50,9 +47,7 @@ targetNamespace = PlanetsServices.NS,
 endpointInterface = "eu.planets_project.services.migrate.Migrate")
 public final class Gimp26Migration implements Migrate {
 
-    private Log log = LogFactory.getLog(Gimp26Migration.class);
-    @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(Gimp26Migration.class.getName());
+    private static Logger log = Logger.getLogger(Gimp26Migration.class.getName());
     /** The GIMP install directory */
     public String gimp_install_dir;
     /** The application name */
@@ -415,7 +410,7 @@ public final class Gimp26Migration implements Migrate {
         File gimpExecutable = new File(gimpPath);
         if (!gimpExecutable.exists()) {
             String msg = "Error: Unable to find Gimp executable in the given path " + gimpPath + ". ";
-            log.error(msg);
+            log.severe(msg);
             report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
             return new MigrateResult(null, report);
         }
@@ -430,7 +425,7 @@ public final class Gimp26Migration implements Migrate {
         File gimpFuScript = new File(gimp_scripts_dir + "/planetsMigrate" + inputFmtExt + "to" + outputFmtExt + ".scm");
         if (!gimpFuScript.exists()) {
             String msg = "Error: The Gimp script " + gimpFuScript + " which is required for executing this service request does not exist. ";
-            log.error(msg);
+            log.severe(msg);
             report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
             return new MigrateResult(null, report);
         } else {
@@ -464,7 +459,7 @@ public final class Gimp26Migration implements Migrate {
             serviceMessage.append(m + " \n");
         } else {
             String msg = "Error: Unable to read temporary input file " + tmpInFile.getAbsolutePath() + ". ";
-            log.error(msg);
+            log.severe(msg);
             report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
             return new MigrateResult(null, report);
         }
@@ -510,7 +505,7 @@ public final class Gimp26Migration implements Migrate {
             if (return_code != 0) {
                 String errMsg = runner.getProcessErrorAsString();
                 String msg = "Gimp returned an error when trying to convert the image. Gimp error code: " + Integer.toString(return_code) + ". Gimp error message: " + errMsg + ". ";
-                log.error(msg);
+                log.severe(msg);
                 report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
                 return new MigrateResult(null, report);
             }
@@ -530,7 +525,7 @@ public final class Gimp26Migration implements Migrate {
                 serviceMessage.append(m + " \n");
             } else {
                 String msg = "Error: Unable to read temporary output file " + tmpOutFile.getAbsolutePath();
-                log.error(msg);
+                log.severe(msg);
                 report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
                 return new MigrateResult(null, report);
             }

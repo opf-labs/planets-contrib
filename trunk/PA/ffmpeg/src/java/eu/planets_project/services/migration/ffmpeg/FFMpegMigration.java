@@ -6,6 +6,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
+
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -14,8 +16,6 @@ import javax.jws.WebService;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.ws.BindingType;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 
 import eu.planets_project.services.PlanetsServices;
@@ -47,7 +47,7 @@ import eu.planets_project.services.utils.cli.CliMigrationPaths;
         endpointInterface = "eu.planets_project.services.migrate.Migrate")
 public class FFMpegMigration implements Migrate {
 
-    Log log = LogFactory.getLog(FFMpegMigration.class);
+    private static Logger log = Logger.getLogger(FFMpegMigration.class.getName());
 
     /**
      * The service name.
@@ -71,7 +71,7 @@ public class FFMpegMigration implements Migrate {
         try {
             init();
         } catch (URISyntaxException e) {
-            log.error("Invalid URI in the paths file",e);
+            log.severe("Invalid URI in the paths file"+": " + e.getMessage());
             return fail(null);
         }
 
@@ -138,7 +138,7 @@ public class FFMpegMigration implements Migrate {
             init();
             builder.paths(migrationPaths.getAsPlanetsPaths());
         } catch (URISyntaxException e) {
-            log.warn("Invalid URI in the paths file",e);
+            log.warning("Invalid URI in the paths file"+": "+e.getMessage());
         }
 
         builder.author("Asger Blekinge-Rasmussen <abr@statsbiblioteket.dk>");

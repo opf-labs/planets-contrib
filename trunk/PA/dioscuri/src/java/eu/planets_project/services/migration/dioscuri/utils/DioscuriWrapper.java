@@ -13,27 +13,22 @@ import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHe
 import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelperFactory;
 import eu.planets_project.services.utils.*;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jboss.annotation.ejb.TransactionTimeout;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.logging.Logger;
 
 @TransactionTimeout(6000)
 public class DioscuriWrapper {
-	
+	private static Logger log = Logger.getLogger(DioscuriWrapper.class.getName());
 	public DioscuriWrapper() {
 		FileUtils.deleteTempFiles(WORK_TEMP_FOLDER);
 		WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp(WORK_TEMP_NAME);
 		FLOPPY_RESULT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, FileUtils.randomizeFileName("EXTRACTED_FILES"));
 		log.info("Installed OS: " + OS_NAME + ", Version: " + OS_VERSION + ", Architecture: " + OS_ARCHITECTURE);
 	}
-	
-	private Log log = LogFactory.getLog(this.getClass());
-	
 	private String DIOSCURI_HOME = System.getenv("DIOSCURI_HOME");
 //	private String DIOSCURI_HOME = "D:/PLANETS/DIOSCURI_HOME"; // TESTING
 	
@@ -76,7 +71,7 @@ public class DioscuriWrapper {
 			DioscuriWrapperResult result = new DioscuriWrapperResult();
 			result.setMessage(ERROR_OUT);
 			result.setState(DioscuriWrapperResult.ERROR);
-			log.error(ERROR_OUT);
+			log.severe(ERROR_OUT);
 			return result;
 		}
 		else {
@@ -94,7 +89,7 @@ public class DioscuriWrapper {
 		MigrateResult floppyHelperResult = floppyHelper.migrate(floppyInput, format.createExtensionUri("ZIP"), format.createExtensionUri("IMA"), null);
 		
 		if(floppyHelperResult.getReport().getStatus() != Status.SUCCESS ) {
-			log.error(floppyHelperResult.getReport().getMessage());
+			log.severe(floppyHelperResult.getReport().getMessage());
 			return createErrorResult(floppyHelperResult.getReport().getMessage());
 		}
 		
@@ -138,7 +133,7 @@ public class DioscuriWrapper {
 		MigrateResult mr = extract.migrate(floppy, format.createExtensionUri(FileUtils.getExtensionFromFile(floppyImage)), format.createExtensionUri("ZIP"), null);
 		
 		if(mr.getReport().getType() == Type.ERROR) {
-			log.error("No Result received from FloppyImageHelperWin. Returning with ERROR: " + mr.getReport().getMessage());
+			log.severe("No Result received from FloppyImageHelperWin. Returning with ERROR: " + mr.getReport().getMessage());
 			return this.createErrorResult("No Result received from FloppyImageHelperWin. Returning with ERROR: " + mr.getReport().getMessage());
 		}
 		
@@ -153,7 +148,7 @@ public class DioscuriWrapper {
 		DigitalObjectContent resultContent = mr.getDigitalObject().getContent();
 		
 		if(resultContent==null) {
-			log.error("There is no result file! Returning with ERROR! ");
+			log.severe("There is no result file! Returning with ERROR! ");
 			return this.createErrorResult("There is no result file! Returning with ERROR! ");
 		}
 		
@@ -171,10 +166,10 @@ public class DioscuriWrapper {
 		}
 		
 		File outFile = new File(FLOPPY_RESULT_FOLDER, outputFileName);
-        log.debug("Looking for file: "+outFile.getAbsolutePath());
+        log.fine("Looking for file: "+outFile.getAbsolutePath());
         
 		for( File exfile: extractedFiles) {
-		    log.debug("Found file: "+exfile.getAbsolutePath());
+		    log.fine("Found file: "+exfile.getAbsolutePath());
 		}
 		
 		int index = extractedFiles.indexOf(outFile);
@@ -219,7 +214,7 @@ public class DioscuriWrapper {
 		ERROR_OUT = dioscuriCmd.getProcessErrorAsString();
         log.info("Got Process output: "+PROCESS_OUT);
         if( ERROR_OUT != null && !"".equals(ERROR_OUT) )
-            log.error("Got Process error output: "+ERROR_OUT);
+            log.severe("Got Process error output: "+ERROR_OUT);
 	}
 
 
@@ -238,7 +233,7 @@ public class DioscuriWrapper {
 			log.info("Success! DioscuriConfig.xml Template found and adjusted.");
 		}
 		else {
-			log.error("ERROR: Config file-template not found, unable to run Dioscuri without that!");
+			log.severe("ERROR: Config file-template not found, unable to run Dioscuri without that!");
 			ERROR_OUT = "ERROR: Config file-template not found, unable to run Dioscuri without that!";
 			return null;
 		}

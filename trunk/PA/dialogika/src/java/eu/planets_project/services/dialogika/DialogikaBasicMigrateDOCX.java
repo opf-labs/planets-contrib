@@ -7,12 +7,10 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.jws.WebService;
 import javax.xml.namespace.QName;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import de.dialogika.planets.planets_webservice.genericmigration.ArrayOfParameter;
 import de.dialogika.planets.planets_webservice.genericmigration.GenericMigration;
@@ -42,7 +40,7 @@ public class DialogikaBasicMigrateDOCX implements Migrate {
 
     public static final String NAME = "DialogikaBasicMigrateDOCX";
 
-    private static Log log = LogFactory.getLog(DialogikaBasicMigrateDOCX.class);
+    private static Logger log = Logger.getLogger(DialogikaBasicMigrateDOCX.class.getName());
 
     /**
      * {@inheritDoc}

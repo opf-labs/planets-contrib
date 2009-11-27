@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -18,8 +19,6 @@ import javax.jws.WebService;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.ws.BindingType;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
@@ -72,7 +71,7 @@ public class GhostscriptMigration implements Migrate {
     /**
      *  Used for logging in the Planets framework.
      */
-    private final Log log = LogFactory.getLog(GhostscriptMigration.class);
+    private final Logger log = Logger.getLogger(GhostscriptMigration.class.getName());
 
     /**
      * XML configuration file containing commands and pathways.
@@ -125,8 +124,8 @@ public class GhostscriptMigration implements Migrate {
         try {
             this.init();
         } catch (URISyntaxException e) {
-            log.error("[GhostscriptMigration] "
-                + "Invalid URI in the paths file", e);
+            log.severe("[GhostscriptMigration] "
+                + "Invalid URI in the paths file"+": "+e.getMessage());
             return this.fail(null);
         }
 
@@ -155,7 +154,7 @@ public class GhostscriptMigration implements Migrate {
                 && tmpInFile.canRead())) {
             String tmpError = "[GhostscriptMigration] Unable to create/use "
                 + "temporary input file!";
-            log.error(tmpError);
+            log.severe(tmpError);
             report = new ServiceReport(Type.ERROR, Status.INSTALLATION_ERROR, tmpError);
             return this.fail(report);
         }
@@ -292,7 +291,7 @@ public class GhostscriptMigration implements Migrate {
             this.init();
             builder.paths(migrationPaths.getAsPlanetsPaths());
         } catch (URISyntaxException e) {
-            log.warn("[GhostscriptMigration] Invalid URI in the paths file", e);
+            log.warning("[GhostscriptMigration] Invalid URI in the paths file: "+e.getMessage());
         }
 
         builder.author("Claus Jensen <cjen@kb.dk>");

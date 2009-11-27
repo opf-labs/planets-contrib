@@ -12,14 +12,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
@@ -54,7 +52,7 @@ import eu.planets_project.services.utils.ServiceUtils;
         endpointInterface = "eu.planets_project.services.migrate.Migrate" )
 public final class AvidemuxMigration implements Migrate {
 
-    Log log = LogFactory.getLog(AvidemuxMigration.class);
+    private static Logger log = Logger.getLogger(AvidemuxMigration.class.getName());
 
 
     /** The dvi ps installation dir */
@@ -229,7 +227,7 @@ public final class AvidemuxMigration implements Migrate {
         if( !(tmpInFile.exists() && tmpInFile.isFile() && tmpInFile.canRead() ))
         {
             String errorMsg = "[AvidemuxMigration] Unable to create temporary input file!";
-            log.error(errorMsg);
+            log.severe(errorMsg);
             return new MigrateResult( null, ServiceUtils.createErrorReport(errorMsg) );
         }
         log.info("[AvidemuxMigration] Temporary input file created: "+tmpInFile.getAbsolutePath());
@@ -253,7 +251,7 @@ public final class AvidemuxMigration implements Migrate {
         if (return_code != 0){
             String errorMsg = "[AvidemuxMigration] Avidemux conversion error. Error code: " +
                     Integer.toString(return_code) + ". Error message: " + runner.getProcessErrorAsString();
-            log.error(errorMsg);
+            log.severe(errorMsg);
             return new MigrateResult( null, ServiceUtils.createErrorReport(errorMsg) );
         }
 
@@ -263,7 +261,7 @@ public final class AvidemuxMigration implements Migrate {
             binary = FileUtils.readFileIntoByteArray(tmpOutFile);
         else {
             String errorMsg =  "[AvidemuxMigration] Error: Unable to read temporary file "+tmpOutFile.getAbsolutePath();
-            log.error(errorMsg);
+            log.severe(errorMsg);
             return new MigrateResult( null, ServiceUtils.createErrorReport(errorMsg) );
         }
                 

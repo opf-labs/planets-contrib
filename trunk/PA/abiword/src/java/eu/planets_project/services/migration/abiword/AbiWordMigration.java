@@ -12,14 +12,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
@@ -47,7 +45,7 @@ import eu.planets_project.services.utils.ProcessRunner;
 @WebService(name = AbiWordMigration.NAME, serviceName = Migrate.NAME, targetNamespace = PlanetsServices.NS, endpointInterface = "eu.planets_project.services.migrate.Migrate")
 public final class AbiWordMigration implements Migrate {
 
-    Log log = LogFactory.getLog(AbiWordMigration.class);
+    private static Logger log = Logger.getLogger(AbiWordMigration.class.getName());
 
     /** The dvi ps installation dir */
     public String abiword_install_dir;
@@ -139,8 +137,7 @@ public final class AbiWordMigration implements Migrate {
         tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets",
                 inputFmtExt);
         if (!(tmpInFile.exists() && tmpInFile.isFile() && tmpInFile.canRead())) {
-            log
-                    .error("[AbiWordMigration] Unable to create temporary input file!");
+            log.severe("[AbiWordMigration] Unable to create temporary input file!");
             return null;
         }
         log.info("[AbiWordMigration] Temporary input file created: "
@@ -169,10 +166,10 @@ public final class AbiWordMigration implements Migrate {
         runner.run();
         int return_code = runner.getReturnCode();
         if (return_code != 0) {
-            log.error("[AbiWordMigration] Abiword conversion error code: "
+            log.severe("[AbiWordMigration] Abiword conversion error code: "
                     + Integer.toString(return_code));
-            log.error("[AbiWordMigration] " + runner.getProcessErrorAsString());
-            // log.error("[AbiWordMigration] Output: "+runner.getProcessOutputAsString());
+            log.severe("[AbiWordMigration] " + runner.getProcessErrorAsString());
+            // log.severe("[AbiWordMigration] Output: "+runner.getProcessOutputAsString());
             return null;
         }
 
@@ -186,7 +183,7 @@ public final class AbiWordMigration implements Migrate {
         } else {
             String message = "Error: Unable to read temporary file "
                     + tmpOutFile.getAbsolutePath();
-            log.error(message);
+            log.severe(message);
             report = new ServiceReport(Type.ERROR, Status.INSTALLATION_ERROR,
                     message);
         }

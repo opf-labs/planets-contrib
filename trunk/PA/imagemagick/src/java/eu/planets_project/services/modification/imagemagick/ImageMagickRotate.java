@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -15,8 +16,6 @@ import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
@@ -58,7 +57,7 @@ public class ImageMagickRotate implements Modify {
 	
 	public static final String NAME = "ImageMagickRotate";
 	
-	private Log PLOGGER = LogFactory.getLog(this.getClass()) ;
+	private static Logger log = Logger.getLogger(ImageMagickRotate.class.getName()) ;
 	
 	private String workFolderName = "IMAGEMAGICK_ROTATE_TMP";
 	private File work_folder = FileUtils.createFolderInWorkFolder(FileUtils.getPlanetsTmpStoreFolder(), workFolderName);
@@ -97,17 +96,17 @@ public class ImageMagickRotate implements Modify {
 				IMGlobalSettings.setImageMagickHomeDir(im_home);
 			}
 			else {
-				PLOGGER.error("The System variable IMAGEMAGICK_HOME is not set properly. " +
+				log.severe("The System variable IMAGEMAGICK_HOME is not set properly. " +
 						"Please install ImageMagick and set up a system variable pointing to the ImageMagick " +
 						"installation folder! Otherwise this service won't work on Windows OS!");
 			}
 		}
 		
-	    PLOGGER.info("Hello! Initializing and starting ImageMagickRotate service!");
+	    log.info("Hello! Initializing and starting ImageMagickRotate service!");
 	    // getting formats supported by ImageMagick on THIS system (the system where this service is running)
 	    // This may vary from system to system, depending on which external libraries are installed for image handling (e.g. jasper for JP2000 etc.)
 	    inFormats = ImageMagickHelper.getSupportedInputFormats();
-	    PLOGGER.info("Ready!");
+	    log.info("Ready!");
 	}
 	
 	/* (non-Javadoc)

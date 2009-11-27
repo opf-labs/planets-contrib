@@ -3,15 +3,13 @@ package eu.planets_project.services.migration.imagemagick;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
@@ -42,7 +40,7 @@ public class ImageMagickMigrate implements Migrate, Serializable {
      */
     private static final long serialVersionUID = 1999759257332654952L;
 
-    private static Log plogger = LogFactory.getLog(ImageMagickMigrate.class);
+    private static Logger log = Logger.getLogger(ImageMagickMigrate.class.getName());
     
     /**
      * the service name
@@ -53,7 +51,7 @@ public class ImageMagickMigrate implements Migrate, Serializable {
      * default no arg constructor
      */
     public ImageMagickMigrate() {
-        plogger.info("Hello! Initializing ImageMagickMigrate service...");
+        log.info("Hello! Initializing ImageMagickMigrate service...");
     }
 
     /**

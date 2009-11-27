@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.logging.Logger;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
@@ -22,7 +20,7 @@ import eu.planets_project.services.utils.ProcessRunner;
  */
 public class CoreGraphicsMagick {
 	
-	private static Log log = LogFactory.getLog(CoreGraphicsMagick.class);
+	private static Logger log = Logger.getLogger(CoreGraphicsMagick.class.getName());
 	
 	private static final FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 	
@@ -99,7 +97,7 @@ public class CoreGraphicsMagick {
 			return version;
 		}
 		else {
-			log.error("[CoreGraphicsMagick] Sorry, cannot retrieve GraphicsMagick version: " + error);
+			log.severe("[CoreGraphicsMagick] Sorry, cannot retrieve GraphicsMagick version: " + error);
 		}
 		return version;
 	}
@@ -244,7 +242,7 @@ public class CoreGraphicsMagick {
 	            log.info("Success! Actual format of input file verified!");
 	        }
 	        else {
-	        	log.error("Error! File has a different format than it claims it has!");
+	        	log.severe("Error! File has a different format than it claims it has!");
 	        }
 	
 	        return success;

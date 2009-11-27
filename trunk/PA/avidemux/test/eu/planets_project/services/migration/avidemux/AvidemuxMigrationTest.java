@@ -4,11 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +33,7 @@ public final class AvidemuxMigrationTest extends TestCase {
     /* The location of this service when deployed. */
     String wsdlLoc = "/pserv-pa-avidemux/AvidemuxMigration?wsdl";
 
-    Log log = LogFactory.getLog(AvidemuxMigrationTest.class);
+    private static Logger log = Logger.getLogger(AvidemuxMigrationTest.class.getName());
 
     /* A holder for the object to be tested */
     Migrate dom = null;

@@ -8,13 +8,12 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jboss.annotation.ejb.TransactionTimeout;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
@@ -56,7 +55,7 @@ import eu.planets_project.services.utils.ZipUtils;
 @TransactionTimeout(6000)
 public class DioscuriArjMigration implements Migrate, Serializable {
 	
-	private Log log = LogFactory.getLog(this.getClass()); 
+	private static Logger log = Logger.getLogger(DioscuriArjMigration.class.getName()); 
 	private static final long serialVersionUID = 7520484154909390134L;
 
 	public static final String NAME = "DioscuriArjMigration";
@@ -227,7 +226,7 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 			String inputFileName = inputFile.getName();
 			String inputExt = FileUtils.getExtensionFromFile(inputFile);
 			if(inputExt==null) {
-				log.warn("Could not retrieve format extension from input file. Using '.arj' as default.");
+				log.warning("Could not retrieve format extension from input file. Using '.arj' as default.");
 			}
 			if(inputExt.equalsIgnoreCase("ARJ")) {
 //				runScript = EMU_ARJ_PATH + " " + "f " + "A:\\" + inputFileName.toUpperCase() + " -je" + 

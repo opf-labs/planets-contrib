@@ -15,8 +15,6 @@ import eu.planets_project.services.migration.dioscuri.utils.DioscuriWrapper;
 import eu.planets_project.services.migration.dioscuri.utils.DioscuriWrapperResult;
 import eu.planets_project.services.utils.*;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jboss.annotation.ejb.TransactionTimeout;
 
 import javax.ejb.Stateless;
@@ -27,6 +25,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author melmsp
@@ -45,7 +44,7 @@ import java.util.List;
 @TransactionTimeout(6000)
 public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 	
-	private Log log = LogFactory.getLog(this.getClass()); 
+	private static Logger log = Logger.getLogger(DioscuriPnmToPngMigration.class.getName()); 
 	private static final long serialVersionUID = 7520484154909390134L;
 
 	public static final String NAME = "DioscuriPnmToPngMigration";
