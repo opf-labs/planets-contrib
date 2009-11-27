@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -11,8 +12,6 @@ import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 
 import eu.planets_project.ifr.core.services.migration.genericwrapper1.GenericMigrationWrapper;
@@ -43,7 +42,7 @@ import eu.planets_project.services.migrate.MigrateResult;
         endpointInterface = "eu.planets_project.services.migrate.Migrate")
 public class NetPbmMigration implements Migrate, Serializable {
 
-    Log log = LogFactory.getLog(NetPbmMigration.class);
+    private static Logger log = Logger.getLogger(NetPbmMigration.class.getName());
 
     /**
      * The service name.
@@ -64,11 +63,10 @@ public class NetPbmMigration implements Migrate, Serializable {
             migrationResult = genericWrapper.migrate(digitalObject,
                                                      inputFormat, outputFormat, parameters);
         } catch (Exception e) {
-            log
-                    .error("Migration failed for object with title '"
+            log.severe("Migration failed for object with title '"
                            + digitalObject.getTitle()
                            + "' from input format URI: " + inputFormat
-                           + " to output format URI: " + outputFormat, e);
+                           + " to output format URI: " + outputFormat+": "+e.getMessage());
             return new MigrateResult(
                     null,
                     new ServiceReport(Type.ERROR,
@@ -97,11 +95,11 @@ public class NetPbmMigration implements Migrate, Serializable {
             genericWrapper = new GenericMigrationWrapper(
                     documentLocator.getDocument(),this.getClass().getCanonicalName());
         } catch (MigrationInitialisationException e) {
-            log.error("Failed to parse the config file",e);
+            log.severe("Failed to parse the config file: "+e.getMessage());
         } catch (IOException e) {
-            log.error("Could not read the config file",e);
+            log.severe("Could not read the config file: "+e.getMessage());
         } catch (SAXException e) {
-            log.error("Could not parse the config file as valid xml",e);
+            log.severe("Could not parse the config file as valid xml: "+e.getMessage());
         }
     }
 }

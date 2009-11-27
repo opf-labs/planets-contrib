@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.annotation.Resource;
 import javax.jws.WebService;
@@ -17,9 +18,6 @@ import javax.servlet.ServletRequest;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import eu.planets_project.ifr.core.storage.utils.DigitalObjectDiskCache;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
@@ -62,7 +60,7 @@ public class JJ2000ViewerService implements CreateView {
     private static final URI defaultBaseUrl = URI.create("http://localhost:8080"+CONTEXT_PATH);
 
     /** A logger */
-    public static final Log log = LogFactory.getLog(JJ2000ViewerService.class);
+    private static final Logger log = Logger.getLogger(JJ2000ViewerService.class.getName());
     
     /** A reference to the web service context. */
     @Resource 
@@ -92,7 +90,7 @@ public class JJ2000ViewerService implements CreateView {
 
     private static CreateViewResult returnWithErrorMessage(String message) {
         ServiceReport rep = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, message);
-        log.error(message);
+        log.severe(message);
         return new CreateViewResult(null, null, rep);
     }
     

@@ -19,15 +19,13 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
@@ -77,7 +75,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	private static final long serialVersionUID = 2127494848765937613L;
 
 	/** data members */
-	Log log = LogFactory.getLog(Mdb2SiardMigrate.class);
+	private static Logger log = Logger.getLogger(Mdb2SiardMigrate.class.getName());
 	
 	public Mdb2SiardMigrate() {
 		SIARD_TMP = FileUtils.createFolderInWorkFolder(FileUtils.getPlanetsTmpStoreFolder(), SIARD_TMP_NAME);
@@ -117,12 +115,12 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 			String outputExt = format.getFirstExtension(outputFormat);
 			
 			if(!inputExt.equalsIgnoreCase("mdb")) {
-				log.error("Sorry, unsupported input format: " + inputFormat.toASCIIString() + " Returning with ERROR.");
+				log.severe("Sorry, unsupported input format: " + inputFormat.toASCIIString() + " Returning with ERROR.");
 				return this.returnWithErrorMessage("Sorry, unsupported input format: " + inputFormat.toASCIIString()  + " Returning with ERROR.", null);
 			}
 			
 			if(!outputExt.equalsIgnoreCase("siard")) {
-				log.error("Sorry, unsupported output format: " + outputFormat.toASCIIString() + " Returning with ERROR.");
+				log.severe("Sorry, unsupported output format: " + outputFormat.toASCIIString() + " Returning with ERROR.");
 				return this.returnWithErrorMessage("Sorry, unsupported output format: " + outputFormat.toASCIIString() + " Returning with ERROR.", null);
 			}
 			

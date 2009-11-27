@@ -7,9 +7,7 @@ import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.logging.Logger;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
@@ -19,7 +17,7 @@ public class SoXHelper {
 	
 	private static String SOX_HOME = System.getenv("SOX_HOME");
 	
-	private static Log log = LogFactory.getLog(SoXHelper.class);
+	private static Logger log = Logger.getLogger(SoXHelper.class.getName());
 	
 	private static List<URI> inputFormats = null;
 	private static List<URI> outputFormats = null;
@@ -61,7 +59,7 @@ public class SoXHelper {
 	
 	private static void init() {
 		if(SOX_HOME==null) {
-			log.warn("SOX_HOME is not set! Trying to look up SoX on the PATH...");
+			log.warning("SOX_HOME is not set! Trying to look up SoX on the PATH...");
 			SOX_HOME = "";
 		}
 		if(inputFormats == null && outputFormats == null) { 

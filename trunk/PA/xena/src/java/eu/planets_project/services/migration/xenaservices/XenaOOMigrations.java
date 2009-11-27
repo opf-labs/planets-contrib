@@ -12,11 +12,8 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 
 import com.sun.star.beans.PropertyValue;
@@ -35,7 +32,7 @@ import eu.planets_project.services.utils.FileUtils;
  */
 public class XenaOOMigrations {
 
-    Log log = LogFactory.getLog(XenaOOMigrations.class);
+    private static Logger log = Logger.getLogger(XenaOOMigrations.class.getName());
     /*
      * Code from the Xena project.
      */
@@ -71,7 +68,6 @@ public class XenaOOMigrations {
     /** tag name for description */
     public final static String PROCESS_DESCRIPTION_TAG_NAME = "description";
     private final static String OS_X_ARCHITECTURE_NAME = "mac os x";
-    private static Logger logger = Logger.getLogger(XenaOOMigrations.class.getName());
     private boolean pdfa = false;
 
     public boolean isPdfa() {
@@ -235,7 +231,7 @@ public class XenaOOMigrations {
         commandList.add("-accept=socket,port=8100;urp;");
         String[] commandArr = commandList.toArray(new String[0]);
         try {
-            logger.info("Starting OpenOffice process: " + commandArr[0]);
+            log.info("Starting OpenOffice process: " + commandArr[0]);
             Runtime.getRuntime().exec(commandArr);
         } catch (IOException x) {
             throw new Exception("Cannot start OpenOffice.org. Try Checking Office Properties. " + sofficeProgram.getAbsolutePath(), x);
@@ -327,7 +323,7 @@ public class XenaOOMigrations {
             throw new Exception("OpenOffice open document file is empty. Do you have OpenOffice Java integration installed?");
             }*/
         } catch (Exception e) {
-            logger.log(Level.FINEST, "Problem normalisting office document", e);
+            log.finest("Problem normalising office document: "+e.getMessage());
             throw new SAXException(e);
         }
         // Check file was created successfully by opening up the zip and checking for at least one entry
@@ -406,10 +402,10 @@ public class XenaOOMigrations {
         try {
             this.transform(input.toURI(), output.toURI());
         } catch (SAXException e) {
-            log.error("Transforming " + input.getAbsolutePath() + " :: " + e);
+            log.severe("Transforming " + input.getAbsolutePath() + " :: " + e);
             return null;
         } catch (IOException e) {
-            log.error("Transforming " + input.getAbsolutePath() + " :: " + e);
+            log.severe("Transforming " + input.getAbsolutePath() + " :: " + e);
             return null;
         }
 

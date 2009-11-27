@@ -9,15 +9,13 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
@@ -77,7 +75,7 @@ public class SoX implements Migrate, Serializable {
 	private static String sox_version = SoXHelper.getVersion();
 	private static String sox_help = SoXHelper.getHelpText();
 	
-	private Log plogger = LogFactory.getLog(this.getClass());
+	private static Logger log = Logger.getLogger(SoX.class.getName());
 	
 	
 	/**
@@ -115,14 +113,14 @@ public class SoX implements Migrate, Serializable {
     	if(SOX_HOME==null){
     		System.err.println("SOX_HOME is not set! Please create an system variable\n" +
     				"and point it to the SoX installation folder!");
-    		plogger.error("SOX_HOME is not set! Please create an system variable\n" +
+    		log.severe("SOX_HOME is not set! Please create an system variable\n" +
     				"and point it to the SoX installation folder!");
     		SOX_HOME = "";
     	} else {
     	    SOX_HOME += File.separator;
     	}
 		
-        plogger.info("Found SoX installation in: " + SOX_HOME);
+        log.info("Found SoX installation in: " + SOX_HOME);
 	}
 
 	/* (non-Javadoc)
@@ -323,7 +321,7 @@ public class SoX implements Migrate, Serializable {
         if (!destExt.startsWith("."))
         	destExt = "." + destExt;
         
-        plogger.info("Starting migration. Converting from "
+        log.info("Starting migration. Converting from "
                 + inputFormat.toASCIIString() + " to " + outputFormat.toASCIIString());
         
         // Creating the work folder in Sys temp
@@ -353,7 +351,7 @@ public class SoX implements Migrate, Serializable {
         	soxCommands.add(SOX);
         }
         if(srcExt.equalsIgnoreCase(".raw")) {
-        	plogger.warn("RAW format detected! Using defaults. Please be aware that this might produce unpredictable results!"
+        	log.warning("RAW format detected! Using defaults. Please be aware that this might produce unpredictable results!"
         			+ br +"To make sure you are using the correct settings, please use the advancedCmd parameter and pass the command line directly!");
         	soxCommands.add("-r");
         	soxCommands.add("44100");
@@ -362,7 +360,7 @@ public class SoX implements Migrate, Serializable {
         soxCommands.add(inputFile.getAbsolutePath());	// the input file
         
         if(destExt.equalsIgnoreCase(".raw")) {
-        	plogger.warn("RAW format detected! Using defaults. Please be aware that this might produce unpredictable results!"
+        	log.warning("RAW format detected! Using defaults. Please be aware that this might produce unpredictable results!"
         			+ br +"To make sure you are using the correct settings, please use the advancedCmd parameter and pass the command line directly!");
         	soxCommands.add("-r");
         	soxCommands.add("44100");
@@ -373,7 +371,7 @@ public class SoX implements Migrate, Serializable {
         
      // Are there any additional parameters for us?
 		if(parameters != null) {
-			plogger.info("Got additional parameters:");
+			log.info("Got additional parameters:");
 			String showProgress;
 			String noShowProgress;
 			String verbosityLevel;
@@ -384,12 +382,12 @@ public class SoX implements Migrate, Serializable {
 				String name = parameter.getName();
 				String value = parameter.getValue();
 				
-				plogger.info("Got parameter: " + name + " with value: " + value);
+				log.info("Got parameter: " + name + " with value: " + value);
 				if(!name.equalsIgnoreCase(SHOW_PROGRESS_PARAM) 
 						&& !name.equalsIgnoreCase(NO_SHOW_PROGRESS_PARAM) 
 						&& !name.equalsIgnoreCase(VERBOSITY_LEVEL_PARAM) 
 						&& !name.equalsIgnoreCase(ADVANCED_CLI_PARAM)) {
-					plogger.info("Invalid parameter with name: " + parameter.getName()+"\n using DEFAULT values.");
+					log.info("Invalid parameter with name: " + parameter.getName()+"\n using DEFAULT values.");
 				}
 				
 				if(name.equalsIgnoreCase(ADVANCED_CLI_PARAM)) {
@@ -401,21 +399,21 @@ public class SoX implements Migrate, Serializable {
 				if(name.equalsIgnoreCase(SHOW_PROGRESS_PARAM)) {
 					showProgress = value;
 					soxCommands.add(showProgress);
-					plogger.info("Enabling 'showProgress' feature '-S'.");
+					log.info("Enabling 'showProgress' feature '-S'.");
 					continue;
 				}
 				
 				if(name.equalsIgnoreCase(NO_SHOW_PROGRESS_PARAM)) {
 					noShowProgress = value;
 					soxCommands.add(noShowProgress);
-					plogger.info("Enabling 'noShowProgress' feature '-q' or 'quiet mode'.");
+					log.info("Enabling 'noShowProgress' feature '-q' or 'quiet mode'.");
 				}
 				
 				if(name.equalsIgnoreCase(VERBOSITY_LEVEL_PARAM)){
 					verbosityLevel = value;
 					String parameterString = "-V" + verbosityLevel;
 					soxCommands.add(parameterString);
-					plogger.info("Setting verbosity level to: " + verbosityLevel + "\n" +
+					log.info("Setting verbosity level to: " + verbosityLevel + "\n" +
 							"(Please see ServiceDescription for further information)");
 				}
 			}
@@ -427,13 +425,13 @@ public class SoX implements Migrate, Serializable {
 		if(USE_ADVANCED_CLI) {
 			List<String> cmd = getAdvancedCmd(CLI_STRING, inputFile, outputFilePath);
 			pr.setCommand(cmd);
-			plogger.info("Executing: " + cmd);
+			log.info("Executing: " + cmd);
 			soxCommands = cmd;
 			USE_ADVANCED_CLI = false;
 		}
 		else {
 			pr.setCommand(soxCommands);
-			plogger.info("Executing: " + soxCommands);
+			log.info("Executing: " + soxCommands);
 		}
 		if( SOX_HOME != null && ! "".equals(SOX_HOME)) {
 		    pr.setStartingDir(new File(SOX_HOME));
@@ -444,12 +442,12 @@ public class SoX implements Migrate, Serializable {
         processOutput = pr.getProcessOutputAsString();
         processError = pr.getProcessErrorAsString();
         
-        plogger.info("SOX call output: " + processOutput);
-        plogger.error("SOX call error: " + processError);
+        log.info("SOX call output: " + processOutput);
+        log.severe("SOX call error: " + processError);
         
-        plogger.info("Executing " + soxCommands + " finished.");
+        log.info("Executing " + soxCommands + " finished.");
 
-        plogger.info("Migration finished.");
+        log.info("Migration finished.");
 		//**********************************************************************
         
         
@@ -463,17 +461,17 @@ public class SoX implements Migrate, Serializable {
         	DigitalObject resultDigObj = null;
 			resultDigObj = createDigitalObjectByReference(processOutputFile);
 			
-			plogger.info("Created new DigitalObject for result file...");
-            plogger.info("Output file lenght: " + processOutputFile.length());
+			log.info("Created new DigitalObject for result file...");
+            log.info("Output file lenght: " + processOutputFile.length());
             
          // create a ServiceReport...
             ServiceReport report = new ServiceReport(Type.INFO, Status.SUCCESS,
                     "Output and error logs:\n" + "--------------------------\n"
                             + processOutput + "\n" + processError);
 			
-			plogger.info("Created Service report...");
+			log.info("Created Service report...");
 			
-			plogger.info("Success!! Returning results!");
+			log.info("Success!! Returning results!");
 			// and create a MigrateResult
 			MigrateResult migrateResult = new MigrateResult(resultDigObj, report);
 
@@ -483,7 +481,7 @@ public class SoX implements Migrate, Serializable {
         
         // if no output file has been created, log out an error and return with an Error report!
         else {
-        	plogger.error("No result file created. Maybe SoX is missing a required library for this migration?");
+        	log.severe("No result file created. Maybe SoX is missing a required library for this migration?");
         	return this.returnWithErrorMessage("No result file created. Maybe SoX is missing a required library for this migration?", null);
         }
     }

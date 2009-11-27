@@ -6,14 +6,12 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
@@ -77,7 +75,7 @@ public class XenaOOMigration implements Migrate, Serializable {
             }
         }
     };
-    Log log = LogFactory.getLog(XenaOOMigration.class);
+    private static Logger log = Logger.getLogger(XenaOOMigration.class.getName());
     private static final long serialVersionUID = 3952711367037433051L;
     static final String NAME = "XenaOOMigration";
 

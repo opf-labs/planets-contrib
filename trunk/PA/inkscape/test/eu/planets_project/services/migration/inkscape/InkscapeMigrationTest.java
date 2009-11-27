@@ -5,11 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +34,7 @@ public final class InkscapeMigrationTest extends TestCase {
     /* The location of this service when deployed. */
     String wsdlLoc = "/pserv-pa-inkscape/InkscapeMigration?wsdl";
 
-    Log log = LogFactory.getLog(InkscapeMigrationTest.class);
+    private static Logger log = Logger.getLogger(InkscapeMigrationTest.class.getName());
 
     /* A holder for the object to be tested */
     Migrate dom = null;

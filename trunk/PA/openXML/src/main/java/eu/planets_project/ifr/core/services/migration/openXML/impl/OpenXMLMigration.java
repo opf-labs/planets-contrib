@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Logger;
 
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
@@ -29,8 +30,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.ws.BindingType;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jboss.annotation.ejb.RemoteBinding;
 
 import eu.planets_project.ifr.core.services.migration.openXML.api.OpenXMLMigrationServiceRemoteInterface;
@@ -54,7 +53,7 @@ import eu.planets_project.services.utils.FileUtils;
 public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface {
     
 	private final static String logConfigFile = "eu/planets_project/ifr/core/services/migration/openXML/openXMLMigration-log4j.xml";
-	private Log log = LogFactory.getLog(this.getClass());
+	private static Logger log = Logger.getLogger(OpenXMLMigration.class.getName());
 	static final String TEMP_EXTENSION = ".$TMP$";
     static final String XML_EXTENSION = ".xml";
 
@@ -91,14 +90,14 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
     @javax.jws.WebMethod()
     public String convertFileRef(@javax.jws.WebParam(name="fileRef") String toConvert_) throws PlanetsServiceException {
     //public ConversionReport convertFileRef(String toConvert_, String convertPath_) throws PlanetsServiceException {
-    	log.debug("convertFileRef:: fileRef = " + toConvert_);
+    	log.fine("convertFileRef:: fileRef = " + toConvert_);
         File toConvert = new File(toConvert_);
         // Create the output dir if it doesn't already exist
         File convertPath = new File(config.getOutputDir());
         try {
-        	log.debug("Checking output directory " + convertPath.getCanonicalPath());
+        	log.fine("Checking output directory " + convertPath.getCanonicalPath());
             if (!convertPath.exists()) {
-            	log.debug("Creating output directory " + convertPath.getCanonicalPath());
+            	log.fine("Creating output directory " + convertPath.getCanonicalPath());
                 if (!convertPath.mkdirs()) {
                     throw new PlanetsServiceException("OpenXMLMigration::convertFile: Couldn't create output directory");
                 }
@@ -269,7 +268,7 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
         // Set the timeout loop
         int retries = config.getTimeout() / config.getPollfrequency();
         int timesTried = 0;
-        log.debug("getConversionReport:: retries = " + retries);
+        log.fine("getConversionReport:: retries = " + retries);
         try {
             // Loop looking for files, only finishes if it finds a .$FILESET$
             // or a .$END$ file, sleeps for 5 seconds between iterations
@@ -315,13 +314,13 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
     protected ArrayList<String> processConversionReport(File currentPath_, File convPath_) throws PlanetsServiceException {
         int successfulCount = 0;
         
-        log.debug("processConversionReport:: currentPath_ = " + currentPath_.getAbsolutePath());
-        log.debug("processConversionReport:: convPath_ = " + convPath_.getAbsolutePath());
+        log.fine("processConversionReport:: currentPath_ = " + currentPath_.getAbsolutePath());
+        log.fine("processConversionReport:: convPath_ = " + convPath_.getAbsolutePath());
         List<ConvertedFile> convFileList = convReport.getConvertedFileList();
         ArrayList<String> outputFileList = new ArrayList<String>();
         
         Iterator<ConvertedFile> iterator = convFileList.iterator();
-        log.debug("Iterator has " + convFileList.size() + " elements");
+        log.fine("Iterator has " + convFileList.size() + " elements");
         while (iterator.hasNext()) {
             ConvertedFile convFile = iterator.next();
 
@@ -352,7 +351,7 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
                 outputFile = new File(createIndexedName(outputFile.getAbsolutePath()));
             }
 
-            log.debug("processConversionReport:: renaming " + 
+            log.fine("processConversionReport:: renaming " + 
                                                                           currentFile.getAbsolutePath() + " to " +
                                                                           outputFile.getAbsolutePath());
             if (!currentFile.renameTo(outputFile)) {
@@ -378,9 +377,9 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
         String extPart = nameToIndex_.substring(nameToIndex_.lastIndexOf("."));
         String indexedName = null;
 
-        log.debug("createIndexName:: nameToIndex_: " + nameToIndex_);
-        log.debug("createIndexName:: pathPart: " + pathPart);
-        log.debug("createIndexName:: extPart: " + extPart);
+        log.fine("createIndexName:: nameToIndex_: " + nameToIndex_);
+        log.fine("createIndexName:: pathPart: " + pathPart);
+        log.fine("createIndexName:: extPart: " + extPart);
 
         for (int indexer = 0; indexer < 1000; indexer++) {
             // Create a new file name
@@ -392,7 +391,7 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
                 break;
             }
         }
-        log.debug("createIndexName:: indexedName: " + indexedName);
+        log.fine("createIndexName:: indexedName: " + indexedName);
 
         return indexedName;
     }

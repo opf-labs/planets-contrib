@@ -13,14 +13,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
@@ -54,7 +52,7 @@ import eu.planets_project.services.utils.ProcessRunner;
         endpointInterface = "eu.planets_project.services.migrate.Migrate" )
 public final class Pdf2PdfaMayComputerMigration implements Migrate, Serializable {
 
-    Log log = LogFactory.getLog(Pdf2PdfaMayComputerMigration.class);
+    private static Logger log = Logger.getLogger(Pdf2PdfaMayComputerMigration.class.getName());
 
 
     /** The dvi ps installation dir */
@@ -137,7 +135,7 @@ public final class Pdf2PdfaMayComputerMigration implements Migrate, Serializable
             tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets", inputFmtExt);
             if( !(tmpInFile.exists() && tmpInFile.isFile() && tmpInFile.canRead() ))
             {
-                log.error("[Pdf2PdfaMayComputerMigration] Unable to create temporary input file!");
+                log.severe("[Pdf2PdfaMayComputerMigration] Unable to create temporary input file!");
                 return null;
             }
             log.info("[Pdf2PdfaMayComputerMigration] Temporary input file created: "+tmpInFile.getAbsolutePath());
@@ -160,8 +158,8 @@ public final class Pdf2PdfaMayComputerMigration implements Migrate, Serializable
             runner.run();
             int return_code = runner.getReturnCode();
             if (return_code != 0){
-                log.error("[Pdf2PdfaMayComputerMigration] Jasper conversion error code: " + Integer.toString(return_code));
-                log.error("[Pdf2PdfaMayComputerMigration] " + runner.getProcessErrorAsString());
+                log.severe("[Pdf2PdfaMayComputerMigration] Jasper conversion error code: " + Integer.toString(return_code));
+                log.severe("[Pdf2PdfaMayComputerMigration] " + runner.getProcessErrorAsString());
                 //log.error("[Pdf2PdfaMayComputerMigration] Output: "+runner.getProcessOutputAsString());
                 return null;
             }
@@ -171,7 +169,7 @@ public final class Pdf2PdfaMayComputerMigration implements Migrate, Serializable
             if( tmpOutFile.isFile() && tmpOutFile.canRead() )
                 binary = FileUtils.readFileIntoByteArray(tmpOutFile);
             else
-                log.error( "Error: Unable to read temporary file "+tmpOutFile.getAbsolutePath() );
+                log.severe( "Error: Unable to read temporary file "+tmpOutFile.getAbsolutePath() );
 
         DigitalObject newDO = null;
 

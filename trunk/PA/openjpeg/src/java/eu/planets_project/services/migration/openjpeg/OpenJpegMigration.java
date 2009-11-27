@@ -12,14 +12,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
@@ -53,7 +51,7 @@ import eu.planets_project.services.utils.ProcessRunner;
         endpointInterface = "eu.planets_project.services.migrate.Migrate" )
 public final class OpenJpegMigration implements Migrate {
 
-    Log log = LogFactory.getLog(OpenJpegMigration.class);
+    private static Logger log = Logger.getLogger(OpenJpegMigration.class.getName());
 
 
     /** The dvi ps installation dir */
@@ -133,7 +131,7 @@ public final class OpenJpegMigration implements Migrate {
             tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets", inputFmtExt);
             if( !(tmpInFile.exists() && tmpInFile.isFile() && tmpInFile.canRead() ))
             {
-                log.error("[OpenJpegMigration] Unable to create temporary input file!");
+                log.severe("[OpenJpegMigration] Unable to create temporary input file!");
                 return null;
             }
             log.info("[OpenJpegMigration] Temporary input file created: "+tmpInFile.getAbsolutePath());
@@ -164,9 +162,9 @@ public final class OpenJpegMigration implements Migrate {
             runner.run();
             int return_code = runner.getReturnCode();
             if (return_code != 0){
-                log.error("[OpenJpegMigration] Jasper conversion error code: " + Integer.toString(return_code));
-                log.error("[OpenJpegMigration] " + runner.getProcessErrorAsString());
-                //log.error("[OpenJpegMigration] Output: "+runner.getProcessOutputAsString());
+                log.severe("[OpenJpegMigration] Jasper conversion error code: " + Integer.toString(return_code));
+                log.severe("[OpenJpegMigration] " + runner.getProcessErrorAsString());
+                //log.severe("[OpenJpegMigration] Output: "+runner.getProcessOutputAsString());
                 return null;
             }
 
@@ -175,7 +173,7 @@ public final class OpenJpegMigration implements Migrate {
             if( tmpOutFile.isFile() && tmpOutFile.canRead() )
                 binary = FileUtils.readFileIntoByteArray(tmpOutFile);
             else
-                log.error( "Error: Unable to read temporary file "+tmpOutFile.getAbsolutePath() );
+                log.severe( "Error: Unable to read temporary file "+tmpOutFile.getAbsolutePath() );
 
         DigitalObject newDO = null;
 
