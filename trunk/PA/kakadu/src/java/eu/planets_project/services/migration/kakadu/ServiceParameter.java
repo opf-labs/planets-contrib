@@ -6,8 +6,8 @@
 package eu.planets_project.services.migration.kakadu;
 
 import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.utils.PlanetsLogger;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  *
@@ -23,7 +23,7 @@ public abstract class ServiceParameter {
 
     protected String statusMessage;
 
-    PlanetsLogger log = PlanetsLogger.getLogger(ServiceParameter.class);
+    Logger log = Logger.getLogger(ServiceParameter.class.getName());
 
     protected String getParamPattern() {
         return paramPattern;
@@ -63,7 +63,7 @@ public abstract class ServiceParameter {
     public boolean isValid() {
         valid = validate();
         if(!valid)
-            log.error("Invalid parameter "+getParameter().getName()+" with " +
+            log.severe("Invalid parameter "+getParameter().getName()+" with " +
                     "value "+getParameter().getValue());
         return valid;
     }

@@ -55,7 +55,7 @@ public class VarsizeListParameter extends ServiceParameter {
                     case BOOLEANPARM:
                         if (val.equalsIgnoreCase("true") || val.equalsIgnoreCase("false")) {
                         } else {
-                            log.error("validate - Parameter '" + getParameter().getName() + "' with value '" + val + "' is not valid.");
+                            log.severe("validate - Parameter '" + getParameter().getName() + "' with value '" + val + "' is not valid.");
                             return false;
                         }
                         return true;
@@ -63,7 +63,7 @@ public class VarsizeListParameter extends ServiceParameter {
                         try {
                             Double.parseDouble(val);
                         } catch (NumberFormatException ex) {
-                            log.error("validate - Parameter '" + getParameter().getName() + "' with value '" + val + "' is not valid.");
+                            log.severe("validate - Parameter '" + getParameter().getName() + "' with value '" + val + "' is not valid.");
                             return false;
                         }
                         return true;
@@ -71,7 +71,7 @@ public class VarsizeListParameter extends ServiceParameter {
                         try {
                             new Integer(Integer.parseInt(val));
                         } catch (NumberFormatException ex) {
-                            log.error("validate - Parameter '" + getParameter().getName() + "' with value '" + val + "' is not valid.");
+                            log.severe("validate - Parameter '" + getParameter().getName() + "' with value '" + val + "' is not valid.");
                             return false;
                         }
                         return true;

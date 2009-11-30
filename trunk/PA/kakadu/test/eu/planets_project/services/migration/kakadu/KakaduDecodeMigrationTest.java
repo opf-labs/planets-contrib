@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
@@ -12,7 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.planets_project.ifr.core.techreg.formats.api.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Content;
@@ -21,7 +22,6 @@ import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.test.ServiceCreator;
 
 /**
@@ -33,7 +33,7 @@ public final class KakaduDecodeMigrationTest extends TestCase {
 
     /* The location of this service when deployed. */
     String wsdlLoc = "/pserv-pa-kakadu/KakaduDecodeMigration?wsdl";
-    PlanetsLogger log = PlanetsLogger.getLogger(KakaduDecodeMigrationTest.class);
+    Logger log = Logger.getLogger(KakaduDecodeMigrationTest.class.getName());
 
     /* A holder for the object to be tested */
     Migrate dom = null;

@@ -12,13 +12,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 
-import eu.planets_project.ifr.core.techreg.formats.api.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
@@ -32,7 +33,6 @@ import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.PlanetsLogger;
 import eu.planets_project.services.utils.ProcessRunner;
 
 /**
@@ -45,7 +45,7 @@ import eu.planets_project.services.utils.ProcessRunner;
 @WebService(name = KakaduCompressMigration.NAME, serviceName = Migrate.NAME, targetNamespace = PlanetsServices.NS, endpointInterface = "eu.planets_project.services.migrate.Migrate")
 public final class KakaduCompressMigration implements Migrate {
 
-    PlanetsLogger log = PlanetsLogger.getLogger(KakaduCompressMigration.class);
+    Logger log = Logger.getLogger(KakaduCompressMigration.class.getName());
     /** The dvi ps installation dir */
     public String kakadu_install_dir;
     /** The kakadu application name */
@@ -148,7 +148,7 @@ public final class KakaduCompressMigration implements Migrate {
         tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets",
                 inputFmtExt);
         if (!(tmpInFile.exists() && tmpInFile.isFile() && tmpInFile.canRead())) {
-            log.error("Unable to create temporary input file!");
+            log.severe("Unable to create temporary input file!");
             return null;
         }
         log.info("Temporary input file created: " + tmpInFile.getAbsolutePath());
@@ -187,8 +187,8 @@ public final class KakaduCompressMigration implements Migrate {
         runner.run();
         int return_code = runner.getReturnCode();
         if (return_code != 0) {
-            log.error("Kakadu conversion error code: " + Integer.toString(return_code));
-            log.error(runner.getProcessErrorAsString());
+            log.severe("Kakadu conversion error code: " + Integer.toString(return_code));
+            log.severe(runner.getProcessErrorAsString());
             return null;
         }
 
@@ -201,7 +201,7 @@ public final class KakaduCompressMigration implements Migrate {
             report = new ServiceReport(Type.INFO, Status.SUCCESS, serviceReportMessage.toString()+"Wrote: " + tmpOutFile);
         } else {
             String message = "Error: Unable to read temporary file " + tmpOutFile.getAbsolutePath();
-            log.error(message);
+            log.severe(message);
             report = new ServiceReport(Type.ERROR, Status.INSTALLATION_ERROR,
                     serviceReportMessage.toString()+message);
         }

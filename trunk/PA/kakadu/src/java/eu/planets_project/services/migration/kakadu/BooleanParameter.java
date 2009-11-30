@@ -1,9 +1,9 @@
 package eu.planets_project.services.migration.kakadu;
 
 import eu.planets_project.services.datatypes.Parameter;
-import eu.planets_project.services.utils.PlanetsLogger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  *
@@ -13,7 +13,7 @@ public class BooleanParameter extends ServiceParameter {
 
     String trueStrVal;
     String falseStrVal;
-    PlanetsLogger log = PlanetsLogger.getLogger(BooleanParameter.class);
+    Logger log = Logger.getLogger(BooleanParameter.class.getName());
 
     public BooleanParameter(Parameter parameter, String paramPattern, String trueStrVal, String falseStrVal) {
         super(parameter, paramPattern);
@@ -27,7 +27,7 @@ public class BooleanParameter extends ServiceParameter {
             log.info("validate - Parameter '" + getParameter().getName() + "' with value '" + requestValue + "' is valid.");
             return true;
         } else {
-            log.error("validate - Parameter '" + getParameter().getName() + "' with value '" + requestValue + "' is not valid.");
+            log.severe("validate - Parameter '" + getParameter().getName() + "' with value '" + requestValue + "' is not valid.");
             return false;
         }
     }
