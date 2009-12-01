@@ -98,7 +98,7 @@ public class JJ2000MigrateService implements Migrate {
         
         // Store DO in a temporary file.
         String extension = format.getFirstExtension(inputFormat);
-        File inFile = FileUtils.writeInputStreamToTmpFile(dob.getContent().read(), "jj2000-conv-in", "."+ extension );
+        File inFile = FileUtils.writeInputStreamToTmpFile(dob.getContent().getInputStream(), "jj2000-conv-in", "."+ extension );
         inFile.deleteOnExit();
         
         // Output file:

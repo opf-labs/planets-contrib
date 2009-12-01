@@ -118,7 +118,7 @@ public class GraphicsMagickMigrate implements Migrate, Serializable {
 		
 		String inputFileName = DEFAULT_INPUT_NAME + SESSION_ID + "." + inputExt;
 		File inputFile = new File(tmp_folder, inputFileName);
-		FileUtils.writeInputStreamToFile(digitalObject.getContent().read(), inputFile);
+		FileUtils.writeInputStreamToFile(digitalObject.getContent().getInputStream(), inputFile);
 		
 		parseParameters(parameters);
 		

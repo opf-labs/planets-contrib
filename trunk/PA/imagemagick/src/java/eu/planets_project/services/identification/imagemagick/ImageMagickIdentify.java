@@ -135,7 +135,7 @@ public class ImageMagickIdentify implements Identify {
 			FileUtils.deleteAllFilesInFolder(workFolder);
 		}
 		
-		File inputFile = FileUtils.writeInputStreamToFile(digitalObject.getContent().read(), workFolder, fileName);
+		File inputFile = FileUtils.writeInputStreamToFile(digitalObject.getContent().getInputStream(), workFolder, fileName);
 		log.info("Created temporary input file: " + inputFile.getAbsolutePath());
 		
 		ArrayList<URI> uriList = null;

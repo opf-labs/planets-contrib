@@ -133,7 +133,7 @@ public class GhostscriptMigration implements Migrate {
 
         this.getExtensions(inputFormat, outputFormat);
 
-        InputStream inStream = digitalObject.getContent().read();
+        InputStream inStream = digitalObject.getContent().getInputStream();
 
         // This should not be the way to do things, but this works.
         final File workfolder = FileUtils

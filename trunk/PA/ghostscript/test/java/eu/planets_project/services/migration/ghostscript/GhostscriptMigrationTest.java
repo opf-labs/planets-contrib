@@ -132,7 +132,7 @@ public class GhostscriptMigrationTest extends TestCase {
                 .createWorkFolderInSysTemp("ghostscript_test");
 
             final File resultText = FileUtils.writeInputStreamToFile(
-                content.read(), this.workfolder, "ps2pdf_result.pdf");
+                content.getInputStream(), this.workfolder, "ps2pdf_result.pdf");
 
             assertTrue("Result file was not created successfully!",
                         resultText.exists());

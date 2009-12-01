@@ -103,7 +103,7 @@ public class NetPbmMigrationTest extends TestCase {
 
 
 
-        File result = FileUtils.writeInputStreamToFile(content.read(), workfolder, "test.png.gif");
+        File result = FileUtils.writeInputStreamToFile(content.getInputStream(), workfolder, "test.png.gif");
 
         System.out.println("Please find the result HTML file here: \n" + result.getAbsolutePath());
 

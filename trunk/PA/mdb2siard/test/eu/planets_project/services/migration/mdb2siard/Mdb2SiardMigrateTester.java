@@ -156,7 +156,7 @@ public class Mdb2SiardMigrateTester
       assertTrue("Resulting digital object is null.", doOutput != null);
       if (mr.getReport().getStatus() != Status.TOOL_ERROR)
       {
-        FileUtils.writeInputStreamToFile(doOutput.getContent().read(), fileOutput);
+        FileUtils.writeInputStreamToFile(doOutput.getContent().getInputStream(), fileOutput);
         if (mr.getReport().getType() == Type.WARN)
         	System.out.println("Warning: "+mr.getReport().getMessage());
         if (mr.getReport().getType() == Type.INFO)

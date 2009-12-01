@@ -180,7 +180,7 @@ public class GrateViewService implements CreateView {
 			String filename = dob.getTitle();
 			if(filename == null)
 				filename = "no_file_name" + i++;
-			FileUtils.writeInputStreamToFile(dob.getContent().read(), content_dir, filename);
+			FileUtils.writeInputStreamToFile(dob.getContent().getInputStream(), content_dir, filename);
 		}
 		ZipResult zip_result = ZipUtils.createZipAndCheck(content_dir, temp_dir, FileUtils.randomizeFileName("floppy.zip"), false);
 		if(zip_result == null)

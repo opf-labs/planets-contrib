@@ -99,7 +99,7 @@ public class DioscuriWrapper {
 		
 		File floppyImage = new File(WORK_TEMP_FOLDER, FileUtils.randomizeFileName(FLOPPY_NAME)) ;
 			
-		FileUtils.writeInputStreamToFile(floppyImageDigObj.getContent().read(), floppyImage);
+		FileUtils.writeInputStreamToFile(floppyImageDigObj.getContent().getInputStream(), floppyImage);
 		
 		this.run(floppyImage);
 		
@@ -152,7 +152,7 @@ public class DioscuriWrapper {
 			return this.createErrorResult("There is no result file! Returning with ERROR! ");
 		}
 		
-		FileUtils.writeInputStreamToFile(resultContent.read(), resultZIP);
+		FileUtils.writeInputStreamToFile(resultContent.getInputStream(), resultZIP);
 		
 		Checksum check = resultContent.getChecksum();
 		

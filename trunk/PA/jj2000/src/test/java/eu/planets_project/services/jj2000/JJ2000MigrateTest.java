@@ -98,10 +98,10 @@ public final class JJ2000MigrateTest extends TestCase {
         System.out.println("Output: " + doOut);
         System.out.println("Output.content: " + doOut.getContent());
         System.out.println("Output.content.read().available(): "
-                + doOut.getContent().read().available());
+                + doOut.getContent().getInputStream().available());
 
         File out = new File(outFile);
-        writeInStreamToOutStream(doOut.getContent().read(), new FileOutputStream(out));
+        writeInStreamToOutStream(doOut.getContent().getInputStream(), new FileOutputStream(out));
 
     }
     

@@ -541,7 +541,7 @@ public class Im4JavaImageMagickMigrateTests {
         if(outFile.exists()) {
             outFile.delete();
         }
-        outFile = FileUtils.writeInputStreamToFile(doOut.getContent().read(), outFolder, outFileName);
+        outFile = FileUtils.writeInputStreamToFile(doOut.getContent().getInputStream(), outFolder, outFileName);
 
         System.out.println("Please find the result file here: " + outFile.getAbsolutePath() + "\n\n");
         assertTrue("Result file created?", outFile.canRead());

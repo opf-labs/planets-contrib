@@ -67,7 +67,7 @@ public class ImageMagickRotateTest {
 		ModifyResult mr = im_rotate.modify(input, formatReg.createExtensionUri("tiff"), parameters);
 		assertTrue("ModifyResult should not be NULL!", mr!=null);
 		File result = new File(test_tmp_folder, "rotated_CW.tiff");
-		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().read(), result);
+		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().getInputStream(), result);
 		assertTrue("File has been written correctly!", result.exists());
 	}
 	
@@ -82,7 +82,7 @@ public class ImageMagickRotateTest {
 		ModifyResult mr = im_rotate.modify(input, formatReg.createExtensionUri("tiff"), parameters);
 		assertTrue("ModifyResult should not be NULL!", mr!=null);
 		File result = new File(test_tmp_folder, "rotated_CCW.tiff");
-		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().read(), result);
+		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().getInputStream(), result);
 		assertTrue("File has been written correctly!", result.exists());
 	}
 	
@@ -98,7 +98,7 @@ public class ImageMagickRotateTest {
 		ModifyResult mr = im_rotate.modify(input, formatReg.createExtensionUri("tiff"), parameters);
 		assertTrue("ModifyResult should not be NULL!", mr!=null);
 		File result = new File(test_tmp_folder, "rotated_CW_background.tiff");
-		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().read(), result);
+		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().getInputStream(), result);
 		assertTrue("File has been written correctly!", result.exists());
 	}
 }

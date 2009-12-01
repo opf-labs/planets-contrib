@@ -85,7 +85,7 @@ public IdentifyResult identify(DigitalObject digitalObject, List<Parameter> para
 			FileUtils.deleteAllFilesInFolder(workFolder);
 		}
 		
-		File inputFile = FileUtils.writeInputStreamToFile(digitalObject.getContent().read(), workFolder, fileName);
+		File inputFile = FileUtils.writeInputStreamToFile(digitalObject.getContent().getInputStream(), workFolder, fileName);
 		
 		ArrayList<URI> uriList = null;
 		

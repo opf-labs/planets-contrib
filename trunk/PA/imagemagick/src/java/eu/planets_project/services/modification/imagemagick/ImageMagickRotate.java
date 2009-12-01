@@ -175,7 +175,7 @@ public class ImageMagickRotate implements Modify {
 		}
 		
 		File inputFile = new File(work_folder, FileUtils.randomizeFileName(inputImageName + extension)); 
-		FileUtils.writeInputStreamToFile(digitalObject.getContent().read(), inputFile);
+		FileUtils.writeInputStreamToFile(digitalObject.getContent().getInputStream(), inputFile);
 		
 		boolean parameters_correct = parseParameters(parameters);
 		

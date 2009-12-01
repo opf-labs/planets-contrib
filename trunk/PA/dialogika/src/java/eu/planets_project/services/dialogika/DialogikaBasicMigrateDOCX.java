@@ -50,7 +50,7 @@ public class DialogikaBasicMigrateDOCX implements Migrate {
     public MigrateResult migrate(DigitalObject digitalObject, URI inputFormat,
             URI outputFormat, List<Parameter> parameters) {
         byte[] binary = FileUtils.writeInputStreamToBinary(digitalObject
-                .getContent().read());
+                .getContent().getInputStream());
         byte[] result = basicMigrateOneBinary(binary);
         DigitalObject resultObject = new DigitalObject.Builder(Content
                 .byValue(result)).build();

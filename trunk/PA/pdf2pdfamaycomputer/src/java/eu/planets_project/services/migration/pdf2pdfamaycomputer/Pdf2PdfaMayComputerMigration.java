@@ -129,7 +129,7 @@ public final class Pdf2PdfaMayComputerMigration implements Migrate, Serializable
          * as the given:
          */
         byte[] binary = null;
-        InputStream inputStream = digitalObject.getContent().read();
+        InputStream inputStream = digitalObject.getContent().getInputStream();
 
             // write input stream to temporary file
             tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets", inputFmtExt);

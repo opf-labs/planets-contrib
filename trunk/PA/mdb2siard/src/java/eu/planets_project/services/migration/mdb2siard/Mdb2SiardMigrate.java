@@ -138,7 +138,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 		    fileInput = new File(SIARD_TMP, FileUtils.randomizeFileName("siard_tmp"+ sMDB_EXTENSION));
 		    /* make sure, it is at least deleted, when the Web Service is stopped */
 		    fileInput.deleteOnExit();
-	        FileUtils.writeInputStreamToFile(doInput.getContent().read(), fileInput);
+	        FileUtils.writeInputStreamToFile(doInput.getContent().getInputStream(), fileInput);
 			/* output file has same unique file name with different extension */
 			String sInputFile = fileInput.getAbsolutePath();
 			String sOutputFile = sInputFile.substring(0,sInputFile.lastIndexOf("."))+sSIARD_EXTENSION;

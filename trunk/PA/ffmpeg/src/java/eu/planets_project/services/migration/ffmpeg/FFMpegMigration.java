@@ -94,7 +94,7 @@ public class FFMpegMigration implements Migrate {
          */
 
 
-        InputStream psfile = digitalObject.getContent().read();
+        InputStream psfile = digitalObject.getContent().getInputStream();
 
 
 

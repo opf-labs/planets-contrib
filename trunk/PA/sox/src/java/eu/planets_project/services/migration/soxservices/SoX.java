@@ -340,7 +340,7 @@ public class SoX implements Migrate, Serializable {
         String inputFilePath = FileUtils.randomizeFileName("SoX_INPUT_FILE" + srcExt);
         
      // getting the input data from the DigitalObject and writing it to a File...
-        File inputFile = FileUtils.writeInputStreamToFile(input.getContent().read(), inputFolder, inputFilePath);
+        File inputFile = FileUtils.writeInputStreamToFile(input.getContent().getInputStream(), inputFolder, inputFilePath);
         
         // setting up the command line 
         List<String> soxCommands = new ArrayList<String>();

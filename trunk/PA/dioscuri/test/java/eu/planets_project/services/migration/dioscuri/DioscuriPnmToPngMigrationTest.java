@@ -78,7 +78,7 @@ public class DioscuriPnmToPngMigrationTest {
 		System.out.println(result.getReport());
 		
 		File resultFile = new File(DIOSCURI_TEST_OUT, result.getDigitalObject().getTitle());
-		FileUtils.writeInputStreamToFile(result.getDigitalObject().getContent().read(), resultFile);
+		FileUtils.writeInputStreamToFile(result.getDigitalObject().getContent().getInputStream(), resultFile);
 		
 		System.out.println("Please find the converted file here: " + resultFile.getAbsolutePath());
 		
@@ -93,7 +93,7 @@ public class DioscuriPnmToPngMigrationTest {
 		System.out.println(result.getReport());
 		
 		resultFile = new File(DIOSCURI_TEST_OUT, result.getDigitalObject().getTitle());
-		FileUtils.writeInputStreamToFile(result.getDigitalObject().getContent().read(), resultFile);
+		FileUtils.writeInputStreamToFile(result.getDigitalObject().getContent().getInputStream(), resultFile);
 		
 		System.out.println("Please find the converted file here: " + resultFile.getAbsolutePath());
 	}

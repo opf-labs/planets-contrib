@@ -227,7 +227,7 @@ public class CoreImageMagick {
 			inputFile.delete();
 		}
 		
-		FileUtils.writeInputStreamToFile( digOb.getContent().read(), inputFile );
+		FileUtils.writeInputStreamToFile( digOb.getContent().getInputStream(), inputFile );
 		log.info("Temp file created for input: " + inputFile.getAbsolutePath());
 
 		// Also define the output file:
@@ -347,7 +347,7 @@ public class CoreImageMagick {
 			log.info("PLEASE NOTE: Input file with same name already exists. Deleting old file: " + inputFile.getName());
 			inputFile.delete();
 		}
-		FileUtils.writeInputStreamToFile( digOb.getContent().read(), inputFile );
+		FileUtils.writeInputStreamToFile( digOb.getContent().getInputStream(), inputFile );
 		log.info("Temp file created for input: " + inputFile.getAbsolutePath());
 	
 		// Also define the output file:

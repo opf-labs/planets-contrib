@@ -58,7 +58,7 @@ public class ShotgunModifyTests {
         DigitalObject outputDigitalObject = modify.getDigitalObject();
         Assert.assertNotNull("Result digital object is null", modify);
         File resultFile = FileUtils.writeByteArrayToTempFile(FileUtils.writeInputStreamToBinary(outputDigitalObject
-                .getContent().read()));
+                .getContent().getInputStream()));
         Assert.assertNotNull("Result file is null", resultFile);
         Assert.assertTrue("Result file does not exist", resultFile.exists());
         /* Return the bytes of the resulting file (used in the tests below) */

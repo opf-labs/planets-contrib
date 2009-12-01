@@ -168,7 +168,7 @@ public final class Gimp26MigrationTest {
         MigrateResult mr = dom.migrate(input, format.createExtensionUri(origExt), format.createExtensionUri(destExt), params);
         DigitalObject doOut = mr.getDigitalObject();
         assertTrue("Resulting digital object is null for planetsMigrate"+origExt+"to"+destExt+".", doOut != null);
-        FileUtils.writeInputStreamToFile(doOut.getContent().read(), new File( resFileDir), resFileName);
+        FileUtils.writeInputStreamToFile(doOut.getContent().getInputStream(), new File( resFileDir), resFileName);
         File resultFile = new File(resFileDir+resFileName);
         assertTrue("Result file was not created successfully!", resultFile.exists());
     }

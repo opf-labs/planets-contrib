@@ -164,7 +164,7 @@ public final class Jasper19Migration implements Migrate {
          * as the given:
          */
         byte[] binary = null;
-        InputStream inputStream = digitalObject.getContent().read();
+        InputStream inputStream = digitalObject.getContent().getInputStream();
 
         DigitalObject newDO = null;
         ServiceReport report = null;

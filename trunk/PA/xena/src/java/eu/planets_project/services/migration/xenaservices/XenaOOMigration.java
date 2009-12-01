@@ -142,7 +142,7 @@ public class XenaOOMigration implements Migrate, Serializable {
      * @return
      */
     public MigrateResult migrate(DigitalObject digitalObject, URI inputFormat, URI outputFormat, List<Parameter> parameters) {
-        InputStream inputStream = digitalObject.getContent().read();
+        InputStream inputStream = digitalObject.getContent().getInputStream();
         XenaOOMigrations xena = new XenaOOMigrations();
 
         OdfFormat odfExtInput = getOdfFormatExt(inputFormat);

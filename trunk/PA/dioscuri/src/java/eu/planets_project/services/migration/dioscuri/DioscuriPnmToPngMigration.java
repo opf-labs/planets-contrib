@@ -193,7 +193,7 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 	private File getInputFileFromDigitalObject(DigitalObject digObj, URI inputFormat, File destFolder) {
 		String inName = DigitalObjectUtils.getFileNameFromDigObject(digObj, inputFormat);
 		File in = new File(destFolder, inName);
-		FileUtils.writeInputStreamToFile(digObj.getContent().read(), in);
+		FileUtils.writeInputStreamToFile(digObj.getContent().getInputStream(), in);
 		in = FileUtils.truncateNameAndRenameFile(in);
 		return in;
 	}

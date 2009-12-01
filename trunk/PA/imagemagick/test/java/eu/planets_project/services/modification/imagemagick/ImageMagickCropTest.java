@@ -69,7 +69,7 @@ public class ImageMagickCropTest {
 		ModifyResult mr = im_crop.modify(input, formatReg.createExtensionUri("tiff"), parameters);
 		assertTrue("ModifyResult should not be NULL!", mr!=null);
 		File result = new File(test_tmp_folder, "cropped.tiff");
-		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().read(), result);
+		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().getInputStream(), result);
 		assertTrue("File has been written correctly!", result.exists());
 	}
 	
@@ -85,7 +85,7 @@ public class ImageMagickCropTest {
 		ModifyResult mr = im_crop.modify(input, formatReg.createExtensionUri("tiff"), parameters);
 		assertTrue("ModifyResult should not be NULL!", mr!=null);
 		File result = new File(test_tmp_folder, "cropped1.tiff");
-		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().read(), result);
+		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().getInputStream(), result);
 		assertTrue("File has been written correctly!", result.exists());
 	}
 	
@@ -102,7 +102,7 @@ public class ImageMagickCropTest {
 		ModifyResult mr = im_crop.modify(input, formatReg.createExtensionUri("tiff"), parameters);
 		assertTrue("ModifyResult should not be NULL!", mr!=null);
 		File result = new File(test_tmp_folder, "cropped2.tiff");
-		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().read(), result);
+		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().getInputStream(), result);
 		assertTrue("File has been written correctly!", result.exists());
 	}
 	
@@ -118,7 +118,7 @@ public class ImageMagickCropTest {
 		ModifyResult mr = im_crop.modify(input, formatReg.createExtensionUri("tiff"), parameters);
 		assertTrue("ModifyResult should not be NULL!", mr!=null);
 		File result = new File(test_tmp_folder, "cropped3.tiff");
-		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().read(), result);
+		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().getInputStream(), result);
 		assertTrue("File has been written correctly!", result.exists());
 	}
 }

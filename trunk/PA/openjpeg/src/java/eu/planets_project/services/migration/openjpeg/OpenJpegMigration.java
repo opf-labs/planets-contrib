@@ -125,7 +125,7 @@ public final class OpenJpegMigration implements Migrate {
          * as the given:
          */
         byte[] binary = null;
-        InputStream inputStream = digitalObject.getContent().read();
+        InputStream inputStream = digitalObject.getContent().getInputStream();
 
             // write input stream to temporary file
             tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets", inputFmtExt);

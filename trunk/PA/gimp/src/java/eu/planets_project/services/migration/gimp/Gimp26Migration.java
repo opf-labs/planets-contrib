@@ -443,7 +443,7 @@ public final class Gimp26Migration implements Migrate {
 
         // get binary data from digital object
         byte[] binary = null;
-        InputStream inputStream = digitalObject.getContent().read();
+        InputStream inputStream = digitalObject.getContent().getInputStream();
 
         // write binary array to temporary file
         //tmpInFile = ByteArrayHelper.write(binary);

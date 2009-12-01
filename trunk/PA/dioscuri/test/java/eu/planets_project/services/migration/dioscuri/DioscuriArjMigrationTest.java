@@ -73,7 +73,7 @@ public class DioscuriArjMigrationTest {
 		System.out.println(result.getReport());
 		
 		File resultFile = new File(DIOSCURI_TEST_OUT, result.getDigitalObject().getTitle());
-		FileUtils.writeInputStreamToFile(result.getDigitalObject().getContent().read(), resultFile);
+		FileUtils.writeInputStreamToFile(result.getDigitalObject().getContent().getInputStream(), resultFile);
 //		String content = FileUtils.readTxtFileIntoString(resultFile);
 //		System.out.println("Archive Content:\r\n");
 //		System.out.println(content);
