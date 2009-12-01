@@ -7,9 +7,9 @@ package eu.planets_project.services.migration.dioscuri;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -46,10 +46,10 @@ public class DioscuriPnmToPngMigrationTest {
 	 */
 	@BeforeClass
 	public static void setUp() throws Exception {
+      	Logger.getLogger(DioscuriPnmToPngMigration.class.getName()).setLevel(Level.FINE);		
 		System.setProperty("pserv.test.context", "server");
         System.setProperty("pserv.test.host", "localhost");
         System.setProperty("pserv.test.port", "8080");
-	    Logger.getRootLogger().setLevel(Level.DEBUG);
 		DIOSCURI_MIGRATE = ServiceCreator.createTestService(Migrate.QNAME, DioscuriPnmToPngMigration.class, wsdlLoc);
 	}
 	

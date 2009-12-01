@@ -9,14 +9,13 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
-
-import org.apache.log4j.Logger;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
@@ -51,7 +50,7 @@ public class GraphicsMagickIdentify implements Identify, Serializable {
 	public static final String NAME = "GraphicsMagickIdentify";
 	
 	private static String version = CoreGraphicsMagick.getVersion();
-	private Logger PLOGGER = Logger.getLogger(this.getClass()) ;
+	private static Logger log = Logger.getLogger(GraphicsMagickIdentify.class.getName()) ;
 	
 	private FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 	
@@ -66,22 +65,22 @@ public class GraphicsMagickIdentify implements Identify, Serializable {
 public IdentifyResult identify(DigitalObject digitalObject, List<Parameter> parameters ) {
 		
 		if(digitalObject.getContent()==null) {
-			PLOGGER.error("The Content of the DigitalObject should NOT be NULL! Returning with ErrorReport");
+			log.severe("The Content of the DigitalObject should NOT be NULL! Returning with ErrorReport");
 			return this.returnWithErrorMessage("The Content of the DigitalObject should NOT be NULL! Returning with ErrorReport", null);
 		}
 		
 		String fileName = digitalObject.getTitle();
 		
 		if(fileName!=null && !fileName.equalsIgnoreCase("")) { 
-			PLOGGER.info("Input file to identify: " +fileName);
+			log.info("Input file to identify: " +fileName);
 		}
 		else {
 			fileName = DEFAULT_INPUT_NAME + DEFAULT_EXTENSION;
-			PLOGGER.info("No file name passed, using: " + DEFAULT_INPUT_NAME + DEFAULT_EXTENSION);
+			log.info("No file name passed, using: " + DEFAULT_INPUT_NAME + DEFAULT_EXTENSION);
 		}
 		
 		File workFolder = FileUtils.createWorkFolderInSysTemp(WORKFOLDER_NAME);
-		PLOGGER.info("Created workfolder for temp files: " + workFolder.getAbsolutePath());
+		log.info("Created workfolder for temp files: " + workFolder.getAbsolutePath());
 		if(workFolder.exists()) {
 			FileUtils.deleteAllFilesInFolder(workFolder);
 		}
@@ -98,7 +97,7 @@ public IdentifyResult identify(DigitalObject digitalObject, List<Parameter> para
 			srcImageFormat = result.getFormatExtension();
 		}
 		else {
-			PLOGGER.error("NOT IDENTIFIED! Got: " + result.getErrorMsg());
+			log.severe("NOT IDENTIFIED! Got: " + result.getErrorMsg());
 	    	return this.returnWithErrorMessage("NOT IDENTIFIED! Got: " + result.getErrorMsg(), null);
 		}
 		
@@ -109,13 +108,13 @@ public IdentifyResult identify(DigitalObject digitalObject, List<Parameter> para
 	    URI formatURI = format.createExtensionUri(srcImageFormat);
 	    uriList.add(0, formatURI);
 	    String infoString = createFormatInfoString(uris);
-	    PLOGGER.info("Successfully identified Input file as: " + formatURI.toASCIIString() + "\n" + infoString);
+	    log.info("Successfully identified Input file as: " + formatURI.toASCIIString() + "\n" + infoString);
 	    ServiceReport sr = new ServiceReport(Type.INFO, Status.SUCCESS,
                 "Successfully identified Input file as: "
                         + formatURI.toASCIIString() + "\n" + infoString);
 		IdentifyResult identRes = new IdentifyResult(uriList, IdentifyResult.Method.EXTENSION, sr);
 		
-		PLOGGER.info("SUCCESS! Returning IdentifyResult. Goodbye!");
+		log.info("SUCCESS! Returning IdentifyResult. Goodbye!");
 		return identRes;
 	}
 

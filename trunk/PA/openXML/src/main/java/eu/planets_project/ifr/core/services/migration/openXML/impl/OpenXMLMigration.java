@@ -52,7 +52,6 @@ import eu.planets_project.services.utils.FileUtils;
 @javax.jws.soap.SOAPBinding(style = SOAPBinding.Style.RPC)
 public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface {
     
-	private final static String logConfigFile = "eu/planets_project/ifr/core/services/migration/openXML/openXMLMigration-log4j.xml";
 	private static Logger log = Logger.getLogger(OpenXMLMigration.class.getName());
 	static final String TEMP_EXTENSION = ".$TMP$";
     static final String XML_EXTENSION = ".xml";

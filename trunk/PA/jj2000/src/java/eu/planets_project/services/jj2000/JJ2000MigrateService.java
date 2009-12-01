@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.annotation.Resource;
 import javax.jws.WebService;
@@ -15,8 +16,6 @@ import javax.xml.ws.WebServiceContext;
 
 import jj2000.j2k.decoder.CmdLnDecoder;
 import jj2000.j2k.encoder.CmdLnEncoder;
-
-import org.apache.log4j.Logger;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
@@ -50,7 +49,7 @@ public class JJ2000MigrateService implements Migrate {
     /** The service name */
     public static final String NAME = "JJ2000 Migration Service";
     
-    Logger log = Logger.getLogger(JJ2000MigrateService.class);
+    Logger log = Logger.getLogger(JJ2000MigrateService.class.getName());
     
     private final static FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
     
