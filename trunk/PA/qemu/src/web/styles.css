@@ -1,0 +1,110 @@
+html, body
+{
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+
+#page
+{
+  width: 100%;
+  height: 100%;
+}
+
+
+table
+{
+  width: 100%;
+  height: 100%;
+  padding: 4% 10%;
+  text-align: center;
+}
+
+
+#sessRec
+{
+  width: 70%;
+  height: 100%;
+  border: 2pt solid black; 
+}
+
+
+#sessOpt
+{
+  width: 30%;
+  height: 100%;
+  border: 2pt solid black;
+vertical-align: middle;
+
+}
+
+
+object
+{
+  width: 100%;
+  height: 100%;
+}
+
+
+form
+{
+  width: 100%;
+  height: 100%;
+  vertical-align: middle;
+
+}
+
+
+#sessName
+{
+  width: 90%;
+  height: 10%;
+  wrap: virtual;
+}
+
+.options
+{
+  margin-bottom: 25px;
+}
+
+
+.options div.text
+{
+  margin;
+  padding: 15;
+}
+
+
+#sessDesc
+{
+  width: 90%;
+  height: 10%;
+  wrap: virtual;
+}
+
+
+#osImage
+{
+  width: 90%;
+}
+
+
+#fileInject
+{ 
+  size: 12;
+}
+
+
+#injectedFiles
+{
+  width: 90%;
+}
+
+
+input.buttons
+{
+  width: 40%;
+}
