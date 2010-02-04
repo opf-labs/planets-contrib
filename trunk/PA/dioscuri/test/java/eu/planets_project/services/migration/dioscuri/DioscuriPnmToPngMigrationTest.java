@@ -30,7 +30,7 @@ import eu.planets_project.services.utils.test.ServiceCreator;
  */
 public class DioscuriPnmToPngMigrationTest {
 	
-	public static String wsdlLoc = "/pserv-pa-dioscuri-migrate/DioscuriPnmToPngMigration?wsdl"; 
+	public static String wsdlLoc = "/pserv-pa-dioscuri/DioscuriPnmToPngMigration?wsdl"; 
 	
 	public static Migrate DIOSCURI_MIGRATE = null;
 	

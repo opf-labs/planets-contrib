@@ -28,7 +28,7 @@ import eu.planets_project.services.utils.test.ServiceCreator;
  */
 public class DioscuriArjMigrationTest {
 	
-	public static String wsdlLoc = "/pserv-pa-dioscuri-migrate/DioscuriArjMigration?wsdl";
+	public static String wsdlLoc = "/pserv-pa-dioscuri/DioscuriArjMigration?wsdl";
 	
 	public static Migrate DIOSCURI_MIGRATE = null;
 	
