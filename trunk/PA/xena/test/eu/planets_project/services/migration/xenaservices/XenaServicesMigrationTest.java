@@ -93,7 +93,10 @@ public final class XenaServicesMigrationTest extends TestCase {
 
     private void migrate(String from, String to) throws IOException {
         FormatRegistry formatRegistry = FormatRegistryFactory.getFormatRegistry();
-        byte[] binary = FileUtils.readFileIntoByteArray(new File("PA/xena/test/testfiles/testin." + from));
+        File inputFile = new File("PA/xena/test/testfiles/testin." + from);
+        assertTrue("Input file "+inputFile.getAbsolutePath()+" does not exist!", inputFile.exists() );
+        byte[] binary = FileUtils.readFileIntoByteArray(inputFile);
+        assertTrue("Input file "+inputFile.getAbsolutePath()+" resulting in a null binary.", binary != null );
         DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
 //        MigrateResult mr = dom.migrate(input, Format.extensionToURI(from), Format.pronomIdToURI(to), null);
         MigrateResult mr = dom.migrate(input, formatRegistry.createExtensionUri(from), formatRegistry.createPronomUri(to), null);

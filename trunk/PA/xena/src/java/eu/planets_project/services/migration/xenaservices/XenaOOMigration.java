@@ -27,6 +27,7 @@ import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.ServiceUtils;
 
 /**
  * @author Georg Petz <georg.petz@onb.ac.at> *
@@ -184,6 +185,11 @@ public class XenaOOMigration implements Migrate, Serializable {
         }
 
         byte[] binary = xena.migrate(FileUtils.writeInputStreamToBinary(inputStream));
+        
+        // Sanity check the result:
+        if( binary == null ) {
+            return new MigrateResult(null, ServiceUtils.createErrorReport("OpenOffice invocation failed. No output file was created."));
+        }
 
         DigitalObject newDO = null;
         ServiceReport report = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
