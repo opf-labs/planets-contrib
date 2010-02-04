@@ -1,7 +1,7 @@
 package eu.planets_project.services.migration.xenaservices;
 
 import eu.planets_project.ifr.core.techreg.formats.Format;
-import eu.planets_project.ifr.core.techreg.formats.api.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import org.junit.Test;
 import eu.planets_project.services.datatypes.Content;
@@ -99,7 +99,7 @@ public final class XenaServicesMigrationTest extends TestCase {
         MigrateResult mr = dom.migrate(input, formatRegistry.createExtensionUri(from), formatRegistry.createPronomUri(to), null);
         DigitalObject doOut = mr.getDigitalObject();
         assertTrue("Resulting digital object is null.", doOut != null);
-        InputStream inputStream_odf = doOut.getContent().read();
+        InputStream inputStream_odf = doOut.getContent().getInputStream();
         File outDir = new File("PA/xena/test/testfiles/out");
         if (!outDir.exists()) {
             outDir.mkdir();
