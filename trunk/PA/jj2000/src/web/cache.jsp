@@ -20,7 +20,7 @@ if( dob != null ) {
     response.setContentType( "image/jp2" );
 
     // Now stream out the data:
-    DataInputStream in = new DataInputStream(dob.getContent().read());
+    DataInputStream in = new DataInputStream(dob.getContent().getInputStream());
     ServletOutputStream op = response.getOutputStream();
     byte[] bbuf = new byte[2*1024];
     int length = 0;
