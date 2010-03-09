@@ -15,8 +15,11 @@ import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.ws.BindingType;
+import javax.xml.ws.soap.MTOM;
 
 import org.xml.sax.SAXException;
+
+import com.sun.xml.ws.developer.StreamingAttachment;
 
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.Content;
@@ -30,21 +33,21 @@ import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ProcessRunner;
+import eu.planets_project.services.utils.ServiceUtils;
 import eu.planets_project.services.utils.cli.CliMigrationPaths;
 
 /**
  * The class migrates between a number of formats
  * @author Asger Blekinge-Rasmussen <abr@statsbiblioteket.dk>
  */
-@Local(Migrate.class)
-@Remote(Migrate.class)
 @Stateless
-@BindingType(value = "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")
 @WebService(
         name = FFMpegMigration.NAME,
         serviceName = Migrate.NAME,
         targetNamespace = PlanetsServices.NS,
         endpointInterface = "eu.planets_project.services.migrate.Migrate")
+@MTOM
+@StreamingAttachment( parseEagerly=true, memoryThreshold=ServiceUtils.JAXWS_SIZE_THRESHOLD )
 public class FFMpegMigration implements Migrate {
 
     private static Logger log = Logger.getLogger(FFMpegMigration.class.getName());

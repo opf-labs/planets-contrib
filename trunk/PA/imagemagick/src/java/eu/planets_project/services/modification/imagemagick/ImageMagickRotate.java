@@ -15,11 +15,14 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
+import javax.xml.ws.soap.MTOM;
 
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 import org.im4java.settings.IMGlobalSettings;
+
+import com.sun.xml.ws.developer.StreamingAttachment;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
@@ -46,9 +49,8 @@ import eu.planets_project.services.utils.ServiceUtils;
  */
 
 @Stateless
-@Local(Modify.class)
-@Remote(Modify.class)
-@BindingType(value = "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")
+@MTOM
+@StreamingAttachment( parseEagerly=true, memoryThreshold=ServiceUtils.JAXWS_SIZE_THRESHOLD )
 @WebService(name = ImageMagickRotate.NAME, 
         serviceName = Modify.NAME, 
         targetNamespace = PlanetsServices.NS,

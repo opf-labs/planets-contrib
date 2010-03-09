@@ -18,6 +18,10 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
+import javax.xml.ws.soap.MTOM;
+
+import com.sun.xml.ws.developer.StreamingAttachment;
+
 import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
@@ -29,11 +33,9 @@ import java.util.logging.Logger;
  * @author Peter Melms
  *
  */
-@Stateless()
-@Local(Migrate.class)
-@Remote(Migrate.class)
-
-@BindingType(value = "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")
+@Stateless
+@MTOM
+@StreamingAttachment( parseEagerly=true, memoryThreshold=ServiceUtils.JAXWS_SIZE_THRESHOLD )
 @WebService(
         name = GraphicsMagickMigrate.NAME, 
         serviceName = Migrate.NAME,

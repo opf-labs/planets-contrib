@@ -29,8 +29,11 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.ws.BindingType;
+import javax.xml.ws.soap.MTOM;
 
 import org.jboss.annotation.ejb.RemoteBinding;
+
+import com.sun.xml.ws.developer.StreamingAttachment;
 
 import eu.planets_project.ifr.core.services.migration.openXML.api.OpenXMLMigrationServiceRemoteInterface;
 import eu.planets_project.ifr.core.services.migration.openXML.api.PlanetsServiceException;
@@ -39,6 +42,7 @@ import eu.planets_project.ifr.core.services.migration.openXML.common.ConversionR
 import eu.planets_project.ifr.core.services.migration.openXML.common.ConvertedFile;
 import eu.planets_project.ifr.core.services.migration.openXML.common.ConvertedFileNames;
 import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.ServiceUtils;
 
 /**
  *
@@ -48,8 +52,8 @@ import eu.planets_project.services.utils.FileUtils;
 @Stateless()
 @Remote(OpenXMLMigrationServiceRemoteInterface.class)
 @RemoteBinding(jndiBinding="planets-project.eu/OpenXMLMigrationServiceRemoteInterface")
-@BindingType(value="http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")
-@javax.jws.soap.SOAPBinding(style = SOAPBinding.Style.RPC)
+@MTOM
+@StreamingAttachment( parseEagerly=true, memoryThreshold=ServiceUtils.JAXWS_SIZE_THRESHOLD )
 public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface {
     
 	private static Logger log = Logger.getLogger(OpenXMLMigration.class.getName());

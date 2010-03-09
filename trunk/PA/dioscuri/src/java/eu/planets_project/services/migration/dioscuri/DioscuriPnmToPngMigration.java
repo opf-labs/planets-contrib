@@ -17,9 +17,13 @@ import eu.planets_project.services.utils.*;
 
 import org.jboss.annotation.ejb.TransactionTimeout;
 
+import com.sun.xml.ws.developer.StreamingAttachment;
+
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
+import javax.xml.ws.soap.MTOM;
+
 import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
@@ -32,16 +36,14 @@ import java.util.logging.Logger;
  *
  */
 
-@Stateless()
-
-@BindingType(value = "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")
-
+@Stateless
 @WebService(
         name = DioscuriPnmToPngMigration.NAME, 
         serviceName = Migrate.NAME,
         targetNamespace = PlanetsServices.NS,
         endpointInterface = "eu.planets_project.services.migrate.Migrate")
-@TransactionTimeout(6000)
+@MTOM
+@StreamingAttachment( parseEagerly=true, memoryThreshold=ServiceUtils.JAXWS_SIZE_THRESHOLD )
 public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 	
 	private static Logger log = Logger.getLogger(DioscuriPnmToPngMigration.class.getName()); 

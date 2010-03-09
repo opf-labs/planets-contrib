@@ -18,8 +18,11 @@ import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.ws.BindingType;
+import javax.xml.ws.soap.MTOM;
 
 import org.xml.sax.SAXException;
+
+import com.sun.xml.ws.developer.StreamingAttachment;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
@@ -34,6 +37,7 @@ import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ProcessRunner;
+import eu.planets_project.services.utils.ServiceUtils;
 import eu.planets_project.services.utils.cli.CliMigrationPaths;
 
 /**
@@ -41,10 +45,9 @@ import eu.planets_project.services.utils.cli.CliMigrationPaths;
  * to a number of formats.
  * @author <a href="mailto:cjen@kb.dk">Claus Jensen</a>
  */
-@Local(Migrate.class)
-@Remote(Migrate.class)
 @Stateless
-@BindingType(value = "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")
+@MTOM
+@StreamingAttachment( parseEagerly=true, memoryThreshold=ServiceUtils.JAXWS_SIZE_THRESHOLD )
 @WebService(
         name = GhostscriptMigration.NAME,
         serviceName = Migrate.NAME,

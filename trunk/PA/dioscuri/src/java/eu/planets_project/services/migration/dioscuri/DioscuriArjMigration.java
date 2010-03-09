@@ -13,8 +13,11 @@ import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
+import javax.xml.ws.soap.MTOM;
 
 import org.jboss.annotation.ejb.TransactionTimeout;
+
+import com.sun.xml.ws.developer.StreamingAttachment;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
@@ -43,16 +46,14 @@ import eu.planets_project.services.utils.ZipUtils;
  *
  */
 
-@Stateless()
-
-@BindingType(value = "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")
-
+@Stateless
 @WebService(
         name = DioscuriArjMigration.NAME, 
         serviceName = Migrate.NAME,
         targetNamespace = PlanetsServices.NS,
         endpointInterface = "eu.planets_project.services.migrate.Migrate")
-@TransactionTimeout(6000)
+@MTOM
+@StreamingAttachment( parseEagerly=true, memoryThreshold=ServiceUtils.JAXWS_SIZE_THRESHOLD )
 public class DioscuriArjMigration implements Migrate, Serializable {
 	
 	private static Logger log = Logger.getLogger(DioscuriArjMigration.class.getName()); 

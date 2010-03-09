@@ -11,8 +11,11 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.BindingType;
+import javax.xml.ws.soap.MTOM;
 
 import org.xml.sax.SAXException;
+
+import com.sun.xml.ws.developer.StreamingAttachment;
 
 import eu.planets_project.ifr.core.services.migration.genericwrapper1.GenericMigrationWrapper;
 import eu.planets_project.ifr.core.services.migration.genericwrapper1.exceptions.MigrationInitialisationException;
@@ -26,15 +29,15 @@ import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.utils.ServiceUtils;
 
 /**
  * The class migrates between a number of formats
  * @author Asger Blekinge-Rasmussen <abr@statsbiblioteket.dk>
  */
-@Local(Migrate.class)
-@Remote(Migrate.class)
 @Stateless
-@BindingType(value = "http://schemas.xmlsoap.org/wsdl/soap/http?mtom=true")
+@MTOM
+@StreamingAttachment( parseEagerly=true, memoryThreshold=ServiceUtils.JAXWS_SIZE_THRESHOLD )
 @WebService(
         name = NetPbmMigration.NAME,
         serviceName = Migrate.NAME,
