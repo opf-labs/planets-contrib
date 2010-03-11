@@ -39,8 +39,13 @@
 <endpoints xmlns='http://java.sun.com/xml/ns/jax-ws/ri/runtime' version='2.0'>
 
     <endpoint
-        name='Gimp26Migration'
-        implementation='eu.planets_project.services.migration.gimp.Gimp26Migration'
-        url-pattern='/Gimp26Migration'/>
+        name='KakaduCompressMigration'
+        implementation='eu.planets_project.services.migration.kakadu.KakaduCompressMigration'
+        url-pattern='/KakaduCompressMigration'/>
+        
+        <endpoint
+        name='KakaduDecodeMigration'
+        implementation='eu.planets_project.services.migration.kakadu.KakaduDecodeMigration'
+        url-pattern='/KakaduDecodeMigration'/>
 
 </endpoints>
