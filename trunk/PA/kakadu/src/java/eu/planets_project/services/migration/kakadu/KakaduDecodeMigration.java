@@ -18,6 +18,9 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
+import javax.xml.ws.soap.MTOM;
+
+import com.sun.xml.ws.developer.StreamingAttachment;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
@@ -37,15 +40,15 @@ import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.utils.ServicePerformanceHelper;
+import eu.planets_project.services.utils.ServiceUtils;
 
 /**
  * The KakaduDecodeMigration migrates TIF files to JP2 files.
  * @author Sven Schlarb <shsschlarb-planets@yahoo.de>
  */
-@Local(Migrate.class)
-@Remote(Migrate.class)
-@Stateless
 @WebService(name = KakaduDecodeMigration.NAME, serviceName = Migrate.NAME, targetNamespace = PlanetsServices.NS, endpointInterface = "eu.planets_project.services.migrate.Migrate")
+@MTOM
+@StreamingAttachment( parseEagerly=true, memoryThreshold=ServiceUtils.JAXWS_SIZE_THRESHOLD )
 public final class KakaduDecodeMigration implements Migrate {
 
     Logger log = Logger.getLogger(KakaduDecodeMigration.class.getName());
