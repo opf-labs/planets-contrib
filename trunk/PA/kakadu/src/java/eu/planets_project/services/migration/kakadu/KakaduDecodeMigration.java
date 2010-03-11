@@ -21,11 +21,13 @@ import javax.jws.WebService;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
+import eu.planets_project.ifr.core.techreg.properties.ServiceProperties;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
+import eu.planets_project.services.datatypes.Property;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
@@ -34,6 +36,7 @@ import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ProcessRunner;
+import eu.planets_project.services.utils.ServicePerformanceHelper;
 
 /**
  * The KakaduDecodeMigration migrates TIF files to JP2 files.
@@ -113,6 +116,10 @@ public final class KakaduDecodeMigration implements Migrate {
      */
     public MigrateResult migrate(final DigitalObject digitalObject,
             URI inputFormat, URI outputFormat, List<Parameter> parameters) {
+    	
+    	// Start timing...
+        ServicePerformanceHelper sph = new ServicePerformanceHelper();
+        
         requestParametersList = parameters;
         Properties props = new Properties();
         try {
@@ -146,6 +153,10 @@ public final class KakaduDecodeMigration implements Migrate {
         // write input stream to temporary file
         tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets",
                 inputFmtExt);
+        
+        // Record time take to load the input data:
+        sph.loaded();
+        
         if (!(tmpInFile.exists() && tmpInFile.isFile() && tmpInFile.canRead())) {
             log.severe("Unable to create temporary input file!");
             return null;
@@ -183,7 +194,11 @@ public final class KakaduDecodeMigration implements Migrate {
         runner.setCommand(command);
         runner.setInputStream(inputStream);
         log.info("Executing command (update): " + command.toString() + " ...");
+        
+        long startMillis = System.currentTimeMillis();
         runner.run();
+        long endMillis = System.currentTimeMillis();
+        
         int return_code = runner.getReturnCode();
         if (return_code != 0) {
             log.severe("Kakadu conversion error code: " + Integer.toString(return_code));
@@ -197,7 +212,12 @@ public final class KakaduDecodeMigration implements Migrate {
         // read byte array from temporary file
         if (tmpOutFile.isFile() && tmpOutFile.canRead()) {
             binary = FileUtils.readFileIntoByteArray(tmpOutFile);
-            report = new ServiceReport(Type.INFO, Status.SUCCESS, serviceReportMessage.toString()+"Wrote: " + tmpOutFile);
+            
+            //get the measured proeprties to return
+            List<Property> retProps = sph.getPerformanceProperties();
+            retProps.add(ServiceProperties.createToolRunnerTimeProperty(endMillis-startMillis));
+ 
+            report = new ServiceReport(Type.INFO, Status.SUCCESS, serviceReportMessage.toString()+"Wrote: " + tmpOutFile, retProps);
         } else {
             String message = "Error: Unable to read temporary file " + tmpOutFile.getAbsolutePath();
             log.severe(message);

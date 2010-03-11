@@ -16,22 +16,30 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
+import javax.xml.ws.soap.MTOM;
+
+import com.sun.xml.ws.developer.StreamingAttachment;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
+import eu.planets_project.ifr.core.techreg.properties.ServiceProperties;
 import eu.planets_project.services.PlanetsServices;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
+import eu.planets_project.services.datatypes.Property;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
+import eu.planets_project.services.java_se.image.JavaImageIOMigrate;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ProcessRunner;
+import eu.planets_project.services.utils.ServicePerformanceHelper;
+import eu.planets_project.services.utils.ServiceUtils;
 
 /**
  * The Gimp26Migration class migrates various image file formats. 
@@ -39,12 +47,13 @@ import eu.planets_project.services.utils.ProcessRunner;
  * 
  * @author Sven Schlarb <shsschlarb-planets@yahoo.de>, Georg Petz <georg.petz@onb.ac.at>
  */
-@Local(Migrate.class)
-@Remote(Migrate.class)
-@Stateless
-@WebService(name = Gimp26Migration.NAME, serviceName = Migrate.NAME,
-targetNamespace = PlanetsServices.NS,
-endpointInterface = "eu.planets_project.services.migrate.Migrate")
+
+@WebService(name = Gimp26Migration.NAME, 
+		    serviceName = Migrate.NAME,
+            targetNamespace = PlanetsServices.NS,
+            endpointInterface = "eu.planets_project.services.migrate.Migrate")
+@MTOM
+@StreamingAttachment( parseEagerly=true, memoryThreshold=ServiceUtils.JAXWS_SIZE_THRESHOLD )
 public final class Gimp26Migration implements Migrate {
 
     private static Logger log = Logger.getLogger(Gimp26Migration.class.getName());
@@ -374,6 +383,9 @@ public final class Gimp26Migration implements Migrate {
     public MigrateResult migrate(final DigitalObject digitalObject, URI inputFormat,
             URI outputFormat, List<Parameter> parameters) {
 
+    	 // Start timing...
+        ServicePerformanceHelper sph = new ServicePerformanceHelper();
+        
         // read global gimp configuration parameters from properties file
         Properties props = new Properties();
         try {
@@ -449,6 +461,9 @@ public final class Gimp26Migration implements Migrate {
         //tmpInFile = ByteArrayHelper.write(binary);
         tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets", inputFmtExt);
 
+        // Record time take to load the input data:
+        sph.loaded();
+        
         // read byte array from temporary file
         if (tmpInFile.isFile() && tmpInFile.canRead()) {
             m = "Temporary input file created successfully: " + tmpInFile.getAbsolutePath() + ". ";
@@ -493,13 +508,13 @@ public final class Gimp26Migration implements Migrate {
             String outFileStr = tmpInFile.getAbsolutePath() + ".out";
             tmpOutFile = new File(outFileStr);
 
-            long startMillis = System.currentTimeMillis();
-
+          long startMillis = System.currentTimeMillis();
             // Create process runner and execute commands
             ProcessRunner runner = new ProcessRunner();
             runner.setCommand(Arrays.asList(commands));
             runner.setInputStream(inputStream);
             runner.run();
+          long endMillis = System.currentTimeMillis();
             System.out.println(runner.getProcessErrorAsString());
             int return_code = runner.getReturnCode();
             if (return_code != 0) {
@@ -513,7 +528,7 @@ public final class Gimp26Migration implements Migrate {
             // read byte array from temporary file
             if (tmpOutFile.isFile() && tmpOutFile.canRead()) {
                 binary = FileUtils.readFileIntoByteArray(tmpOutFile);
-                long endMillis = System.currentTimeMillis();
+                
                 m = "Processing time: " + (endMillis - startMillis) + " milliseconds. ";
                 log.info(m);
                 serviceMessage.append(m + " \n");
@@ -529,13 +544,24 @@ public final class Gimp26Migration implements Migrate {
                 report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
                 return new MigrateResult(null, report);
             }
+            
+            //get the measured proeprties to return
+            List<Property> retProps = sph.getPerformanceProperties();
+            retProps.add(ServiceProperties.createToolRunnerTimeProperty(endMillis-startMillis));
+            
+            // digital object output
+            DigitalObject newDO = null;
+            newDO = new DigitalObject.Builder(Content.byValue(binary)).build();
+            report = new ServiceReport(Type.INFO, Status.SUCCESS, this.serviceMessage.toString(), retProps);
+            return new MigrateResult(newDO, report);
+            
         }
-
-        // digital object output
-        DigitalObject newDO = null;
-        newDO = new DigitalObject.Builder(Content.byValue(binary)).build();
-        report = new ServiceReport(Type.INFO, Status.SUCCESS, this.serviceMessage.toString());
-        return new MigrateResult(newDO, report);
+        else{
+	        String msg = "Error: Unable to build the GIMP Fu-Script command ";
+	        log.severe(msg);
+	        report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
+	        return new MigrateResult(null, report);
+        }
     }
 
     private List<Parameter> getParameters() {
