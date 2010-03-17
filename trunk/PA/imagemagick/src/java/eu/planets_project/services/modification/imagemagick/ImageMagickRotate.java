@@ -10,11 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.ejb.Local;
-import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
-import javax.xml.ws.BindingType;
 import javax.xml.ws.soap.MTOM;
 
 import org.im4java.core.ConvertCmd;
@@ -33,14 +30,14 @@ import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.Property;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
-import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
+import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.identification.imagemagick.utils.ImageMagickHelper;
 import eu.planets_project.services.migration.imagemagick.CoreImageMagick;
 import eu.planets_project.services.modify.Modify;
 import eu.planets_project.services.modify.ModifyResult;
-import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.ServiceUtils;
 
 /**
@@ -62,10 +59,6 @@ public class ImageMagickRotate implements Modify {
 	private static Logger log = Logger.getLogger(ImageMagickRotate.class.getName()) ;
 	
 	private String workFolderName = "IMAGEMAGICK_ROTATE_TMP";
-	private File work_folder = FileUtils.createFolderInWorkFolder(FileUtils.getPlanetsTmpStoreFolder(), workFolderName);
-//	private String sessionID = FileUtils.randomizeFileName("");
-//	private String inputImageName = "imageMagickRotateInput" + sessionID;
-//	private String resultImageName = "imageMagickRotateResult" + sessionID;
 	private String inputImageName = "imageMagickRotateInput";
 	private String resultImageName = "imageMagickRotateResult";
 	private String extension = null;
@@ -176,50 +169,57 @@ public class ImageMagickRotate implements Modify {
 			}
 		}
 		
-		File inputFile = new File(work_folder, FileUtils.randomizeFileName(inputImageName + extension)); 
-		FileUtils.writeInputStreamToFile(digitalObject.getContent().getInputStream(), inputFile);
+		File inputFile = null;
+		// write input object to temporary file        
+        try { 
+            /* TODO If extension not really needed, use DigitalObjectUtils.toFile(DigitalObject). */
+            inputFile = File.createTempFile("planets", extension);
+            DigitalObjectUtils.toFile(digitalObject, inputFile);
+        } catch (IOException x) {
+            throw new IllegalStateException("Could not create temp file.", x);
+        }
 		
 		boolean parameters_correct = parseParameters(parameters);
 		
 		if(!parameters_correct) {
 			return this.returnWithErrorMessage("Don't understand the parameters you've passed to this service! Sorry.", null);
 		}
-		
-		File resultFile = new File(work_folder.getAbsolutePath() + File.separator + FileUtils.randomizeFileName(resultImageName + extension));
-		
-		IMOperation op = new IMOperation();
-	    op.addImage(inputFile.getAbsolutePath());
-	    
-	    if(color_set) {
-	    	op.background(color);
-	    }
-	    
-	    op.rotate(degrees);
-	    
-	    op.addImage(resultFile.getAbsolutePath());
-	    
-	    try {
-	    	ConvertCmd convert = new ConvertCmd();
-		    List<String> commands = op.getCmdArgs();
-		    for (String string : commands) {
-				System.out.print(string + " ");
-			}
-			convert.run(op);
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IM4JavaException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		File resultFile = null;
+        try {
+            resultFile = File.createTempFile("planets", null, inputFile.getParentFile());
+
+            IMOperation op = new IMOperation();
+            op.addImage(inputFile.getAbsolutePath());
+
+            if (color_set) {
+                op.background(color);
+            }
+
+            op.rotate(degrees);
+
+            op.addImage(resultFile.getAbsolutePath());
+
+            ConvertCmd convert = new ConvertCmd();
+            List<String> commands = op.getCmdArgs();
+            for (String string : commands) {
+                System.out.print(string + " ");
+            }
+            convert.run(op);
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IM4JavaException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
 //		File resultFile = new File(work_folder.getAbsolutePath() + File.separator + resultImageName + extension);
 		
-		if(!resultFile.exists()) {
+		if(resultFile == null || !resultFile.exists()) {
 			return this.returnWithErrorMessage("No result file found. Something has gone terribly wrong during this operation. Sorry.", null);
 		}
 		

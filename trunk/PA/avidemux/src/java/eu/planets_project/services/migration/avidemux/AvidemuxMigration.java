@@ -4,6 +4,7 @@
 package eu.planets_project.services.migration.avidemux;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -19,6 +20,9 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
@@ -32,7 +36,7 @@ import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.utils.ServiceUtils;
 
@@ -197,7 +201,7 @@ public final class AvidemuxMigration implements Migrate {
             // config vars
             this.avidemux_install_dir = props.getProperty("avidemux.install.dir");
             this.avidemux_app_name = props.getProperty("avidemux.app.name");
-            FileUtils.close(stream);
+            IOUtils.closeQuietly(stream);
         } catch( Exception e ) {
             // // config vars
             this.avidemux_install_dir  = "/usr/bin";
@@ -222,8 +226,16 @@ public final class AvidemuxMigration implements Migrate {
         byte[] binary = null;
         InputStream inputStream = digitalObject.getContent().getInputStream();
 
-        // write input stream to temporary file
-        tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets", inputFmtExt);
+        // write input object to temporary file        
+        try { 
+            /* TODO If extension not really needed, use DigitalObjectUtils.toFile(DigitalObject). */
+            String suffix = inputFmtExt.startsWith(".") ? inputFmtExt : "." + inputFmtExt;
+            tmpInFile = File.createTempFile("planets", suffix);
+            DigitalObjectUtils.toFile(digitalObject, tmpInFile);
+        } catch (IOException x) {
+            x.printStackTrace();
+        }
+        
         if( !(tmpInFile.exists() && tmpInFile.isFile() && tmpInFile.canRead() ))
         {
             String errorMsg = "[AvidemuxMigration] Unable to create temporary input file!";
@@ -258,7 +270,11 @@ public final class AvidemuxMigration implements Migrate {
         
         // read byte array from temporary file
         if( tmpOutFile.isFile() && tmpOutFile.canRead() )
-            binary = FileUtils.readFileIntoByteArray(tmpOutFile);
+            try {
+                binary = FileUtils.readFileToByteArray(tmpOutFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         else {
             String errorMsg =  "[AvidemuxMigration] Error: Unable to read temporary file "+tmpOutFile.getAbsolutePath();
             log.severe(errorMsg);

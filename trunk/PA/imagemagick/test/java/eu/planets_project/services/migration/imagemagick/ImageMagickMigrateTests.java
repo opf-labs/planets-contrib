@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,7 +21,7 @@ import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
 
 
@@ -82,8 +81,8 @@ public class ImageMagickMigrateTests {
     public void testDescribe() {
     	System.out.println("running Service at: " + Migrate.QNAME);
         ServiceDescription desc = imageMagick.describe();
-        System.out.println("Recieved service description: " + desc.toXmlFormatted());
         assertTrue("The ServiceDescription should not be NULL.", desc != null );
+        System.out.println("Recieved service description: " + desc.toXmlFormatted());
     }
     
     /**
@@ -581,58 +580,8 @@ public class ImageMagickMigrateTests {
         System.out.println("DigitalObject.getTitle(): " + doOut.getTitle());
         System.out.println("DigitalObject.getFormat(): " + doOut.getFormat().toASCIIString());
         System.out.println("Events: ");
-//        List<Event> events = doOut.getEvents();
-//        for (Event event : events) {
-//            System.out.println("Agent name: " + event.getAgent().getName());
-//            System.out.println("Agent type: " + event.getAgent().getType());
-//            System.out.println("Agent id: " + event.getAgent().getId());
-//            System.out.println("Event summary: " + event.getSummary());
-//            System.out.println("Event datetime: " + event.getDatetime());
-//            System.out.println("Event duration: " + event.getDuration());
-//        }
 
-        int compressionType = 1;
-        String compressionQuality= "";
-        String compressionTypeStr = "";
-
-        if(parameters!=null) {
-
-            for (Iterator<Parameter> iterator = parameters.iterator(); iterator.hasNext();) {
-                Parameter parameter = (Parameter) iterator.next();
-                String name = parameter.getName();
-                if(name.equalsIgnoreCase("compressionType")) {
-                    compressionType = Integer.parseInt(parameter.getValue());
-                }
-                if(name.equalsIgnoreCase("compressionQuality")) {
-                    compressionQuality = parameter.getValue();
-                }
-            }
-            compressionTypeStr = "-" + compressionTypes[compressionType].replace(" ", "_");
-        }
-        else {
-            compressionType = 1;		// Setting compressionType to default value = No compression
-            compressionQuality = "100";	// Setting compressionQuality to default value = 100%
-            compressionTypeStr = "-" + "DEFAULT_NO_COMP";
-        }      
-
-        File outFolder = FileUtils.createWorkFolderInSysTemp(TEST_OUT + File.separator + srcExtension.toUpperCase() + "-" + targetExtension.toUpperCase());
-        String outFileName = 
-
-            srcExtension 
-            + "_To_" 
-            + targetExtension 
-            + compressionTypeStr
-            + "_"
-            + compressionQuality
-            + "."
-            + targetExtension;
-
-        //            ByteArrayHelper.writeToDestFile(doOut.getContent().getValue(), outFile.getAbsolutePath());
-        File outFile = new File(outFolder, outFileName);
-        if(outFile.exists()) {
-            outFile.delete();
-        }
-        outFile = FileUtils.writeInputStreamToFile(doOut.getContent().getInputStream(), outFolder, outFileName);
+        File outFile = DigitalObjectUtils.toFile(doOut);
 
         System.out.println("Please find the result file here: " + outFile.getAbsolutePath() + "\n\n");
         assertTrue("Result file created?", outFile.canRead());

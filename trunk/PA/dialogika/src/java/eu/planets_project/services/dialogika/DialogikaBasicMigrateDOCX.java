@@ -3,6 +3,7 @@
  */
 package eu.planets_project.services.dialogika;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -11,6 +12,8 @@ import java.util.logging.Logger;
 
 import javax.jws.WebService;
 import javax.xml.namespace.QName;
+
+import org.apache.commons.io.FileUtils;
 
 import de.dialogika.planets.planets_webservice.genericmigration.ArrayOfParameter;
 import de.dialogika.planets.planets_webservice.genericmigration.GenericMigration;
@@ -26,7 +29,7 @@ import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 
 /**
  * A simple service to wrap the Dialogika services.
@@ -49,8 +52,12 @@ public class DialogikaBasicMigrateDOCX implements Migrate {
      */
     public MigrateResult migrate(DigitalObject digitalObject, URI inputFormat,
             URI outputFormat, List<Parameter> parameters) {
-        byte[] binary = FileUtils.writeInputStreamToBinary(digitalObject
-                .getContent().getInputStream());
+        byte[] binary = null;
+        try {
+            binary = FileUtils.readFileToByteArray(DigitalObjectUtils.toFile(digitalObject));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         byte[] result = basicMigrateOneBinary(binary);
         DigitalObject resultObject = new DigitalObject.Builder(Content
                 .byValue(result)).build();

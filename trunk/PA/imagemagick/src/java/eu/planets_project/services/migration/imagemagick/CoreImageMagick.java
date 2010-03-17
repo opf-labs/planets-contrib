@@ -25,14 +25,13 @@ import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
-import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
+import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.identification.imagemagick.utils.ImageMagickHelper;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.DigitalObjectUtils;
-import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.utils.ServiceUtils;
 
@@ -54,10 +53,6 @@ public class CoreImageMagick {
     private static final int JMAGICK_COMPRESSION_TYPE_PARAM_DEFAULT = 1;
     private static final int JMAGICK_COMPRESSION_QUALITY_LEVEL_DEFAULT = 100;
     
-    private static final String IM4JAVA_TEMP = "Im4Java_ImageMagickMigrate";
-    private static final String JMAGICK_TEMP = "JMagick_ImageMagickMigrate";
-    private static final String sessionID = FileUtils.randomizeFileName("");
-    private static final String DEFAULT_INPUT_FILE_NAME = "imageMagickInput" + sessionID;
     private static final FormatRegistry formatRegistry = FormatRegistryFactory.getFormatRegistry();
     
     private static List<URI> inFormats = ImageMagickHelper.getSupportedInputFormats();
@@ -211,27 +206,26 @@ public class CoreImageMagick {
 			}
 		}
         
-        
-        File imageMagickTmpFolder = FileUtils.createWorkFolderInSysTemp(JMAGICK_TEMP);
-        log.info("Created tmp folder: " + imageMagickTmpFolder.getAbsolutePath());
-
         log.info("Getting content from DigitalObject as InputStream...");
-        File inputFile;
+        
         File outputFile;
 
         log.info("Writing content to temp file.");
-		inputFile = new File(imageMagickTmpFolder, FileUtils.randomizeFileName(DigitalObjectUtils.getFileNameFromDigObject(digOb, inputFormat)));
 		
-		if(inputFile.exists()) {
-			log.info("PLEASE NOTE: Input file with same name already exists. Deleting old file: " + inputFile.getName());
-			inputFile.delete();
-		}
-		
-		FileUtils.writeInputStreamToFile( digOb.getContent().getInputStream(), inputFile );
+		File inputFile = null;
+		// write input object to temporary file        
+        try { 
+            /* TODO If extension not really needed, use DigitalObjectUtils.toFile(DigitalObject). */
+            String suffix = inputExt.startsWith(".") ? inputExt : "." + inputExt;
+            inputFile = File.createTempFile("planets", suffix);
+            DigitalObjectUtils.toFile(digOb, inputFile);
+        } catch (IOException x) {
+            throw new IllegalStateException("Could not create temp file.", x);
+        }
 		log.info("Temp file created for input: " + inputFile.getAbsolutePath());
 
 		// Also define the output file:
-		outputFile = new File(imageMagickTmpFolder, getOutputFileName(inputFile.getName(), outputFormat));
+		outputFile = new File(inputFile.getParentFile(), getOutputFileName(inputFile.getName(), outputFormat));
 
         log.info("Starting ImageMagick Migration from " + inputExt + " to " + outputExt + "...");
         
@@ -334,24 +328,15 @@ public class CoreImageMagick {
 			}
 		}
 	    
-	    File imageMagickTmpFolder = FileUtils.createWorkFolderInSysTemp(IM4JAVA_TEMP);
-	    log.info("Created tmp folder: " + imageMagickTmpFolder.getAbsolutePath());
-	
 	    log.info("Getting content from DigitalObject as InputStream...");
-	    File inputFile;
 	    File outputFile;
 	
 	    log.info("Writing content to temp file.");
-		inputFile = new File(imageMagickTmpFolder, FileUtils.randomizeFileName(DigitalObjectUtils.getFileNameFromDigObject(digOb, inputFormat)));
-		if(inputFile.exists()) {
-			log.info("PLEASE NOTE: Input file with same name already exists. Deleting old file: " + inputFile.getName());
-			inputFile.delete();
-		}
-		FileUtils.writeInputStreamToFile( digOb.getContent().getInputStream(), inputFile );
+	    File inputFile = DigitalObjectUtils.toFile(digOb);
 		log.info("Temp file created for input: " + inputFile.getAbsolutePath());
 	
 		// Also define the output file:
-		outputFile = new File(imageMagickTmpFolder, getOutputFileName(inputFile.getName(), outputFormat));
+		outputFile = new File(inputFile.getParentFile(), getOutputFileName(inputFile.getName(), outputFormat));
 	
 	    log.info("Starting ImageMagick Migration from " + inputExt + " to " + outputExt + "...");
 	    
@@ -579,20 +564,6 @@ public class CoreImageMagick {
 		}
 		
 		return version;
-	}
-
-	private String getInputFileName(DigitalObject digOb, URI inputFormat) {
-		String title = DigitalObjectUtils.getFileNameFromDigObject(digOb, inputFormat);
-		
-//		if(title==null || title.equals("")) {
-//			String inputExt = formatRegistry.getFirstExtension(inputFormat);
-//			fileName = DEFAULT_INPUT_FILE_NAME + "." + inputExt;
-//		}
-//		else {
-//			fileName = title;
-//		}
-		
-		return title;
 	}
 
 	private String getOutputFileName(String inputFileName, URI outputFormat) {

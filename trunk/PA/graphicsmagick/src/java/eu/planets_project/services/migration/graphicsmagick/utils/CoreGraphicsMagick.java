@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
-import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ProcessRunner;
 
 /**
@@ -29,9 +28,9 @@ public class CoreGraphicsMagick {
 	
 	private static String version = null;
 	
-	public GraphicsMagickResult convert(File inputFile, File outputFolder, String outFormatExtension, String compressionType, int imageQuality) {
-		String outFileName = FileUtils.getOutputFileNameFor(inputFile.getName(), outFormatExtension);
-		File outputFile = new File(outputFolder, outFileName);
+	public GraphicsMagickResult convert(File inputFile, String outFormatExtension, String compressionType, int imageQuality) {
+		String outFileName = inputFile.getName() + (outFormatExtension.startsWith(".") ? outFormatExtension : "." + outFormatExtension);
+		File outputFile = new File(inputFile.getParentFile(), outFileName);
 		ProcessRunner convert = new ProcessRunner(getConvertCmd(inputFile, outputFile, compressionType, imageQuality));
 		convert.run();
 		String error = convert.getProcessErrorAsString();

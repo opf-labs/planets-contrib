@@ -24,13 +24,12 @@ import java.util.logging.Logger;
 
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
-import javax.jws.soap.SOAPBinding;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.ws.BindingType;
 import javax.xml.ws.soap.MTOM;
 
+import org.apache.commons.io.FileUtils;
 import org.jboss.annotation.ejb.RemoteBinding;
 
 import com.sun.xml.ws.developer.StreamingAttachment;
@@ -41,7 +40,6 @@ import eu.planets_project.ifr.core.services.migration.openXML.common.ConversionR
 import eu.planets_project.ifr.core.services.migration.openXML.common.ConversionResult;
 import eu.planets_project.ifr.core.services.migration.openXML.common.ConvertedFile;
 import eu.planets_project.ifr.core.services.migration.openXML.common.ConvertedFileNames;
-import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ServiceUtils;
 
 /**
@@ -297,7 +295,7 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
             obj = unmarshaller.unmarshal(foundReportFiles[0]);
             
             //Delete the report
-            FileUtils.delete(foundReportFiles[0]);
+            FileUtils.deleteQuietly(foundReportFiles[0]);
         }
         catch (JAXBException jxbe) {
             throw new PlanetsServiceException("OpenXMLService::getReportFile: JAXB Problem deserializing from file " +
@@ -341,7 +339,7 @@ public class OpenXMLMigration implements OpenXMLMigrationServiceRemoteInterface 
             File outputFile = new File(convPath_.getAbsolutePath() + "/" + convFileNames.getOutput());
             
             if (originalCopy.isFile() && originalCopy.exists()) {
-                FileUtils.delete(originalCopy);
+                FileUtils.deleteQuietly(originalCopy);
             }
 
             if (!currentFile.isFile()) {

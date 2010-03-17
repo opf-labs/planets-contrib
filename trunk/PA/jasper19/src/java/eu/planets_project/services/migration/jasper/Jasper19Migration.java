@@ -4,6 +4,7 @@
 package eu.planets_project.services.migration.jasper;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -14,11 +15,10 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.ejb.Local;
-import javax.ejb.Remote;
-import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.soap.MTOM;
+
+import org.apache.commons.io.FileUtils;
 
 import com.sun.xml.ws.developer.StreamingAttachment;
 
@@ -26,8 +26,8 @@ import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.ifr.core.techreg.properties.ServiceProperties;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.Property;
@@ -37,7 +37,7 @@ import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.utils.ServicePerformanceHelper;
 import eu.planets_project.services.utils.ServiceUtils;
@@ -179,8 +179,15 @@ public final class Jasper19Migration implements Migrate {
         DigitalObject newDO = null;
         ServiceReport report = null;
 
-        // write input stream to temporary file
-        tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets", inputFmtExt);
+        // write input object to temporary file        
+        try { 
+            /* TODO If extension not really needed, use DigitalObjectUtils.toFile(DigitalObject). */
+            String suffix = inputFmtExt.startsWith(".") ? inputFmtExt : "." + inputFmtExt;
+            tmpInFile = File.createTempFile("planets", suffix);
+            DigitalObjectUtils.toFile(digitalObject, tmpInFile);
+        } catch (IOException x) {
+            throw new IllegalStateException("Could not create temp file.", x);
+        }
      
         // Record time take to load the input data:
         sph.loaded();
@@ -260,7 +267,11 @@ public final class Jasper19Migration implements Migrate {
         tmpOutFile = new File(outFileStr);
         // read byte array from temporary file
         if (tmpOutFile.isFile() && tmpOutFile.canRead()) {
-            	binary = FileUtils.readFileIntoByteArray(tmpOutFile);
+            try {
+                binary = FileUtils.readFileToByteArray(tmpOutFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 		String m60 = "Processing time: " + (endMillis-startMillis) + " milliseconds. ";
 		log.info(m60); serviceMessage.append(m60+"\n");
 		String m6 = "Output file: " + tmpOutFile.getAbsolutePath() + " created successfully. ";
@@ -282,25 +293,6 @@ public final class Jasper19Migration implements Migrate {
         newDO = new DigitalObject.Builder(Content.byValue(binary)).build();
 
         return new MigrateResult(newDO, report);
-    }
-
-    /**
-     * Get value of one parameter.
-     *
-     * @param ext Extension for which we retrieve the parameter list.
-     * @return Paramter string
-     */
-    private String getRequestParameterValue(String parmName) {
-        Iterator<Parameter> itr = this.requestParametersList.iterator();
-        String paramValue = null;
-        while (itr.hasNext()) {
-            Parameter param = (Parameter) itr.next();
-            if (param.getName() != null && param.getName().equals(parmName)) {
-                paramValue = param.getValue();
-                return paramValue;
-            }
-        }
-        return null;
     }
 
     private void getExtensions(URI inputFormat, URI outputFormat) {
@@ -380,7 +372,6 @@ public final class Jasper19Migration implements Migrate {
         ServiceDescription.Builder builder = new ServiceDescription.Builder(NAME, Migrate.class.getName());
         init();
         initParameters();
-        List<Parameter> parameters = serviceParametersList;
         builder.author("Sven Schlarb <shsschlarb-planets@yahoo.de>");
         builder.classname(this.getClass().getCanonicalName());
         builder.description("Simple service for Jasper Transcoder Version 1.900.1 for JPG to JP2 (JPEG2000)" +

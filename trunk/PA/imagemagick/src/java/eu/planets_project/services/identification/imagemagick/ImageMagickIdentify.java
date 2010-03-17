@@ -22,14 +22,14 @@ import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
-import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
+import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.identification.imagemagick.utils.ImageMagickHelper;
 import eu.planets_project.services.identify.Identify;
 import eu.planets_project.services.identify.IdentifyResult;
 import eu.planets_project.services.migration.imagemagick.CoreImageMagick;
-import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.ServiceUtils;
 
 /**
@@ -54,15 +54,12 @@ public class ImageMagickIdentify implements Identify {
 	
 	private static Logger log = Logger.getLogger(ImageMagickIdentify.class.getName()) ;
 	
-	private static final String WORKFOLDER_NAME = "ImageMagickIdentify";
-	private String sessionID = FileUtils.randomizeFileName("");
-	private final String DEFAULT_INPUT_NAME = "ImageMagickIdentify_input" + sessionID;
 	private static final String DEFAULT_EXTENSION = "bin";
 	private static final FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 	
 	private static final String IMAGE_MAGICK_URI = "http://www.imagemagick.org";
 	
-	private static String version = "unknown";
+	private String version = "unknown";
 	
 	
 	
@@ -124,39 +121,12 @@ public class ImageMagickIdentify implements Identify {
 			extension = DEFAULT_EXTENSION;
 		}
 		
-		if(fileName==null || fileName.equalsIgnoreCase("")) {
-			log.info("Could not retrieve file name\n(digitalObject.getTitle() returns NULL), using DEFAULT_INPUT_NAME instead: " + DEFAULT_INPUT_NAME + "." + extension);
-			fileName = DEFAULT_INPUT_NAME + "." + extension;
-		}
-		
-		File workFolder = FileUtils.createWorkFolderInSysTemp(WORKFOLDER_NAME);
-		log.info("Created workfolder for temp files: " + workFolder.getAbsolutePath());
-		if(workFolder.exists()) {
-			FileUtils.deleteAllFilesInFolder(workFolder);
-		}
-		
-		File inputFile = FileUtils.writeInputStreamToFile(digitalObject.getContent().getInputStream(), workFolder, fileName);
+		File inputFile = DigitalObjectUtils.toFile(digitalObject);
 		log.info("Created temporary input file: " + inputFile.getAbsolutePath());
 		
 		ArrayList<URI> uriList = null;
 		
 		String srcImageFormat = null;
-		
-//		try {
-//			PLOGGER.info("Initialising ImageInfo Object");
-//			ImageInfo imageInfo = new ImageInfo(inputFile.getAbsolutePath());
-//			MagickImage image = new MagickImage(imageInfo);
-//			
-//		    // Checking input image format
-//		    srcImageFormat = image.getMagick();
-//		    PLOGGER.info("The image format is: '" + srcImageFormat + "'");
-//		    image.destroyImages();
-//		    
-//		} catch (MagickException e) {
-//			PLOGGER.error("The file seems to have an unsupported file format!");
-//			e.getLocalizedMessage();
-//			e.printStackTrace();
-//		}
 		
 		srcImageFormat = CoreImageMagick.verifyInputFormat(inputFile);
 		

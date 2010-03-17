@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +22,7 @@ import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
 
 /**
@@ -111,14 +112,14 @@ public final class AbiWordMigrationTest extends TestCase {
         //String outTestFileName = "PA/abiword/test/testfiles/generatedfiles/planetsMigrate"+origExt+"to"+destExt+String.valueOf(cycle)+"."+destExt.toLowerCase();
         String resFileDir = "PA/abiword/test/testfiles/generatedfiles/";
         String resFileName = "planetsMigrate"+origExt.toUpperCase()+"to"+destExt.toUpperCase()+"."+destExt.toLowerCase();
-        byte[] binary = FileUtils.readFileIntoByteArray(new File(inTestFileName));
+        byte[] binary = FileUtils.readFileToByteArray(new File(inTestFileName));
         DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
         FormatRegistry formatRegistry = FormatRegistryFactory.getFormatRegistry();
         MigrateResult mr = dom.migrate(input, formatRegistry.createExtensionUri(origExt), formatRegistry.createExtensionUri(destExt), params);
         assertTrue("Migration result is null is null for planetsMigrate"+origExt+"to"+destExt+".", mr != null);
         DigitalObject doOut = mr.getDigitalObject();
         assertTrue("Resulting digital object is null for planetsMigrate"+origExt+"to"+destExt+".", doOut != null);
-        FileUtils.writeInputStreamToFile(doOut.getContent().getInputStream(), new File( resFileDir), resFileName);
+        DigitalObjectUtils.toFile(doOut, new File(resFileDir));
         File resultFile = new File(resFileDir+resFileName);
         assertTrue("Result file was not created successfully!", resultFile.exists());
     }

@@ -1,6 +1,7 @@
 package eu.planets_project.services.migration.gimp;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -12,11 +13,11 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.ejb.Local;
-import javax.ejb.Remote;
-import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.ws.soap.MTOM;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import com.sun.xml.ws.developer.StreamingAttachment;
 
@@ -35,7 +36,7 @@ import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.utils.ServicePerformanceHelper;
 import eu.planets_project.services.utils.ServiceUtils;
@@ -395,7 +396,7 @@ public final class Gimp26Migration implements Migrate {
             this.gimp_install_dir = props.getProperty("gimp.install.dir");
             this.gimp_app_name = props.getProperty("gimp.app.name");
             this.gimp_scripts_dir = props.getProperty("gimp.scripts.dir");
-            FileUtils.close(stream);
+            IOUtils.closeQuietly(stream);
         } catch (Exception e) {
             this.gimp_install_dir = "/usr/bin";
             this.gimp_app_name = "gimp";
@@ -456,9 +457,15 @@ public final class Gimp26Migration implements Migrate {
         byte[] binary = null;
         InputStream inputStream = digitalObject.getContent().getInputStream();
 
-        // write binary array to temporary file
-        //tmpInFile = ByteArrayHelper.write(binary);
-        tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets", inputFmtExt);
+        // write input object to temporary file        
+        try { 
+            /* TODO If extension not really needed, use DigitalObjectUtils.toFile(DigitalObject). */
+            String suffix = inputFmtExt.startsWith(".") ? inputFmtExt : "." + inputFmtExt;
+            tmpInFile = File.createTempFile("planets", suffix);
+            DigitalObjectUtils.toFile(digitalObject, tmpInFile);
+        } catch (IOException x) {
+            x.printStackTrace();
+        }
 
         // Record time take to load the input data:
         sph.loaded();
@@ -526,7 +533,11 @@ public final class Gimp26Migration implements Migrate {
 
             // read byte array from temporary file
             if (tmpOutFile.isFile() && tmpOutFile.canRead()) {
-                binary = FileUtils.readFileIntoByteArray(tmpOutFile);
+                try {
+                    binary = FileUtils.readFileToByteArray(tmpOutFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 
                 m = "Processing time: " + (endMillis - startMillis) + " milliseconds. ";
                 log.info(m);

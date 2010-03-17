@@ -17,21 +17,23 @@ import javax.xml.ws.WebServiceContext;
 import jj2000.j2k.decoder.CmdLnDecoder;
 import jj2000.j2k.encoder.CmdLnEncoder;
 
+import org.apache.commons.io.FileUtils;
+
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
-import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
+import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.ServiceUtils;
 
 /**
@@ -98,19 +100,21 @@ public class JJ2000MigrateService implements Migrate {
         
         // Store DO in a temporary file.
         String extension = format.getFirstExtension(inputFormat);
-        File inFile = FileUtils.writeInputStreamToTmpFile(dob.getContent().getInputStream(), "jj2000-conv-in", "."+ extension );
-        inFile.deleteOnExit();
-        
-        // Output file:
-        extension = format.getFirstExtension(outputFormat);
+        File inFile = null;
         File outFile = null;
         try {
+            inFile = File.createTempFile("jj2000-conv-in", "." + extension);
+            DigitalObjectUtils.toFile(dob, inFile);
+            inFile.deleteOnExit();
+
+            // Output file:
+            extension = format.getFirstExtension(outputFormat);
             outFile = File.createTempFile("jj2000-conv-out", "." + extension );
+            outFile.deleteOnExit();
         } catch (IOException e) {
             e.printStackTrace();
             return this.returnWithErrorMessage("Could not open output file. "+e, null);
         }
-        outFile.deleteOnExit();
 
 
         // Invoking as command-line, but internally.  This means we can't get System.out/err!
@@ -127,10 +131,16 @@ public class JJ2000MigrateService implements Migrate {
         }
         
         // Grab the file and pass it back.
-        byte[] bytes = FileUtils.readFileIntoByteArray(outFile);
-        ServiceReport rep = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
-        DigitalObject ndo = new DigitalObject.Builder(Content.byValue(bytes)).build();
-        return new MigrateResult( ndo, rep );
+        try {
+            byte[] bytes = FileUtils.readFileToByteArray(outFile);
+            ServiceReport rep = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
+            DigitalObject ndo = new DigitalObject.Builder(Content.byValue(bytes)).build();
+            return new MigrateResult( ndo, rep );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new MigrateResult(null, ServiceUtils
+                .createErrorReport("Failed during read of result file."));
     }
 
     /**

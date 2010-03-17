@@ -1,20 +1,22 @@
 package eu.planets_project.services.migration.netpbm;
 
-import eu.planets_project.services.datatypes.DigitalObjectContent;
-import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.Content;
-import eu.planets_project.services.datatypes.ServiceDescription;
-import eu.planets_project.services.migrate.Migrate;
-import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.test.ServiceCreator;
-import junit.framework.TestCase;
-import org.junit.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import junit.framework.TestCase;
+
+import org.junit.Test;
+
+import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.DigitalObjectContent;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.migrate.Migrate;
+import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.utils.DigitalObjectUtils;
+import eu.planets_project.services.utils.test.ServiceCreator;
 
 /**
  * TODO abr forgot to document this class
@@ -39,7 +41,6 @@ public class NetPbmMigrationTest extends TestCase {
     private File testpng = new File("tests/test-files/images/bitmap/test_png/2274192346_4a0a03c5d6.png");
     private int testPngToGifLength = 200037;
 
-                    File workfolder;
     /*
     * (non-Javadoc)
     * @see junit.framework.TestCase#setUp()
@@ -50,7 +51,6 @@ public class NetPbmMigrationTest extends TestCase {
                NetPbmMigration.class, wsdlLoc);
 
 
-        workfolder = FileUtils.createWorkFolderInSysTemp("netpbm_test");
     }
 
     /*
@@ -61,7 +61,6 @@ public class NetPbmMigrationTest extends TestCase {
     protected void tearDown() throws Exception {
         // TODO Auto-generated method stub
         super.tearDown();
-        workfolder.delete();
     }
 
     /**
@@ -70,8 +69,8 @@ public class NetPbmMigrationTest extends TestCase {
     @Test
     public void testDescribe() {
         ServiceDescription desc = dom.describe();
-        System.out.println("Recieved service description: " + desc.toXmlFormatted());
         assertTrue("The ServiceDescription should not be NULL.", desc != null);
+        System.out.println("Recieved service description: " + desc.toXmlFormatted());
     }
 
     /**
@@ -99,11 +98,8 @@ public class NetPbmMigrationTest extends TestCase {
 
         System.out.println("Output: " + doOut);
 
-        DigitalObjectContent content = doOut.getContent();
 
-
-
-        File result = FileUtils.writeInputStreamToFile(content.getInputStream(), workfolder, "test.png.gif");
+        File result = DigitalObjectUtils.toFile(doOut);
 
         System.out.println("Please find the result HTML file here: \n" + result.getAbsolutePath());
 

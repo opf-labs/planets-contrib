@@ -14,11 +14,8 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
-import javax.ejb.Local;
-import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
-import javax.xml.ws.BindingType;
 import javax.xml.ws.soap.MTOM;
 
 import magick.ImageInfo;
@@ -41,14 +38,14 @@ import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.Property;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
-import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
+import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.identification.imagemagick.utils.ImageMagickHelper;
 import eu.planets_project.services.migration.imagemagick.CoreImageMagick;
 import eu.planets_project.services.modify.Modify;
 import eu.planets_project.services.modify.ModifyResult;
-import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.ServiceUtils;
 
 /**
@@ -68,16 +65,6 @@ public class ImageMagickCrop implements Modify {
 	public static final String NAME = "ImageMagickCrop";
 	
 	private static Logger log = Logger.getLogger(ImageMagickCrop.class.getName()) ;
-	
-	private String workFolderName = "IMAGEMAGICK_CROP_TMP";
-//	private File work_folder = FileUtils.createWorkFolderInSysTemp(workFolderName);
-	private File work_folder = FileUtils.createFolderInWorkFolder(FileUtils.getPlanetsTmpStoreFolder(), workFolderName);
-//	private static String sessionID = FileUtils.randomizeFileName("");
-//	private String inputImageName = "imageMagickCropInput" + sessionID;
-//	private String resultImageName = "imageMagickCropResult" + sessionID;
-	private String inputImageName = "imageMagickCropInput";
-	private String resultImageName = "imageMagickCropResult";
-	private String extension = null;
 	
 	private Point top_left = new Point();
 	private Point bottom_right = new Point();
@@ -119,12 +106,7 @@ public class ImageMagickCrop implements Modify {
 						"installation folder! Otherwise this service won't work on Windows OS!");
 			}
 		}
-		
 			
-		// cleaning the TMP folder first
-//		FileUtils.deleteTempFiles(work_folder);
-//		work_folder = FileUtils.createWorkFolderInSysTemp(workFolderName);
- 
 		// Use the JBoss-Classloader, instead of the Systemclassloader.
 		System.setProperty("jmagick.systemclassloader","no"); 
 	    log.info("Hello! Initializing and starting ImageMagickCrop service!");
@@ -173,7 +155,7 @@ public class ImageMagickCrop implements Modify {
 	public ModifyResult modify(DigitalObject digitalObject, URI inputFormat,
 			List<Parameter> parameters) {
 
-		extension = "." + formatReg.getFirstExtension(inputFormat);
+		String extension = "." + formatReg.getFirstExtension(inputFormat);
 		
 		URI testIn = formatReg.createExtensionUri(formatReg.getFirstExtension(inputFormat));
 		
@@ -188,8 +170,15 @@ public class ImageMagickCrop implements Modify {
 			}
 		}
 		
-		File inputFile = new File(work_folder, FileUtils.randomizeFileName(inputImageName + extension)); 
-		FileUtils.writeInputStreamToFile(digitalObject.getContent().getInputStream(), inputFile);
+		File inputFile = null;
+		// write input object to temporary file        
+        try { 
+            /* TODO If extension not really needed, use DigitalObjectUtils.toFile(DigitalObject). */
+            inputFile = File.createTempFile("planets", extension);
+            DigitalObjectUtils.toFile(digitalObject, inputFile);
+        } catch (IOException x) {
+            throw new IllegalStateException("Could not create temp file.", x);
+        }
 		
 		Rectangle croppingArea = null;
 		
@@ -207,37 +196,33 @@ public class ImageMagickCrop implements Modify {
 					"If no top_left_point is specified, it is assumed to be located at (0,0) which is the upper left corner of the image.", null);
 		}
 		
-		File resultFile = new File(work_folder.getAbsolutePath() + File.separator + FileUtils.randomizeFileName(resultImageName + extension));
+		File resultFile = null;
 		
-		croppingArea = createCroppingArea(inputFile);
+        try {
+            resultFile = File.createTempFile("planets", null, inputFile.getParentFile());
+
+            croppingArea = createCroppingArea(inputFile);
+
+            IMOperation op = new IMOperation();
+            op.addImage(inputFile.getAbsolutePath());
+
+            op.crop(croppingArea.width, croppingArea.height, croppingArea.x, croppingArea.y);
+
+            op.p_repage();
+            op.addImage(resultFile.getAbsolutePath());
+
+            ConvertCmd convert = new ConvertCmd();
+            convert.run(op);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IM4JavaException e) {
+            e.printStackTrace();
+        }
 		
-		IMOperation op = new IMOperation();
-	    op.addImage(inputFile.getAbsolutePath());
-	    
-	    op.crop(croppingArea.width, croppingArea.height, croppingArea.x, croppingArea.y);
-	    
-	    op.p_repage();
-	    op.addImage(resultFile.getAbsolutePath());
-	    
-	    try {
-	    	ConvertCmd convert = new ConvertCmd();
-//		    List<String> commands = op.getCmdArgs();
-//		    for (String string : commands) {
-//				System.out.print(string + " ");
-//			}
-			convert.run(op);
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (IM4JavaException e) {
-			e.printStackTrace();
-		}
-		
-//		File resultFile = new File(work_folder.getAbsolutePath() + File.separator + resultImageName + extension);
-		
-		if(!resultFile.exists()) {
+		if(resultFile == null || !resultFile.exists()) {
 			return this.returnWithErrorMessage("No result file found. Something has gone terribly wrong during this operation. Sorry.", null);
 		}
 		

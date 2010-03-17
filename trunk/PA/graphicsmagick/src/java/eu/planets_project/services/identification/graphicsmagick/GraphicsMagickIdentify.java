@@ -4,7 +4,6 @@
 package eu.planets_project.services.identification.graphicsmagick;
 
 import java.io.File;
-import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +14,6 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
-import javax.xml.ws.BindingType;
 import javax.xml.ws.soap.MTOM;
 
 import com.sun.xml.ws.developer.StreamingAttachment;
@@ -27,14 +25,14 @@ import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
-import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
+import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.identify.Identify;
 import eu.planets_project.services.identify.IdentifyResult;
 import eu.planets_project.services.migration.graphicsmagick.utils.CoreGraphicsMagick;
 import eu.planets_project.services.migration.graphicsmagick.utils.GraphicsMagickResult;
-import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.ServiceUtils;
 
 @Local(Identify.class)
@@ -47,7 +45,7 @@ import eu.planets_project.services.utils.ServiceUtils;
         endpointInterface = "eu.planets_project.services.identify.Identify" )
 @MTOM
 @StreamingAttachment( parseEagerly=true, memoryThreshold=ServiceUtils.JAXWS_SIZE_THRESHOLD )
-public class GraphicsMagickIdentify implements Identify, Serializable {
+public class GraphicsMagickIdentify implements Identify {
 	
 	public static final long serialVersionUID = 6268629849696320639L;
 
@@ -58,11 +56,6 @@ public class GraphicsMagickIdentify implements Identify, Serializable {
 	
 	private FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 	
-	private String DEFAULT_EXTENSION = ".bin";
-	private String DEFAULT_INPUT_NAME = FileUtils.randomizeFileName("gm_identify_input");
-	
-	private String WORKFOLDER_NAME = "gm_identify_tmp".toUpperCase();
-
 	/* (non-Javadoc)
 	 * @see eu.planets_project.services.identify.Identify#identify(eu.planets_project.services.datatypes.DigitalObject, java.util.List)
 	 */
@@ -73,23 +66,7 @@ public IdentifyResult identify(DigitalObject digitalObject, List<Parameter> para
 			return this.returnWithErrorMessage("The Content of the DigitalObject should NOT be NULL! Returning with ErrorReport", null);
 		}
 		
-		String fileName = digitalObject.getTitle();
-		
-		if(fileName!=null && !fileName.equalsIgnoreCase("")) { 
-			log.info("Input file to identify: " +fileName);
-		}
-		else {
-			fileName = DEFAULT_INPUT_NAME + DEFAULT_EXTENSION;
-			log.info("No file name passed, using: " + DEFAULT_INPUT_NAME + DEFAULT_EXTENSION);
-		}
-		
-		File workFolder = FileUtils.createWorkFolderInSysTemp(WORKFOLDER_NAME);
-		log.info("Created workfolder for temp files: " + workFolder.getAbsolutePath());
-		if(workFolder.exists()) {
-			FileUtils.deleteAllFilesInFolder(workFolder);
-		}
-		
-		File inputFile = FileUtils.writeInputStreamToFile(digitalObject.getContent().getInputStream(), workFolder, fileName);
+		File inputFile = DigitalObjectUtils.toFile(digitalObject);
 		
 		ArrayList<URI> uriList = null;
 		

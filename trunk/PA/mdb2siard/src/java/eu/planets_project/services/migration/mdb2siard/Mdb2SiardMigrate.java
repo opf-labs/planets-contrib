@@ -21,12 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.ejb.Local;
-import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
-import javax.xml.ws.BindingType;
 import javax.xml.ws.soap.MTOM;
+
+import org.apache.commons.io.FileUtils;
 
 import com.sun.xml.ws.developer.StreamingAttachment;
 
@@ -43,7 +42,7 @@ import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.utils.ServiceUtils;
 
@@ -65,8 +64,6 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 	private static int iEOS = -1;
 	public static final String sMDB_EXTENSION = ".mdb";  
 	public static final String sSIARD_EXTENSION = ".siard";  
-	private String SIARD_TMP_NAME = "SIARD_TMP";
-	private File SIARD_TMP = null;
 	
 	private static FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 
@@ -78,13 +75,6 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 
 	/** data members */
 	private static Logger log = Logger.getLogger(Mdb2SiardMigrate.class.getName());
-	
-	public Mdb2SiardMigrate() {
-		SIARD_TMP = FileUtils.createFolderInWorkFolder(FileUtils.getPlanetsTmpStoreFolder(), SIARD_TMP_NAME);
-		if(SIARD_TMP.exists()) {
-			// delete all files in here...?
-		}
-	}
 	
 	/*--------------------------------------------------------------------*/
 	/* (non-Javadoc)
@@ -137,10 +127,10 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 			{
 				/* write to temporary file */
 	//	    fileInput = File.createTempFile("planets", sMDB_EXTENSION);
-		    fileInput = new File(SIARD_TMP, FileUtils.randomizeFileName("siard_tmp"+ sMDB_EXTENSION));
+			fileInput = File.createTempFile("siard_tmp", sMDB_EXTENSION);
+		    DigitalObjectUtils.toFile(doInput, fileInput);
 		    /* make sure, it is at least deleted, when the Web Service is stopped */
 		    fileInput.deleteOnExit();
-	        FileUtils.writeInputStreamToFile(doInput.getContent().getInputStream(), fileInput);
 			/* output file has same unique file name with different extension */
 			String sInputFile = fileInput.getAbsolutePath();
 			String sOutputFile = sInputFile.substring(0,sInputFile.lastIndexOf("."))+sSIARD_EXTENSION;
@@ -169,7 +159,7 @@ public final class Mdb2SiardMigrate implements Migrate, Serializable
 			{
 				/* clean up temporary files in any case */
 				if ((fileInput != null) && (fileInput.exists()))
-				    FileUtils.delete(fileInput);
+				    FileUtils.deleteQuietly(fileInput);
 	//			if ((fileOutput != null) && (fileOutput.exists()))
 	//			    FileUtils.delete(fileOutput);
 				/* if no output was generated, create a zero length byte array */

@@ -1,33 +1,36 @@
 package eu.planets_project.services.migration.graphicsmagick;
 
-import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
-import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
-import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.*;
-import eu.planets_project.services.datatypes.ServiceReport.Status;
-import eu.planets_project.services.datatypes.ServiceReport.Type;
-import eu.planets_project.services.migrate.Migrate;
-import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.migration.graphicsmagick.utils.CoreGraphicsMagick;
-import eu.planets_project.services.migration.graphicsmagick.utils.GraphicsMagickResult;
-import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.ServiceUtils;
-
-import javax.ejb.Local;
-import javax.ejb.Remote;
-import javax.ejb.Stateless;
-import javax.jws.WebService;
-import javax.xml.ws.BindingType;
-import javax.xml.ws.soap.MTOM;
-
-import com.sun.xml.ws.developer.StreamingAttachment;
-
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
+import javax.ejb.Stateless;
+import javax.jws.WebService;
+import javax.xml.ws.soap.MTOM;
+
+import com.sun.xml.ws.developer.StreamingAttachment;
+
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
+import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.Parameter;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.ServiceReport.Status;
+import eu.planets_project.services.datatypes.ServiceReport.Type;
+import eu.planets_project.services.datatypes.Tool;
+import eu.planets_project.services.migrate.Migrate;
+import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.migration.graphicsmagick.utils.CoreGraphicsMagick;
+import eu.planets_project.services.migration.graphicsmagick.utils.GraphicsMagickResult;
+import eu.planets_project.services.utils.DigitalObjectUtils;
+import eu.planets_project.services.utils.ServiceUtils;
 
 /**
  * @author Peter Melms
@@ -47,12 +50,6 @@ public class GraphicsMagickMigrate implements Migrate, Serializable {
 	
 	private static final long serialVersionUID = 2542354060692928942L;
 
-	private String TMP_FOLDER_NAME = "GRAPHICSMAGICK_TMP";
-	
-	private String SESSION_ID = null;
-	
-	private String DEFAULT_INPUT_NAME = "gm_input";
-	
 	private static Logger log = Logger.getLogger(GraphicsMagickMigrate.class.getName());
 	
 	private static final FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
@@ -89,13 +86,6 @@ public class GraphicsMagickMigrate implements Migrate, Serializable {
 	 */
 	public MigrateResult migrate(DigitalObject digitalObject, URI inputFormat,
 			URI outputFormat, List<Parameter> parameters) {
-		SESSION_ID = FileUtils.randomizeFileName("");
-		
-		File tmp_folder = FileUtils.createFolderInWorkFolder(FileUtils.getPlanetsTmpStoreFolder(), TMP_FOLDER_NAME);
-		
-//		if(tmp_folder.exists()) {
-//			FileUtils.deleteAllFilesInFolder(tmp_folder);
-//		}
 		
 		String inputExt = format.getFirstExtension(inputFormat);
 		String outputExt = format.getFirstExtension(outputFormat);
@@ -118,9 +108,13 @@ public class GraphicsMagickMigrate implements Migrate, Serializable {
 			}
 		}
 		
-		String inputFileName = DEFAULT_INPUT_NAME + SESSION_ID + "." + inputExt;
-		File inputFile = new File(tmp_folder, inputFileName);
-		FileUtils.writeInputStreamToFile(digitalObject.getContent().getInputStream(), inputFile);
+		File inputFile = null;
+        try {
+            inputFile = File.createTempFile("planets", "." + inputExt);
+            DigitalObjectUtils.toFile(digitalObject, inputFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 		
 		parseParameters(parameters);
 		
@@ -130,7 +124,7 @@ public class GraphicsMagickMigrate implements Migrate, Serializable {
 			return this.returnWithErrorMessage("The input file has a different Format than it claims it has! Nothing has been done, sorry!", null);
 		}
 		
-		GraphicsMagickResult result = gm.convert(inputFile, tmp_folder, outputExt, compressionType, imageQuality);
+		GraphicsMagickResult result = gm.convert(inputFile, outputExt, compressionType, imageQuality);
 		
 		if(result.SUCCESS) {
 			DigitalObject resultDO = createDigitalObject(result.getResultFile(), outputFormat);

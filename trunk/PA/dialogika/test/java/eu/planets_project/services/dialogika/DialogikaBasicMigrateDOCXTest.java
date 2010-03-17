@@ -6,15 +6,16 @@ package eu.planets_project.services.dialogika;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
 
 /**
@@ -42,10 +43,11 @@ public class DialogikaBasicMigrateDOCXTest {
     }
     
     /**
+     * @throws IOException 
      * 
      */
     @Test
-    public void testInvoke() {
+    public void testInvoke() throws IOException {
         /*
         #http-proxy-host = bspcache.bl.uk
         #http-proxy-port = 8080
@@ -60,7 +62,7 @@ public class DialogikaBasicMigrateDOCXTest {
         System.out.println("The HTTP Proxy host is: "+System.getProperty("http.proxyHost"));
 */
         System.out.println("Reading in the input...");
-        byte[] input = FileUtils.readFileIntoByteArray(new File("PA/dialogika/test/resources/test.doc"));
+        byte[] input = FileUtils.readFileToByteArray(new File("PA/dialogika/test/resources/test.doc"));
         System.out.println("Invoking the service...");
         DigitalObject inputObject = new DigitalObject.Builder(Content.byValue(input)).build();
         MigrateResult output = bmob.migrate(inputObject,null,null,null);

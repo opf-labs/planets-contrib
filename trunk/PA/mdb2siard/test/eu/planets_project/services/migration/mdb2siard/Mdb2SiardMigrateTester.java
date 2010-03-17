@@ -19,6 +19,7 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,7 +33,7 @@ import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
 
 public class Mdb2SiardMigrateTester
@@ -72,8 +73,8 @@ public class Mdb2SiardMigrateTester
 	public void testDescribe()
 	{
     ServiceDescription desc = dom.describe();
-    System.out.println("Received service description: " + desc.toXmlFormatted());
     assertTrue("The ServiceDescription should not be NULL.", desc != null );
+    System.out.println("Received service description: " + desc.toXmlFormatted());
 	} /* testDescribe */
 
 	
@@ -147,7 +148,7 @@ public class Mdb2SiardMigrateTester
     {
       File fileOutput = new File(sOUTPUT_FILE);
       if (fileOutput.exists())
-          FileUtils.delete(fileOutput);
+          FileUtils.deleteQuietly(fileOutput);
       File fileInput = new File(sINPUT_FILE);
       DigitalObject doInput = new DigitalObject.Builder(
       		Content.byReference(fileInput)).title(fileInput.getName()).format(format.createExtensionUri("mdb")).build();
@@ -156,7 +157,7 @@ public class Mdb2SiardMigrateTester
       assertTrue("Resulting digital object is null.", doOutput != null);
       if (mr.getReport().getStatus() != Status.TOOL_ERROR)
       {
-        FileUtils.writeInputStreamToFile(doOutput.getContent().getInputStream(), fileOutput);
+        DigitalObjectUtils.toFile(doOutput, fileOutput);
         if (mr.getReport().getType() == Type.WARN)
         	System.out.println("Warning: "+mr.getReport().getMessage());
         if (mr.getReport().getType() == Type.INFO)

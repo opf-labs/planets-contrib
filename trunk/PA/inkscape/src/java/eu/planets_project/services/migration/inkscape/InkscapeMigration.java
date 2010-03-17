@@ -4,6 +4,7 @@
 package eu.planets_project.services.migration.inkscape;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -19,6 +20,8 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 
+import org.apache.commons.io.FileUtils;
+
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
@@ -32,7 +35,7 @@ import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.ProcessRunner;
 
 
@@ -130,8 +133,15 @@ public final class InkscapeMigration implements Migrate {
         byte[] binary = null;
         InputStream inputStream = digitalObject.getContent().getInputStream();
 
-            // write input stream to temporary file
-            tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets", inputFmtExt);
+             // write input object to temporary file        
+            try { 
+                /* TODO If extension not really needed, use DigitalObjectUtils.toFile(DigitalObject). */
+                String suffix = inputFmtExt.startsWith(".") ? inputFmtExt : "." + inputFmtExt;
+                tmpInFile = File.createTempFile("planets", suffix);
+                DigitalObjectUtils.toFile(digitalObject, tmpInFile);
+            } catch (IOException x) {
+                throw new IllegalStateException("Could not create temp file.", x);
+            }
             if( !(tmpInFile.exists() && tmpInFile.isFile() && tmpInFile.canRead() ))
             {
                 log.severe("[InkscapeMigration] Unable to create temporary input file!");
@@ -183,7 +193,11 @@ public final class InkscapeMigration implements Migrate {
             tmpOutFile = new File(outFileStr);
             // read byte array from temporary file
             if( tmpOutFile.isFile() && tmpOutFile.canRead() )
-                binary = FileUtils.readFileIntoByteArray(tmpOutFile);
+                try {
+                    binary = FileUtils.readFileToByteArray(tmpOutFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             else
                 log.severe( "Error: Unable to read temporary file "+tmpOutFile.getAbsolutePath() );
 

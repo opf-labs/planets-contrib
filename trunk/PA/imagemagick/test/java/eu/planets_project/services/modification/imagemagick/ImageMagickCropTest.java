@@ -20,7 +20,7 @@ import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.modify.Modify;
 import eu.planets_project.services.modify.ModifyResult;
-import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
 
 /**
@@ -31,7 +31,6 @@ public class ImageMagickCropTest {
 	
 	String WSDL = "/pserv-pa-imagemagick/ImageMagickCrop?wsdl";
 	
-	File test_tmp_folder = FileUtils.createWorkFolderInSysTemp("ImageMagickCrop_test_tmp".toUpperCase()); 
 	File testFile = new File("tests/test-files/images/bitmap/test_tiff/2326378356_65c3b81dfd.tif");
 	
 	Modify im_crop = ServiceCreator.createTestService(Modify.QNAME, ImageMagickCrop.class, WSDL);
@@ -52,8 +51,8 @@ public class ImageMagickCropTest {
 	public void testDescribe() {
 		System.out.println("running Service at: " + Modify.QNAME);
 	    ServiceDescription desc = im_crop.describe();
-	    System.out.println("Recieved service description: " + desc.toXmlFormatted());
 	    assertTrue("The ServiceDescription should not be NULL.", desc != null );
+	    System.out.println("Recieved service description: " + desc.toXmlFormatted());
 	}
 
 	/**
@@ -68,8 +67,7 @@ public class ImageMagickCropTest {
 		
 		ModifyResult mr = im_crop.modify(input, formatReg.createExtensionUri("tiff"), parameters);
 		assertTrue("ModifyResult should not be NULL!", mr!=null);
-		File result = new File(test_tmp_folder, "cropped.tiff");
-		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().getInputStream(), result);
+		File result = DigitalObjectUtils.toFile(mr.getDigitalObject());
 		assertTrue("File has been written correctly!", result.exists());
 	}
 	
@@ -84,8 +82,7 @@ public class ImageMagickCropTest {
 		parameters.add(new Parameter("crop_area_size", "330,180"));
 		ModifyResult mr = im_crop.modify(input, formatReg.createExtensionUri("tiff"), parameters);
 		assertTrue("ModifyResult should not be NULL!", mr!=null);
-		File result = new File(test_tmp_folder, "cropped1.tiff");
-		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().getInputStream(), result);
+		File result = DigitalObjectUtils.toFile(mr.getDigitalObject());
 		assertTrue("File has been written correctly!", result.exists());
 	}
 	
@@ -101,8 +98,7 @@ public class ImageMagickCropTest {
 		parameters.add(new Parameter("crop_area_size", "330,180"));
 		ModifyResult mr = im_crop.modify(input, formatReg.createExtensionUri("tiff"), parameters);
 		assertTrue("ModifyResult should not be NULL!", mr!=null);
-		File result = new File(test_tmp_folder, "cropped2.tiff");
-		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().getInputStream(), result);
+		File result = DigitalObjectUtils.toFile(mr.getDigitalObject());
 		assertTrue("File has been written correctly!", result.exists());
 	}
 	
@@ -117,8 +113,7 @@ public class ImageMagickCropTest {
 		parameters.add(new Parameter("crop_area_size", "330,180"));
 		ModifyResult mr = im_crop.modify(input, formatReg.createExtensionUri("tiff"), parameters);
 		assertTrue("ModifyResult should not be NULL!", mr!=null);
-		File result = new File(test_tmp_folder, "cropped3.tiff");
-		FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().getInputStream(), result);
+		File result = DigitalObjectUtils.toFile(mr.getDigitalObject());
 		assertTrue("File has been written correctly!", result.exists());
 	}
 }
