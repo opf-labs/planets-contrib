@@ -1,32 +1,25 @@
 package eu.planets_project.services.migration.ghostscript;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.Serializable;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ejb.Local;
-import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.ws.BindingType;
 import javax.xml.ws.soap.MTOM;
-
-import org.xml.sax.SAXException;
 
 import com.sun.xml.ws.developer.StreamingAttachment;
 
-import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
+import eu.planets_project.ifr.core.common.conf.Configuration;
+import eu.planets_project.ifr.core.common.conf.ServiceConfig;
+import eu.planets_project.ifr.core.services.migration.
+    genericwrapper2.GenericMigrationWrapper;
+import eu.planets_project.ifr.core.services.migration.
+    genericwrapper2.utils.DocumentLocator;
+
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
@@ -35,10 +28,7 @@ import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.utils.ServiceUtils;
-import eu.planets_project.services.utils.cli.CliMigrationPaths;
 
 /**
  * The class GhostscriptMigration migrates from PostScript and PDF
@@ -47,13 +37,15 @@ import eu.planets_project.services.utils.cli.CliMigrationPaths;
  */
 @Stateless
 @MTOM
-@StreamingAttachment( parseEagerly=true, memoryThreshold=ServiceUtils.JAXWS_SIZE_THRESHOLD )
+@StreamingAttachment(
+        parseEagerly = true, memoryThreshold =
+        ServiceUtils.JAXWS_SIZE_THRESHOLD)
 @WebService(
         name = GhostscriptMigration.NAME,
         serviceName = Migrate.NAME,
         targetNamespace = PlanetsServices.NS,
         endpointInterface = "eu.planets_project.services.migrate.Migrate")
-public class GhostscriptMigration implements Migrate {
+public class GhostscriptMigration implements Migrate, Serializable {
 
     /**
      *  Used for serialization.
@@ -63,192 +55,75 @@ public class GhostscriptMigration implements Migrate {
     /**
      * The service name.
      */
-    static final String NAME = "GhostscriptMigration";
-
-    /**
-     * An additional parameter (one of migrate method parameters)
-     * that can be passed to the underlying tool.
-     */
-    private static final String NOPLATFONTS = "noPlatFonts";
+    static final String NAME = "GhostscriptMigrationService";
 
     /**
      *  Used for logging in the Planets framework.
      */
-    private final Logger log = Logger.getLogger(GhostscriptMigration.class.getName());
+    private final Logger log =
+                        Logger.getLogger(GhostscriptMigration.class.getName());
 
     /**
-     * XML configuration file containing commands and pathways.
+     * XML service configuration file containing commands and pathways.
      */
-    // Path for outside Eclipse.
-    private final String configfile = "ghostscript.paths.xml";
+    private static final String SERVICE_CONFIG_FILE_NAME =
+                        "GhostscriptMigrateConfiguration.xml";
 
-    // Path for Eclipse, the above path do not work in Eclipse
-    // so this path has to be use when running tests in Eclipse
-    // Please be aware that this path work for test:local and
-    // test:standalone tests but not for test:server!
-    //private final String configfile = "PA/ghostscript/src/"
-    //                   + "resources/ghostscript.paths.xml";
+    /** Path for Eclipse, the above path do not work in Eclipse
+      * so this path has to be use when running tests in Eclipse.
+      * Please be aware that this path work for test:local and
+      * test:standalone tests but not for test:server!
+      */
+    //private static final String SERVICE_CONFIG_FILE_NAME = "PA/ghostscript/"
+    //                   + "src/resources/GhostscriptMigrateConfiguration.xml";
 
-    /**
-     * The migration paths of the service.
-     */
-    private CliMigrationPaths migrationPaths = null;
-
-    /**
-     * Format extension of the input stream.
-     */
-    private String inputFmtExt = null;
-
-    /**
-     * Format extension of the output stream.
-     */
-//    private String outputFmtExt = null;
-
-    /**
-     * Formats of the input and output streams.
-     */
-    private List<String> inputFormats = null;
-    private List<String> outputFormats = null;
-    private HashMap<String, String>  formatMapping = null;
+    /** The file name of the dynamic run-time configuration. **/
+    private static final String RUN_TIME_CONFIGURATION_FILE_NAME =
+                        "pserv-pa-ghostscript";
 
     /**
      * {@inheritDoc}
      *
      * @see eu.planets_project.services.migrate.Migrate#migrate(
-     * eu.planets_project.services.datatypes.DigitalObject, java.net.URI,
-     * java.net.URI, eu.planets_project.services.datatypes.Parameter)
+     *      eu.planets_project.services.datatypes.DigitalObject,
+     *      java.net.URI, java.net.URI,
+     *      eu.planets_project.services.datatypes.Parameter)
      */
     public final MigrateResult migrate(final DigitalObject digitalObject,
             final URI inputFormat, final URI outputFormat,
                 final List<Parameter> parameters) {
 
-        ServiceReport report = new ServiceReport(Type.INFO, Status.SUCCESS, "OK");
-
-        try {
-            this.init();
-        } catch (URISyntaxException e) {
-            log.severe("[GhostscriptMigration] "
-                + "Invalid URI in the paths file"+": "+e.getMessage());
-            return this.fail(null);
-        }
-
+        ServiceReport report = new ServiceReport(
+                Type.INFO, Status.SUCCESS, "OK");
         checkMigrateArgs(digitalObject, inputFormat, outputFormat, report);
 
-        this.getExtensions(inputFormat, outputFormat);
+        try {
+            final DocumentLocator documentLocator = new DocumentLocator(
+                SERVICE_CONFIG_FILE_NAME);
 
-        InputStream inStream = digitalObject.getContent().getInputStream();
+            final Configuration runtimeConfiguration = ServiceConfig
+                .getConfiguration(RUN_TIME_CONFIGURATION_FILE_NAME);
 
-        // This should not be the way to do things, but this works.
-        final File workfolder = FileUtils
-        .createWorkFolderInSysTemp("Temp_ghostscript");
+            GenericMigrationWrapper genericWrapper =
+                new GenericMigrationWrapper(
+                        documentLocator.getDocument(),
+                        runtimeConfiguration,
+                        this.getClass().getCanonicalName());
 
-        final File tmpInFile = FileUtils.writeInputStreamToFile(
-                inStream, workfolder, "planets." + inputFmtExt);
+            return genericWrapper.migrate(digitalObject, inputFormat,
+                outputFormat, parameters);
 
-        /* This do not work, but should work.
-        // Write input stream to temporary file
-        final File tmpInFile = FileUtils.writeInputStreamToTmpFile(
-                inStream, "planets", inputFmtExt);
-        */
+            } catch (Exception exception) {
+            log.log(Level.SEVERE, "Migration failed for object with title '"
+                + digitalObject.getTitle() + "' from input format URI: "
+                + inputFormat + " to output format URI: " + outputFormat,
+                exception);
 
-        tmpInFile.deleteOnExit();
+            ServiceReport serviceReport = new ServiceReport(Type.ERROR,
+                Status.TOOL_ERROR, exception.toString());
 
-        if (!(tmpInFile.exists() && tmpInFile.isFile()
-                && tmpInFile.canRead())) {
-            String tmpError = "[GhostscriptMigration] Unable to create/use "
-                + "temporary input file!";
-            log.severe(tmpError);
-            report = new ServiceReport(Type.ERROR, Status.INSTALLATION_ERROR, tmpError);
-            return this.fail(report);
+            return new MigrateResult(null, serviceReport);
         }
-
-        log.info("[GhostscriptMigration] Temporary input file created: "
-                + tmpInFile.getAbsolutePath());
-
-        ProcessRunner runner = new ProcessRunner();
-
-        String command = migrationPaths.findMigrationCommand(
-                inputFormat, outputFormat);
-
-        if (command == null) {
-            report = new ServiceReport(Type.ERROR, Status.INSTALLATION_ERROR,
-                    "Could not find the command associated with the "
-                            + "migrationPath for the input and output formats");
-            return this.fail(report);
-        }
-
-        ArrayList<String> commands = new ArrayList<String>();
-
-        // Commands for Linux.
-        commands.add("/bin/sh");
-        commands.add("-c");
-
-        // Commands for Windows
-        //commands.add("cmd");
-        //commands.add("/c");
-
-        commands.add(command + " " + anyParameters(parameters) + " "
-            + tmpInFile.getAbsolutePath());
-
-        runner.setCommand(commands);
-
-        log.info("[GhostscriptMigration] Executing command: "
-                + command.toString() + " ...");
-
-        runner.setInputStream(inStream);
-        runner.setCollection(true);
-        runner.setOutputCollectionByteSize(-1);
-
-        runner.run();
-
-        int return_code = runner.getReturnCode();
-
-        if (return_code != 0) {
-            return fail(new ServiceReport(Type.ERROR,
-                    Status.INSTALLATION_ERROR, runner
-                            .getProcessOutputAsString()
-                            + "\n" + runner.getProcessErrorAsString()));
-        }
-
-        InputStream newFileStream = runner.getProcessOutput();
-        byte[] outbytes = FileUtils.writeInputStreamToBinary(newFileStream);
-
-        DigitalObject outputFile = new DigitalObject.Builder(
-                Content.byValue(outbytes)).build();
-        return new MigrateResult(outputFile, report);
-    }
-
-    /**
-     * Handles any parameters of the migrate method.
-     * @param parameters Parameters from the migrate method.
-     * @return If any parameters, the value of the parameters
-     * concatenated as a string or if no parameters an empty sting.
-     */
-    private String anyParameters(final List<Parameter> parameters) {
-        String paravalue = "";
-
-        if (parameters != null) {
-            log.info("Got additional parameters:");
-
-            for (Iterator<Parameter> iterator = parameters.iterator();
-                    iterator.hasNext();) {
-                Parameter parameter = (Parameter) iterator.next();
-                String name = parameter.getName();
-                String value = parameter.getValue();
-
-                log.info("Got parameter: " + name + " with value: " + value);
-                if (!name.equalsIgnoreCase(NOPLATFONTS)) {
-                    log.info("Invalid parameter with name: "
-                        + parameter.getName() + "\n using DEFAULT values.");
-                }
-
-                if (name.equalsIgnoreCase(NOPLATFONTS)) {
-                    log.info("Enabling 'noPlatFonts' feature '-dNOPLATFONTS'.");
-                    paravalue = paravalue + value;
-                }
-            }
-        }
-        return paravalue;
     }
 
     /** Check the arguments of migrate method.
@@ -282,69 +157,6 @@ public class GhostscriptMigration implements Migrate {
     }
 
     /**
-     * @see eu.planets_project.services.migrate.Migrate#describe()
-     * @return ServiceDescription
-     */
-    public final ServiceDescription describe() {
-
-        ServiceDescription.Builder builder =
-            new ServiceDescription.Builder(NAME,
-                Migrate.class.getName());
-        try {
-            this.init();
-            builder.paths(migrationPaths.getAsPlanetsPaths());
-        } catch (URISyntaxException e) {
-            log.warning("[GhostscriptMigration] Invalid URI in the paths file: "+e.getMessage());
-        }
-
-        builder.author("Claus Jensen <cjen@kb.dk>");
-        builder.classname(this.getClass().getCanonicalName());
-        builder.description("Converts from PostScript and PDF to a number "
-                + "of other formats");
-
-        builder.version("0.1");
-        return builder.build();
-    }
-
-    /**
-     * Initialize the migration.
-     * @throws URISyntaxException which can be thrown by URI in the call to
-     * CliMigrationPaths.initialiseFromFile
-     */
-    private void init() throws URISyntaxException {
-
-        // Input formats.
-        inputFormats = new ArrayList<String>();
-        inputFormats.add("ps");
- 
-
-        // Output formats and associated output parameters.
-        outputFormats = new ArrayList<String>();
-        outputFormats.add("pdf");
-
-        // Disambiguation of extensions, e.g. {"JPG","JPEG"} to {"JPEG"}
-        // FIXIT This should be supported by the FormatRegistryImpl class, but
-        // it does not provide the complete set at the moment.
-        formatMapping = new HashMap<String, String>();
-        formatMapping.put("ps", "ps");
-        formatMapping.put("pdf", "pdf");
-
-        // Gets the migrationPaths from the XML configuration file.
-        try {
-            if (migrationPaths == null) {
-                migrationPaths = CliMigrationPaths.initialiseFromFile(
-                        configfile);
-            }
-        } catch (ParserConfigurationException e) {
-            throw new Error("Not supposed to happen", e);
-        } catch (IOException e) {
-            throw new Error("Not supposed to happen", e);
-        } catch (SAXException e) {
-            throw new Error("Not supposed to happen", e);
-        }
-    }
-
-    /**
      * Handles the failure of a migration.
      * @param report Planets ServiceReport containing a status of the migration.
      * @return MigrateResult.
@@ -354,80 +166,36 @@ public class GhostscriptMigration implements Migrate {
     }
 
     /**
-     * Get the file extensions for the URIs.
-     * @param inputFormat The format of the input.
-     * @param outputFormat The format of the output.
+     * @see eu.planets_project.services.migrate.Migrate#describe()
+     * @return ServiceDescription
      */
-    private void getExtensions(final URI inputFormat, final URI outputFormat) {
-        if (inputFormat != null && outputFormat != null) {
-            inputFmtExt = this.getFormatExt(inputFormat, false);
-//            outputFmtExt = this.getFormatExt(outputFormat, true);
-        }
-    }
+    public final ServiceDescription describe() {
 
-    /**
-     * Gets one extension from a set of possible extensions for the incoming
-     * request planets URI (e.g. planets:fmt/ext/jpeg) which matches with
-     * one format of the set of Ghostscript's supported input/output formats. If
-     * isOutput is false, it checks against the input formats ArrayList,
-     * otherwise it checks against the output formats HashMap.
-     *
-     * @param formatUri Planets URI (e.g. planets:fmt/ext/jpeg)
-     * @param isOutput Is the format an input or an output format
-     * @return Format extension (e.g. "JPEG")
-     */
-    private String getFormatExt(final URI formatUri, final boolean isOutput) {
-        String fmtStr = null;
-        // status variable which indicates if an input/out format has been found
-        // while iterating over possible matches
-        boolean fmtFound = false;
-        // Extensions which correspond to the format
-        // planets:fmt/ext/jpg -> { "JPEG", "JPG" }
-        // or can be found in the list of supported formats
-        Set<String> reqInputFormatExts = FormatRegistryFactory
-                .getFormatRegistry().getExtensions(formatUri);
-        Iterator<String> itrReq = reqInputFormatExts.iterator();
-        // Iterate either over input formats ArrayList or over output formats
-        // HasMap
-        Iterator<String> itrGhostscript =
-            (isOutput) ? outputFormats.iterator() : inputFormats.iterator();
-        // Iterate over possible extensions that correspond to the request
-        // planets uri.
-        while (itrReq.hasNext()) {
-            // Iterate over the different extensions of the planets:fmt/ext/jpg
-            // format URI, note that the relation of Planets-format-URI to
-            // extensions is 1 : n.
-            String reqFmtExt = this.normalizeExt((String) itrReq.next());
-            while (itrGhostscript.hasNext()) {
-                // Iterate over the formats that Ghostscript
-                // offers either as input or as output format.
-                // See input formats in the this.init() method to see the
-                // Ghostscript input/output formats offered by this service.
-                String gsFmtStr = (String) itrGhostscript.next();
-                if (reqFmtExt.equalsIgnoreCase(gsFmtStr)) {
-                    // select the Ghostscript supported format
-                    fmtStr = gsFmtStr;
-                    fmtFound = true;
-                    break;
-                }
-                if (fmtFound) {
-                    break;
-                }
-            }
-        }
-        return fmtStr;
-    }
+        final DocumentLocator documentLocator = new DocumentLocator(
+            SERVICE_CONFIG_FILE_NAME);
+        try {
+            final Configuration runtimeConfiguration = ServiceConfig
+                    .getConfiguration(RUN_TIME_CONFIGURATION_FILE_NAME);
 
-    /**
-     * Disambiguation (e.g. JPG -> JPEG) according to the formatMapping
-     * datas structure defined in this class.
-     *
-     * @param ext Extension.
-     * @return Uppercase disambiguized extension string
-     */
-    private String normalizeExt(final String ext) {
-        String normExt = ext.toUpperCase();
-        return ((formatMapping.containsKey(normExt))
-            ? (String) formatMapping.get(normExt) : normExt);
+            GenericMigrationWrapper genericWrapper =
+                new GenericMigrationWrapper(
+                        documentLocator.getDocument(),
+                        runtimeConfiguration,
+                        this.getClass().getCanonicalName());
+
+            return genericWrapper.describe();
+
+        } catch (Exception e) {
+            log.log(Level.SEVERE,
+                "Failed getting service description for service: "
+                    + this.getClass().getCanonicalName(), e);
+
+            // FIXME! Report failure in a proper way. Should we return a service
+            // description anyway? If so, then how?
+            ServiceDescription.Builder serviceDescriptionBuilder =
+                    new ServiceDescription.Builder(
+                NAME, Migrate.class.getCanonicalName());
+            return serviceDescriptionBuilder.build();
+        }
     }
 }

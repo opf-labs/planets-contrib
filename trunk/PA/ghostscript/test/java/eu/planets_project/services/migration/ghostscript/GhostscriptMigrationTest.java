@@ -12,12 +12,11 @@ import org.junit.Test;
 
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
-import eu.planets_project.services.datatypes.DigitalObjectContent;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
 
 /**
@@ -41,19 +40,16 @@ public class GhostscriptMigrationTest extends TestCase {
     /**
      * A test PostScript file object.
      */
-    private final File testps =
-        new File("PA/ghostscript/test/resources/test.ps");
+    private final File psTestFile =
+        new File("tests/test-files/documents/test_ps/"
+            + "small_formatted_text.ps");
 
     /**
-     * Set up test folder.
+     * A test PDF file object.
      */
-    private File workfolder = FileUtils
-        .createWorkFolderInSysTemp("ghostscript_test");
-
-    /**
-     * Remove the test folder or not.
-     */
-    private boolean removeTestFolder = false;
+    private final File pdfTestFile =
+        new File("tests/test-files/documents/test_pdf/"
+            + "small_formatted_text.pdf");
 
     /*
      * (non-Javadoc)
@@ -63,9 +59,6 @@ public class GhostscriptMigrationTest extends TestCase {
     protected final void setUp() throws Exception {
         dom = ServiceCreator.createTestService(Migrate.QNAME,
                 GhostscriptMigration.class, wsdlLoc);
-
-        // Sets the removeTestFolder to clean up temporary files and folders.
-        setRemoveTestFolder(true);
         }
 
     /*
@@ -75,9 +68,6 @@ public class GhostscriptMigrationTest extends TestCase {
     @Override
     protected final void tearDown() throws Exception {
         super.tearDown();
-        if (isRemoveTestFolder()) {
-            FileUtils.deleteTempFiles(workfolder);
-        }
     }
 
     /**
@@ -100,21 +90,19 @@ public class GhostscriptMigrationTest extends TestCase {
      */
     @Test
     public final void testPS2PDFMigration() throws IOException {
-        System.out.println(testps.getCanonicalPath());
+        System.out.println(psTestFile.getCanonicalPath());
 
         try {
-            //final URI formatPS = new URI("info:pronom/x-fmt/408");
-            //final URI formatPDF = new URI("info:pronom/fmt/18");
-
             final URI formatPS = new URI("planets:fmt/ext/ps");
             final URI formatPDF = new URI("planets:fmt/ext/pdf");
 
             final DigitalObject doInput =
                 new DigitalObject.Builder(
-                    Content.byReference((testps).toURI().toURL()))
+                    Content.byReference((psTestFile).toURI().toURL()))
                     .permanentUri(URI.create("http://example.com/test.ps"))
-                    .title("test.ps")
+                    .title("PS to PDF test")
                     .build();
+
             System.out.println("Input " + doInput);
 
             final MigrateResult mr = dom.migrate(doInput, formatPS,
@@ -124,26 +112,61 @@ public class GhostscriptMigrationTest extends TestCase {
             assertNotNull("Resulting digital object is null, error was "
                           + mr.getReport().getMessage(), doOutput);
 
+            assertFalse("Resulting digital object equal to the original.",
+                    doInput.equals(doOutput));
+
+            final ServiceReport serviceReport = mr.getReport();
+            final ServiceReport.Status migrationStatus =
+                    serviceReport.getStatus();
+            assertEquals(ServiceReport.Status.SUCCESS, migrationStatus);
+
             System.out.println("Output" + doOutput);
 
-            final DigitalObjectContent content = doOutput.getContent();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-            this.workfolder = FileUtils
-                .createWorkFolderInSysTemp("ghostscript_test");
+    /**
+     * Test PDF to PS migration.
+     * Testing the web services by calling it with
+     * a digital object instance containing a PDF
+     * and expect the service to return a PS file.
+     * @throws IOException Throws java.io.IOException.
+     */
+    @Test
+    public final void testPDF2PSMigration() throws IOException {
+        System.out.println(pdfTestFile.getCanonicalPath());
 
-            final File resultText = FileUtils.writeInputStreamToFile(
-                content.getInputStream(), this.workfolder, "ps2pdf_result.pdf");
+        try {
+            final URI formatPS = new URI("planets:fmt/ext/ps");
+            final URI formatPDF = new URI("planets:fmt/ext/pdf");
 
-            assertTrue("Result file was not created successfully!",
-                        resultText.exists());
+            final DigitalObject doInput =
+                new DigitalObject.Builder(
+                    Content.byReference((pdfTestFile).toURI().toURL()))
+                    .permanentUri(URI.create("http://example.com/test.pdf"))
+                    .title("PDF to PS migration test")
+                    .build();
 
-            if (!isRemoveTestFolder()) {
-                System.out.println("Please find the result text file here: \n"
-                                   + resultText.getAbsolutePath());
-            }
+            System.out.println("Input " + doInput);
+
+            final MigrateResult mr = dom.migrate(doInput, formatPDF,
+                formatPS, this.createParameters(true));
+            final DigitalObject doOutput = mr.getDigitalObject();
+
+            assertNotNull("Resulting digital object is null, error was "
+                          + mr.getReport().getMessage(), doOutput);
 
             assertFalse("Resulting digital object equal to the original.",
                     doInput.equals(doOutput));
+
+            final ServiceReport serviceReport = mr.getReport();
+            final ServiceReport.Status migrationStatus =
+                    serviceReport.getStatus();
+            assertEquals(ServiceReport.Status.SUCCESS, migrationStatus);
+
+            System.out.println("Output" + doOutput);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -163,27 +186,16 @@ public class GhostscriptMigrationTest extends TestCase {
                     "-dNOPLATFONTS")
                     .description(
                             "Disables the use of fonts supplied by "
-                                    + "the underlying platform (for instance X Windows). "
-                                    + "This may be needed if the platform fonts look "
-                                    + "undesirably different from the scalable fonts.")
+                                + "the underlying platform "
+                                + "(for instance X Windows). "
+                                + "This may be needed if the "
+                                + "platform fonts look "
+                                + "undesirably different from "
+                                + "the scalable fonts.")
                     .build();
             parameterList.add(noPlatFonts);
         }
 
         return parameterList;
-    }
-
-    /**
-      * @param removeTestFolder the removeTestFolder to set
-    */
-    private void setRemoveTestFolder(final boolean removeTestFolder) {
-        this.removeTestFolder = removeTestFolder;
-    }
-
-    /**
-      * @return the removeTestFolder
-    */
-    private boolean isRemoveTestFolder() {
-        return removeTestFolder;
     }
 }
