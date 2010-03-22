@@ -187,15 +187,9 @@ public class GhostscriptMigration implements Migrate, Serializable {
 
         } catch (Exception e) {
             log.log(Level.SEVERE,
-                "Failed getting service description for service: "
-                    + this.getClass().getCanonicalName(), e);
-
-            // FIXME! Report failure in a proper way. Should we return a service
-            // description anyway? If so, then how?
-            ServiceDescription.Builder serviceDescriptionBuilder =
-                    new ServiceDescription.Builder(
-                NAME, Migrate.class.getCanonicalName());
-            return serviceDescriptionBuilder.build();
+                    "Failed getting service description for service: "
+                            + this.getClass().getCanonicalName(), e);
+            return null;
         }
     }
 }
