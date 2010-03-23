@@ -79,6 +79,8 @@ public class GhostscriptMigrationTest extends TestCase {
         System.out.println("Recieved service description: "
             + desc.toXmlFormatted());
         assertNotNull("The ServiceDescription should not be NULL.", desc);
+        assertNotNull("The author should be set",desc.getAuthor());
+        assertNotNull("The classname should be set",desc.getClassname());
     }
 
     /**
