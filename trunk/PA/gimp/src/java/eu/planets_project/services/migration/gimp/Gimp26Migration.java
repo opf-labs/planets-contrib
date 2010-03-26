@@ -519,6 +519,8 @@ public final class Gimp26Migration implements Migrate {
             ProcessRunner runner = new ProcessRunner();
             runner.setCommand(Arrays.asList(commands));
             runner.setInputStream(inputStream);
+            //set timeout to 10 minutes
+            runner.setTimeout(600000);
             runner.run();
           long endMillis = System.currentTimeMillis();
             System.out.println(runner.getProcessErrorAsString());
@@ -529,6 +531,11 @@ public final class Gimp26Migration implements Migrate {
                 log.severe(msg);
                 report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
                 return new MigrateResult(null, report);
+            }
+            if(return_code ==-1){
+            	//in this case the time-out occurred 
+            	 report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, "process runner time-out occurred after 10 minutes of tool unresponsiveness");
+            	 return new MigrateResult(null, report);
             }
 
             // read byte array from temporary file

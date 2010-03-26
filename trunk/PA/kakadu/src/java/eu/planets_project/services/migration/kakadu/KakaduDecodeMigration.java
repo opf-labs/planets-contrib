@@ -196,6 +196,8 @@ public final class KakaduDecodeMigration implements Migrate {
       
         runner.setCommand(command);
         runner.setInputStream(inputStream);
+        //timeout after 10 minutes, e.g. the tool crashed
+        runner.setTimeout(600000);
         log.info("Executing command (update): " + command.toString() + " ...");
         
         long startMillis = System.currentTimeMillis();
@@ -207,6 +209,11 @@ public final class KakaduDecodeMigration implements Migrate {
             log.severe("Kakadu conversion error code: " + Integer.toString(return_code));
             log.severe(runner.getProcessErrorAsString());
             return null;
+        }
+        if(return_code ==-1){
+        	//in this case the time-out occurred 
+        	 ServiceReport report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, "process runner time-out occurred after 10 minutes of tool unresponsiveness");
+        	 return new MigrateResult(null, report);
         }
 
         tmpOutFile = new File(outFileStr);

@@ -241,6 +241,8 @@ public final class Jasper19Migration implements Migrate {
         }
         runner.setCommand(command);
         runner.setInputStream(inputStream);
+        //timeout after 10 minutes, e.g. the tool crashed
+        runner.setTimeout(600000);
 	
 	String m5 = "Command: " + command.toString() + ". ";
         log.info(m5); serviceMessage.append(m5+"\n");
@@ -262,6 +264,11 @@ public final class Jasper19Migration implements Migrate {
             }
             report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, msg);
             return new MigrateResult(null, report);
+        }
+        if(return_code ==-1){
+        	//in this case the time-out occurred 
+        	 report = new ServiceReport(Type.ERROR, Status.TOOL_ERROR, "process runner time-out occurred after 10 minutes of tool unresponsiveness");
+        	 return new MigrateResult(null, report);
         }
 
         tmpOutFile = new File(outFileStr);
