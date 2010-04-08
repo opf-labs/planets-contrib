@@ -30,8 +30,7 @@ import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.utils.ServiceUtils;
 
 /**
- * The class GhostscriptMigration migrates from PostScript and PDF
- * to a number of formats.
+ * The class Ps2pdfMigration migrates from PostScript to PDF.
  * @author <a href="mailto:cjen@kb.dk">Claus Jensen</a>
  */
 @Stateless
