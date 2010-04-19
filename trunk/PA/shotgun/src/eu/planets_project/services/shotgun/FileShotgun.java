@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import eu.planets_project.services.utils.FileUtils;
+import org.apache.commons.io.FileUtils;
 
 /**
  * Java re-implementation of the C++ shotgun file modification tool by Manfred
@@ -30,7 +30,11 @@ public final class FileShotgun {
         List<Integer> startOffsets = randomStartOffsets(file, seqCount,
                 seqLength);
         for (Integer startOffset : startOffsets) {
-            file = action.modify(file, startOffset, seqLength);
+            try {
+                file = action.modify(file, startOffset, seqLength);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return file;
     }
@@ -44,10 +48,11 @@ public final class FileShotgun {
         CORRUPT {
             /**
              * {@inheritDoc}
+             * @throws IOException 
              * @see eu.planets_project.services.shotgun.FileShotgun.Action#modify(java.io.File,
              *      long, int)
              */
-            File modify(File file, long offset, int length) {
+            File modify(File file, long offset, int length) throws IOException {
                 RandomAccessFile raf = null;
                 try {
                     raf = new RandomAccessFile(file, "rwd");
@@ -59,7 +64,7 @@ public final class FileShotgun {
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
-                    FileUtils.close(raf);
+                    raf.close();
                 }
                 return file;
             }
@@ -67,18 +72,21 @@ public final class FileShotgun {
         DROP {
             /**
              * {@inheritDoc}
+             * @throws IOException 
              * @see eu.planets_project.services.shotgun.FileShotgun.Action#modify(java.io.File,
              *      long, int)
              */
-            File modify(File file, long offset, int length) {
-                byte[] input = FileUtils.readFileIntoByteArray(file);
+            File modify(File file, long offset, int length) throws IOException {
+                byte[] input = FileUtils.readFileToByteArray(file);
                 byte[] result = new byte[input.length - length];
                 for (int i = 0, j = 0; i < input.length && j < result.length; i++, j++) {
                     if (i < offset || i > offset + length) {
                         result[j] = result[i];
                     }
                 }
-                return FileUtils.writeByteArrayToTempFile(result);
+                File resultFile = File.createTempFile("shotgun", null);
+                FileUtils.writeByteArrayToFile(resultFile, result);
+                return resultFile;
             }
         };
         /**
@@ -88,7 +96,7 @@ public final class FileShotgun {
          *        offset
          * @return The modified file
          */
-        abstract File modify(File file, long offset, int length);
+        abstract File modify(File file, long offset, int length) throws IOException;
     }
 
     /** Shotgun configuration keys. */

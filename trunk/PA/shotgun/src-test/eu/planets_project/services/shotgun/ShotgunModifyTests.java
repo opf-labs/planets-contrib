@@ -1,8 +1,10 @@
 package eu.planets_project.services.shotgun;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -14,7 +16,7 @@ import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.modify.ModifyResult;
 import eu.planets_project.services.shotgun.FileShotgun.Action;
 import eu.planets_project.services.shotgun.FileShotgun.Key;
-import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 
 /**
  * Tests and sample usage for the ShotgunModify service.
@@ -25,7 +27,7 @@ public class ShotgunModifyTests {
             "tests/test-files/images/bitmap/test_tiff/2274192346_4a0a03c5d6.tif");
     private static final DigitalObject INPUT_DIGITAL_OBJECT = new DigitalObject.Builder(Content.byReference(INPUT_FILE))
             .build();
-    private static final byte[] INPUT_BYTES = FileUtils.readFileIntoByteArray(INPUT_FILE);
+    private static final byte[] INPUT_BYTES = read(INPUT_FILE);
     private static final byte[] WRITE_RESULT = shotgun(Action.CORRUPT);
     private static final byte[] DELETE_RESULT = shotgun(Action.DROP);
 
@@ -57,12 +59,16 @@ public class ShotgunModifyTests {
         Assert.assertNotNull("Result object is null", modify);
         DigitalObject outputDigitalObject = modify.getDigitalObject();
         Assert.assertNotNull("Result digital object is null", modify);
-        File resultFile = FileUtils.writeByteArrayToTempFile(FileUtils.writeInputStreamToBinary(outputDigitalObject
-                .getContent().getInputStream()));
+        File resultFile = DigitalObjectUtils.toFile(outputDigitalObject);
         Assert.assertNotNull("Result file is null", resultFile);
         Assert.assertTrue("Result file does not exist", resultFile.exists());
         /* Return the bytes of the resulting file (used in the tests below) */
-        return FileUtils.readFileIntoByteArray(resultFile);
+        try {
+            return FileUtils.readFileToByteArray(resultFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Test
@@ -105,5 +111,14 @@ public class ShotgunModifyTests {
             }
         }
         Assert.fail("Byte arrays are equal");
+    }
+    
+    private static byte[] read(final File inputFile) {
+        try {
+            return FileUtils.readFileToByteArray(inputFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

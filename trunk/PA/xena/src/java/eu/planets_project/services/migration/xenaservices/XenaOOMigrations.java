@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.FileUtils;
 import org.xml.sax.SAXException;
 
 import com.sun.star.beans.PropertyValue;
@@ -23,8 +24,6 @@ import com.sun.star.frame.XStorable;
 import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.uno.UnoRuntime;
-
-import eu.planets_project.services.utils.FileUtils;
 
 /**
  * @author <a href="mailto:Andrew.Jackson@bl.uk">Andy Jackson</a>
@@ -388,15 +387,16 @@ public class XenaOOMigrations {
      * 
      * @param binary
      * @return the migrated binary
+     * @throws IOException 
      */
-    public byte[] migrate(byte[] binary) {
+    public byte[] migrate(byte[] binary) throws IOException {
 
-        File input = FileUtils.getTempFile("input", "0");
+        File input = File.createTempFile("input", "0");
         input.deleteOnExit();
 
-        input = FileUtils.writeByteArrayToTempFile(binary);
+        FileUtils.writeByteArrayToFile(input, binary);
 
-        File output = FileUtils.getTempFile("output", "0");
+        File output = File.createTempFile("output", "0");
         output.deleteOnExit();
 
         try {
@@ -412,11 +412,11 @@ public class XenaOOMigrations {
 
         byte[] result = null;
 
-        result = FileUtils.readFileIntoByteArray(output);
+        result = FileUtils.readFileToByteArray(output);
 
         // Delete the temporaries:
-        input.delete();
-        output.delete();
+        FileUtils.deleteQuietly(input);
+        FileUtils.deleteQuietly(output);
 
         // Return the result.
         return result;

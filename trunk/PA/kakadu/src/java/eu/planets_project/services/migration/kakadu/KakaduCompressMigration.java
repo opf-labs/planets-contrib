@@ -4,6 +4,7 @@
 package eu.planets_project.services.migration.kakadu;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -14,11 +15,11 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.ejb.Local;
-import javax.ejb.Remote;
-import javax.ejb.Stateless;
 import javax.jws.WebService;
+import javax.resource.spi.IllegalStateException;
 import javax.xml.ws.soap.MTOM;
+
+import org.apache.commons.io.FileUtils;
 
 import com.sun.xml.ws.developer.StreamingAttachment;
 
@@ -26,8 +27,8 @@ import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.ifr.core.techreg.properties.ServiceProperties;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.Property;
@@ -37,7 +38,7 @@ import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.utils.ServicePerformanceHelper;
 import eu.planets_project.services.utils.ServiceUtils;
@@ -154,9 +155,8 @@ public final class KakaduCompressMigration implements Migrate {
         byte[] binary = null;
         InputStream inputStream = digitalObject.getContent().getInputStream();
 
-        // write input stream to temporary file
-        tmpInFile = FileUtils.writeInputStreamToTmpFile(inputStream, "planets",
-                inputFmtExt);
+        // write input object to temporary file
+        tmpInFile = DigitalObjectUtils.toFile(digitalObject); //TODO need extension?
         
         // Record time take to load the input data:
         sph.loaded();
@@ -221,7 +221,11 @@ public final class KakaduCompressMigration implements Migrate {
 
         // read byte array from temporary file
         if (tmpOutFile.isFile() && tmpOutFile.canRead()) {
-            binary = FileUtils.readFileIntoByteArray(tmpOutFile);
+            try {
+                binary = FileUtils.readFileToByteArray(tmpOutFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             
             //get the measured proeprties to return
             List<Property> retProps = sph.getPerformanceProperties();

@@ -1,5 +1,6 @@
 package eu.planets_project.services.migration.xenaservices;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
@@ -12,6 +13,8 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
+
+import org.apache.commons.io.IOUtils;
 
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
@@ -26,7 +29,6 @@ import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ServiceUtils;
 
 /**
@@ -184,7 +186,12 @@ public class XenaOOMigration implements Migrate, Serializable {
             xena.setPdfa(false);
         }
 
-        byte[] binary = xena.migrate(FileUtils.writeInputStreamToBinary(inputStream));
+        byte[] binary = null;
+        try {
+            binary = xena.migrate(IOUtils.toByteArray(inputStream));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         
         // Sanity check the result:
         if( binary == null ) {

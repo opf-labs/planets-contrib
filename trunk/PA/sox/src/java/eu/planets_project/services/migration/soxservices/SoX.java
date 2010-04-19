@@ -4,6 +4,7 @@
 package eu.planets_project.services.migration.soxservices;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
@@ -11,11 +12,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.ejb.Local;
-import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
-import javax.xml.ws.BindingType;
 import javax.xml.ws.soap.MTOM;
 
 import com.sun.xml.ws.developer.StreamingAttachment;
@@ -29,13 +27,12 @@ import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
-import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
+import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.migration.soxservices.utils.SoXHelper;
-import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.utils.ServiceUtils;
 
@@ -102,7 +99,7 @@ public class SoX implements Migrate, Serializable {
     /**
      * SOX home dir
      */
-    public static String SOX_HOME = null;
+    public String SOX_HOME = null;
     
     public static String processOutput = "";
     public static String processError = "";
@@ -325,27 +322,19 @@ public class SoX implements Migrate, Serializable {
         log.info("Starting migration. Converting from "
                 + inputFormat.toASCIIString() + " to " + outputFormat.toASCIIString());
         
-        // Creating the work folder in Sys temp
-        File workFolder = FileUtils.createWorkFolderInSysTemp(SoX_WORK_DIR);
-        
-        // creating the output folder for temp files inside the work folder
-        File outputFolder = FileUtils.createFolderInWorkFolder(workFolder, SoX_OUTPUT_DIR);
-        
-        // the path for the migrated file to be created
-        String outputFilePath = outputFolder.getAbsolutePath() + File.separator + FileUtils.randomizeFileName("SoX_OUTPUT_FILE" + destExt); 
-        
-        // the file the input (temp) file is placed in
-        File inputFolder = FileUtils.createFolderInWorkFolder(workFolder, SoX_IN);
-        
-        // the path to the input file
-        String inputFilePath = FileUtils.randomizeFileName("SoX_INPUT_FILE" + srcExt);
-        
      // getting the input data from the DigitalObject and writing it to a File...
-        File inputFile = FileUtils.writeInputStreamToFile(input.getContent().getInputStream(), inputFolder, inputFilePath);
+        File inputFile = null;
+        File outputFile = null;
+        try {
+            inputFile = File.createTempFile("planets", srcExt);
+            outputFile = File.createTempFile("planets", destExt);
+        } catch (IOException x) {
+            throw new IllegalStateException("Could not create temp files.", x);
+        }
         
         // setting up the command line 
         List<String> soxCommands = new ArrayList<String>();
-        if(!SOX_HOME.equalsIgnoreCase("")) {
+        if(SOX_HOME!=null && !SOX_HOME.equalsIgnoreCase("")) {
         	soxCommands.add(SOX_HOME + SOX);	// the path and name of the tool itself
         }
         else {
@@ -367,7 +356,7 @@ public class SoX implements Migrate, Serializable {
         	soxCommands.add("44100");
         	soxCommands.add("-g");
         }
-        soxCommands.add(outputFilePath);	// the output file path
+        soxCommands.add(outputFile.getAbsolutePath());	// the output file path
         
         
      // Are there any additional parameters for us?
@@ -376,7 +365,6 @@ public class SoX implements Migrate, Serializable {
 			String showProgress;
 			String noShowProgress;
 			String verbosityLevel;
-			String advancedCmd;
 			
 			for (Iterator<Parameter> iterator = parameters.iterator(); iterator.hasNext();) {
 				Parameter parameter = (Parameter) iterator.next();
@@ -424,7 +412,7 @@ public class SoX implements Migrate, Serializable {
         // Configuring and running the ProcessRunner
 		ProcessRunner pr = new ProcessRunner();
 		if(USE_ADVANCED_CLI) {
-			List<String> cmd = getAdvancedCmd(CLI_STRING, inputFile, outputFilePath);
+			List<String> cmd = getAdvancedCmd(CLI_STRING, inputFile, outputFile.getAbsolutePath());
 			pr.setCommand(cmd);
 			log.info("Executing: " + cmd);
 			soxCommands = cmd;
@@ -453,17 +441,14 @@ public class SoX implements Migrate, Serializable {
         
         
         
-        // Getting the output file...
-        File processOutputFile = new File(outputFilePath);
-        
         // if an output file has been created by the service,
         // read it into a byte[]
-        if(processOutputFile.canRead()) {
+        if(outputFile.canRead()) {
         	DigitalObject resultDigObj = null;
-			resultDigObj = createDigitalObjectByReference(processOutputFile);
+			resultDigObj = createDigitalObjectByReference(outputFile);
 			
 			log.info("Created new DigitalObject for result file...");
-            log.info("Output file lenght: " + processOutputFile.length());
+            log.info("Output file lenght: " + outputFile.length());
             
          // create a ServiceReport...
             ServiceReport report = new ServiceReport(Type.INFO, Status.SUCCESS,
@@ -538,26 +523,4 @@ public class SoX implements Migrate, Serializable {
 	}
 	
 	
-	private MigrationPath[] createMigrationPathwayMatrix (List<String> inputFormats, List<String> outputFormats) {
-		List<MigrationPath> paths = new ArrayList<MigrationPath>();
-
-		for (Iterator<String> iterator = inputFormats.iterator(); iterator.hasNext();) {
-			String input = iterator.next();
-			
-			for (Iterator<String> iterator2 = outputFormats.iterator(); iterator2.hasNext();) {
-				String output = iterator2.next();
-				if(!input.equalsIgnoreCase(output)) {
-					FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
-                    MigrationPath path = new MigrationPath(format.createExtensionUri(input), format.createExtensionUri(output), null);
-					paths.add(path);
-				}
-				// Debug...
-//				System.out.println(path.getInputFormat() + " --> " + path.getOutputFormat());
-			}
-		}
-		
-		return paths.toArray(new MigrationPath[]{});
-	}
-	
-
 }

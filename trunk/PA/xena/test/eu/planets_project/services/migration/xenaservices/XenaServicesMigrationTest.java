@@ -1,24 +1,27 @@
 package eu.planets_project.services.migration.xenaservices;
 
-import eu.planets_project.ifr.core.techreg.formats.Format;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import junit.framework.TestCase;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
-import org.junit.Test;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import junit.framework.TestCase;
-import org.junit.After;
-import org.junit.Before;
-
-import static org.junit.Assert.*;
 
 public final class XenaServicesMigrationTest extends TestCase {
 
@@ -95,7 +98,7 @@ public final class XenaServicesMigrationTest extends TestCase {
         FormatRegistry formatRegistry = FormatRegistryFactory.getFormatRegistry();
         File inputFile = new File("PA/xena/test/testfiles/testin." + from);
         assertTrue("Input file "+inputFile.getAbsolutePath()+" does not exist!", inputFile.exists() );
-        byte[] binary = FileUtils.readFileIntoByteArray(inputFile);
+        byte[] binary = FileUtils.readFileToByteArray(inputFile);
         assertTrue("Input file "+inputFile.getAbsolutePath()+" resulting in a null binary.", binary != null );
         DigitalObject input = new DigitalObject.Builder(Content.byValue(binary)).build();
 //        MigrateResult mr = dom.migrate(input, Format.extensionToURI(from), Format.pronomIdToURI(to), null);
@@ -108,9 +111,16 @@ public final class XenaServicesMigrationTest extends TestCase {
             outDir.mkdir();
         }
         if (to.equals("fmt/18")) {
-            FileUtils.writeInputStreamToFile(inputStream_odf, outDir, "testout_" + from + ".pdf");
+            write(inputStream_odf, outDir, "testout_" + from + ".pdf");
         } else if (to.equals("fmt/95")) {
-            FileUtils.writeInputStreamToFile(inputStream_odf, outDir, "testout_" + from + "A.pdf");
+            write(inputStream_odf, outDir, "testout_" + from + "A.pdf");
         }
+    }
+
+    private void write(InputStream inputStream_odf, File outDir, String name)
+            throws FileNotFoundException, IOException {
+        FileOutputStream out = new FileOutputStream(new File(outDir, name));
+        IOUtils.copy(inputStream_odf, out);
+        out.close();
     }
 }
