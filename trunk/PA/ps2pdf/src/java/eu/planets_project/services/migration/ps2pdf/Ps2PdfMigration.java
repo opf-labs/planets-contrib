@@ -145,12 +145,12 @@ public class Ps2PdfMigration implements Migrate, Serializable {
 
         if (inputFormat == null) {
             this.fail(new ServiceReport(Type.ERROR, Status.TOOL_ERROR,
-                    "An empty (null) digital object was given"));
+                    "An empty (null) input format was given"));
         }
 
         if (outputFormat == null) {
             this.fail(new ServiceReport(Type.ERROR, Status.TOOL_ERROR,
-                    "An empty (null) digital object was given"));
+                    "An empty (null) output format was given"));
         }
     }
 
