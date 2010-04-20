@@ -8,15 +8,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-
-import javax.ejb.Local;
-import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.ws.BindingType;
 import javax.xml.ws.soap.MTOM;
 
+import org.apache.commons.io.IOUtils;
 import org.xml.sax.SAXException;
 
 import com.sun.xml.ws.developer.StreamingAttachment;
@@ -31,7 +28,6 @@ import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ProcessRunner;
 import eu.planets_project.services.utils.ServiceUtils;
 import eu.planets_project.services.utils.cli.CliMigrationPaths;
@@ -123,7 +119,12 @@ public class FFMpegMigration implements Migrate {
             return fail(report);
         }
         InputStream newFileStream = runner.getProcessOutput();
-        byte[] outbytes = FileUtils.writeInputStreamToBinary(newFileStream);
+        byte[] outbytes = null;
+        try {
+            outbytes = IOUtils.toByteArray(newFileStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         DigitalObject pdfFile = new DigitalObject.Builder(Content.byValue(outbytes)).build();
         return new MigrateResult(pdfFile,report);

@@ -10,6 +10,8 @@ import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -21,7 +23,7 @@ import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.utils.FileUtils;
+import eu.planets_project.services.utils.DigitalObjectUtils;
 import eu.planets_project.services.utils.test.ServiceCreator;
 
 /**
@@ -34,7 +36,7 @@ public class DioscuriPnmToPngMigrationTest {
 	
 	public static Migrate DIOSCURI_MIGRATE = null;
 	
-	public static File DIOSCURI_TEST_OUT = FileUtils.createWorkFolderInSysTemp("DIOSCURI_TEST_OUT");
+	public static File DIOSCURI_TEST_OUT = null;
 	
 	public static File PNM_TEST_FILE = new File("tests/test-files/images/bitmap/test_pnm/BASI0G02.PNM"); 
 	public static File PNG_TEST_FILE = null;
@@ -51,6 +53,8 @@ public class DioscuriPnmToPngMigrationTest {
         System.setProperty("pserv.test.host", "localhost");
         System.setProperty("pserv.test.port", "8080");
 		DIOSCURI_MIGRATE = ServiceCreator.createTestService(Migrate.QNAME, DioscuriPnmToPngMigration.class, wsdlLoc);
+		DIOSCURI_TEST_OUT = new File(System.getProperty("java.io.tmpdir"), "DIOSCURI_TEST_OUT");
+		FileUtils.forceMkdir(DIOSCURI_TEST_OUT);
 	}
 	
 	@Test
@@ -68,8 +72,8 @@ public class DioscuriPnmToPngMigrationTest {
 	@Test
 	public void testMigrate() {
 		printTestTitle("Testing Doscuri PNM to PNG migration");
-		DigitalObject inputDigOb = new DigitalObject.Builder(Content.byReference(PNM_TEST_FILE)).title(PNM_TEST_FILE.getName()).format(format.createExtensionUri(FileUtils.getExtensionFromFile(PNM_TEST_FILE))).build();
-		MigrateResult result = DIOSCURI_MIGRATE.migrate(inputDigOb, format.createExtensionUri(FileUtils.getExtensionFromFile(PNM_TEST_FILE)), format.createExtensionUri("PNG"), null);
+		DigitalObject inputDigOb = new DigitalObject.Builder(Content.byReference(PNM_TEST_FILE)).title(PNM_TEST_FILE.getName()).format(format.createExtensionUri(FilenameUtils.getExtension(PNM_TEST_FILE.getName()))).build();
+		MigrateResult result = DIOSCURI_MIGRATE.migrate(inputDigOb, format.createExtensionUri(FilenameUtils.getExtension(PNM_TEST_FILE.getName())), format.createExtensionUri("PNG"), null);
 		
 		assertTrue("MigrateResult should not be NULL", result!=null);
 		System.out.println("DEBUG ServiceReport: " + result.getReport() );
@@ -78,14 +82,14 @@ public class DioscuriPnmToPngMigrationTest {
 		System.out.println(result.getReport());
 		
 		File resultFile = new File(DIOSCURI_TEST_OUT, result.getDigitalObject().getTitle());
-		FileUtils.writeInputStreamToFile(result.getDigitalObject().getContent().getInputStream(), resultFile);
+		DigitalObjectUtils.toFile(result.getDigitalObject(), resultFile);
 		
 		System.out.println("Please find the converted file here: " + resultFile.getAbsolutePath());
 		
 		PNG_TEST_FILE = resultFile;
 		printTestTitle("Testing Doscuri PNG to PNM migration");
-		inputDigOb = new DigitalObject.Builder(Content.byReference(PNG_TEST_FILE)).title(PNG_TEST_FILE.getName()).format(format.createExtensionUri(FileUtils.getExtensionFromFile(PNG_TEST_FILE))).build();
-		result = DIOSCURI_MIGRATE.migrate(inputDigOb, format.createExtensionUri(FileUtils.getExtensionFromFile(PNG_TEST_FILE)), format.createExtensionUri("PNM"), null);
+		inputDigOb = new DigitalObject.Builder(Content.byReference(PNG_TEST_FILE)).title(PNG_TEST_FILE.getName()).format(format.createExtensionUri(FilenameUtils.getExtension(PNG_TEST_FILE.getName()))).build();
+		result = DIOSCURI_MIGRATE.migrate(inputDigOb, format.createExtensionUri(FilenameUtils.getExtension(PNG_TEST_FILE.getName())), format.createExtensionUri("PNM"), null);
 		
 		assertTrue("MigrateResult should not be NULL", result!=null);
 		assertTrue("ServiceReport should be SUCCESS", result.getReport().getStatus()==Status.SUCCESS);
@@ -93,7 +97,7 @@ public class DioscuriPnmToPngMigrationTest {
 		System.out.println(result.getReport());
 		
 		resultFile = new File(DIOSCURI_TEST_OUT, result.getDigitalObject().getTitle());
-		FileUtils.writeInputStreamToFile(result.getDigitalObject().getContent().getInputStream(), resultFile);
+		DigitalObjectUtils.toFile(result.getDigitalObject(), resultFile);
 		
 		System.out.println("Please find the converted file here: " + resultFile.getAbsolutePath());
 	}

@@ -3,33 +3,43 @@
  */
 package eu.planets_project.services.migration.dioscuri;
 
-import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
-import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
-import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.*;
-import eu.planets_project.services.datatypes.ServiceReport.Status;
-import eu.planets_project.services.datatypes.ServiceReport.Type;
-import eu.planets_project.services.migrate.Migrate;
-import eu.planets_project.services.migrate.MigrateResult;
-import eu.planets_project.services.migration.dioscuri.utils.DioscuriWrapper;
-import eu.planets_project.services.migration.dioscuri.utils.DioscuriWrapperResult;
-import eu.planets_project.services.utils.*;
-
-import org.jboss.annotation.ejb.TransactionTimeout;
-
-import com.sun.xml.ws.developer.StreamingAttachment;
-
-import javax.ejb.Stateless;
-import javax.jws.WebService;
-import javax.xml.ws.BindingType;
-import javax.xml.ws.soap.MTOM;
-
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
+import javax.ejb.Stateless;
+import javax.jws.WebService;
+import javax.xml.ws.soap.MTOM;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+
+import com.sun.xml.ws.developer.StreamingAttachment;
+
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
+import eu.planets_project.services.PlanetsServices;
+import eu.planets_project.services.datatypes.Content;
+import eu.planets_project.services.datatypes.DigitalObject;
+import eu.planets_project.services.datatypes.MigrationPath;
+import eu.planets_project.services.datatypes.Parameter;
+import eu.planets_project.services.datatypes.ServiceDescription;
+import eu.planets_project.services.datatypes.ServiceReport;
+import eu.planets_project.services.datatypes.ServiceReport.Status;
+import eu.planets_project.services.datatypes.ServiceReport.Type;
+import eu.planets_project.services.datatypes.Tool;
+import eu.planets_project.services.migrate.Migrate;
+import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.migration.dioscuri.utils.DioscuriWrapper;
+import eu.planets_project.services.migration.dioscuri.utils.DioscuriWrapperResult;
+import eu.planets_project.services.utils.DigitalObjectUtils;
+import eu.planets_project.services.utils.ServiceUtils;
+import eu.planets_project.services.utils.ZipResult;
+import eu.planets_project.services.utils.ZipUtils;
 
 /**
  * @author melmsp
@@ -51,10 +61,11 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 
 	public static final String NAME = "DioscuriPnmToPngMigration";
 	private String WORK_TEMP_NAME = "DIOSCURI_PNM2PNG_TMP";
-	private String sessionID = FileUtils.randomizeFileName("");
+	private String sessionID = DioscuriWrapper.randomize("dioscuri");
 	private String FLOPPY_INPUT_NAME = "FLOPPY_INPUT" + sessionID;
-	private File WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp(WORK_TEMP_NAME);
-	private File FLOPPY_INPUT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, FLOPPY_INPUT_NAME);
+	private final File SYSTEM_TEMP_FOLDER = new File(System.getProperty("java.io.tmpdir"));
+	private File WORK_TEMP_FOLDER = null;
+	private File FLOPPY_INPUT_FOLDER = null;
 	
 	private String DEFAULT_INPUT_NAME = "input" + sessionID;
 	private static String RUN_BAT = "RUN.BAT";
@@ -96,7 +107,15 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 //		supportedFormats.put(Format.extensionToURI("PCX"), "-p");
 //		supportedFormats.put(Format.extensionToURI("BMP"), "-w");
 //		supportedFormats.put(Format.extensionToURI("ICO"), "-i");
-		FileUtils.deleteTempFiles(WORK_TEMP_FOLDER);
+	    try {
+            WORK_TEMP_FOLDER = new File(SYSTEM_TEMP_FOLDER, WORK_TEMP_NAME);
+            FileUtils.forceMkdir(WORK_TEMP_FOLDER);
+            FLOPPY_INPUT_FOLDER = new File(WORK_TEMP_FOLDER, FLOPPY_INPUT_NAME);
+            FileUtils.forceMkdir(FLOPPY_INPUT_FOLDER);
+            FileUtils.deleteDirectory(WORK_TEMP_FOLDER);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
 	
 
@@ -149,12 +168,17 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 	 */
 	public MigrateResult migrate(DigitalObject digitalObject, URI inputFormat,
 			URI outputFormat, List<Parameter> parameters) {
-		if(WORK_TEMP_FOLDER.exists()) {
-			FileUtils.deleteAllFilesInFolder(WORK_TEMP_FOLDER);
-		}
-		INPUT_ZIP_NAME = FileUtils.randomizeFileName("dioscuri-pnm-png-input.zip");
-		
-		FLOPPY_INPUT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, FLOPPY_INPUT_NAME);
+		try {
+            if(WORK_TEMP_FOLDER.exists()) {
+            	FileUtils.cleanDirectory(WORK_TEMP_FOLDER);
+            }
+            INPUT_ZIP_NAME = DioscuriWrapper.randomize("dioscuri-pnm-png-input.zip");
+            
+            FLOPPY_INPUT_FOLDER = new File(WORK_TEMP_FOLDER, FLOPPY_INPUT_NAME);
+            FileUtils.forceMkdir(FLOPPY_INPUT_FOLDER);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 		
 		File inputFile = getInputFileFromDigitalObject(digitalObject, inputFormat, FLOPPY_INPUT_FOLDER);
 		String inFileName = inputFile.getName();
@@ -195,8 +219,8 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 	private File getInputFileFromDigitalObject(DigitalObject digObj, URI inputFormat, File destFolder) {
 		String inName = DigitalObjectUtils.getFileNameFromDigObject(digObj, inputFormat);
 		File in = new File(destFolder, inName);
-		FileUtils.writeInputStreamToFile(digObj.getContent().getInputStream(), in);
-		in = FileUtils.truncateNameAndRenameFile(in);
+		DigitalObjectUtils.toFile(digObj, in);
+		in = DioscuriWrapper.truncateNameAndRenameFile(in);
 		return in;
 	}
 	
@@ -252,7 +276,7 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 		private boolean createRunBat(File destFolder, File inputFile, String outputFileName) {
 			String runScript = null;
 			String inputFileName = inputFile.getName();
-			String inputExt = FileUtils.getExtensionFromFile(inputFile);
+			String inputExt = FilenameUtils.getExtension(inputFile.getName());
 			if(inputExt.equalsIgnoreCase("PNM")) {
 				runScript = PNM_2_PNG_TOOL + " " + "A:\\" + inputFileName.toUpperCase() + " " + PNGMINUS_HOME + outputFileName.toUpperCase() 
 					+ "\r\n"
@@ -275,7 +299,11 @@ public class DioscuriPnmToPngMigration implements Migrate, Serializable {
 			}
 			
 			File runBat = new File(destFolder, RUN_BAT);
-			runBat = FileUtils.writeStringToFile(runScript, runBat);
+			try {
+                FileUtils.writeStringToFile(runBat, runScript);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 			log.info(RUN_BAT + " created: " + System.getProperty("line.separator") + runScript);
 			
 			return runBat.exists();

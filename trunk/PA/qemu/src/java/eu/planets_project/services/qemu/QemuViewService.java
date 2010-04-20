@@ -3,50 +3,48 @@
  */
 package eu.planets_project.services.qemu;
 
-import java.util.Properties;
-import java.io.IOException;
 import java.io.File;
-import java.lang.Runtime;
-import java.lang.Process;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.Properties;
 import java.util.UUID;
+import java.util.logging.Logger;
+
 import javax.annotation.Resource;
 import javax.jws.WebService;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
-import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
-import eu.planets_project.ifr.core.storage.utils.DigitalObjectDiskCache;
-import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
+
+import org.apache.commons.io.FileUtils;
+
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
+import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
 import eu.planets_project.services.PlanetsServices;
-import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
-import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
+import eu.planets_project.services.datatypes.Tool;
+import eu.planets_project.services.migrate.MigrateResult;
+import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelper;
+import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelperFactory;
+import eu.planets_project.services.utils.DigitalObjectUtils;
+import eu.planets_project.services.utils.ZipResult;
+import eu.planets_project.services.utils.ZipUtils;
 import eu.planets_project.services.view.CreateView;
 import eu.planets_project.services.view.CreateViewResult;
 import eu.planets_project.services.view.ViewAction;
 import eu.planets_project.services.view.ViewActionResult;
 import eu.planets_project.services.view.ViewStatus;
-import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelper;
-import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelperFactory;
-import eu.planets_project.services.utils.DigitalObjectUtils;
-import eu.planets_project.services.utils.FileUtils;
-import eu.planets_project.services.utils.ZipResult;
-import eu.planets_project.services.utils.ZipUtils;
-import eu.planets_project.services.migrate.MigrateResult;
 
 /**
  * A qemu viewer service based on the vncplay interactive session recorder.
@@ -154,19 +152,22 @@ public class QemuViewService implements CreateView
     }
  
 
-    private String createFloppy(List<DigitalObject> digitalObjects)
+    private String createFloppy(List<DigitalObject> digitalObjects) throws IOException
     {
     	if(digitalObjects == null)
     		return null;
     	
     	FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
-    	FileUtils.deleteTempFiles(new File(FileUtils.getSystemTempFolder(), TMP_PATH)); 
-    	File temp_dir = FileUtils.createFolderInWorkFolder(FileUtils.getSystemTempFolder(), TMP_PATH);
+    	File systemTempFolder = new File(System.getProperty("java.io.tmpdir"));
+    	FileUtils.deleteDirectory(new File(systemTempFolder, TMP_PATH)); 
+    	File temp_dir = new File(systemTempFolder, TMP_PATH);
+    	FileUtils.forceMkdir(temp_dir);
     	if(temp_dir == null)
     		return null;
 
-    	FileUtils.deleteTempFiles(new File(FileUtils.getSystemTempFolder(), FLOPPY_PATH));
-    	File content_dir = FileUtils.createFolderInWorkFolder(FileUtils.getSystemTempFolder(), FLOPPY_PATH);
+    	FileUtils.deleteDirectory(new File(systemTempFolder, FLOPPY_PATH));
+    	File content_dir = new File(systemTempFolder, FLOPPY_PATH);
+    	FileUtils.forceMkdir(content_dir);
     	if(content_dir == null)
     		return null;
 
@@ -176,11 +177,13 @@ public class QemuViewService implements CreateView
     		String filename = dob.getTitle();
     		if(filename == null)
     			filename = "no_file_name" + i++;
-    		FileUtils.writeInputStreamToFile(dob.getContent().getInputStream(), content_dir, filename);
+    		File file = new File(content_dir, filename);
+    		DigitalObjectUtils.toFile(dob, file);
     	}
-	
+    	File temp = File.createTempFile("floppy", ".zip");
     	ZipResult zip_result = ZipUtils.createZipAndCheck(content_dir, temp_dir, 
-    				FileUtils.randomizeFileName("floppy.zip"), false);
+    				temp.getName(), false);
+    	FileUtils.deleteQuietly(temp);
     	if(zip_result == null)
     		return null;
 	
@@ -206,8 +209,8 @@ public class QemuViewService implements CreateView
     			return null;
     		}
     	}
-
-    	FileUtils.writeInputStreamToFile(mr.getDigitalObject().getContent().getInputStream(), cachedir, sessionId);
+    	File file = new File(cachedir, sessionId);
+    	DigitalObjectUtils.toFile(mr.getDigitalObject(), file);
     	
     	log.info("floppy created @ " + cachedir.getAbsolutePath() + "sessionID");
     	return cachedir.getAbsolutePath() + "sessionID";
@@ -219,7 +222,12 @@ public class QemuViewService implements CreateView
      */
     public CreateViewResult createView(List<DigitalObject> digitalObjects, List<Parameter> parameters) 
     {
-    	String floppy = createFloppy(digitalObjects);
+    	String floppy = null;
+        try {
+            floppy = createFloppy(digitalObjects);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
 	
     	URI tmp = getBaseURIFromWSContext();
     	if(tmp != null)

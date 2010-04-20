@@ -4,6 +4,7 @@
 package eu.planets_project.services.migration.dioscuri;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
@@ -12,10 +13,10 @@ import java.util.logging.Logger;
 
 import javax.ejb.Stateless;
 import javax.jws.WebService;
-import javax.xml.ws.BindingType;
 import javax.xml.ws.soap.MTOM;
 
-import org.jboss.annotation.ejb.TransactionTimeout;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
 import com.sun.xml.ws.developer.StreamingAttachment;
 
@@ -28,15 +29,14 @@ import eu.planets_project.services.datatypes.MigrationPath;
 import eu.planets_project.services.datatypes.Parameter;
 import eu.planets_project.services.datatypes.ServiceDescription;
 import eu.planets_project.services.datatypes.ServiceReport;
-import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.datatypes.ServiceReport.Status;
 import eu.planets_project.services.datatypes.ServiceReport.Type;
+import eu.planets_project.services.datatypes.Tool;
 import eu.planets_project.services.migrate.Migrate;
 import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.migration.dioscuri.utils.DioscuriWrapper;
 import eu.planets_project.services.migration.dioscuri.utils.DioscuriWrapperResult;
 import eu.planets_project.services.utils.DigitalObjectUtils;
-import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ServiceUtils;
 import eu.planets_project.services.utils.ZipResult;
 import eu.planets_project.services.utils.ZipUtils;
@@ -60,12 +60,13 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 	private static final long serialVersionUID = 7520484154909390134L;
 
 	public static final String NAME = "DioscuriArjMigration";
-	private static File WORK_TEMP_FOLDER = FileUtils.createWorkFolderInSysTemp("Dioscuri_ArjMigration_TMP".toUpperCase());
+	private static File WORK_TEMP_FOLDER = null;
+	private static File SYSTEM_TEMP_FOLDER = new File(System.getProperty("java.io.tmpdir"));
 //	private static File FLOPPY_INPUT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, "FLOPPY_INPUT");
 	private static String FLOPPY_INPUT_FOLDER_NAME = null;
 	private static File FLOPPY_INPUT_FOLDER = null;
 	private static String DEFAULT_INPUT_NAME = null;
-	private String sessionID = FileUtils.randomizeFileName("");
+	private String sessionID = DioscuriWrapper.randomize("dioscuri");
 	
 	private static String RUN_BAT = "RUN.BAT";
 //	private static String INPUT_ZIP_NAME = "input.zip";
@@ -79,7 +80,13 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 	
 	
 	public DioscuriArjMigration() {
-		FileUtils.deleteTempFiles(WORK_TEMP_FOLDER);
+		try {
+            FileUtils.cleanDirectory(WORK_TEMP_FOLDER);
+            WORK_TEMP_FOLDER = new File(SYSTEM_TEMP_FOLDER, "Dioscuri_ArjMigration_TMP".toUpperCase());
+            FileUtils.forceMkdir(WORK_TEMP_FOLDER);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 	}
 	
 
@@ -118,18 +125,23 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 	 */
 	public MigrateResult migrate(DigitalObject digitalObject, URI inputFormat,
 			URI outputFormat, List<Parameter> parameters) {
-		if(WORK_TEMP_FOLDER.exists()) {
-			boolean deletedAllFiles = FileUtils.deleteAllFilesInFolder(WORK_TEMP_FOLDER);
-			log.info("Deleted all files in: " + WORK_TEMP_FOLDER.getAbsolutePath() + ": " + String.valueOf(deletedAllFiles).toUpperCase());
-		}
-		
-		INPUT_ZIP_NAME = FileUtils.randomizeFileName("dioscuri-arj-migrate.zip");
-		
-		DEFAULT_INPUT_NAME = "input" + sessionID;
-		
-		FLOPPY_INPUT_FOLDER_NAME = "FLOPPY_INPUT" + sessionID;
-		
-		FLOPPY_INPUT_FOLDER = FileUtils.createFolderInWorkFolder(WORK_TEMP_FOLDER, FLOPPY_INPUT_FOLDER_NAME);
+		try {
+            if(WORK_TEMP_FOLDER.exists()) {
+            	FileUtils.cleanDirectory(WORK_TEMP_FOLDER);
+            	log.info("Deleted all files in: " + WORK_TEMP_FOLDER.getAbsolutePath().toUpperCase());
+            }
+            
+            INPUT_ZIP_NAME = DioscuriWrapper.randomize("dioscuri-arj-migrate.zip");
+            
+            DEFAULT_INPUT_NAME = "input" + sessionID;
+            
+            FLOPPY_INPUT_FOLDER_NAME = "FLOPPY_INPUT" + sessionID;
+            
+            FLOPPY_INPUT_FOLDER = new File(WORK_TEMP_FOLDER, FLOPPY_INPUT_FOLDER_NAME);
+            FileUtils.forceMkdir(FLOPPY_INPUT_FOLDER);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 		
 		File inputFile = getInputFileFromDigitalObject(digitalObject, inputFormat, FLOPPY_INPUT_FOLDER);
 		String inFileName = inputFile.getName();
@@ -172,11 +184,10 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 	private File getInputFileFromDigitalObject(DigitalObject digObj, URI inputFormat, File destFolder) {
 		String inName = DigitalObjectUtils.getFileNameFromDigObject(digObj, inputFormat);
 		File in = new File(destFolder, inName);
-		FileUtils.writeInputStreamToFile(digObj.getContent().getInputStream(), in);
-		in = FileUtils.truncateNameAndRenameFile(in);
+		DigitalObjectUtils.toFile(digObj, in);
+		in = DioscuriWrapper.truncateNameAndRenameFile(in);
 		return in;
 	}
-	
 	
 	/**
 	 * This methods gets the "title" from a DigitalObject <strong>or</strong> uses a DEFAULT_NAME if this field is not set.
@@ -225,7 +236,7 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 		private boolean createRunBat(File destFolder, File inputFile, String outputFileName) {
 			String runScript = null;
 			String inputFileName = inputFile.getName();
-			String inputExt = FileUtils.getExtensionFromFile(inputFile);
+			String inputExt = FilenameUtils.getExtension(inputFile.getName());
 			if(inputExt==null) {
 				log.warning("Could not retrieve format extension from input file. Using '.arj' as default.");
 			}
@@ -244,7 +255,11 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 //			}
 			
 			File runBat = new File(destFolder, RUN_BAT);
-			runBat = FileUtils.writeStringToFile(runScript, runBat);
+			try {
+                FileUtils.writeStringToFile(runBat, runScript);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 			log.info(RUN_BAT + " created: " + System.getProperty("line.separator") + runScript);
 			
 			return runBat.exists();
@@ -263,7 +278,7 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 		private boolean createListOfContentRunBat(File destFolder, File inputFile, String outputFileName) {
 			String runScript = null;
 			String inputFileName = inputFile.getName();
-			String inputExt = FileUtils.getExtensionFromFile(inputFile);
+			String inputExt = FilenameUtils.getExtension(inputFile.getName());
 			if(inputExt.equalsIgnoreCase("ARJ")) {
 				runScript = EMU_ARJ_PATH + " " + "a -r -a -ji" + INDEX_FILE_NAME + " "+ "A:\\" + inputFileName.toUpperCase() + 
 				"\r\n" + "ECHO Finished archive conversion to selfextracting ARJ archive. Bye Bye..." +
@@ -275,7 +290,11 @@ public class DioscuriArjMigration implements Migrate, Serializable {
 //			}
 			
 			File runBat = new File(destFolder, RUN_BAT);
-			runBat = FileUtils.writeStringToFile(runScript, runBat);
+			try {
+                FileUtils.writeStringToFile(runBat, runScript);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 			log.info(RUN_BAT + " created: " + runScript);
 			
 			return runBat.exists();

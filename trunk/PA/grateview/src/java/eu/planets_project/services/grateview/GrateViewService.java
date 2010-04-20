@@ -4,6 +4,7 @@
 package eu.planets_project.services.grateview;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -22,6 +23,8 @@ import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
+import org.apache.commons.io.FileUtils;
+
 import eu.planets_project.ifr.core.storage.utils.DigitalObjectDiskCache;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistry;
 import eu.planets_project.ifr.core.techreg.formats.FormatRegistryFactory;
@@ -37,7 +40,6 @@ import eu.planets_project.services.migrate.MigrateResult;
 import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelper;
 import eu.planets_project.services.migration.floppyImageHelper.api.FloppyImageHelperFactory;
 import eu.planets_project.services.utils.DigitalObjectUtils;
-import eu.planets_project.services.utils.FileUtils;
 import eu.planets_project.services.utils.ZipResult;
 import eu.planets_project.services.utils.ZipUtils;
 import eu.planets_project.services.view.CreateView;
@@ -144,15 +146,21 @@ public class GrateViewService implements CreateView {
 
 	public CreateViewResult createView(List<DigitalObject> digitalObjects,  List<Parameter> parameters) {
 		// Instanciate the View:
-		return createViewerSession(digitalObjects, getBaseURIFromWSContext(wsc));
+		try {
+            return createViewerSession(digitalObjects, getBaseURIFromWSContext(wsc));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return returnWithErrorMessage("Could not perform required IO: " + e.getMessage());
+        }
 	}
 
 	/**
 	* 
 	* @param digitalObjects
 	* @return
+	 * @throws IOException 
 	*/
-	public static CreateViewResult createViewerSession(List<DigitalObject> digitalObjects, URI baseUrl)
+	public static CreateViewResult createViewerSession(List<DigitalObject> digitalObjects, URI baseUrl) throws IOException
 	{	
 		FormatRegistry format = FormatRegistryFactory.getFormatRegistry();
 		
@@ -164,13 +172,16 @@ public class GrateViewService implements CreateView {
 
 		loadProperties();
 	
-		FileUtils.deleteTempFiles(new File(FileUtils.getSystemTempFolder(), TMP_PATH)); 
-		File temp_dir = FileUtils.createFolderInWorkFolder(FileUtils.getSystemTempFolder(), TMP_PATH);
+		File systemTempFolder = new File(System.getProperty("java.io.tmpdir"));
+		FileUtils.deleteDirectory(new File(systemTempFolder, TMP_PATH)); 
+		File temp_dir = new File(systemTempFolder, TMP_PATH);
+		FileUtils.forceMkdir(temp_dir);
 		if(temp_dir == null)
 			return returnWithErrorMessage("Failed to create temp folder.");
 
-		FileUtils.deleteTempFiles(new File(FileUtils.getSystemTempFolder(), FLOPPY_PATH));
-		File content_dir = FileUtils.createFolderInWorkFolder(FileUtils.getSystemTempFolder(), FLOPPY_PATH);
+		FileUtils.deleteDirectory(new File(systemTempFolder, FLOPPY_PATH));
+		File content_dir = new File(systemTempFolder, FLOPPY_PATH);
+		FileUtils.forceMkdir(content_dir);
 		if(content_dir == null)
 			return returnWithErrorMessage("Failed to create temp folder.");
 
@@ -180,9 +191,11 @@ public class GrateViewService implements CreateView {
 			String filename = dob.getTitle();
 			if(filename == null)
 				filename = "no_file_name" + i++;
-			FileUtils.writeInputStreamToFile(dob.getContent().getInputStream(), content_dir, filename);
+			DigitalObjectUtils.toFile(dob, new File(content_dir, filename));
 		}
-		ZipResult zip_result = ZipUtils.createZipAndCheck(content_dir, temp_dir, FileUtils.randomizeFileName("floppy.zip"), false);
+		File temp = File.createTempFile("floppy", ".zip");
+		ZipResult zip_result = ZipUtils.createZipAndCheck(content_dir, temp_dir, temp.getName(), false);
+		FileUtils.deleteQuietly(temp);
 		if(zip_result == null)
 			return returnWithErrorMessage("Failed to create zip file.");
 
