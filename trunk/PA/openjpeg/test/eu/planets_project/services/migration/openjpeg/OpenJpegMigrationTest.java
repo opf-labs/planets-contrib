@@ -113,8 +113,8 @@ public final class OpenJpegMigrationTest extends TestCase {
         MigrateResult mr = dom.migrate(input, format.createExtensionUri(origExt), format.createExtensionUri(destExt), params);
         DigitalObject doOut = mr.getDigitalObject();
         assertTrue("Resulting digital object is null for planetsMigrate"+origExt+"to"+destExt+".", doOut != null);
-        DigitalObjectUtils.toFile(doOut, new File(resFileDir));
         File resultFile = new File(resFileDir+resFileName);
+        DigitalObjectUtils.toFile(doOut, resultFile);
         assertTrue("Result file was not created successfully!", resultFile.exists());
     }
 }

@@ -138,8 +138,8 @@ public final class AvidemuxMigrationTest extends TestCase {
         assertTrue("Migration result is null is null for planetsMigrate"+origExt+"to"+destExt+".", mr != null);
         DigitalObject doOut = mr.getDigitalObject();
         assertTrue("Resulting digital object is null for planetsMigrate"+origExt+"to"+destExt+".", doOut != null);
-        DigitalObjectUtils.toFile(doOut, new File(resFileDir));
         File resultFile = new File(resFileDir+resFileName);
+        DigitalObjectUtils.toFile(doOut, resultFile);
         assertTrue("Result file was not created successfully!", resultFile.exists());
     }
 }
