@@ -36,7 +36,7 @@ import eu.planets_project.services.utils.ServiceUtils;
 
 /**
  * The class migrates between a number of formats
- * @author Asger Blekinge-Rasmussen <abr@statsbiblioteket.dk>
+ * @author Pelle Kofod <pko@statsbiblioteket.dk>
  */
 @Stateless
 @MTOM
