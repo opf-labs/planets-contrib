@@ -54,7 +54,7 @@ public class NetPbmMigrationTest extends TestCase {
     * @see junit.framework.TestCase#setUp()
     */
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() throws Exception {           
         dom = ServiceCreator.createTestService(Migrate.QNAME,
                 NetPbmMigration.class, wsdlLoc);
 
@@ -68,7 +68,7 @@ public class NetPbmMigrationTest extends TestCase {
     @Override
     protected void tearDown() throws Exception {
         // TODO Auto-generated method stub
-        super.tearDown();
+        super.tearDown();                                                                   
     }
 
     /**
