@@ -48,7 +48,7 @@ import eu.planets_project.services.utils.ServiceUtils;
         endpointInterface = "eu.planets_project.services.migrate.Migrate")
 public class MEncoderMigration implements Migrate, Serializable {
 
-    private static Logger log = Logger.getLogger(MEndocerMigration.class.getName());
+    private static Logger log = Logger.getLogger(MEncoderMigration.class.getName());
 
     /**
      * The file name of the static configuration for the generic wrapping
