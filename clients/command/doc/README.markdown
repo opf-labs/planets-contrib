@@ -29,7 +29,8 @@ service registry through which hosted services can be invoked.
 * Install text, parameter descriptions, in or out formats as optional but recommended.
 * If install package then install-dir available as field for env description, eg FITS_HOME or JHove etc.
 * Spec can define where additional parameters go, defaults to eol.
-* Allow property definitions so that shared parameter lists do not need to be repeated.
+* Allows var definitions so that common values, e.g. sets of parameters, do not need to be repeated.
+* Platforms specified as e.g. Java/1.6, not dissimilar to User Agents or os.name/arch or GCC or perhaps http://www.csee.wvu.edu/~jdm/classes/cs258/OScat/
 
 
 ### Instrumentation & Measurement ###
