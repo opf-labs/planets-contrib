@@ -29,7 +29,7 @@ service registry through which hosted services can be invoked.
 * Install text, parameter descriptions, in or out formats as optional but recommended.
 * If install package then install-dir available as field for env description, eg FITS_HOME or JHove etc.
 * Spec can define where additional parameters go, defaults to eol.
-* Write specs for kakadu-5, openjpeg and jasper. Automatch, ie default to highest match, so 'pit tr kakadu in out' would work?
+* Allow property definitions so that shared parameter lists do not need to be repeated.
 
 
 ### Instrumentation & Measurement ###

@@ -27,7 +27,10 @@ public class ToolSpec {
 	Install install;
 	
 	@XmlElement
-	List<EnvProperty> env;
+	List<Var> env;
+	
+	@XmlElement
+	List<Var> var;
 	
 	@XmlElement
 	List<Convert> convert;

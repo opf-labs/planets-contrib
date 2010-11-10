@@ -1,6 +1,6 @@
 package eu.planets_project.tools;
 
-public class EnvProperty {
+public class Var {
 
 	String name;
 	

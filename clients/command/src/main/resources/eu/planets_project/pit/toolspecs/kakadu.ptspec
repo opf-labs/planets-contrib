@@ -8,8 +8,12 @@
 
   <!-- Specify environment variables required to run this tool. -->
   <env name="KAKADU_HOME" value="/home/anj/Applications/Kakadu6.3.1/Linux-x86-32"/>  
-  <env name="LD_LIBRARY_PATH" value="$KAKADU_HOME"/>  
-
+  <env name="LD_LIBRARY_PATH" value="$KAKADU_HOME"/>
+  
+  <!-- Specify vars for expansion elsewhere -->
+  <var name="kdu.ir.config" value="Creversible=no Clevels=6 Cmodes=BYPASS Corder=RPCL Cblk={64,64} Cprecincts={256,256},{256,256},{128,128} ORGgen_plt=yes ORGtparts=R"/>
+  <var name="kdu.rates.hi" value="1.2,0.6,0.3,0.15,0.075"/>
+  
   <!-- You may also specify some information via commands - this executes the version command and matches the version as #.#.# -->
   <version>
     <command>$KAKADU_HOME/kdu_compress -v</command>
@@ -33,23 +37,23 @@
   </convert>
 
   <convert id="lossy-maxrate-4.0">
-    <command>$KAKADU_HOME/kdu_compress -i %{inFile} -o %{outFile} -rate 4.0,3.4,2.1,1.2,0.6,0.3,0.15,0.075 Creversible=no Clevels=6 Cmodes=BYPASS Corder=RPCL Cblk={64,64} Cprecincts={256,256},{256,256},{128,128} ORGgen_plt=yes ORGtparts=R</command>
+    <command>$KAKADU_HOME/kdu_compress -i %{inFile} -o %{outFile} -rate 4.0,3.4,2.1,%{kdu.rates.hi} %{kdu.ir.config}</command>
   </convert>
 
   <convert id="lossy-maxrate-3.4">
-    <command>$KAKADU_HOME/kdu_compress -i %{inFile} -o %{outFile} -rate 3.4,2.1,1.2,0.6,0.3,0.15,0.075 Creversible=no Clevels=6 Cmodes=BYPASS Corder=RPCL Cblk={64,64} Cprecincts={256,256},{256,256},{128,128} ORGgen_plt=yes ORGtparts=R</command>
+    <command>$KAKADU_HOME/kdu_compress -i %{inFile} -o %{outFile} -rate 3.4,2.1,%{kdu.rates.hi} %{kdu.ir.config}</command>
   </convert>
 
   <convert id="lossy-maxrate-2.8">
-    <command>$KAKADU_HOME/kdu_compress -i %{inFile} -o %{outFile} -rate 2.8,2.1,1.2,0.6,0.3,0.15,0.075 Creversible=no Clevels=6 Cmodes=BYPASS Corder=RPCL Cblk={64,64} Cprecincts={256,256},{256,256},{128,128} ORGgen_plt=yes ORGtparts=R</command>
+    <command>$KAKADU_HOME/kdu_compress -i %{inFile} -o %{outFile} -rate 2.8,2.1,%{kdu.rates.hi} %{kdu.ir.config}</command>
   </convert>
 
   <convert id="lossy-maxrate-2.1">
-    <command>$KAKADU_HOME/kdu_compress -i %{inFile} -o %{outFile} -rate 2.1,1.2,0.6,0.3,0.15,0.075 Creversible=no Clevels=6 Cmodes=BYPASS Corder=RPCL Cblk={64,64} Cprecincts={256,256},{256,256},{128,128} ORGgen_plt=yes ORGtparts=R</command>
+    <command>$KAKADU_HOME/kdu_compress -i %{inFile} -o %{outFile} -rate 2.1,%{kdu.rates.hi} %{kdu.ir.config}</command>
   </convert>
 
   <convert id="lossy-maxrate-1.5">
-    <command>$KAKADU_HOME/kdu_compress -i %{inFile} -o %{outFile} -rate 1.5,1.2,0.6,0.3,0.15,0.075 Creversible=no Clevels=6 Cmodes=BYPASS Corder=RPCL Cblk={64,64} Cprecincts={256,256},{256,256},{128,128} ORGgen_plt=yes ORGtparts=R</command>
+    <command>$KAKADU_HOME/kdu_compress -i %{inFile} -o %{outFile} -rate 1.5,%{kdu.rates.hi} %{kdu.ir.config}</command>
   </convert>
 
   <!-- 
