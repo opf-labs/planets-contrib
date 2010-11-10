@@ -29,9 +29,9 @@ import org.apache.commons.cli.PosixParser;
 
 import com.sun.xml.ws.developer.JAXWSProperties;
 
-import eu.planets_project.ifr.core.servreg.utils.PlanetsServiceExplorer;
-import eu.planets_project.ifr.core.servreg.utils.client.wrappers.IdentifyWrapper;
-import eu.planets_project.ifr.core.servreg.utils.client.wrappers.MigrateWrapper;
+import eu.planets_project.clients.ws.IdentifyWrapper;
+import eu.planets_project.clients.ws.MigrateWrapper;
+import eu.planets_project.clients.ws.PlanetsServiceExplorer;
 import eu.planets_project.services.PlanetsService;
 import eu.planets_project.services.datatypes.Content;
 import eu.planets_project.services.datatypes.DigitalObject;
