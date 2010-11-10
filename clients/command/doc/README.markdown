@@ -77,6 +77,7 @@ When these actions are called, the framework records lots of useful metadata
 about the process and the content. This data is stored in PIT reports (see later).
 
 * Extra pit flags to turn off heavy profiling (total time always included)
+* Extra pit flags to avoid/enforce recording the result report.
 
 ### Querying Reports ###
 
