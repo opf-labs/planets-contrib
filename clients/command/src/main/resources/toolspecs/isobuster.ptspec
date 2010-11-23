@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<toolspec>
+  <tool>IsoBuster</tool>
+  <homepage>http://www.isobuster.com/</homepage>
+  
+  <!-- 
+  Set up common commandline parameters.
+  See http://www.isobuster.com/help.php?help=920 for details.
+  -->  
+  <var name="isobuster.common" value="/ep:oea /ep:now /m /nosplash /nodrives /c /l:%{logFile}"/>
+
+  <convert id="isobuster-mds-to-userdata-iso">
+    <command>isobuster.exe "%{inFile}" "/ei:%{outFile}" /et:u %{isobuster.common}</command>
+    <formats in="mds" out="iso"/>
+  </convert>
+
+  <convert id="isobuster-image-to-userdata-image">
+    <command>isobuster.exe "%{inFile}" "/ei:%{outFolder}" /et:u %{isobuster.common}</command>
+    <formats in="mds,iso" out="folder"/>
+  </convert>
+
+  <convert id="isobuster-image-to-userdata-files">
+    <command>isobuster.exe "%{inFile}" "/ef:%{outFolder}" %{isobuster.common}</command>
+    <formats in="mds,iso" out="folder"/>
+  </convert>
+
+</toolspec>
