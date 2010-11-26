@@ -103,9 +103,9 @@ public class PitInvoker {
 	 */
 	public static void main(String[] args) throws IOException, ToolSpecNotFoundException, CommandNotFoundException {
 		PitInvoker ib = new PitInvoker("isobuster");
-		ib.migrate("mds-to-userdata-iso", 
-				new File("Y:/DropBox/Andy/EAP/EAP078/DataCarriers/DISK_2.mds"), 
-				new File("test2") );
+		ib.migrate("image-to-userdata-image", 
+				new File("Y:\\DropBox\\Akiko\\test-nimbie\\DISK_1.mds"), 
+				new File("test1") );
 //				File.createTempFile("DISC_1",".iso") );
 	}
 	
