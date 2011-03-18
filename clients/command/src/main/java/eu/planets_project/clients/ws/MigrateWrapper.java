@@ -62,7 +62,7 @@ public class MigrateWrapper extends Service implements Migrate {
     private void init() {
         try {
             // Set up the service, using the standard features.
-            m = this.getPort(Migrate.class, ServiceUtils.JAXWS_FEATURES );
+            m = this.getPort(Migrate.class);//, ServiceUtils.JAXWS_FEATURES );
 
             // This enables streaming when combined with the MTOM feature (above)
             ((BindingProvider)m).getRequestContext().put( 
