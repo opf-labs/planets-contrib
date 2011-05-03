@@ -101,7 +101,7 @@ public class PlanetsCommand {
         System.out.println("Logging MTOM="+binding.isMTOMEnabled());
         binding.setMTOMEnabled(true);
         System.out.println("Logging MTOM="+binding.isMTOMEnabled());
-        System.out.println("Logging MTOM="+((BindingProvider)ps).getBinding().getBindingID()+" v. "+SOAPBinding.SOAP11HTTP_MTOM_BINDING);
+        //System.out.println("Logging MTOM="+((BindingProvider)ps).getBinding().getBindingID()+" v. "+SOAPBinding.SOAP11HTTP_MTOM_BINDING);
 
         /* 
          * The different services are invoked in different ways...
